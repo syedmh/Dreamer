@@ -1,0 +1,119 @@
+@model ShareApp.Web.Models.ViewModels.CreateReviewViewModel
+
+@{
+    ViewData["Title"] = "Leave a Review";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-star"></i> Leave a Review
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info mb-4">
+                        <p class="mb-1"><strong>Item:</strong> @Model.ItemTitle</p>
+                        <p class="mb-0"><strong>Reviewing:</strong> @Model.ReviewedUserName</p>
+                    </div>
+
+                    <form asp-action="Create" method="post">
+                        <input type="hidden" asp-for="TransactionId" />
+                        <input type="hidden" asp-for="ItemId" />
+                        <input type="hidden" asp-for="ReviewedUserId" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Rating -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <strong>Rating</strong> <span class="text-danger">*</span>
+                            </label>
+                            <div class="rating-input">
+                                <div class="star-rating">
+                                    @for (int i = 5; i >= 1; i--)
+                                    {
+                                        <input type="radio" id="star@(i)" name="Rating" value="@i" asp-for="Rating" />
+                                        <label for="star@(i)" class="star">
+                                            <i class="fas fa-star"></i>
+                                        </label>
+                                    }
+                                </div>
+                            </div>
+                            <span asp-validation-for="Rating" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Comment -->
+                        <div class="mb-4">
+                            <label asp-for="Comment" class="form-label">
+                                <strong>Your Review</strong> (Optional)
+                            </label>
+                            <textarea asp-for="Comment" class="form-control" rows="5"
+                                      placeholder="Share your experience with this transaction..."></textarea>
+                            <span asp-validation-for="Comment" class="text-danger small"></span>
+                            <small class="text-muted">Maximum 1000 characters</small>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-controller="Transactions" asp-action="Details" asp-route-id="@Model.TransactionId" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Submit Review
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="fas fa-info-circle"></i> Review Guidelines</h6>
+                    <ul class="small mb-0">
+                        <li>Be honest and fair in your review</li>
+                        <li>Focus on the transaction experience</li>
+                        <li>Keep your comments respectful</li>
+                        <li>Reviews help build trust in the community</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <style>
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 2.5rem;
+        }
+
+        .star-rating input[type="radio"] {
+            display: none;
+        }
+
+        .star-rating label {
+            cursor: pointer;
+            color: #ddd;
+            transition: color 0.2s;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input[type="radio"]:checked ~ label {
+            color: #ffc107;
+        }
+
+        .star-rating input[type="radio"]:checked ~ label {
+            color: #ffc107;
+        }
+    </style>
+}

@@ -1,0 +1,86 @@
+@model IEnumerable<ShareApp.Web.Entities.Location>
+
+@{
+    ViewData["Title"] = "Manage Addresses";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-map-marker-alt"></i> Manage Addresses
+        </h2>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="fas fa-map-marked-alt fa-3x mb-3"></i>
+            <h4>No Addresses Added</h4>
+            <p>You currently have the address you registered with. You can add more addresses for different pickup locations.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            @foreach (var location in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm @(location.IsDefault ? "border-primary" : "")">
+                        @if (location.IsDefault)
+                        {
+                            <div class="card-header bg-primary text-white">
+                                <i class="fas fa-star"></i> Default Location
+                            </div>
+                        }
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-home"></i> Address
+                            </h5>
+                            <address class="mb-3">
+                                @location.AddressLine1<br />
+                                @if (!string.IsNullOrEmpty(location.AddressLine2))
+                                {
+                                    @location.AddressLine2<br />
+                                }
+                                @location.City, @location.State @location.ZipCode<br />
+                                @location.Country
+                            </address>
+
+                            <p class="text-muted small mb-2">
+                                <i class="fas fa-map-pin"></i>
+                                Coordinates: @location.Latitude.ToString("F6"), @location.Longitude.ToString("F6")
+                            </p>
+
+                            <p class="text-muted small">
+                                <i class="fas fa-calendar"></i>
+                                Added: @location.CreatedAt.ToString("MMM dd, yyyy")
+                            </p>
+                        </div>
+                        <div class="card-footer bg-white">
+                            @if (!location.IsDefault)
+                            {
+                                <form asp-controller="Profile" asp-action="SetDefaultLocation" method="post" class="d-inline">
+                                    <input type="hidden" name="locationId" value="@location.Id" />
+                                    <button type="submit" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-star"></i> Set as Default
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary">
+                                    <i class="fas fa-check"></i> Current Default
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="alert alert-info mt-4">
+        <i class="fas fa-info-circle"></i>
+        <strong>Note:</strong> Adding more locations is coming soon! For now, you can use the address from your registration.
+    </div>
+</div>

@@ -1,0 +1,212 @@
+@model ShareApp.Web.Models.ViewModels.ItemDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container mt-4 mb-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-action="MyListings">Items</a></li>
+            <li class="breadcrumb-item active">@Model.Title</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-7">
+            @if (Model.ImageUrls.Any())
+            {
+                <div id="itemCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        @for (int i = 0; i < Model.ImageUrls.Count; i++)
+                        {
+                            <button type="button" data-bs-target="#itemCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-current="@(i == 0 ? "true" : "false")"></button>
+                        }
+                    </div>
+                    <div class="carousel-inner rounded">
+                        @foreach (var (imageUrl, index) in Model.ImageUrls.Select((url, i) => (url, i)))
+                        {
+                            <div class="carousel-item @(index == 0 ? "active" : "")">
+                                <img src="@imageUrl" class="d-block w-100" alt="@Model.Title" style="max-height: 500px; object-fit: contain; background-color: #f8f9fa;" />
+                            </div>
+                        }
+                    </div>
+                    @if (Model.ImageUrls.Count > 1)
+                    {
+                        <button class="carousel-control-prev" type="button" data-bs-target="#itemCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#itemCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        </button>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="bg-light rounded d-flex align-items-center justify-content-center mb-4" style="height: 400px;">
+                    <i class="fas fa-image fa-5x text-muted"></i>
+                </div>
+            }
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="card-title mb-3">@Model.Title</h2>
+
+                    <div class="mb-3">
+                        @if (Model.ItemType == ShareApp.Web.Entities.ItemType.ForSale && Model.Price.HasValue)
+                        {
+                            <h3 class="text-success mb-0">$@Model.Price.Value.ToString("F2")</h3>
+                        }
+                        else if (Model.ItemType == ShareApp.Web.Entities.ItemType.Free)
+                        {
+                            <h3 class="text-primary mb-0">FREE</h3>
+                        }
+                        else
+                        {
+                            <h3 class="text-info mb-0">BARTER</h3>
+                            @if (!string.IsNullOrEmpty(Model.BarterPreference))
+                            {
+                                <p class="text-muted small mb-0">Looking for: @Model.BarterPreference</p>
+                            }
+                        }
+                    </div>
+
+                    <hr />
+
+                    <div class="mb-3">
+                        <span class="badge bg-@(Model.Status == ShareApp.Web.Entities.ItemStatus.Available ? "success" : Model.Status == ShareApp.Web.Entities.ItemStatus.Reserved ? "warning" : "secondary") me-2">
+                            @Model.Status
+                        </span>
+                        <span class="badge bg-secondary">@Model.CategoryName</span>
+                    </div>
+
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-box text-muted"></i>
+                            <strong>Quantity:</strong> @Model.Quantity
+                        </li>
+                        @if (Model.ExpirationDate.HasValue)
+                        {
+                            <li class="mb-2">
+                                <i class="fas fa-calendar-times text-muted"></i>
+                                <strong>Expires:</strong> @Model.ExpirationDate.Value.ToString("MMM dd, yyyy")
+                            </li>
+                        }
+                        <li class="mb-2">
+                            <i class="fas fa-map-marker-alt text-muted"></i>
+                            <strong>Location:</strong> @Model.LocationCity, @Model.LocationState
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-eye text-muted"></i>
+                            <strong>Views:</strong> @Model.Views
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-clock text-muted"></i>
+                            <strong>Posted:</strong> @Model.CreatedAt.ToString("MMM dd, yyyy")
+                        </li>
+                    </ul>
+
+                    <hr />
+
+                    <div class="mb-3">
+                        <h6><i class="fas fa-user"></i> Seller</h6>
+                        <p class="mb-1"><strong>@Model.UserName</strong></p>
+                        @if (Model.UserRating.HasValue)
+                        {
+                            <p class="mb-1">
+                                <i class="fas fa-star text-warning"></i> @Model.UserRating.Value.ToString("F1") out of 5
+                            </p>
+                            <a asp-controller="Reviews" asp-action="User" asp-route-id="@Model.UserId" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-comments"></i> View Reviews
+                            </a>
+                        }
+                        else
+                        {
+                            <p class="text-muted small mb-0">No reviews yet</p>
+                        }
+                    </div>
+
+                    <hr />
+
+                    @if (Model.IsOwner)
+                    {
+                        <div class="d-grid gap-2">
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Edit Item
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">
+                                <i class="fas fa-trash"></i> Delete Item
+                            </a>
+                        </div>
+                    }
+                    else if (Model.Status == ShareApp.Web.Entities.ItemStatus.Available)
+                    {
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <div class="d-grid gap-2">
+                                @if (Model.ItemType == ShareApp.Web.Entities.ItemType.ForSale)
+                                {
+                                    <form asp-controller="Transactions" asp-action="RequestItem" method="post">
+                                        <input type="hidden" name="itemId" value="@Model.Id" />
+                                        <button type="submit" class="btn btn-success w-100">
+                                            <i class="fas fa-shopping-cart"></i> Purchase Item
+                                        </button>
+                                    </form>
+                                }
+                                else if (Model.ItemType == ShareApp.Web.Entities.ItemType.Free)
+                                {
+                                    <form asp-controller="Transactions" asp-action="RequestItem" method="post">
+                                        <input type="hidden" name="itemId" value="@Model.Id" />
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="fas fa-hand-holding-heart"></i> Request Free Item
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-controller="Transactions" asp-action="RequestItem" method="post">
+                                        <input type="hidden" name="itemId" value="@Model.Id" />
+                                        <button type="submit" class="btn btn-info w-100">
+                                            <i class="fas fa-exchange-alt"></i> Request Barter
+                                        </button>
+                                    </form>
+                                }
+                                <a asp-controller="Messages" asp-action="Compose" asp-route-userId="@Model.UserId" asp-route-itemId="@Model.Id" class="btn btn-outline-secondary">
+                                    <i class="fas fa-envelope"></i> Contact Seller
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info mb-3">
+                                <i class="fas fa-info-circle"></i>
+                                Please <a asp-controller="Account" asp-action="Login" class="alert-link">login</a> to request this item.
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mb-0">
+                            <i class="fas fa-exclamation-triangle"></i> This item is no longer available.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-align-left"></i> Description</h5>
+                    <p class="card-text" style="white-space: pre-wrap;">@Model.Description</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

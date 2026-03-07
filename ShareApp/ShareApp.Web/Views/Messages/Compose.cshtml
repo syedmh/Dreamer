@@ -1,0 +1,60 @@
+@model ShareApp.Web.Models.ViewModels.SendMessageViewModel
+
+@{
+    ViewData["Title"] = $"Send Message to {Model.ReceiverName}";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-paper-plane"></i> Send Message
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <p class="mb-1"><strong>To:</strong> @Model.ReceiverName</p>
+                        @if (!string.IsNullOrEmpty(Model.ItemTitle))
+                        {
+                            <p class="mb-0"><strong>Regarding:</strong> @Model.ItemTitle</p>
+                        }
+                    </div>
+
+                    <form asp-action="Compose" method="post">
+                        <input type="hidden" asp-for="ReceiverId" />
+                        <input type="hidden" asp-for="ItemId" />
+                        <input type="hidden" asp-for="TransactionId" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Content" class="form-label">
+                                <strong>Your Message</strong> <span class="text-danger">*</span>
+                            </label>
+                            <textarea asp-for="Content" class="form-control" rows="8"
+                                      placeholder="Type your message here..." required></textarea>
+                            <span asp-validation-for="Content" class="text-danger small"></span>
+                            <small class="text-muted">Maximum 2000 characters</small>
+                        </div>
+
+                        <hr />
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

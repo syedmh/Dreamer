@@ -1,0 +1,258 @@
+/* General styles */
+html {
+    font-size: 14px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(135deg, #b90000 0%, #890000 100%);
+    background-attachment: fixed;
+}
+
+.container {
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    padding-bottom: 3rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+/* Navigation */
+.navbar-husaynia {
+    background: linear-gradient(135deg, #b90000 0%, #890000 100%) !important;
+}
+
+/* Husaynia branding */
+.text-husaynia {
+    color: #b90000;
+}
+
+/* Funnel container */
+.funnel-container {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.funnel-stats h3 {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #b90000;
+    margin: 0;
+}
+
+.funnel-stats .percentage {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #666;
+}
+
+/* Overflow Indicator */
+.overflow-indicator {
+    margin: 1rem auto;
+    padding: 1rem;
+    max-width: 400px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.overflow-indicator.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.overflow-badge {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border-radius: 15px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    animation: pulse 2s infinite;
+}
+
+.overflow-icon {
+    font-size: 2rem;
+    animation: bounce 1s infinite;
+}
+
+.overflow-text {
+    color: white;
+    text-align: left;
+}
+
+.overflow-text strong {
+    font-size: 1.2rem;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.overflow-percent {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 25px rgba(255, 165, 0, 0.6);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Overflow Visual */
+.overflow-visual {
+    transition: opacity 0.8s ease;
+}
+
+/* SVG Funnel */
+#funnelSvg {
+    max-width: 400px;
+    height: 400px;
+    margin: 0 auto;
+    display: block;
+}
+
+#funnelFill {
+    transition: height 0.8s ease, y 0.8s ease;
+}
+
+/* Dollar scale styles */
+.dollar-scale text {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 500;
+}
+
+.dollar-scale line {
+    shape-rendering: crispEdges;
+}
+
+/* Funnel block dividers */
+.funnel-blocks line {
+    shape-rendering: crispEdges;
+}
+
+/* Donation Form */
+#donationForm input {
+    font-size: 1.2rem;
+    padding: 0.75rem;
+}
+
+#donationForm button {
+    font-size: 1.2rem;
+    padding: 0.75rem;
+}
+
+/* Message alerts */
+#message {
+    display: none;
+}
+
+#message.show {
+    display: block;
+}
+
+/* Recent donations */
+#donationList {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.donation-time {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* Fireworks canvas */
+#fireworksCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    display: none;
+}
+
+#fireworksCanvas.active {
+    display: block;
+}
+
+/* Card styles */
+.card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #b90000 0%, #890000 100%);
+    color: white;
+}
+
+/* Button styles */
+.btn-primary {
+    background: linear-gradient(135deg, #b90000 0%, #890000 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #d10000 0%, #a00000 100%);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #c71010 0%, #b90000 100%);
+    border: none;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #d82020 0%, #c71010 100%);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .funnel-stats h3 {
+        font-size: 2rem;
+    }
+
+    #funnelSvg {
+        max-width: 320px;
+        height: 350px;
+    }
+
+    .dollar-scale text {
+        font-size: 8px;
+    }
+}
+
+/* Animation for new donations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.donation-added {
+    animation: fadeIn 0.5s ease;
+}

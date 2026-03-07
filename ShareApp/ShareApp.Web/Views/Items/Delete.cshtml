@@ -1,0 +1,66 @@
+@model ShareApp.Web.Entities.Item
+
+@{
+    ViewData["Title"] = "Delete Item";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-trash"></i> Delete Item
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Warning:</strong> Are you sure you want to delete this item? This action cannot be undone.
+                    </div>
+
+                    <div class="row">
+                        @if (Model.Images.Any())
+                        {
+                            <div class="col-md-4">
+                                <img src="@Model.Images.First().ImageUrl" class="img-fluid rounded" alt="@Model.Title" />
+                            </div>
+                        }
+                        <div class="col-md-8">
+                            <h4>@Model.Title</h4>
+                            <p class="text-muted">@Model.Category.Name</p>
+                            <p>@Model.Description</p>
+
+                            @if (Model.ItemType == ShareApp.Web.Entities.ItemType.ForSale && Model.Price.HasValue)
+                            {
+                                <p class="h5 text-success">$@Model.Price.Value.ToString("F2")</p>
+                            }
+                            else if (Model.ItemType == ShareApp.Web.Entities.ItemType.Free)
+                            {
+                                <p class="h5 text-primary">FREE</p>
+                            }
+                            else
+                            {
+                                <p class="h5 text-info">BARTER</p>
+                            }
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="MyListings" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Yes, Delete Item
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

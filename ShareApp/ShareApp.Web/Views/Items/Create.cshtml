@@ -1,0 +1,188 @@
+@model ShareApp.Web.Models.ViewModels.ItemCreateViewModel
+
+@{
+    ViewData["Title"] = "List a New Item";
+    var categories = ViewBag.Categories as List<ShareApp.Web.Entities.Category>;
+    var locations = ViewBag.Locations as IEnumerable<ShareApp.Web.Entities.Location>;
+}
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-plus-circle"></i> List a New Item
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <h5 class="mb-3"><i class="fas fa-info-circle"></i> Item Information</h5>
+
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label"></label>
+                            <input asp-for="Title" class="form-control" placeholder="e.g., 12-pack Evaporated Milk" />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="4" placeholder="Describe your item, its condition, and any other relevant details..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CategoryId" class="form-label"></label>
+                                <select asp-for="CategoryId" class="form-select">
+                                    <option value="">-- Select Category --</option>
+                                    @foreach (var category in categories ?? new List<ShareApp.Web.Entities.Category>())
+                                    {
+                                        <option value="@category.Id">
+                                            @category.Name
+                                        </option>
+                                    }
+                                </select>
+                                <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Quantity" class="form-label"></label>
+                                <input asp-for="Quantity" class="form-control" type="number" min="1" />
+                                <span asp-validation-for="Quantity" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <h5 class="mb-3"><i class="fas fa-tag"></i> Pricing</h5>
+
+                        <div class="mb-3">
+                            <label asp-for="ItemType" class="form-label"></label>
+                            <select asp-for="ItemType" class="form-select" id="itemTypeSelect">
+                                <option value="0">For Sale</option>
+                                <option value="1">Free</option>
+                                <option value="2">Barter/Exchange</option>
+                            </select>
+                            <span asp-validation-for="ItemType" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3" id="priceField">
+                            <label asp-for="Price" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="Price" class="form-control" type="number" step="0.01" min="0.01" placeholder="0.00" />
+                                <button type="button" class="btn btn-outline-secondary" id="suggestPriceBtn">
+                                    <i class="fas fa-magic"></i> Suggest Price
+                                </button>
+                            </div>
+                            <span asp-validation-for="Price" class="text-danger small"></span>
+                            <div id="priceSuggestion" class="mt-2 text-muted small"></div>
+                        </div>
+
+                        <div class="mb-3 d-none" id="barterField">
+                            <label asp-for="BarterPreference" class="form-label"></label>
+                            <input asp-for="BarterPreference" class="form-control" placeholder="e.g., Fresh vegetables, baked goods, etc." />
+                            <span asp-validation-for="BarterPreference" class="text-danger small"></span>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <h5 class="mb-3"><i class="fas fa-calendar-alt"></i> Additional Details</h5>
+
+                        <div class="mb-3">
+                            <label asp-for="ExpirationDate" class="form-label"></label>
+                            <input asp-for="ExpirationDate" class="form-control" type="date" />
+                            <span asp-validation-for="ExpirationDate" class="text-danger small"></span>
+                            <small class="text-muted">For perishable items</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="LocationId" class="form-label"></label>
+                            <select asp-for="LocationId" class="form-select">
+                                <option value="">-- Select Pickup Location --</option>
+                                @foreach (var location in locations ?? Enumerable.Empty<ShareApp.Web.Entities.Location>())
+                                {
+                                    <option value="@location.Id" selected="@location.IsDefault">
+                                        @location.AddressLine1, @location.City, @location.State
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="LocationId" class="text-danger small"></span>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <h5 class="mb-3"><i class="fas fa-camera"></i> Photos</h5>
+
+                        <div class="mb-3">
+                            <label asp-for="Images" class="form-label"></label>
+                            <input asp-for="Images" class="form-control" type="file" accept="image/*" multiple />
+                            <small class="text-muted">Upload up to 5 images (JPG, PNG, WEBP). Max 5MB each.</small>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="MyListings" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check-circle"></i> List Item
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function() {
+            // Handle item type change
+            $('#itemTypeSelect').change(function() {
+                var itemType = $(this).val();
+                if (itemType === '0') { // For Sale
+                    $('#priceField').removeClass('d-none');
+                    $('#barterField').addClass('d-none');
+                } else if (itemType === '1') { // Free
+                    $('#priceField').addClass('d-none');
+                    $('#barterField').addClass('d-none');
+                } else if (itemType === '2') { // Barter
+                    $('#priceField').addClass('d-none');
+                    $('#barterField').removeClass('d-none');
+                }
+            });
+
+            // Price suggestion
+            $('#suggestPriceBtn').click(function() {
+                var title = $('#Title').val();
+                var categoryId = $('#CategoryId').val();
+
+                if (!title || !categoryId) {
+                    alert('Please enter a title and select a category first.');
+                    return;
+                }
+
+                $.get('/Items/SuggestPrice', { title: title, categoryId: categoryId }, function(data) {
+                    if (data.success) {
+                        $('#priceSuggestion').html(
+                            '<i class="fas fa-lightbulb"></i> Suggested price range: $' +
+                            data.minPrice.toFixed(2) + ' - $' + data.maxPrice.toFixed(2) +
+                            ' (Avg: $' + data.averagePrice.toFixed(2) + ')'
+                        );
+                        $('#Price').val(data.averagePrice.toFixed(2));
+                    } else {
+                        $('#priceSuggestion').html('<i class="fas fa-info-circle"></i> ' + data.message);
+                    }
+                });
+            });
+        });
+    </script>
+}

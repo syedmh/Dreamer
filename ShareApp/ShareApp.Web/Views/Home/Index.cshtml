@@ -1,0 +1,146 @@
+﻿@{
+    ViewData["Title"] = "Browse Items Near You";
+    var googleMapsApiKey = Configuration["GoogleMaps:ApiKey"];
+}
+
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+
+<div class="container-fluid px-0" style="height: calc(100vh - 56px);">
+    <div class="row g-0 h-100">
+        <!-- Filters Sidebar -->
+        <div class="col-md-3 bg-light p-3 overflow-auto">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0"><i class="fas fa-filter"></i> Filters</h5>
+                <button id="resetFilters" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+            </div>
+
+            <!-- Search Radius -->
+            <div class="mb-4">
+                <label for="radiusSlider" class="form-label">
+                    <i class="fas fa-map-marker-alt"></i> Search Radius: <span id="radiusValue">10</span> miles
+                </label>
+                <input type="range" class="form-range" id="radiusSlider" min="1" max="50" value="10" step="1">
+            </div>
+
+            <!-- Item Type Filter -->
+            <div class="mb-4">
+                <label class="form-label"><i class="fas fa-tag"></i> Item Type</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="typeAll" checked>
+                    <label class="form-check-label" for="typeAll">All Types</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input item-type-filter" type="checkbox" value="0" id="typeForSale" checked>
+                    <label class="form-check-label" for="typeForSale">
+                        <span class="badge bg-success">For Sale</span>
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input item-type-filter" type="checkbox" value="1" id="typeFree" checked>
+                    <label class="form-check-label" for="typeFree">
+                        <span class="badge bg-primary">Free</span>
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input item-type-filter" type="checkbox" value="2" id="typeBarter" checked>
+                    <label class="form-check-label" for="typeBarter">
+                        <span class="badge bg-info">Barter</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="mb-4">
+                <label class="form-label"><i class="fas fa-list"></i> Category</label>
+                <select id="categoryFilter" class="form-select">
+                    <option value="">All Categories</option>
+                </select>
+            </div>
+
+            <!-- Price Range (for sale items) -->
+            <div class="mb-4" id="priceRangeSection">
+                <label class="form-label"><i class="fas fa-dollar-sign"></i> Price Range</label>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <input type="number" id="minPrice" class="form-control form-control-sm" placeholder="Min" min="0" step="0.01">
+                    </div>
+                    <div class="col-6">
+                        <input type="number" id="maxPrice" class="form-control form-control-sm" placeholder="Max" min="0" step="0.01">
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Results Summary -->
+            <div class="mb-3">
+                <h6><i class="fas fa-list-ul"></i> Results</h6>
+                <p class="mb-1">Items found: <span id="itemCount" class="badge bg-secondary">0</span></p>
+                <div id="locationStatus" class="text-muted small">
+                    <i class="fas fa-spinner fa-spin"></i> Getting your location...
+                </div>
+            </div>
+
+            <!-- Apply Filters Button -->
+            <div class="d-grid">
+                <button id="applyFilters" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Apply Filters
+                </button>
+            </div>
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="d-grid mt-2">
+                    <a asp-controller="Items" asp-action="Create" class="btn btn-success">
+                        <i class="fas fa-plus-circle"></i> List Item
+                    </a>
+                </div>
+            }
+        </div>
+
+        <!-- Map Area -->
+        <div class="col-md-9 position-relative">
+            <div id="map" style="width: 100%; height: 100%;"></div>
+
+            <!-- Loading Overlay -->
+            <div id="mapLoading" class="position-absolute top-50 start-50 translate-middle text-center" style="z-index: 1000;">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading map...</p>
+            </div>
+
+            @if (string.IsNullOrEmpty(googleMapsApiKey) || googleMapsApiKey == "YOUR_GOOGLE_MAPS_API_KEY_HERE")
+            {
+                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-light bg-opacity-75" style="z-index: 1001;">
+                    <div class="text-center p-5 bg-white rounded shadow">
+                        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <h4>Google Maps API Key Required</h4>
+                        <p class="text-muted">
+                            To use the map feature, please add your Google Maps API key to appsettings.json
+                        </p>
+                        <div class="mt-3">
+                            <a asp-controller="Items" asp-action="MyListings" class="btn btn-primary me-2">
+                                <i class="fas fa-list"></i> View My Listings
+                            </a>
+                            <a asp-controller="Items" asp-action="Create" class="btn btn-success">
+                                <i class="fas fa-plus"></i> List New Item
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @if (!string.IsNullOrEmpty(googleMapsApiKey) && googleMapsApiKey != "YOUR_GOOGLE_MAPS_API_KEY_HERE")
+    {
+        <script src="https://maps.googleapis.com/maps/api/js?key=@googleMapsApiKey&callback=initMap" async defer></script>
+    }
+    <script src="~/js/map.js"></script>
+}
+

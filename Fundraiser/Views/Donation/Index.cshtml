@@ -1,0 +1,219 @@
+@{
+    ViewData["Title"] = "Donation Campaign";
+    var totalRaised = ViewBag.TotalRaised ?? 0m;
+    var goal = ViewBag.Goal ?? 4000000m;
+    var scaleIncrement = ViewBag.ScaleIncrement ?? 50000m;
+    var percentage = goal > 0 ? (totalRaised / goal) * 100 : 0;
+
+    // Calculate overflow
+    var isOverflow = totalRaised > goal;
+    var overflowAmount = isOverflow ? totalRaised - goal : 0m;
+    var overflowPercentage = isOverflow ? ((totalRaised - goal) / goal) * 100 : 0;
+
+    // Calculate scale parameters
+    var tickCount = (int)(goal / scaleIncrement);
+    var svgHeight = 400;
+    var pixelsPerTick = (double)svgHeight / tickCount;
+    var majorTickInterval = (int)(500000 / scaleIncrement); // Major tick every $500k
+}
+
+<div class="text-center mb-4">
+    <h1 class="display-4 text-husaynia">Support Our Community</h1>
+    <p class="lead">Help Husaynia Islamic Society of Seattle reach our goal of <strong>$@goal.ToString("N0")</strong></p>
+    <p class="text-muted">Building an interfaith community focused on social justice and shared dialogue</p>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Funnel Visualization -->
+        <div class="funnel-container">
+            <div class="funnel-stats mb-3">
+                <h3 id="totalAmount">$@totalRaised.ToString("N2")</h3>
+                <p class="text-muted">Raised of $@goal.ToString("N0") goal</p>
+                <p class="percentage" id="percentageText">@percentage.ToString("F2")%</p>
+            </div>
+
+            <!-- Overflow Indicator -->
+            <div id="overflowIndicator" class="overflow-indicator @(isOverflow ? "show" : "")" style="@(isOverflow ? "" : "display:none;")">
+                <div class="overflow-badge">
+                    <i class="overflow-icon">🎉</i>
+                    <span class="overflow-text">
+                        <strong>Goal Exceeded!</strong><br>
+                        <span id="overflowAmount">+$@overflowAmount.ToString("N2")</span>
+                        <span class="overflow-percent">(@overflowPercentage.ToString("F1")% over goal)</span>
+                    </span>
+                </div>
+            </div>
+
+            <svg id="funnelSvg" viewBox="0 -10 380 420" xmlns="http://www.w3.org/2000/svg">
+                <!-- Define gradient for funnel fill -->
+                <defs>
+                    <linearGradient id="funnelGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+                        <stop offset="0%" style="stop-color:#890000;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#d10000;stop-opacity:1" />
+                    </linearGradient>
+
+                    <!-- Separate gradient for funnel background -->
+                    <linearGradient id="funnelBgGradient" x1="0" y1="0" x2="0" y2="@svgHeight" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" style="stop-color:#d10000;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#890000;stop-opacity:1" />
+                    </linearGradient>
+
+                    <!-- Clip path for the fill -->
+                    <clipPath id="funnelClip">
+                        <!-- Funnel shape: wide at top, narrow at bottom -->
+                        <path d="M 130 0 L 330 0 L 280 400 L 180 400 Z" />
+                    </clipPath>
+                </defs>
+
+                <!-- Dollar Scale on Left Side -->
+                <g class="dollar-scale">
+                    @for (int i = 0; i <= tickCount; i++)
+                    {
+                        var yPos = svgHeight - (i * pixelsPerTick);
+                        var amount = i * scaleIncrement;
+                        var isMajorTick = i % majorTickInterval == 0;
+
+                        if (isMajorTick)
+                        {
+                            <line x1="100" y1="@yPos" x2="115" y2="@yPos" stroke="#666" stroke-width="1.5"></line>
+                            <text x="95" y="@(yPos + 4)" text-anchor="end" font-size="10" fill="#666">$@(amount/1000)k</text>
+                        }
+                        else
+                        {
+                            <line x1="107" y1="@yPos" x2="115" y2="@yPos" stroke="#999" stroke-width="1"></line>
+                        }
+                    }
+                </g>
+
+                <!-- Funnel outline -->
+                <path d="M 130 0 L 330 0 L 280 400 L 180 400 Z"
+                      fill="none"
+                      stroke="#333"
+                      stroke-width="2"/>
+
+                <!-- Block Divider Lines (4 blocks at 25%, 50%, 75%, 100%) -->
+                <g class="funnel-blocks">
+                    @{
+                        // Block dividers at 25%, 50%, 75% from the top
+                        var blockY = new[] { svgHeight * 0.25, svgHeight * 0.5, svgHeight * 0.75 };
+                    }
+                    @foreach (var y in blockY)
+                    {
+                        var leftX = 130 + (y / svgHeight * 50);
+                        var rightX = 330 - (y / svgHeight * 50);
+                        <line x1="@leftX" y1="@y" x2="@rightX" y2="@y"
+                              stroke="#666"
+                              stroke-width="1.5"
+                              stroke-dasharray="5,5"
+                              opacity="0.5"></line>
+                    }
+                </g>
+
+                <!-- Funnel fill (clipped) -->
+                <g clip-path="url(#funnelClip)">
+                    <rect id="funnelFill"
+                          x="0"
+                          y="@svgHeight"
+                          width="380"
+                          height="0"
+                          fill="url(#funnelGradient)"
+                          data-percentage="@percentage"
+                          data-max-height="@svgHeight" />
+                </g>
+
+                <!-- Overflow visualization -->
+                <g id="overflowVisual" class="overflow-visual" opacity="@(isOverflow ? "1" : "0")">
+                    <!-- Overflow liquid spilling over -->
+                    <ellipse cx="230" cy="-5" rx="100" ry="15" fill="#FFD700" opacity="0.8">
+                        <animate attributeName="ry" values="15;18;15" dur="2s" repeatCount="indefinite" />
+                    </ellipse>
+                    <ellipse cx="230" cy="-5" rx="80" ry="12" fill="#FFA500" opacity="0.6">
+                        <animate attributeName="ry" values="12;15;12" dur="1.5s" repeatCount="indefinite" />
+                    </ellipse>
+
+                    <!-- Overflow drops -->
+                    <g id="overflowDrops">
+                        <circle cx="150" cy="5" r="3" fill="#FFD700" opacity="0">
+                            <animate attributeName="cy" values="5;30;5" dur="3s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0;0.8;0" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="310" cy="8" r="3" fill="#FFD700" opacity="0">
+                            <animate attributeName="cy" values="8;35;8" dur="2.5s" repeatCount="indefinite" begin="0.5s" />
+                            <animate attributeName="opacity" values="0;0.8;0" dur="2.5s" repeatCount="indefinite" begin="0.5s" />
+                        </circle>
+                        <circle cx="180" cy="3" r="2" fill="#FFA500" opacity="0">
+                            <animate attributeName="cy" values="3;25;3" dur="2.8s" repeatCount="indefinite" begin="1s" />
+                            <animate attributeName="opacity" values="0;0.7;0" dur="2.8s" repeatCount="indefinite" begin="1s" />
+                        </circle>
+                        <circle cx="280" cy="6" r="2" fill="#FFA500" opacity="0">
+                            <animate attributeName="cy" values="6;28;6" dur="3.2s" repeatCount="indefinite" begin="1.5s" />
+                            <animate attributeName="opacity" values="0;0.7;0" dur="3.2s" repeatCount="indefinite" begin="1.5s" />
+                        </circle>
+                    </g>
+                </g>
+            </svg>
+        </div>
+
+        <!-- Donation Form -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Make a Donation</h5>
+                <form id="donationForm">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label for="donationAmount" class="form-label">Amount ($)</label>
+                        <input type="number"
+                               class="form-control"
+                               id="donationAmount"
+                               placeholder="Enter amount"
+                               min="0.01"
+                               step="0.01"
+                               required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Add Donation</button>
+                </form>
+                <div id="message" class="mt-3"></div>
+            </div>
+        </div>
+
+        <!-- Download CSV -->
+        <div class="text-center mt-3 mb-5">
+            <a href="@Url.Action("DownloadCsv", "Donation")" class="btn btn-success">
+                Download CSV Report
+            </a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Recent Donations -->
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Donations</h5>
+            </div>
+            <div class="card-body">
+                <div id="recentDonations">
+                    @if (ViewBag.RecentDonations != null && ViewBag.RecentDonations.Count > 0)
+                    {
+                        <ul class="list-group" id="donationList">
+                            @foreach (var donation in ViewBag.RecentDonations)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="donation-time">@donation.Timestamp.ToString("MMM dd, HH:mm")</span>
+                                    <span class="badge bg-primary rounded-pill">$@donation.Amount.ToString("N2")</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No donations yet. Be the first!</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fireworks Canvas (hidden by default) -->
+<canvas id="fireworksCanvas"></canvas>

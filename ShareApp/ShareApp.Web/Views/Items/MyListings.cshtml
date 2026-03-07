@@ -1,0 +1,104 @@
+@model IEnumerable<ShareApp.Web.Entities.Item>
+
+@{
+    ViewData["Title"] = "My Listings";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-list"></i> My Listings
+        </h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> List New Item
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="fas fa-box-open fa-3x mb-3"></i>
+            <h4>No Items Listed Yet</h4>
+            <p>Start sharing food with your neighbors by listing your first item!</p>
+            <a asp-action="Create" class="btn btn-primary mt-3">
+                <i class="fas fa-plus-circle"></i> List Your First Item
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        @if (item.Images.Any())
+                        {
+                            <img src="@item.Images.First().ImageUrl" class="card-img-top" alt="@item.Title" style="height: 200px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="fas fa-image fa-3x text-muted"></i>
+                            </div>
+                        }
+
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title mb-0">@item.Title</h5>
+                                <span class="badge bg-@(item.Status == ShareApp.Web.Entities.ItemStatus.Available ? "success" : item.Status == ShareApp.Web.Entities.ItemStatus.Reserved ? "warning" : "secondary")">
+                                    @item.Status
+                                </span>
+                            </div>
+
+                            <p class="card-text text-muted small mb-2">
+                                <i class="fas fa-tag"></i> @item.Category.Name
+                            </p>
+
+                            <p class="card-text mb-2">
+                                @if (item.ItemType == ShareApp.Web.Entities.ItemType.ForSale && item.Price.HasValue)
+                                {
+                                    <strong class="text-success">$@item.Price.Value.ToString("F2")</strong>
+                                }
+                                else if (item.ItemType == ShareApp.Web.Entities.ItemType.Free)
+                                {
+                                    <strong class="text-primary">FREE</strong>
+                                }
+                                else
+                                {
+                                    <strong class="text-info">BARTER</strong>
+                                }
+                            </p>
+
+                            <p class="card-text small text-muted">
+                                <i class="fas fa-eye"></i> @item.Views views
+                                <i class="fas fa-calendar ms-2"></i> @item.CreatedAt.ToString("MMM dd, yyyy")
+                            </p>
+
+                            @if (!string.IsNullOrEmpty(item.Description))
+                            {
+                                <p class="card-text small">
+                                    @(item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)
+                                </p>
+                            }
+                        </div>
+
+                        <div class="card-footer bg-white border-top-0">
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

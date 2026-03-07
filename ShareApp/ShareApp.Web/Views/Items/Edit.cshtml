@@ -1,0 +1,176 @@
+@model ShareApp.Web.Models.ViewModels.ItemEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Item";
+    var categories = ViewBag.Categories as List<ShareApp.Web.Entities.Category>;
+    var locations = ViewBag.Locations as IEnumerable<ShareApp.Web.Entities.Location>;
+}
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-edit"></i> Edit Item
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <h5 class="mb-3"><i class="fas fa-info-circle"></i> Item Information</h5>
+
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label"></label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CategoryId" class="form-label"></label>
+                                <select asp-for="CategoryId" class="form-select">
+                                    @foreach (var category in categories ?? new List<ShareApp.Web.Entities.Category>())
+                                    {
+                                        <option value="@category.Id">@category.Name</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Quantity" class="form-label"></label>
+                                <input asp-for="Quantity" class="form-control" type="number" min="1" />
+                                <span asp-validation-for="Quantity" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <h5 class="mb-3"><i class="fas fa-tag"></i> Pricing</h5>
+
+                        <div class="mb-3">
+                            <label asp-for="ItemType" class="form-label"></label>
+                            <select asp-for="ItemType" class="form-select" id="itemTypeSelect">
+                                <option value="0">For Sale</option>
+                                <option value="1">Free</option>
+                                <option value="2">Barter/Exchange</option>
+                            </select>
+                            <span asp-validation-for="ItemType" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3" id="priceField">
+                            <label asp-for="Price" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="Price" class="form-control" type="number" step="0.01" min="0.01" />
+                            </div>
+                            <span asp-validation-for="Price" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3 d-none" id="barterField">
+                            <label asp-for="BarterPreference" class="form-label"></label>
+                            <input asp-for="BarterPreference" class="form-control" />
+                            <span asp-validation-for="BarterPreference" class="text-danger small"></span>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <h5 class="mb-3"><i class="fas fa-calendar-alt"></i> Additional Details</h5>
+
+                        <div class="mb-3">
+                            <label asp-for="ExpirationDate" class="form-label"></label>
+                            <input asp-for="ExpirationDate" class="form-control" type="date" />
+                            <span asp-validation-for="ExpirationDate" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="LocationId" class="form-label"></label>
+                            <select asp-for="LocationId" class="form-select">
+                                @foreach (var location in locations ?? Enumerable.Empty<ShareApp.Web.Entities.Location>())
+                                {
+                                    <option value="@location.Id">
+                                        @location.AddressLine1, @location.City, @location.State
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="LocationId" class="text-danger small"></span>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <h5 class="mb-3"><i class="fas fa-camera"></i> Photos</h5>
+
+                        @if (Model.ExistingImageUrls.Any())
+                        {
+                            <div class="mb-3">
+                                <label class="form-label">Current Images:</label>
+                                <div class="row g-2">
+                                    @foreach (var imageUrl in Model.ExistingImageUrls)
+                                    {
+                                        <div class="col-4">
+                                            <img src="@imageUrl" class="img-thumbnail" alt="Item image" />
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label asp-for="NewImages" class="form-label"></label>
+                            <input asp-for="NewImages" class="form-control" type="file" accept="image/*" multiple />
+                            <small class="text-muted">Upload additional images (max 5 total)</small>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="MyListings" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function() {
+            function updateFieldsForItemType() {
+                var itemType = $('#itemTypeSelect').val();
+                if (itemType === '0') { // For Sale
+                    $('#priceField').removeClass('d-none');
+                    $('#barterField').addClass('d-none');
+                } else if (itemType === '1') { // Free
+                    $('#priceField').addClass('d-none');
+                    $('#barterField').addClass('d-none');
+                } else if (itemType === '2') { // Barter
+                    $('#priceField').addClass('d-none');
+                    $('#barterField').removeClass('d-none');
+                }
+            }
+
+            // Initialize on page load
+            updateFieldsForItemType();
+
+            // Handle item type change
+            $('#itemTypeSelect').change(updateFieldsForItemType);
+        });
+    </script>
+}

@@ -1,12 +1,26 @@
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+bld/
+dist/
+publish/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
 # Visual Studio
 .vs/
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
-bin/
-obj/
-publish/
+*.csproj.user
 
 # Compiled binaries
 *.exe
@@ -21,6 +35,10 @@ publish/
 *.exp
 *.nupkg
 
+# NuGet
+**/packages/*
+**/[Pp]ackages/
+
 # Node
 node_modules/
 
@@ -33,9 +51,9 @@ __pycache__/
 Thumbs.db
 .DS_Store
 
-# Build outputs
-dist/
-build/
-
-# Logs
+# Misc
+*.swp
+*.bak
+*.tmp
 *.log
+.claude/
