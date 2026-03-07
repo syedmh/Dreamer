@@ -1,0 +1,24 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "OpenWeatherMap": {
+    "ApiKey": "YOUR_OPENWEATHERMAP_API_KEY_HERE"
+  },
+  "ApiKeyAuthentication": {
+    "HeaderName": "X-API-Key",
+    "ValidApiKeys": [
+      "your-api-consumer-key-1",
+      "your-api-consumer-key-2"
+    ]
+  },
+  "RateLimiting": {
+    "PermitLimit": 100,
+    "Window": "00:01:00",
+    "QueueLimit": 0
+  }
+}
