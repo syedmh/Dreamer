@@ -7,7 +7,8 @@ export async function POST(request: NextRequest) {
   // CSRF: verify request origin matches the app
   const origin = request.headers.get("origin");
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  if (origin && !appUrl.startsWith(origin)) {
+  const expectedOrigin = new URL(appUrl).origin;
+  if (origin && origin !== expectedOrigin) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

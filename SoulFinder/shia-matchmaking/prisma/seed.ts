@@ -31,9 +31,13 @@ async function main() {
   console.log(`  ✓ Event: ${event.name}`);
 
   // Create an admin user — password is read from ADMIN_SEED_PASSWORD env var
-  const adminPassword = process.env.ADMIN_SEED_PASSWORD || "change-me-immediately";
-  if (adminPassword === "change-me-immediately") {
-    console.warn("  ⚠️  Using default admin password — set ADMIN_SEED_PASSWORD env var for production!");
+  const adminPassword = process.env.ADMIN_SEED_PASSWORD;
+  if (!adminPassword) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("ADMIN_SEED_PASSWORD env var must be set in production.");
+    }
+    console.warn("  ⚠️  ADMIN_SEED_PASSWORD not set — skipping admin user seed in development.");
+    return;
   }
   const admin = await prisma.adminUser.upsert({
     where: { email: "admin@husaynia.org" },

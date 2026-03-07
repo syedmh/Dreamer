@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { scryptSync, timingSafeEqual } from "crypto";
+import { createSessionToken } from "@/lib/session";
 
 function verifyPassword(password: string, storedHash: string): boolean {
   const [salt, hash] = storedHash.split(":");
@@ -32,8 +33,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const sessionToken = createSessionToken(admin.id);
     const response = NextResponse.json({ success: true });
-    response.cookies.set("admin_session", admin.id, {
+    response.cookies.set("admin_session", sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",

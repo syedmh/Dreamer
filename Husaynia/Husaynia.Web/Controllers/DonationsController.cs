@@ -25,8 +25,10 @@ namespace Husaynia.Web.Controllers
             _configuration = configuration;
             _logger = logger;
 
-            // Configure Stripe API key
-            StripeConfiguration.ApiKey = _configuration["Stripe:SecretKey"] ?? "sk_test_placeholder";
+            var stripeKey = _configuration["Stripe:SecretKey"];
+            if (string.IsNullOrWhiteSpace(stripeKey))
+                throw new InvalidOperationException("Stripe:SecretKey is not configured.");
+            StripeConfiguration.ApiKey = stripeKey;
         }
 
         public async Task<IActionResult> Donate(string? campaign = null)
@@ -49,12 +51,14 @@ namespace Husaynia.Web.Controllers
                 ViewBag.GoalAmount = 6950000m;
             }
 
-            ViewBag.StripePublishableKey = _configuration["Stripe:PublishableKey"] ?? "pk_test_placeholder";
+            ViewBag.StripePublishableKey = _configuration["Stripe:PublishableKey"]
+                ?? throw new InvalidOperationException("Stripe:PublishableKey is not configured.");
 
             return View();
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateCheckoutSession(
             decimal amount,
             string donorName,
@@ -62,6 +66,18 @@ namespace Husaynia.Web.Controllers
             bool isAnonymous,
             string campaign = "Build Husaynia")
         {
+            if (amount < 1 || amount > 1_000_000)
+                return BadRequest(new { error = "Invalid donation amount." });
+            if (string.IsNullOrWhiteSpace(donorName) || donorName.Length > 200)
+                return BadRequest(new { error = "Invalid donor name." });
+            if (string.IsNullOrWhiteSpace(donorEmail) || donorEmail.Length > 320
+                || !System.Net.Mail.MailAddress.TryCreate(donorEmail, out _))
+                return BadRequest(new { error = "Invalid email address." });
+
+            var allowedCampaigns = new[] { "Build Husaynia", "General", "Programs" };
+            if (!allowedCampaigns.Contains(campaign))
+                campaign = "Build Husaynia";
+
             try
             {
                 var domain = $"{Request.Scheme}://{Request.Host}";
@@ -169,16 +185,24 @@ namespace Husaynia.Web.Controllers
         }
 
         [HttpPost]
+        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> Webhook()
         {
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+
+            var webhookSecret = _configuration["Stripe:WebhookSecret"];
+            if (string.IsNullOrWhiteSpace(webhookSecret))
+            {
+                _logger.LogError("Stripe:WebhookSecret is not configured.");
+                return BadRequest();
+            }
 
             try
             {
                 var stripeEvent = EventUtility.ConstructEvent(
                     json,
                     Request.Headers["Stripe-Signature"],
-                    _configuration["Stripe:WebhookSecret"] ?? "whsec_placeholder"
+                    webhookSecret
                 );
 
                 if (stripeEvent.Type == Events.CheckoutSessionCompleted)

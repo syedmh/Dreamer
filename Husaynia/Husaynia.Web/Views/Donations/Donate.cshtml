@@ -35,6 +35,7 @@
             <!-- Donation Form -->
             <div class="donation-form-section p-4 bg-white border">
                 <form id="donation-form">
+                    @Html.AntiForgeryToken()
                     <div class="mb-3">
                         <label for="amount" class="form-label">Donation Amount (USD) *</label>
                         <div class="btn-group btn-group-sm mb-2 d-flex" role="group">
@@ -143,10 +144,12 @@
             donateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
             try {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
                 const response = await fetch('/Donations/CreateCheckoutSession', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
                     },
                     body: JSON.stringify({
                         amount: amount,

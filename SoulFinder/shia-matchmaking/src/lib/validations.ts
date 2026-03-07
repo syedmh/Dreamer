@@ -2,10 +2,10 @@ import { z } from "zod";
 
 // Step 1: Personal Information
 export const personalInfoSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  middleName: z.string().optional(),
-  lastName: z.string().min(1, "Last name is required"),
-  preferredName: z.string().optional(),
+  firstName: z.string().min(1, "First name is required").max(100),
+  middleName: z.string().max(100).optional(),
+  lastName: z.string().min(1, "Last name is required").max(100),
+  preferredName: z.string().max(100).optional(),
   dateOfBirth: z.string().min(1, "Date of birth is required").refine((val) => {
     const dob = new Date(val);
     const today = new Date();
@@ -23,6 +23,7 @@ export const personalInfoSchema = z.object({
   phone: z
     .string()
     .min(10, "Please enter a valid phone number")
+    .max(20, "Phone number too long")
     .regex(/^[\d\s\-+()]+$/, "Invalid phone number format"),
   email: z.string().email("Please enter a valid email address"),
   city: z.string().min(1, "City is required"),
@@ -76,7 +77,8 @@ export const lifestyleSchema = z.object({
   hobbies: z.array(z.string()).min(1, "Select at least one hobby"),
   selfDescription: z
     .string()
-    .min(50, "Please write at least 50 characters about yourself"),
+    .min(50, "Please write at least 50 characters about yourself")
+    .max(5000, "Self description must be under 5000 characters"),
 });
 
 // Step 5: Family Information
@@ -107,7 +109,8 @@ export const partnerPreferencesSchema = z.object({
   dealBreakers: z.string().optional(),
   lookingForInSpouse: z
     .string()
-    .min(100, "Please write at least 100 characters"),
+    .min(100, "Please write at least 100 characters")
+    .max(5000, "Must be under 5000 characters"),
   additionalNotes: z.string().optional(),
 });
 
