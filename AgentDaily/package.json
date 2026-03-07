@@ -8,7 +8,7 @@
     "agentdaily": "./agent.mjs"
   },
   "scripts": {
-    "start": "node agent.mjs",
+    "start": "node server.mjs",
     "web": "node server.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
