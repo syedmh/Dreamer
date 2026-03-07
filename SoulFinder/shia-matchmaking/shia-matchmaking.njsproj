@@ -1,0 +1,119 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">17.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <Name>shia-matchmaking</Name>
+    <RootNamespace>shia-matchmaking</RootNamespace>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>03A62E93-8FE3-4F41-8A3D-4ED74CB80474</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>node_modules\next\dist\bin\next</StartupFile>
+    <StartWebBrowser>True</StartWebBrowser>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <EnableTypeScript>true</EnableTypeScript>
+    <ScriptArguments>dev</ScriptArguments>
+    <NodejsPort>3000</NodejsPort>
+    <LaunchUrl>http://localhost:3000</LaunchUrl>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="package.json" />
+    <Content Include="package-lock.json" />
+    <Content Include="tsconfig.json" />
+    <Content Include="next.config.ts" />
+    <Content Include=".env" />
+    <Content Include=".env.example" />
+    <Content Include=".env.production.example" />
+    <Content Include="README.md" />
+    <Content Include="prisma\schema.prisma" />
+    <Content Include="prisma\schema.sqlite.prisma" />
+    <Content Include="prisma\schema.sqlserver.prisma" />
+    <Content Include="prisma\seed.ts" />
+    <Content Include="public\images\husaynia-logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="prisma\" />
+    <Folder Include="prisma\migrations\" />
+    <Folder Include="public\" />
+    <Folder Include="public\images\" />
+    <Folder Include="src\" />
+    <Folder Include="src\app\" />
+    <Folder Include="src\app\about\" />
+    <Folder Include="src\app\admin\" />
+    <Folder Include="src\app\admin\login\" />
+    <Folder Include="src\app\admin\registrations\" />
+    <Folder Include="src\app\admin\registrations\[id]\" />
+    <Folder Include="src\app\api\" />
+    <Folder Include="src\app\api\admin\" />
+    <Folder Include="src\app\api\admin\export\" />
+    <Folder Include="src\app\api\admin\registrations\" />
+    <Folder Include="src\app\api\register\" />
+    <Folder Include="src\app\api\webhook\" />
+    <Folder Include="src\app\api\webhook\stripe\" />
+    <Folder Include="src\app\faq\" />
+    <Folder Include="src\app\privacy\" />
+    <Folder Include="src\app\register\" />
+    <Folder Include="src\app\register\cancel\" />
+    <Folder Include="src\app\register\confirmation\" />
+    <Folder Include="src\app\register\payment\" />
+    <Folder Include="src\app\terms\" />
+    <Folder Include="src\components\" />
+    <Folder Include="src\components\layout\" />
+    <Folder Include="src\components\registration\" />
+    <Folder Include="src\components\ui\" />
+    <Folder Include="src\hooks\" />
+    <Folder Include="src\lib\" />
+    <Folder Include="src\types\" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="src\app\layout.tsx" />
+    <TypeScriptCompile Include="src\app\page.tsx" />
+    <TypeScriptCompile Include="src\app\globals.css" />
+    <TypeScriptCompile Include="src\app\about\page.tsx" />
+    <TypeScriptCompile Include="src\app\faq\page.tsx" />
+    <TypeScriptCompile Include="src\app\privacy\page.tsx" />
+    <TypeScriptCompile Include="src\app\terms\page.tsx" />
+    <TypeScriptCompile Include="src\app\register\page.tsx" />
+    <TypeScriptCompile Include="src\app\register\cancel\page.tsx" />
+    <TypeScriptCompile Include="src\app\register\confirmation\page.tsx" />
+    <TypeScriptCompile Include="src\app\admin\layout.tsx" />
+    <TypeScriptCompile Include="src\app\admin\page.tsx" />
+    <TypeScriptCompile Include="src\app\admin\login\page.tsx" />
+    <TypeScriptCompile Include="src\app\admin\registrations\page.tsx" />
+    <TypeScriptCompile Include="src\app\admin\registrations\[id]\page.tsx" />
+    <TypeScriptCompile Include="src\app\api\register\route.ts" />
+    <TypeScriptCompile Include="src\app\api\admin\registrations\route.ts" />
+    <TypeScriptCompile Include="src\app\api\admin\export\route.ts" />
+    <TypeScriptCompile Include="src\app\api\webhook\stripe\route.ts" />
+    <TypeScriptCompile Include="src\components\layout\Header.tsx" />
+    <TypeScriptCompile Include="src\components\layout\Footer.tsx" />
+    <TypeScriptCompile Include="src\components\layout\IslamicPattern.tsx" />
+    <TypeScriptCompile Include="src\components\registration\ProgressBar.tsx" />
+    <TypeScriptCompile Include="src\components\registration\PersonalInfoStep.tsx" />
+    <TypeScriptCompile Include="src\components\registration\ReligiousBackgroundStep.tsx" />
+    <TypeScriptCompile Include="src\components\registration\EducationCareerStep.tsx" />
+    <TypeScriptCompile Include="src\components\registration\LifestyleStep.tsx" />
+    <TypeScriptCompile Include="src\components\registration\FamilyInfoStep.tsx" />
+    <TypeScriptCompile Include="src\components\registration\PartnerPreferencesStep.tsx" />
+    <TypeScriptCompile Include="src\components\registration\AgreementsStep.tsx" />
+    <TypeScriptCompile Include="src\components\registration\ReviewPaymentStep.tsx" />
+    <TypeScriptCompile Include="src\lib\prisma.ts" />
+    <TypeScriptCompile Include="src\lib\stripe.ts" />
+    <TypeScriptCompile Include="src\lib\utils.ts" />
+    <TypeScriptCompile Include="src\lib\validations.ts" />
+    <TypeScriptCompile Include="src\hooks\useRegistrationForm.ts" />
+    <TypeScriptCompile Include="src\types\registration.ts" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
+</Project>

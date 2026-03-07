@@ -1,0 +1,46 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">17.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <Name>AgentDaily</Name>
+    <RootNamespace>AgentDaily</RootNamespace>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>4F37A9E2-CD12-4B73-BAF5-CFA076D67BEA</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>server.mjs</StartupFile>
+    <StartWebBrowser>True</StartWebBrowser>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <EnableTypeScript>false</EnableTypeScript>
+    <NodejsPort>3000</NodejsPort>
+    <LaunchUrl>http://localhost:3000</LaunchUrl>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="server.mjs" />
+    <Content Include="agent.mjs" />
+    <Content Include="mcp-client.mjs" />
+    <Content Include="commands.mjs" />
+    <Content Include="actions.mjs" />
+    <Content Include="package.json" />
+    <Content Include="package-lock.json" />
+    <Content Include="public\index.html" />
+    <Content Include="myfile.txt" />
+    <Content Include="schema.txt" />
+    <Content Include="workiq.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="public\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
+</Project>

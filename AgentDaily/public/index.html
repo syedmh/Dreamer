@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgentDaily — WorkIQ Dashboard</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --red: #f85149;
+      --orange: #d29922;
+      --purple: #bc8cff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    header h1 span { font-size: 24px; }
+
+    .date-badge {
+      background: var(--border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Navigation tabs */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .tab:hover { color: var(--text); }
+    .tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      font-size: 12px;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+
+    .badge-blue { background: #1f6feb33; color: var(--accent); }
+    .badge-red { background: #f8514933; color: var(--red); }
+    .badge-green { background: #3fb95033; color: var(--green); }
+    .badge-orange { background: #d2992233; color: var(--orange); }
+
+    .card-body {
+      padding: 20px;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .card-body p { margin-bottom: 8px; }
+
+    /* Markdown-like rendering */
+    .rendered h3 { font-size: 15px; color: var(--accent); margin: 16px 0 8px 0; }
+    .rendered h3:first-child { margin-top: 0; }
+    .rendered hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+    .rendered strong { color: var(--text); }
+    .rendered ul { padding-left: 20px; margin: 8px 0; }
+    .rendered li { margin: 4px 0; }
+    .rendered a { color: var(--accent); text-decoration: none; }
+    .rendered a:hover { text-decoration: underline; }
+
+    /* Callout highlights */
+    .callout-mine {
+      background: #58a6ff15;
+      border-left: 3px solid var(--accent);
+      padding: 10px 14px;
+      margin: 8px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 14px;
+    }
+
+    .callout-mine strong { color: var(--accent); }
+
+    .recap-meeting {
+      border-bottom: 1px solid var(--border);
+      padding: 20px;
+    }
+
+    .recap-meeting:last-child { border-bottom: none; }
+
+    .recap-meeting h3 {
+      color: var(--accent);
+      font-size: 15px;
+      margin: 0 0 10px 0;
+    }
+
+    .recap-section {
+      margin: 10px 0;
+    }
+
+    .recap-section-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    /* Action items */
+    .action-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .action-item:last-child { border-bottom: none; }
+
+    .action-id {
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--muted);
+      min-width: 36px;
+    }
+
+    .action-desc { flex: 1; font-size: 14px; }
+
+    .action-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .overdue-tag {
+      color: var(--red);
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    /* Ask box */
+    .ask-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .ask-box input {
+      flex: 1;
+      padding: 10px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .ask-box input:focus { border-color: var(--accent); }
+
+    .ask-box button, .btn {
+      padding: 10px 20px;
+      background: #238636;
+      border: 1px solid #2ea04333;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .ask-box button:hover, .btn:hover { background: #2ea043; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Loading */
+    .loading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Leadership alert */
+    .leadership-alert {
+      background: #d2992215;
+      border: 1px solid var(--orange);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      color: var(--orange);
+    }
+
+    /* Section panels */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .tabs { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><span>☀️</span> AgentDaily</h1>
+    <div class="date-badge" id="dateDisplay"></div>
+  </header>
+
+  <div class="container">
+    <div class="tabs">
+      <button class="tab active" data-panel="bod">🏠 Dashboard</button>
+      <button class="tab" data-panel="calendar">📅 Calendar</button>
+      <button class="tab" data-panel="messages">💬 Messages</button>
+      <button class="tab" data-panel="actions">✅ Actions</button>
+      <button class="tab" data-panel="recap">📋 Yesterday's Recap</button>
+      <button class="tab" data-panel="ask">🔍 Ask WorkIQ</button>
+    </div>
+
+    <!-- Dashboard / BOD -->
+    <div class="panel active" id="panel-bod">
+      <div style="margin-bottom:16px; text-align:right;">
+        <button class="btn" onclick="loadBOD()">🔄 Run Beginning of Day</button>
+      </div>
+      <div id="bod-content">
+        <div class="card"><div class="card-body" style="color:var(--muted); text-align:center;">
+          Click <strong>Run Beginning of Day</strong> to fetch your calendar, messages, and action items.
+        </div></div>
+      </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="panel" id="panel-calendar">
+      <div style="margin-bottom:16px; text-align:right;">
+        <button class="btn" onclick="loadCalendar()">🔄 Refresh</button>
+      </div>
+      <div id="calendar-content">
+        <div class="card"><div class="card-body loading"><div class="spinner"></div> Click Refresh to load today's calendar.</div></div>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="panel" id="panel-messages">
+      <div style="margin-bottom:16px; text-align:right;">
+        <button class="btn" onclick="loadMessages()">🔄 Refresh</button>
+      </div>
+      <div id="messages-content">
+        <div class="card"><div class="card-body loading"><div class="spinner"></div> Click Refresh to load overnight messages.</div></div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="panel" id="panel-actions">
+      <div style="margin-bottom:16px; text-align:right;">
+        <button class="btn" onclick="loadActions()">🔄 Refresh</button>
+      </div>
+      <div id="actions-content"></div>
+    </div>
+
+    <!-- Yesterday's Recap -->
+    <div class="panel" id="panel-recap">
+      <div style="margin-bottom:16px; text-align:right;">
+        <button class="btn" onclick="loadRecap()">🔄 Load Yesterday's Recap</button>
+      </div>
+      <div id="recap-content">
+        <div class="card"><div class="card-body" style="color:var(--muted); text-align:center;">
+          Click <strong>Load Yesterday's Recap</strong> to summarize all Teams meetings from yesterday with TLDRs, action items, and personal callouts.
+        </div></div>
+      </div>
+    </div>
+
+    <!-- Ask -->
+    <div class="panel" id="panel-ask">
+      <div class="ask-box">
+        <input type="text" id="askInput" placeholder="Ask WorkIQ anything... (e.g., Who emailed me about the budget?)" onkeydown="if(event.key==='Enter')doAsk()" />
+        <button onclick="doAsk()">Ask</button>
+      </div>
+      <div id="ask-content"></div>
+    </div>
+  </div>
+
+  <script>
+    // --- Tab switching ---
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.panel).classList.add('active');
+      });
+    });
+
+    // Date display
+    const today = new Date();
+    document.getElementById('dateDisplay').textContent = today.toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    // --- Simple markdown-to-HTML ---
+    function md(text) {
+      if (!text) return '';
+      let html = text
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        // headings
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^---$/gm, '<hr>')
+        // bold
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        // italic
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        // links  [text](url)
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+        // unordered list items
+        .replace(/^- (.+)$/gm, '<li>$1</li>')
+        // line breaks
+        .replace(/\n/g, '<br>');
+
+      // Wrap consecutive <li> in <ul>
+      html = html.replace(/((?:<li>.*?<\/li><br>?)+)/g, '<ul>$1</ul>');
+      html = html.replace(/<br><\/ul>/g, '</ul>');
+      html = html.replace(/<ul><br>/g, '<ul>');
+      return html;
+    }
+
+    function loadingHTML(msg) {
+      return `<div class="card"><div class="card-body loading"><div class="spinner"></div> ${msg}</div></div>`;
+    }
+
+    function errorHTML(msg) {
+      return `<div class="card"><div class="card-body" style="color:var(--red);">⚠️ ${msg}</div></div>`;
+    }
+
+    // --- API calls ---
+    async function loadBOD() {
+      const el = document.getElementById('bod-content');
+      el.innerHTML = loadingHTML('Running Beginning of Day routine... This may take a moment.');
+      try {
+        const res = await fetch('/api/bod');
+        const data = await res.json();
+        if (data.error) { el.innerHTML = errorHTML(data.error); return; }
+
+        let html = '';
+
+        // Leadership alert
+        if (data.calendarLeadership && data.calendarLeadership.length > 0) {
+          html += `<div class="leadership-alert">⚡ <strong>Leadership detected:</strong> ${data.calendarLeadership.join(', ')} appear in today's schedule. Content is flagged as high-priority.</div>`;
+        }
+
+        // Calendar card
+        html += `<div class="card">
+          <div class="card-header"><h2>📅 Today's Calendar</h2></div>
+          <div class="card-body rendered">${data.calendar ? md(data.calendar) : '<span style="color:var(--muted)">Unable to fetch calendar via WorkIQ.</span>'}</div>
+        </div>`;
+
+        // Messages card
+        html += `<div class="card">
+          <div class="card-header"><h2>💬 Overnight Highlights</h2></div>
+          <div class="card-body rendered">${data.messages ? md(data.messages) : '<span style="color:var(--muted)">Unable to fetch overnight messages.</span>'}</div>
+        </div>`;
+
+        // Actions card
+        if (data.actions) {
+          html += renderActionsCard(data.actions);
+        } else {
+          html += `<div class="card">
+            <div class="card-header"><h2>✅ Action Items</h2></div>
+            <div class="card-body" style="color:var(--muted)">No action items tracked yet.</div>
+          </div>`;
+        }
+
+        el.innerHTML = html;
+      } catch (e) {
+        el.innerHTML = errorHTML('Failed to run BOD: ' + e.message);
+      }
+    }
+
+    async function loadCalendar() {
+      const el = document.getElementById('calendar-content');
+      el.innerHTML = loadingHTML('Fetching today\'s calendar from WorkIQ...');
+      try {
+        const res = await fetch('/api/calendar');
+        const data = await res.json();
+        if (data.error) { el.innerHTML = errorHTML(data.error); return; }
+        el.innerHTML = `<div class="card">
+          <div class="card-header"><h2>📅 Today's Calendar</h2></div>
+          <div class="card-body rendered">${md(data.answer)}</div>
+        </div>`;
+      } catch (e) {
+        el.innerHTML = errorHTML('Failed to fetch calendar: ' + e.message);
+      }
+    }
+
+    async function loadMessages() {
+      const el = document.getElementById('messages-content');
+      el.innerHTML = loadingHTML('Fetching overnight messages from WorkIQ...');
+      try {
+        const res = await fetch('/api/messages');
+        const data = await res.json();
+        if (data.error) { el.innerHTML = errorHTML(data.error); return; }
+        el.innerHTML = `<div class="card">
+          <div class="card-header"><h2>💬 Overnight Messages</h2></div>
+          <div class="card-body rendered">${md(data.answer)}</div>
+        </div>`;
+      } catch (e) {
+        el.innerHTML = errorHTML('Failed to fetch messages: ' + e.message);
+      }
+    }
+
+    async function loadActions() {
+      const el = document.getElementById('actions-content');
+      el.innerHTML = loadingHTML('Loading action items...');
+      try {
+        const res = await fetch('/api/actions');
+        const data = await res.json();
+        if (data.error) { el.innerHTML = errorHTML(data.error); return; }
+        if (!data.actions && data.message) {
+          el.innerHTML = `<div class="card"><div class="card-body" style="color:var(--muted)">${data.message}</div></div>`;
+          return;
+        }
+        el.innerHTML = renderActionsCard(data);
+      } catch (e) {
+        el.innerHTML = errorHTML('Failed to load actions: ' + e.message);
+      }
+    }
+
+    function renderActionsCard(data) {
+      let html = `<div class="card">
+        <div class="card-header">
+          <h2>✅ Open Action Items</h2>
+          <div>
+            <span class="badge badge-blue">${data.openCount} open</span>
+            ${data.overdueCount > 0 ? `<span class="badge badge-red">${data.overdueCount} overdue</span>` : ''}
+          </div>
+        </div>`;
+
+      if (data.overdue && data.overdue.length > 0) {
+        html += `<div style="padding:12px 20px 4px;"><strong style="color:var(--red);">🔴 Overdue</strong></div>`;
+        for (const a of data.overdue) {
+          html += actionItemHTML(a, true);
+        }
+      }
+
+      if (data.dueToday && data.dueToday.length > 0) {
+        html += `<div style="padding:12px 20px 4px;"><strong style="color:var(--orange);">🟡 Due Today</strong></div>`;
+        for (const a of data.dueToday) {
+          html += actionItemHTML(a);
+        }
+      }
+
+      if (data.upcoming && data.upcoming.length > 0) {
+        html += `<div style="padding:12px 20px 4px;"><strong style="color:var(--green);">🟢 Upcoming</strong></div>`;
+        for (const a of data.upcoming.slice(0, 15)) {
+          html += actionItemHTML(a);
+        }
+        if (data.upcoming.length > 15) {
+          html += `<div style="padding:8px 20px; color:var(--muted); font-size:13px;">... and ${data.upcoming.length - 15} more</div>`;
+        }
+      }
+
+      if (data.delegated && data.delegated.length > 0) {
+        html += `<div style="padding:12px 20px 4px;"><strong style="color:var(--purple);">👤 Delegated</strong></div>`;
+        for (const a of data.delegated) {
+          html += actionItemHTML(a);
+        }
+      }
+
+      html += '</div>';
+      return html;
+    }
+
+    function actionItemHTML(a, isOverdue) {
+      let meta = '';
+      if (a.due) meta += `Due: ${a.due}`;
+      if (a._daysOverdue) meta += ` <span class="overdue-tag">(${a._daysOverdue} days overdue)</span>`;
+      if (a.source) meta += ` · Source: ${a.source}`;
+      if (a.owner && a.owner.toLowerCase() !== 'syedhu') meta += ` · Owner: ${a.owner}`;
+
+      return `<div class="action-item">
+        <span class="action-id">#${a.id}</span>
+        <div>
+          <div class="action-desc">${a.description}</div>
+          <div class="action-meta">${meta}</div>
+        </div>
+      </div>`;
+    }
+
+    async function doAsk() {
+      const input = document.getElementById('askInput');
+      const question = input.value.trim();
+      if (!question) return;
+
+      const el = document.getElementById('ask-content');
+      el.innerHTML = loadingHTML('Asking WorkIQ...') + el.innerHTML;
+
+      try {
+        const res = await fetch('/api/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question }),
+        });
+        const data = await res.json();
+        if (data.error) {
+          el.innerHTML = errorHTML(data.error) + el.innerHTML.replace(loadingHTML('Asking WorkIQ...'), '');
+          return;
+        }
+        const answerCard = `<div class="card" style="margin-bottom:16px;">
+          <div class="card-header"><h2>🔍 ${question}</h2></div>
+          <div class="card-body rendered">${md(data.answer)}</div>
+        </div>`;
+
+        // Remove loading, prepend answer
+        el.innerHTML = el.innerHTML.replace(/<div class="card"><div class="card-body loading">.*?Asking WorkIQ\.\.\.<\/div><\/div>/, '');
+        el.innerHTML = answerCard + el.innerHTML;
+        input.value = '';
+      } catch (e) {
+        el.innerHTML = errorHTML('Failed: ' + e.message);
+      }
+    }
+
+    // --- Yesterday's Recap ---
+    async function loadRecap() {
+      const el = document.getElementById('recap-content');
+      el.innerHTML = loadingHTML('Summarizing yesterday\'s Teams meetings... This may take a minute.');
+      try {
+        const res = await fetch('/api/recap');
+        const data = await res.json();
+        if (data.error) { el.innerHTML = errorHTML(data.error); return; }
+
+        let html = '';
+
+        // Meeting summaries card
+        if (data.summaries) {
+          html += `<div class="card">
+            <div class="card-header">
+              <h2>📋 Meeting Summaries</h2>
+              <span class="badge badge-blue">TLDRs + Decisions</span>
+            </div>
+            <div class="card-body rendered">${highlightCallouts(md(data.summaries))}</div>
+          </div>`;
+        } else {
+          html += `<div class="card"><div class="card-body" style="color:var(--muted)">Unable to fetch meeting summaries from WorkIQ.</div></div>`;
+        }
+
+        // Action items & callouts card
+        if (data.actionItems) {
+          html += `<div class="card">
+            <div class="card-header">
+              <h2>🎯 Action Items & My Callouts</h2>
+              <span class="badge badge-orange">Follow-ups</span>
+            </div>
+            <div class="card-body rendered">${highlightCallouts(md(data.actionItems))}</div>
+          </div>`;
+        } else {
+          html += `<div class="card"><div class="card-body" style="color:var(--muted)">Unable to fetch action items from WorkIQ.</div></div>`;
+        }
+
+        el.innerHTML = html;
+      } catch (e) {
+        el.innerHTML = errorHTML('Failed to load recap: ' + e.message);
+      }
+    }
+
+    // Highlight lines that mention "My Callouts" / "Callouts for me" or the user's name
+    function highlightCallouts(html) {
+      const names = ['syedhu', 'masroor', 'syed'];
+
+      // Wrap "Callouts for me" / "My Callouts" sections in a highlight box
+      html = html.replace(
+        /(<strong>(?:My Callouts?|Callouts? for me[^<]*):?<\/strong>)([\s\S]*?)(?=<h3|<hr|<strong>(?:TLDR|Key Decisions|Action Items|Attendees|Meeting)|$)/gi,
+        (match, title, body) => {
+          if (body.trim() && !body.trim().match(/^:?\s*none\.?$/i)) {
+            return `<div class="callout-mine">⭐ ${title}${body}</div>`;
+          }
+          return match;
+        }
+      );
+
+      // Bold-highlight the user's name wherever it appears
+      for (const name of names) {
+        const re = new RegExp(`(${name})`, 'gi');
+        html = html.replace(re, '<strong style="color:#f0883e;background:#f0883e20;padding:1px 4px;border-radius:3px;">$1</strong>');
+      }
+
+      return html;
+    }
+
+    // Auto-load actions on tab click
+    document.querySelector('[data-panel="actions"]').addEventListener('click', () => {
+      if (!document.getElementById('actions-content').innerHTML) loadActions();
+    });
+
+    // Load actions on initial page load
+    loadActions();
+  </script>
+</body>
+</html>

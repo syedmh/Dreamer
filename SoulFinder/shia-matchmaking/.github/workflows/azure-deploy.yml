@@ -1,0 +1,51 @@
+name: Deploy to Azure App Service
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: husaynia-matchmaking  # Change to your App Service name
+  NODE_VERSION: "20.x"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: shia-matchmaking/package-lock.json
+
+      - name: Install dependencies
+        working-directory: shia-matchmaking
+        run: npm ci
+
+      - name: Switch to SQL Server schema
+        working-directory: shia-matchmaking
+        run: cp prisma/schema.sqlserver.prisma prisma/schema.prisma
+
+      - name: Generate Prisma client
+        working-directory: shia-matchmaking
+        run: npx prisma generate
+
+      - name: Build
+        working-directory: shia-matchmaking
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+        run: npm run build
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: shia-matchmaking/.next/standalone

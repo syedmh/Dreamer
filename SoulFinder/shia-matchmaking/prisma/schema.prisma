@@ -1,0 +1,189 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Event {
+  id            String   @id @default(uuid())
+  name          String
+  date          DateTime
+  location      String
+  address       String?
+  price         Int      @default(5000) // cents
+  active        Boolean  @default(true)
+  description   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  registrations Registration[]
+}
+
+model Registration {
+  id        String  @id @default(uuid())
+  status    String  @default("DRAFT") // DRAFT, PENDING_PAYMENT, PAID, CONFIRMED, CANCELLED, REFUNDED, EXPIRED
+  eventId   String?
+  event     Event?  @relation(fields: [eventId], references: [id])
+
+  // Step 1: Personal Information
+  firstName       String
+  middleName      String?
+  lastName        String
+  preferredName   String?
+  dateOfBirth     DateTime
+  gender          String  // MALE or FEMALE
+  phone           String
+  email           String   @unique
+  city            String
+  state           String
+  countryOfOrigin String?
+  languages       String   // JSON array
+  howDidYouHear   String?
+
+  // Step 2: Religious Background
+  practicingMuslim    String?
+  sect                String?
+  prayerFrequency     String?
+  fastingRamadan      String?
+  attendsMajalis      String?
+  hijabStatus         String?
+  religiousKnowledge  String?
+  performedHajj       String?
+  performedZiyarat    String?
+  ziyaratLocations    String?
+  marja               String?
+  religionImportance  Int?       @default(5)
+
+  // Step 3: Education & Career
+  educationLevel  String?
+  fieldOfStudy    String?
+  university      String?
+  occupation      String?
+  employer        String?
+  incomeRange     String?
+  careerGoals     String?
+
+  // Step 4: Lifestyle & Personal
+  maritalStatus       String?
+  hasChildren         Boolean? @default(false)
+  numberOfChildren    Int?     @default(0)
+  height              String?
+  bodyType            String?
+  smokingStatus       String?
+  healthConditions    String?
+  livingSituation     String?
+  willingToRelocate   String?
+  pets                String?
+  hobbies             String?  // JSON array
+  selfDescription     String?
+
+  // Step 5: Family Information
+  fatherName          String?
+  fatherAlive         Boolean? @default(true)
+  motherAlive         Boolean? @default(true)
+  numberOfSiblings    Int?     @default(0)
+  familyOrigin        String?
+  familySupportive    String?
+  familyReligiosity   String?
+  familyExpectations  String?
+
+  // Step 6: Partner Preferences
+  prefAgeMin          Int?
+  prefAgeMax          Int?
+  prefHeightMin       String?
+  prefHeightMax       String?
+  prefEthnicity       String?  // JSON array
+  prefEducation       String?
+  prefIncome          String?
+  prefLocation        String?
+  prefMaritalStatus   String?
+  prefChildren        String?
+  prefReligiosity     String?
+  dealBreakers        String?
+  lookingForInSpouse  String?
+  additionalNotes     String?
+
+  // Step 7: Agreements & Wali
+  waliName            String?
+  waliPhone           String?
+  waliEmail           String?
+  waliRelationship    String?
+  emergencyName       String?
+  emergencyPhone      String?
+  emergencyRelation   String?
+  agreedTerms         Boolean  @default(false)
+  agreedPrivacy       Boolean  @default(false)
+  confirmedTruthful   Boolean  @default(false)
+  agreedNonRefundable Boolean  @default(false)
+  agreedInfoSharing   Boolean  @default(false)
+  digitalSignature    String?
+
+  // Stripe
+  stripeCustomerId    String?
+  stripeSessionId     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profilePhoto  ProfilePhoto?
+  payments      PaymentRecord[]
+  matchNotes    MatchNote[]
+
+  @@index([gender])
+  @@index([city, state])
+  @@index([maritalStatus])
+  @@index([status])
+  @@index([dateOfBirth])
+}
+
+model ProfilePhoto {
+  id              String       @id @default(uuid())
+  registrationId  String       @unique
+  registration    Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  blobUrl         String
+  thumbnailUrl    String?
+  originalFilename String
+  mimeType        String
+  sizeBytes       Int
+  createdAt       DateTime     @default(now())
+}
+
+model PaymentRecord {
+  id              String       @id @default(uuid())
+  registrationId  String
+  registration    Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  stripeSessionId String?
+  paymentIntentId String?
+  amount          Int          // cents
+  currency        String       @default("usd")
+  status          String       // e.g., "succeeded", "failed", "pending"
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([stripeSessionId])
+  @@index([paymentIntentId])
+}
+
+model AdminUser {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  name          String
+  passwordHash  String
+  role          String   @default("admin")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  matchNotes    MatchNote[]
+}
+
+model MatchNote {
+  id              String       @id @default(uuid())
+  registrationId  String
+  registration    Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  note            String
+  createdById     String
+  createdBy       AdminUser    @relation(fields: [createdById], references: [id])
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}

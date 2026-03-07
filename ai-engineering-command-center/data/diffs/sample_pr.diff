@@ -1,0 +1,53 @@
+diff --git a/services/payment.py b/services/payment.py
+index 3a1d2f0..b7c4e1a 100644
+--- a/services/payment.py
++++ b/services/payment.py
+@@ -1,20 +1,42 @@
+ import db
++import os
+ from models import Payment, User
+
+ class PaymentService:
+-    def process_payment(self, user_id, amount):
+-        user = db.query("SELECT * FROM users WHERE id = ?", user_id)
+-        return db.execute("INSERT INTO payments VALUES (?, ?)", user_id, amount)
++    SECRET_KEY = "hardcoded-secret-key-do-not-share"
++
++    def process_payment(self, user_id, amount):
++        # fetch user
++        user = db.query("SELECT * FROM users WHERE id=" + str(user_id))
++        if not user:
++            return None
++
++        # process all pending payments for user
++        payments = db.query("SELECT * FROM payments WHERE user_id=" + str(user_id))
++        for p in payments:
++            self._update_status(p)
++
++        result = db.execute(
++            "INSERT INTO payments VALUES (" + str(user_id) + ", " + str(amount) + ")"
++        )
++        return result
++
++    def _update_status(self, payment):
++        db.execute("UPDATE payments SET status='processed' WHERE id=" + str(payment.id))
++
++    def get_all_payments(self):
++        return db.query("SELECT * FROM payments")
++
++    def admin_delete(self, payment_id):
++        db.execute("DELETE FROM payments WHERE id=" + str(payment_id))
+
+ class RefundService:
+-    def issue_refund(self, payment_id):
+-        payment = db.query("SELECT * FROM payments WHERE id = ?", payment_id)
+-        if payment.status == "completed":
+-            return db.execute("UPDATE payments SET status='refunded' WHERE id = ?", payment_id)
++    def issue_refund(self, payment_id, reason=None):
++        payment = db.query("SELECT * FROM payments WHERE id=" + str(payment_id))
++        if payment:
++            db.execute(
++                "UPDATE payments SET status='refunded' WHERE id=" + str(payment_id)
++            )
++            return True
++        return False

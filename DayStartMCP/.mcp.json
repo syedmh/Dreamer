@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "DayStartMCP": {
+      "type": "stdio",
+      "command": "C:\\Users\\syedhu\\source\\play\\DayStartMCP\\publish\\DayStartMCP.exe"
+    },
+    "workiq": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@microsoft/workiq", "mcp"]
+    }
+  }
+}

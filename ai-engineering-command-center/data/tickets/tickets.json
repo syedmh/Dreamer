@@ -1,0 +1,37 @@
+[
+  {
+    "id": "ENG-101",
+    "title": "Payment service times out under load",
+    "description": "Users report payment failures during peak hours. DB pool exhausted.",
+    "priority": "high",
+    "status": "open"
+  },
+  {
+    "id": "ENG-102",
+    "title": "Fix DB connection pool exhaustion in payment service",
+    "description": "Connection pool hits 100% utilization causing cascading 503s. Need to increase pool size or add queue.",
+    "priority": "high",
+    "status": "open"
+  },
+  {
+    "id": "ENG-103",
+    "title": "Add retry logic to checkout flow",
+    "description": "Checkout does not retry on transient DB errors. Add exponential backoff.",
+    "priority": "medium",
+    "status": "open"
+  },
+  {
+    "id": "ENG-104",
+    "title": "Upgrade Python runtime to 3.12",
+    "description": "Current runtime is 3.10. Upgrade for performance improvements and security patches.",
+    "priority": "low",
+    "status": "open"
+  },
+  {
+    "id": "ENG-105",
+    "title": "Payment timeouts causing user-facing errors",
+    "description": "Duplicate of ENG-101. Same DB pool issue observed in staging.",
+    "priority": "high",
+    "status": "open"
+  }
+]

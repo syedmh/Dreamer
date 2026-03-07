@@ -1,0 +1,216 @@
+# Beginning of Day
+
+Start the day with a structured focus plan: today's calendar, overnight messages, open action items, and prioritized tasks. Save the BOD report to `syedhu/bod/`.
+
+## Arguments
+
+`$ARGUMENTS` is optional.
+
+| Argument | Meaning |
+|----------|---------|
+| (empty) | Run the full beginning-of-day routine (default) |
+| `help` | Show usage guide |
+
+### Usage guide
+
+If `$ARGUMENTS` is "help", display this and STOP. Do NOT use AskUserQuestion.
+
+```
+Usage: /mycmd-bod [help]
+
+Run the beginning-of-day routine: fetch today's calendar, surface overnight messages,
+review open action items, and generate a prioritized daily focus plan.
+
+Examples:
+  /mycmd-bod              Run the full BOD routine
+  /mycmd-bod help         Show this usage guide
+```
+
+---
+
+## Leadership Detection
+
+Scan all surfaced content (calendar attendees, email senders, action item descriptions) for leadership chain names: **Kristi, Anand, Jayu, Brad, Pretish, Vanessa, Jason, Perry, Rajesh**. If any name appears, flag those items as high-priority and ensure all output is executive-facing, polished, and strategically framed.
+
+---
+
+## Shared Resources
+
+Read the shared schema from:
+`.claude/commands/references/actions-schema.md`
+
+The `actions.yaml` file is located at: `c:/Users/syedhu/work/actions.yaml`
+
+---
+
+## Step 1: Fetch Today's Calendar via WorkIQ
+
+Use the `ask_work_iq` MCP tool:
+
+> "What meetings do I have scheduled on my calendar today? For each meeting, provide: the meeting title, start time, end time, attendees, and any agenda or description available. List them in chronological order."
+
+### Fallback
+
+If MCP fails, try CLI: `workiq ask -q "<same question>"`
+
+If WorkIQ is completely unavailable, note "Unable to fetch calendar via Work IQ. Kindly check your connection and try again." and continue to Step 2 (do not STOP, the remaining steps can still provide value).
+
+---
+
+## Step 2: Fetch Overnight Messages via WorkIQ
+
+Use the `ask_work_iq` MCP tool:
+
+> "What emails and Teams messages have I received since 6pm yesterday evening that are important or require my attention? For each message, provide: sender, subject or topic, time received, and a brief summary of the content. Prioritize messages that require a response or action."
+
+### Fallback
+
+If MCP fails, try CLI: `workiq ask -q "<same question>"`
+
+If WorkIQ is unavailable, note "Unable to fetch overnight messages." and continue to Step 3.
+
+---
+
+## Step 3: Read Open Action Items from actions.yaml
+
+1. Read `actions.yaml` from `c:/Users/syedhu/work/actions.yaml`
+2. If the file does not exist or `actions` is empty, note: "No action items tracked yet. Use `/mycmd-actions add` or `/mycmd-eod` to start tracking." and continue to Step 4.
+3. Filter for items with status `open` or `in-progress`
+4. Sort by:
+   - Overdue items first (due date < today)
+   - Then by due date (soonest first)
+   - Then by date_added (oldest first)
+   - Items with `null` due date go last
+5. Flag overdue items prominently
+6. Note which items are owned by Syedhu vs. delegated to others
+
+---
+
+## Step 4: Generate Daily Focus Plan
+
+Using the data gathered from Steps 1-3, generate a structured daily focus plan. This can be done by the main agent directly (no subagent needed unless the data volume is very large).
+
+Display the focus plan in this format:
+
+```
+## Good Morning - {Today's Date, e.g., Tuesday, February 10, 2026}
+
+---
+
+### Today's Calendar ({N} meetings)
+
+| Time | Meeting | Key Attendees | Prep Needed |
+|------|---------|---------------|-------------|
+| 9:35 AM | KeyGuard Investigation Daily | Luis, Enrique, Jason | Review KG rollout status |
+| 10:10 AM | E&D Security Partner Sync | Kristi, Rashmi, Kiran | Prepare Taurus update |
+| ... | ... | ... | ... |
+
+**Heads up:** {Note any meetings with leadership chain members, back-to-back conflicts, or long meetings}
+
+---
+
+### Overnight Highlights
+
+{If messages were fetched:}
+- **{Sender}** ({Time}): {Brief summary of message and whether action is needed}
+- **{Sender}** ({Time}): {Brief summary}
+
+{If no significant messages:}
+No urgent overnight messages requiring immediate attention.
+
+---
+
+### Open Action Items ({N} total, {M} overdue)
+
+**Overdue (requires immediate attention):**
+- [#{id}] {Description} - Due: {date} ({X days overdue}) - Source: {source}
+
+**Due Today:**
+- [#{id}] {Description} - Source: {source}
+
+**Upcoming:**
+- [#{id}] {Description} - Due: {date} - Source: {source}
+
+**Delegated to Others (for follow-up):**
+- [#{id}] {Description} - Owner: {name} - Due: {date}
+
+---
+
+### Today's Focus (Top 3 Priorities)
+
+Based on your calendar, overdue items, and overnight messages:
+
+1. **{Priority 1}** - {Why this is the top priority, what needs to happen}
+2. **{Priority 2}** - {Context and next step}
+3. **{Priority 3}** - {Context and next step}
+
+---
+
+### Blockers to Address
+
+{If any overdue items, blocked action items, or urgent messages exist:}
+- {Blocker 1}: {What is blocked and what is needed to unblock}
+- {Blocker 2}: {Description}
+
+{If no blockers:}
+No active blockers. Clear to proceed with today's priorities.
+```
+
+---
+
+## Prioritization Logic
+
+When determining the "Top 3 Priorities" in the focus plan, use this ranking:
+
+1. **Overdue action items** - These are past due and need immediate attention
+2. **Meetings with leadership chain members** - Prep for these takes priority (Kristi, Anand, Jayu, Brad, Pretish, Vanessa, Jason, Perry, Rajesh)
+3. **Overnight messages requiring response** - Especially from leadership or with urgent indicators
+4. **Action items due today** - Same-day deadlines
+5. **Meetings requiring preparation** - Any meeting where the user is the organizer or a key contributor
+6. **Action items due this week** - Upcoming but not yet urgent
+
+---
+
+## Step 5: Save BOD Report
+
+After displaying the daily focus plan (Step 4), persist the full BOD report as a markdown file for historical reference.
+
+1. **Directory:** `syedhu/bod/` (relative to workspace root: `c:/Users/syedhu/work/syedhu/bod/`)
+2. **File name:** `<mon-dd-yyyy>.md` (e.g., `feb-10-2026.md`)
+3. If the directory does not exist, create it using Bash `mkdir -p`.
+4. **Content:** Write the complete BOD report as displayed in Step 4, including:
+   - The "Good Morning" header with date
+   - Today's Calendar section (table and heads-up notes)
+   - Overnight Highlights section
+   - Open Action Items section (overdue, due today, upcoming, delegated)
+   - Today's Focus (Top 3 Priorities) section
+   - Blockers to Address section
+5. Write the file using the Write tool.
+6. Confirm storage: `BOD report saved to syedhu/bod/<mon-dd-yyyy>.md`
+
+---
+
+## Source Attribution
+
+After displaying the BOD report, print a source note indicating what data sources were used:
+
+```
+---
+📌 Sources: {description of data used}
+```
+
+Examples:
+- `📌 Sources: WorkIQ (14 meetings, 3 overnight messages) + Local (actions.yaml with 69 items)`
+- `📌 Sources: WorkIQ only (calendar). actions.yaml not found.`
+- `📌 Sources: Local only (actions.yaml). WorkIQ unavailable.`
+
+---
+
+## Important Notes
+
+- **Never use AskUserQuestion.** If WorkIQ is unavailable, gracefully degrade and show what data is available locally (action items from actions.yaml).
+- All content must follow the writing style in CLAUDE.md (polite, professional, no em dashes, use "kindly").
+- The BOD routine is **read-only** for `actions.yaml`. It does not modify action items. To update action items, use `/mycmd-actions`.
+- Keep the output concise and skimmable. Use tables and bullet points. The entire output should be readable in under 2 minutes.
+- If leadership names appear anywhere in the data, ensure all content is polished and executive-appropriate.
+- Steps 1 and 2 can be launched as **parallel WorkIQ queries** (in a single message) since they are independent. Step 3 (reading actions.yaml) can also happen in parallel with Steps 1-2.

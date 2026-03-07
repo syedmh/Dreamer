@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "AgentDaily": {
+      "commandName": "ManagedNode",
+      "scriptFile": "server.mjs",
+      "launchBrowser": true,
+      "launchUrl": "http://localhost:3000",
+      "nodePath": "node",
+      "environmentVariables": {
+        "PORT": "3000"
+      }
+    }
+  }
+}

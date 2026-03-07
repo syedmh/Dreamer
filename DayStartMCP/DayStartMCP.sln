@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11430.68 d18.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DayStartMCP", "DayStartMCP.csproj", "{58547848-F063-86F8-1DBF-BF77BD7FF1F5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{58547848-F063-86F8-1DBF-BF77BD7FF1F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58547848-F063-86F8-1DBF-BF77BD7FF1F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58547848-F063-86F8-1DBF-BF77BD7FF1F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58547848-F063-86F8-1DBF-BF77BD7FF1F5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B639D632-2B6E-4E35-8480-770DEF596860}
+	EndGlobalSection
+EndGlobal

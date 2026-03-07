@@ -1,0 +1,75 @@
+{
+  "description": "A moonlit rooftop in Tokyo. Cherry blossom petals drift through the air. Yuki stands at the edge, looking out over the glowing city skyline. Her hair and scarf flutter in the wind. Kenji walks up behind her hesitantly.",
+  "actors": [
+    {
+      "name": "Yuki",
+      "physicalDescription": "24-year-old Japanese woman, long black hair, red scarf, melancholic expression",
+      "age": 24,
+      "gender": "female",
+      "visual": {
+        "hairColor": "black",
+        "hairStyle": "long",
+        "skinTone": "light",
+        "eyeColor": "brown",
+        "outfitDescription": "red scarf, dark coat"
+      },
+      "voice": {
+        "voiceId": "default",
+        "pitch": 1.2,
+        "speed": 0.9,
+        "description": "soft, feminine, melancholic"
+      },
+      "initialEmotion": { "sadness": 0.6, "joy": 0.0, "anger": 0.0, "fear": 0.0, "surprise": 0.0, "disgust": 0.0 }
+    },
+    {
+      "name": "Kenji",
+      "physicalDescription": "26-year-old Japanese man, short hair, dark jacket, nervous demeanor",
+      "age": 26,
+      "gender": "male",
+      "visual": {
+        "hairColor": "black",
+        "hairStyle": "short",
+        "skinTone": "medium",
+        "eyeColor": "brown",
+        "outfitDescription": "dark jacket"
+      },
+      "voice": {
+        "voiceId": "default",
+        "pitch": 0.9,
+        "speed": 0.85,
+        "description": "mid-range, hesitant, slight tremor"
+      },
+      "initialEmotion": { "fear": 0.4, "joy": 0.0, "sadness": 0.2, "anger": 0.0, "surprise": 0.0, "disgust": 0.0 }
+    }
+  ],
+  "dialogue": [
+    {
+      "speaker": "Kenji",
+      "text": "I wasn't sure you'd be here.",
+      "emotion": { "fear": 0.4, "sadness": 0.2, "joy": 0.0, "anger": 0.0, "surprise": 0.0, "disgust": 0.0 },
+      "action": "stops a few feet behind her"
+    },
+    {
+      "speaker": "Yuki",
+      "text": "Where else would I go?",
+      "emotion": { "sadness": 0.7, "joy": 0.0, "anger": 0.0, "fear": 0.0, "surprise": 0.0, "disgust": 0.0 },
+      "action": "doesn't turn around"
+    },
+    {
+      "speaker": "Kenji",
+      "text": "Yuki... I'm sorry.",
+      "emotion": { "sadness": 0.6, "fear": 0.3, "joy": 0.0, "anger": 0.0, "surprise": 0.0, "disgust": 0.0 },
+      "action": "takes one step closer"
+    },
+    {
+      "speaker": "Yuki",
+      "text": "I know.",
+      "emotion": { "sadness": 0.5, "joy": 0.1, "anger": 0.0, "fear": 0.0, "surprise": 0.0, "disgust": 0.0 },
+      "action": "finally turns to face him, a single tear on her cheek"
+    }
+  ],
+  "style": "Anime",
+  "mood": "bittersweet",
+  "fps": 24,
+  "resolution": "Hd720p"
+}

@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "McpServerDemo": {
+      "type": "stdio",
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "C:\\Users\\syedhu\\source\\play\\LearnMCP\\McpServerDemo"
+      ]
+    }
+  }
+}
