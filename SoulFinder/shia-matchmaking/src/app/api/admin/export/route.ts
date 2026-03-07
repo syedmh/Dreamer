@@ -1,8 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
+async function verifyAdmin(): Promise<boolean> {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("admin_session");
+  if (!session?.value) return false;
+  try {
+    const admin = await prisma.adminUser.findFirst({
+      where: { id: session.value },
+    });
+    return !!admin;
+  } catch {
+    return false;
+  }
+}
+
 export async function GET(request: NextRequest) {
-  // TODO: Add auth check
+  if (!(await verifyAdmin())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const searchParams = request.nextUrl.searchParams;
   const format = searchParams.get("format") || "csv";
 

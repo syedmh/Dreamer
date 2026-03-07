@@ -1,6 +1,13 @@
 import { PrismaClient } from "@prisma/client";
+import { randomBytes, scryptSync } from "crypto";
 
 const prisma = new PrismaClient();
+
+function hashPassword(password: string): string {
+  const salt = randomBytes(16).toString("hex");
+  const hash = scryptSync(password, salt, 64).toString("hex");
+  return `${salt}:${hash}`;
+}
 
 async function main() {
   console.log("🌱 Seeding database...");
@@ -23,16 +30,18 @@ async function main() {
   });
   console.log(`  ✓ Event: ${event.name}`);
 
-  // Create an admin user (password: admin123)
+  // Create an admin user — password is read from ADMIN_SEED_PASSWORD env var
+  const adminPassword = process.env.ADMIN_SEED_PASSWORD || "change-me-immediately";
+  if (adminPassword === "change-me-immediately") {
+    console.warn("  ⚠️  Using default admin password — set ADMIN_SEED_PASSWORD env var for production!");
+  }
   const admin = await prisma.adminUser.upsert({
     where: { email: "admin@husaynia.org" },
     update: {},
     create: {
       email: "admin@husaynia.org",
       name: "Admin",
-      // bcrypt hash of "admin123" — replace with proper hash in production
-      passwordHash:
-        "$2b$10$dummyhashfordevonly000000000000000000000000000000",
+      passwordHash: hashPassword(adminPassword),
       role: "admin",
     },
   });

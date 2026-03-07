@@ -15,6 +15,20 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
 
 const app = express();
+
+// CORS: restrict to known origins
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "http://localhost:3000").split(",");
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  }
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
+
 app.use(express.json());
 app.use(express.static(join(__dirname, "public")));
 
@@ -39,7 +53,7 @@ app.post("/api/ask", async (req, res) => {
     const answer = await askWorkIQ(client, question);
     res.json({ answer });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -53,7 +67,7 @@ app.get("/api/calendar", async (_req, res) => {
     );
     res.json({ answer });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -67,7 +81,7 @@ app.get("/api/messages", async (_req, res) => {
     );
     res.json({ answer });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -94,7 +108,7 @@ app.get("/api/actions", (_req, res) => {
       ...categories,
     });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -161,7 +175,7 @@ app.get("/api/bod", async (_req, res) => {
       actions: actionsData,
     });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -205,7 +219,7 @@ Then separately list anything that was specifically assigned to me (Syedhu / Mas
 
     res.json({ summaries, actionItems });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

@@ -28,6 +28,7 @@ public static class ActionItemsTools
         var deserializer = new DeserializerBuilder()
             .WithNamingConvention(UnderscoredNamingConvention.Instance)
             .IgnoreUnmatchedProperties()
+            .WithTagMapping("!!", typeof(object))
             .Build();
 
         ActionsFile actionsFile;

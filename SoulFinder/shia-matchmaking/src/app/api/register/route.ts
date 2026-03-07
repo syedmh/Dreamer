@@ -4,6 +4,13 @@ import { registrationSchema } from "@/lib/validations";
 import { createCheckoutSession } from "@/lib/stripe";
 
 export async function POST(request: NextRequest) {
+  // CSRF: verify request origin matches the app
+  const origin = request.headers.get("origin");
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  if (origin && !appUrl.startsWith(origin)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   try {
     const body = await request.json();
 
@@ -44,8 +51,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Dev mode: skip Stripe and mark as paid immediately
-    if (process.env.DEV_SKIP_PAYMENT === "true") {
+    // Dev mode: skip Stripe and mark as paid immediately (blocked in production)
+    if (process.env.DEV_SKIP_PAYMENT === "true" && process.env.NODE_ENV !== "production") {
       await prisma.registration.update({
         where: { id: registration.id },
         data: { status: "PAID" },

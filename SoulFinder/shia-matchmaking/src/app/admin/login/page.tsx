@@ -11,18 +11,31 @@ export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
-    // TODO: Implement NextAuth.js login
-    // For now, simple placeholder
-    if (email === "admin@husaynia.org" && password === "admin") {
-      router.push("/admin");
-    } else {
-      setError("Invalid credentials");
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (res.ok) {
+        router.push("/admin");
+      } else {
+        const data = await res.json();
+        setError(data.error || "Invalid credentials");
+      }
+    } catch {
+      setError("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,9 +84,10 @@ export default function AdminLoginPage() {
             )}
             <Button
               type="submit"
+              disabled={loading}
               className="w-full bg-primary-red hover:bg-primary-red-light text-white"
             >
-              Sign In
+              {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
         </CardContent>

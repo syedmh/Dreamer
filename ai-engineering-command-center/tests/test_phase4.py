@@ -53,7 +53,7 @@ diff --git a/services/payment.py b/services/payment.py
 @@ -10,6 +10,10 @@ class PaymentService:
 +    def process(self, amount):
 +        conn = db.connect()
-+        conn.execute("SELECT * FROM users WHERE id=" + user_id)
++        conn.execute("SELECT * FROM users WHERE id=?", (user_id,))
 +        return conn.fetchone()
 """
 
