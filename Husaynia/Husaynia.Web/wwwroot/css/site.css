@@ -1,0 +1,552 @@
+/* ========================================
+   Husaynia Islamic Society of Seattle
+   Custom Stylesheet
+   ======================================== */
+
+/* ========================================
+   CSS Variables
+   ======================================== */
+:root {
+    --primary-red: #b90000;
+    --primary-red-dark: #890000;
+    --primary-red-light: #d10000;
+    --text-dark: #333333;
+    --text-light: #666666;
+    --text-muted: #999999;
+    --background-light: #f9f9f9;
+    --background-white: #ffffff;
+    --border-gray: #e0e0e0;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ========================================
+   Base Styles
+   ======================================== */
+html {
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+body {
+    font-family: 'Open Sans', Arial, sans-serif;
+    color: var(--text-dark);
+    background-color: var(--background-light);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+a {
+    color: var(--primary-red);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--primary-red-dark);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+}
+
+/* ========================================
+   Top Bar
+   ======================================== */
+.top-bar {
+    background-color: var(--text-dark);
+    color: #ffffff;
+    padding: 8px 0;
+    font-size: 0.875rem;
+}
+
+.top-bar .top-info {
+    color: #ffffff;
+}
+
+.top-bar .date-info {
+    color: #ffffff;
+    font-size: 0.9rem;
+}
+
+.top-bar .date-info i {
+    color: var(--primary-red);
+    margin-right: 5px;
+}
+
+.top-bar .top-links {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.top-bar .top-links a {
+    color: #ffffff;
+    margin-left: 15px;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+.top-bar .top-links a:hover {
+    color: var(--primary-red);
+}
+
+.search-box-top {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.search-input-top {
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 5px 15px;
+    outline: none;
+    font-size: 0.85rem;
+    width: 150px;
+}
+
+.search-input-top::placeholder {
+    color: rgba(255,255,255,0.6);
+}
+
+.search-btn-top {
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 5px 15px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.search-btn-top:hover {
+    color: var(--primary-red);
+}
+
+/* ========================================
+   Main Header
+   ======================================== */
+.main-header {
+    background-color: var(--background-white);
+    border-bottom: 3px solid var(--primary-red);
+    padding: 20px 0;
+    box-shadow: var(--shadow);
+}
+
+.main-header .logo a {
+    color: var(--primary-red);
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.main-header .logo a:hover {
+    color: var(--primary-red-dark);
+}
+
+.main-header .navbar {
+    padding: 0;
+}
+
+.main-header .navbar-nav {
+    align-items: center;
+}
+
+.main-header .nav-link {
+    color: var(--text-dark);
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    transition: color 0.3s ease;
+}
+
+.main-header .nav-link:hover,
+.main-header .nav-link:focus {
+    color: var(--primary-red);
+}
+
+.main-header .dropdown-menu {
+    border: 1px solid var(--border-gray);
+    box-shadow: var(--shadow);
+    border-radius: 0;
+}
+
+.main-header .dropdown-item {
+    padding: 0.75rem 1.5rem;
+    color: var(--text-dark);
+    transition: background-color 0.3s ease;
+}
+
+.main-header .dropdown-item:hover {
+    background-color: var(--background-light);
+    color: var(--primary-red);
+}
+
+/* ========================================
+   Donate Button
+   ======================================== */
+.btn-donate {
+    background-color: var(--primary-red) !important;
+    color: #ffffff !important;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-right: 20px;
+}
+
+.btn-donate:hover {
+    background-color: var(--primary-red-dark) !important;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.btn-donate i {
+    margin-right: 5px;
+}
+
+.navbar-nav .nav-item:first-child .nav-link {
+    margin-right: 20px;
+}
+
+/* ========================================
+   Main Content
+   ======================================== */
+main {
+    min-height: calc(100vh - 400px);
+    padding: 40px 0;
+}
+
+.page-title {
+    color: var(--text-dark);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid var(--primary-red);
+}
+
+.lead {
+    font-size: 1.25rem;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+/* ========================================
+   Cards
+   ======================================== */
+.card {
+    border: 1px solid var(--border-gray);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    background-color: var(--background-white);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-5px);
+}
+
+.card-title {
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.card-title a {
+    color: var(--text-dark);
+    transition: color 0.3s ease;
+}
+
+.card-title a:hover {
+    color: var(--primary-red);
+}
+
+/* ========================================
+   Buttons
+   ======================================== */
+.btn-primary {
+    background-color: var(--primary-red);
+    border-color: var(--primary-red);
+    color: #ffffff;
+    font-weight: 600;
+    padding: 0.5rem 1.5rem;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--primary-red-dark);
+    border-color: var(--primary-red-dark);
+    box-shadow: var(--shadow);
+}
+
+.btn-outline-primary {
+    color: var(--primary-red);
+    border-color: var(--primary-red);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    background-color: var(--primary-red);
+    border-color: var(--primary-red);
+    color: #ffffff;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem var(--primary-red);
+}
+
+/* ========================================
+   Footer
+   ======================================== */
+.main-footer {
+    background-color: var(--text-dark);
+    color: #ffffff;
+    padding: 40px 0 20px;
+    margin-top: 60px;
+}
+
+.main-footer h5 {
+    color: #ffffff;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.main-footer p {
+    color: #cccccc;
+    line-height: 1.8;
+}
+
+.main-footer .footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.main-footer .footer-links li {
+    margin-bottom: 0.5rem;
+}
+
+.main-footer .footer-links a {
+    color: #cccccc;
+    transition: color 0.3s ease;
+}
+
+.main-footer .footer-links a:hover {
+    color: var(--primary-red);
+}
+
+.main-footer .footer-contact {
+    list-style: none;
+    padding: 0;
+}
+
+.main-footer .footer-contact li {
+    color: #cccccc;
+    margin-bottom: 0.75rem;
+    line-height: 1.8;
+}
+
+.main-footer .footer-contact i {
+    color: var(--primary-red);
+    margin-right: 10px;
+    width: 20px;
+}
+
+.main-footer .social-links a {
+    color: #ffffff;
+    margin-right: 15px;
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.main-footer .social-links a:hover {
+    color: var(--primary-red);
+}
+
+.main-footer hr {
+    border-color: rgba(255, 255, 255, 0.1);
+    margin: 30px 0 20px;
+}
+
+/* ========================================
+   Forms
+   ======================================== */
+.form-control {
+    border: 1px solid var(--border-gray);
+    border-radius: 5px;
+    padding: 0.75rem 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 0.2rem rgba(185, 0, 0, 0.25);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+/* ========================================
+   Alerts
+   ======================================== */
+.alert {
+    border-radius: 5px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+}
+
+/* ========================================
+   Utility Classes
+   ======================================== */
+.text-primary-red {
+    color: var(--primary-red) !important;
+}
+
+.bg-primary-red {
+    background-color: var(--primary-red) !important;
+}
+
+.border-primary-red {
+    border-color: var(--primary-red) !important;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.section-title::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background-color: var(--primary-red);
+    margin: 1rem auto 0;
+}
+
+/* ========================================
+   Responsive Styles
+   ======================================== */
+@media (max-width: 991px) {
+    .main-header .navbar-collapse {
+        margin-top: 1rem;
+    }
+
+    .main-header .nav-link {
+        padding: 0.5rem 0;
+    }
+
+    .btn-donate {
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+
+    .top-bar .contact-info,
+    .top-bar .social-links {
+        text-align: center;
+        margin-top: 5px;
+    }
+}
+
+@media (max-width: 767px) {
+    .page-title {
+        font-size: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.75rem;
+    }
+}
+
+/* ========================================
+   Loading States
+   ======================================== */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.2em;
+}
+
+/* ========================================
+   Accessibility
+   ======================================== */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ========================================
+   Print Styles
+   ======================================== */
+@media print {
+    .top-bar,
+    .main-header,
+    .main-footer,
+    .btn,
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        background-color: #ffffff;
+    }
+}

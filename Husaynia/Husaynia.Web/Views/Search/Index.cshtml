@@ -1,0 +1,147 @@
+@{
+    ViewData["Title"] = $"Search Results for \"{ViewBag.Query}\"";
+    ViewData["Description"] = "Search Husaynia Islamic Society content";
+    var announcements = ViewBag.Announcements as List<Husaynia.Core.Entities.Announcement>;
+    var events = ViewBag.Events as List<Husaynia.Core.Entities.Event>;
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <h1 class="page-title">Search Results</h1>
+
+            <div class="mb-4">
+                <form asp-action="Index" method="get">
+                    <div class="input-group input-group-lg">
+                        <input type="text" name="q" class="form-control" placeholder="Search..." value="@ViewBag.Query" autofocus>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(ViewBag.Query))
+            {
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> @ViewBag.Error
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        Found <strong>@ViewBag.TotalResults</strong> result(s) for "<strong>@ViewBag.Query</strong>"
+                    </div>
+
+                    @if (ViewBag.TotalResults == 0)
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <h4>No results found</h4>
+                            <p class="text-muted">Try different keywords or browse our content:</p>
+                            <div class="d-flex gap-2 justify-content-center">
+                                <a asp-controller="Announcements" asp-action="Index" class="btn btn-outline-primary">
+                                    View Announcements
+                                </a>
+                                <a asp-controller="Calendar" asp-action="UpcomingPrograms" class="btn btn-outline-primary">
+                                    View Events
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        @if (announcements != null && announcements.Any())
+                        {
+                            <div class="mb-5">
+                                <h3><i class="fas fa-bullhorn text-primary-red"></i> Announcements (@announcements.Count)</h3>
+                                <div class="list-group">
+                                    @foreach (var announcement in announcements)
+                                    {
+                                        <a asp-controller="Announcements" asp-action="Details" asp-route-id="@announcement.Id"
+                                           class="list-group-item list-group-item-action">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1">@announcement.Title</h5>
+                                                <small class="text-muted">@announcement.PublishedDate.ToString("MMM dd, yyyy")</small>
+                                            </div>
+                                            <p class="mb-1">@announcement.Excerpt</p>
+                                            @if (!string.IsNullOrEmpty(announcement.Tags))
+                                            {
+                                                <small class="text-muted">
+                                                    <i class="fas fa-tags"></i> @announcement.Tags
+                                                </small>
+                                            }
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        @if (events != null && events.Any())
+                        {
+                            <div class="mb-5">
+                                <h3><i class="fas fa-calendar-alt text-primary-red"></i> Events (@events.Count)</h3>
+                                <div class="list-group">
+                                    @foreach (var evt in events)
+                                    {
+                                        <a asp-controller="Calendar" asp-action="EventDetails" asp-route-id="@evt.Id"
+                                           class="list-group-item list-group-item-action">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1">
+                                                    @evt.Title
+                                                    <span class="badge" style="background-color: @GetCategoryColor(evt.Category);">@evt.Category</span>
+                                                </h5>
+                                                <small class="text-muted">@evt.StartDateTime.ToString("MMM dd, yyyy")</small>
+                                            </div>
+                                            <p class="mb-1">@evt.StartDateTime.ToString("h:mm tt") @if (evt.EndDateTime.HasValue) { <text> - @evt.EndDateTime.Value.ToString("h:mm tt")</text> }</p>
+                                            @if (!string.IsNullOrEmpty(evt.Location))
+                                            {
+                                                <small class="text-muted">
+                                                    <i class="fas fa-map-marker-alt"></i> @evt.Location
+                                                </small>
+                                            }
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4>Search our content</h4>
+                    <p class="text-muted">Enter keywords to find announcements, events, and more</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetCategoryColor(string category)
+    {
+        return category?.ToLower() switch
+        {
+            "lecture" => "#b90000",
+            "social" => "#0066cc",
+            "religious" => "#006600",
+            "education" => "#ff8c00",
+            _ => "#666666"
+        };
+    }
+}
+
+<style>
+    .text-primary-red {
+        color: var(--primary-red);
+    }
+
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+</style>

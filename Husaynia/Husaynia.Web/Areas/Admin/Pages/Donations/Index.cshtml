@@ -1,0 +1,82 @@
+@page
+@model DonationsIndexModel
+@{
+    ViewData["Title"] = "Donation Reports";
+}
+
+<h1><i class="fas fa-dollar-sign"></i> Donation Reports</h1>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5>Total Donations</h5>
+                <h2 class="display-5">$@Model.TotalDonations.ToString("N2")</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5>Total Donors</h5>
+                <h2 class="display-5">@Model.DonationCount</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5>Build Husaynia</h5>
+                <h2 class="display-6">$@Model.CampaignTotal.ToString("N0")</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5>Recent Donations</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Donor</th>
+                        <th>Email</th>
+                        <th>Amount</th>
+                        <th>Campaign</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var donation in Model.RecentDonations)
+                    {
+                        <tr>
+                            <td>@donation.DonationDate.ToString("MMM dd, yyyy")</td>
+                            <td>@(donation.IsAnonymous ? "Anonymous" : donation.DonorName)</td>
+                            <td>@(donation.IsAnonymous ? "-" : donation.DonorEmail)</td>
+                            <td><strong>$@donation.Amount.ToString("N2")</strong></td>
+                            <td><span class="badge bg-secondary">@donation.Campaign</span></td>
+                            <td>
+                                @if (donation.Status == Husaynia.Core.Enums.DonationStatus.Completed)
+                                {
+                                    <span class="badge bg-success">Completed</span>
+                                }
+                                else if (donation.Status == Husaynia.Core.Enums.DonationStatus.Pending)
+                                {
+                                    <span class="badge bg-warning">Pending</span>
+                                }
+                                else if (donation.Status == Husaynia.Core.Enums.DonationStatus.Failed)
+                                {
+                                    <span class="badge bg-danger">Failed</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

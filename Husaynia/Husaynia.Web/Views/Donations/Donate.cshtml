@@ -1,0 +1,192 @@
+@{
+    ViewData["Title"] = "Make a Donation";
+    ViewData["Description"] = "Support Husaynia Islamic Society with your generous donation";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4" style="color: #b90000; font-weight: 600;">Make a Donation</h1>
+            <p class="mb-4">Support our community with your generous contribution</p>
+
+            <!-- Campaign Progress -->
+            <div class="campaign-section mb-4 p-4 bg-white border">
+                <h4 class="text-center mb-3" style="color: #b90000;">Build Husaynia Campaign</h4>
+                <div class="progress mb-3" style="height: 30px;">
+                    <div class="progress-bar"
+                         role="progressbar"
+                         style="width: @((ViewBag.CurrentAmount / ViewBag.GoalAmount * 100))%; background-color: #b90000;"
+                         aria-valuenow="@ViewBag.CurrentAmount"
+                         aria-valuemin="0"
+                         aria-valuemax="@ViewBag.GoalAmount">
+                        @((ViewBag.CurrentAmount / ViewBag.GoalAmount * 100).ToString("F1"))%
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <strong>Raised:</strong> $@ViewBag.CurrentAmount.ToString("N0")
+                    </div>
+                    <div>
+                        <strong>Goal:</strong> $@ViewBag.GoalAmount.ToString("N0")
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donation Form -->
+            <div class="donation-form-section p-4 bg-white border">
+                <form id="donation-form">
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Donation Amount (USD) *</label>
+                        <div class="btn-group btn-group-sm mb-2 d-flex" role="group">
+                            <button type="button" class="btn amount-btn" data-amount="25" style="background-color: white; color: #b90000; border: 1px solid #dee2e6;">$25</button>
+                            <button type="button" class="btn amount-btn" data-amount="50" style="background-color: white; color: #b90000; border: 1px solid #dee2e6;">$50</button>
+                            <button type="button" class="btn amount-btn" data-amount="100" style="background-color: white; color: #b90000; border: 1px solid #dee2e6;">$100</button>
+                            <button type="button" class="btn amount-btn" data-amount="250" style="background-color: white; color: #b90000; border: 1px solid #dee2e6;">$250</button>
+                            <button type="button" class="btn amount-btn" data-amount="500" style="background-color: white; color: #b90000; border: 1px solid #dee2e6;">$500</button>
+                        </div>
+                        <input type="number" class="form-control" id="amount" name="amount" min="1" step="0.01" required placeholder="Enter custom amount">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="donorName" class="form-label">Your Name *</label>
+                        <input type="text" class="form-control" id="donorName" name="donorName" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="donorEmail" class="form-label">Email Address *</label>
+                        <input type="email" class="form-control" id="donorEmail" name="donorEmail" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="campaign" class="form-label">Campaign</label>
+                        <select class="form-select" id="campaign" name="campaign">
+                            <option value="Build Husaynia" selected>Build Husaynia</option>
+                            <option value="General">General Fund</option>
+                            <option value="Programs">Programs & Events</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="isAnonymous" name="isAnonymous">
+                        <label class="form-check-label" for="isAnonymous">
+                            Make my donation anonymous
+                        </label>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-lg" id="donate-btn" style="background-color: #b90000; color: white;">
+                            <i class="fas fa-heart"></i> Proceed to Payment
+                        </button>
+                    </div>
+
+                    <div id="error-message" class="alert alert-danger mt-3 d-none"></div>
+                </form>
+            </div>
+
+            <div class="text-center mt-4 text-muted small">
+                <i class="fas fa-lock"></i> Secure payment processing powered by Stripe<br>
+                Your donation is tax-deductible. Tax ID: 99-9999999
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .campaign-section, .donation-form-section {
+        border-left: 4px solid #b90000 !important;
+    }
+
+    .amount-btn.active {
+        background-color: #b90000 !important;
+        color: white !important;
+        border-color: #b90000 !important;
+    }
+</style>
+
+@section Scripts {
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const stripe = Stripe('@ViewBag.StripePublishableKey');
+
+        // Quick amount buttons
+        document.querySelectorAll('.amount-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.getElementById('amount').value = this.dataset.amount;
+                document.querySelectorAll('.amount-btn').forEach(b => {
+                    b.style.backgroundColor = 'white';
+                    b.style.color = '#b90000';
+                    b.style.borderColor = '#dee2e6';
+                });
+                this.style.backgroundColor = '#b90000';
+                this.style.color = 'white';
+                this.style.borderColor = '#b90000';
+            });
+        });
+
+        // Handle form submission
+        document.getElementById('donation-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const amount = parseFloat(document.getElementById('amount').value);
+            if (!amount || amount < 1) {
+                showError('Please enter a valid donation amount');
+                return;
+            }
+
+            const donorName = document.getElementById('donorName').value;
+            const donorEmail = document.getElementById('donorEmail').value;
+            const campaign = document.getElementById('campaign').value;
+            const isAnonymous = document.getElementById('isAnonymous').checked;
+
+            const donateBtn = document.getElementById('donate-btn');
+            donateBtn.disabled = true;
+            donateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            try {
+                const response = await fetch('/Donations/CreateCheckoutSession', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        amount: amount,
+                        donorName: donorName,
+                        donorEmail: donorEmail,
+                        isAnonymous: isAnonymous,
+                        campaign: campaign
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    showError(data.error);
+                    donateBtn.disabled = false;
+                    donateBtn.innerHTML = '<i class="fas fa-heart"></i> Proceed to Payment';
+                    return;
+                }
+
+                // Redirect to Stripe Checkout
+                const result = await stripe.redirectToCheckout({
+                    sessionId: data.sessionId
+                });
+
+                if (result.error) {
+                    showError(result.error.message);
+                    donateBtn.disabled = false;
+                    donateBtn.innerHTML = '<i class="fas fa-heart"></i> Proceed to Payment';
+                }
+            } catch (error) {
+                showError('An error occurred. Please try again.');
+                donateBtn.disabled = false;
+                donateBtn.innerHTML = '<i class="fas fa-heart"></i> Proceed to Payment';
+            }
+        });
+
+        function showError(message) {
+            const errorEl = document.getElementById('error-message');
+            errorEl.textContent = message;
+            errorEl.classList.remove('d-none');
+        }
+    </script>
+}

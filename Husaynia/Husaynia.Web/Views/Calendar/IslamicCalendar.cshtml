@@ -1,0 +1,83 @@
+@{
+    ViewData["Title"] = "Islamic Calendar";
+    ViewData["Description"] = "Islamic calendar and important dates";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <h1 class="page-title">Islamic Calendar</h1>
+            <p class="lead">Important Islamic dates and observances</p>
+
+            <div class="alert alert-info mb-5">
+                <i class="fas fa-info-circle"></i> Islamic calendar integration is coming soon.
+                This page will display important Islamic dates, Hijri calendar, and religious observances.
+            </div>
+
+            <!-- Placeholder for Islamic months -->
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary-red text-white">
+                            <h5 class="mb-0">Muharram</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>First month of the Islamic calendar</p>
+                            <ul>
+                                <li>Ashura (10th Muharram)</li>
+                                <li>Arba'een (20th Safar)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary-red text-white">
+                            <h5 class="mb-0">Ramadan</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Month of fasting</p>
+                            <ul>
+                                <li>Laylat al-Qadr (Night of Power)</li>
+                                <li>Eid al-Fitr</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary-red text-white">
+                            <h5 class="mb-0">Dhul Hijjah</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Month of Hajj</p>
+                            <ul>
+                                <li>Day of Arafah (9th Dhul Hijjah)</li>
+                                <li>Eid al-Adha (10th Dhul Hijjah)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary-red text-white">
+                            <h5 class="mb-0">Rabi' al-Awwal</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Birth of Prophet Muhammad (PBUH)</p>
+                            <ul>
+                                <li>Mawlid al-Nabi (12th Rabi' al-Awwal)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a asp-action="UpcomingPrograms" class="btn btn-primary">
+                    <i class="fas fa-calendar-alt"></i> View Upcoming Programs
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

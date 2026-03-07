@@ -1,0 +1,64 @@
+@model Husaynia.Web.ViewModels.PrayerTimesViewModel
+
+<div class="prayer-times-widget card">
+    <div class="card-header bg-primary-red text-white">
+        <h5 class="mb-0">
+            <i class="fas fa-mosque"></i> Prayer Times
+        </h5>
+        <small>@Model.Date.ToString("MMMM dd, yyyy")</small>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+            <tbody>
+                <tr>
+                    <td class="fw-bold"><i class="fas fa-sun text-warning"></i> Fajr</td>
+                    <td class="text-end">@Model.FajrFormatted</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold"><i class="fas fa-cloud-sun text-info"></i> Sunrise</td>
+                    <td class="text-end text-muted">@Model.SunriseFormatted</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold"><i class="fas fa-sun text-warning"></i> Dhuhr</td>
+                    <td class="text-end">@Model.DhuhrFormatted</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold"><i class="fas fa-cloud-sun text-warning"></i> Asr</td>
+                    <td class="text-end">@Model.AsrFormatted</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold"><i class="fas fa-moon text-primary"></i> Maghrib</td>
+                    <td class="text-end">@Model.MaghribFormatted</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold"><i class="fas fa-star text-dark"></i> Isha</td>
+                    <td class="text-end">@Model.IshaFormatted</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer text-center">
+        <a asp-controller="Calendar" asp-action="PrayerTimings" class="btn btn-sm btn-outline-primary">
+            View Monthly Schedule <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+</div>
+
+<style>
+    .prayer-times-widget .card-header {
+        background-color: var(--primary-red) !important;
+    }
+
+    .prayer-times-widget table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border-gray);
+    }
+
+    .prayer-times-widget table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .prayer-times-widget .card-footer {
+        background-color: var(--background-light);
+    }
+</style>

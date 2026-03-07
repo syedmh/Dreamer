@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://husaynia.org/sitemap.xml
+
+# Disallow admin area
+Disallow: /Admin/
+Disallow: /Identity/
+
+# Disallow search results to avoid duplicate content
+Disallow: /Search?
+
+# Allow all other pages
+Allow: /Announcements/
+Allow: /Calendar/
+Allow: /Media/
+Allow: /Donations/
+Allow: /About/

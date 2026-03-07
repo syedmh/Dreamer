@@ -1,0 +1,98 @@
+@model IEnumerable<Husaynia.Core.Entities.PrayerTime>
+@{
+    ViewData["Title"] = "Prayer Timings";
+    ViewData["Description"] = "Monthly prayer times for Husaynia Islamic Society";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4" style="color: #b90000; font-weight: 600;">Prayer Timings - @ViewBag.MonthName</h1>
+            <p class="mb-2">Prayer times for Snohomish, WA (Lat: 47.9129°N, Long: 122.0982°W)</p>
+            <p class="text-muted small mb-4">
+                <i class="fas fa-info-circle"></i> Fajr: 16° angle | Isha: 14° angle | Asr: Shafi method
+            </p>
+
+            <!-- Month Navigation -->
+            <div class="mb-4">
+                <div class="btn-group" role="group">
+                    <a asp-action="PrayerTimings"
+                       asp-route-year="@(ViewBag.Month == 1 ? ViewBag.Year - 1 : ViewBag.Year)"
+                       asp-route-month="@(ViewBag.Month == 1 ? 12 : ViewBag.Month - 1)"
+                       class="btn btn-sm" style="background-color: white; color: #b90000; border: 1px solid #dee2e6;">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </a>
+                    <a asp-action="PrayerTimings" class="btn btn-sm" style="background-color: #b90000; color: white; border: 1px solid #b90000;">
+                        Current Month
+                    </a>
+                    <a asp-action="PrayerTimings"
+                       asp-route-year="@(ViewBag.Month == 12 ? ViewBag.Year + 1 : ViewBag.Year)"
+                       asp-route-month="@(ViewBag.Month == 12 ? 1 : ViewBag.Month + 1)"
+                       class="btn btn-sm" style="background-color: white; color: #b90000; border: 1px solid #dee2e6;">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="prayer-times-table bg-white p-4 border">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr style="background-color: #b90000; color: white;">
+                                <th>Date</th>
+                                <th>Day</th>
+                                <th>Fajr</th>
+                                <th>Sunrise</th>
+                                <th>Dhuhr</th>
+                                <th>Asr</th>
+                                <th>Maghrib</th>
+                                <th>Isha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var prayerTime in Model)
+                            {
+                                var isToday = prayerTime.Date.Date == DateTime.Today;
+                                <tr class="@(isToday ? "table-active" : "")">
+                                    <td>
+                                        <strong>@prayerTime.Date.ToString("MMM dd")</strong>
+                                        @if (isToday)
+                                        {
+                                            <span class="badge ms-2" style="background-color: #b90000;">Today</span>
+                                        }
+                                    </td>
+                                    <td>@prayerTime.Date.ToString("dddd")</td>
+                                    <td>@prayerTime.Fajr.ToString(@"hh\:mm")</td>
+                                    <td class="text-muted">@prayerTime.Sunrise.ToString(@"hh\:mm")</td>
+                                    <td>@prayerTime.Dhuhr.ToString(@"hh\:mm")</td>
+                                    <td>@prayerTime.Asr.ToString(@"hh\:mm")</td>
+                                    <td>@prayerTime.Maghrib.ToString(@"hh\:mm")</td>
+                                    <td>@prayerTime.Isha.ToString(@"hh\:mm")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Print Button -->
+                <div class="text-center mt-4">
+                    <button onclick="window.print()" class="btn btn-sm" style="background-color: #b90000; color: white;">
+                        <i class="fas fa-print"></i> Print Schedule
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .prayer-times-table {
+        border-left: 4px solid #b90000 !important;
+    }
+
+    @@media print {
+        .btn-group, .btn {
+            display: none !important;
+        }
+    }
+</style>

@@ -1,0 +1,502 @@
+@{
+    ViewData["Title"] = "Home";
+    ViewData["Description"] = "Husaynia Islamic Society of Seattle - A community center serving the Muslim community";
+    var campaign = ViewBag.Campaign as Husaynia.Core.Entities.DonationCampaign;
+    var featuredAnnouncements = ViewBag.FeaturedAnnouncements as List<Husaynia.Core.Entities.Announcement>;
+    var upcomingEvents = ViewBag.UpcomingEvents as List<Husaynia.Core.Entities.Event>;
+    var progressPercentage = campaign != null ? (campaign.CurrentAmount / campaign.GoalAmount * 100) : 42.6m;
+}
+
+<style>
+    /* Homepage specific styles to match WordPress */
+    body {
+        background-color: #ffffff;
+    }
+
+    main {
+        padding: 0;
+        min-height: auto;
+    }
+
+    .hero-quote {
+        background: linear-gradient(135deg, #8B0000 0%, #B90000 100%);
+        color: white;
+        padding: 60px 0;
+        text-align: center;
+    }
+
+    .hero-quote blockquote {
+        font-size: 1.5rem;
+        font-style: italic;
+        line-height: 1.8;
+        margin: 0 auto;
+        max-width: 900px;
+    }
+
+    .hero-quote footer {
+        margin-top: 20px;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .homepage-section {
+        padding: 60px 0;
+    }
+
+    .section-title-wp {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #B90000;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+
+    .prayer-widget-wp {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .prayer-widget-header {
+        background: #B90000;
+        color: white;
+        padding: 20px;
+        border-radius: 6px 6px 0 0;
+        text-align: center;
+    }
+
+    .prayer-widget-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .prayer-widget-date {
+        margin-top: 5px;
+        font-size: 0.95rem;
+        opacity: 0.9;
+    }
+
+    .prayer-times-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0;
+    }
+
+    .prayer-time-item {
+        padding: 25px 15px;
+        text-align: center;
+        border-right: 1px solid #e0e0e0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .prayer-time-item:nth-child(3n) {
+        border-right: none;
+    }
+
+    .prayer-time-item:nth-last-child(-n+3) {
+        border-bottom: none;
+    }
+
+    .prayer-name {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .prayer-time {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .program-card-wp {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+        height: 100%;
+    }
+
+    .program-card-wp:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    }
+
+    .program-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .program-body {
+        padding: 20px;
+    }
+
+    .program-category {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 3px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .announcement-feed {
+        background: #f8f9fa;
+        padding: 40px;
+        border-radius: 8px;
+        min-height: 300px;
+        text-align: center;
+    }
+
+    .mission-box {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 50px;
+        border-radius: 8px;
+        text-align: center;
+        border-left: 5px solid #B90000;
+    }
+
+    .mission-box h3 {
+        color: #B90000;
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+
+    .mission-box p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #333;
+    }
+
+    .campaign-box {
+        background: white;
+        border: 2px solid #B90000;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(185,0,0,0.1);
+    }
+
+    .campaign-stats {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #B90000;
+        margin: 20px 0;
+    }
+
+    .progress-bar-wp {
+        width: 100%;
+        height: 40px;
+        background: #e9ecef;
+        border-radius: 20px;
+        overflow: hidden;
+        margin: 30px 0;
+    }
+
+    .progress-fill-wp {
+        height: 100%;
+        background: linear-gradient(90deg, #B90000 0%, #D10000 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .btn-wp-primary {
+        background: #B90000;
+        color: white;
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 50px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+
+    .btn-wp-primary:hover {
+        background: #8B0000;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(185,0,0,0.3);
+    }
+
+    .media-section-wp {
+        background: #f8f9fa;
+        padding: 40px;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .media-section-wp h4 {
+        color: #B90000;
+        margin-bottom: 15px;
+    }
+
+    @media (max-width: 768px) {
+        .prayer-times-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .hero-quote blockquote {
+            font-size: 1.2rem;
+        }
+    }
+</style>
+
+<!-- Hero Quote Banner -->
+<section class="hero-quote">
+    <div class="container">
+        <blockquote>
+            "Surely, there exists in the hearts of believers, with respect to martyrdom of Hussain (A.S), a heat that never subsides."
+            <footer>— Prophet Muhammad (PBUH)</footer>
+        </blockquote>
+    </div>
+</section>
+
+<!-- Prayer Times Section -->
+<section class="homepage-section" style="background: #ffffff;">
+    <div class="container">
+        <h2 class="section-title-wp">Prayer Times</h2>
+        <div class="prayer-widget-wp">
+            <div class="prayer-widget-header">
+                <h3><i class="fas fa-mosque"></i> Daily Prayers</h3>
+                <div class="prayer-widget-date">@DateTime.Today.ToString("MMMM dd, yyyy") • Snohomish, WA</div>
+            </div>
+            @{
+                var prayerTimes = await Component.InvokeAsync("PrayerTimesWidget");
+                var viewModel = (prayerTimes as Microsoft.AspNetCore.Mvc.ViewComponents.ViewViewComponentResult)?.ViewData?.Model as Husaynia.Web.ViewModels.PrayerTimesViewModel;
+            }
+            @if (viewModel != null)
+            {
+                <div class="prayer-times-grid">
+                    <div class="prayer-time-item">
+                        <div class="prayer-name">Fajr</div>
+                        <div class="prayer-time">@viewModel.FajrFormatted</div>
+                    </div>
+                    <div class="prayer-time-item">
+                        <div class="prayer-name">Sunrise</div>
+                        <div class="prayer-time" style="color: #999;">@viewModel.SunriseFormatted</div>
+                    </div>
+                    <div class="prayer-time-item">
+                        <div class="prayer-name">Dhuhr</div>
+                        <div class="prayer-time">@viewModel.DhuhrFormatted</div>
+                    </div>
+                    <div class="prayer-time-item">
+                        <div class="prayer-name">Asr</div>
+                        <div class="prayer-time">@viewModel.AsrFormatted</div>
+                    </div>
+                    <div class="prayer-time-item">
+                        <div class="prayer-name">Maghrib</div>
+                        <div class="prayer-time">@viewModel.MaghribFormatted</div>
+                    </div>
+                    <div class="prayer-time-item">
+                        <div class="prayer-name">Isha</div>
+                        <div class="prayer-time">@viewModel.IshaFormatted</div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                @await Component.InvokeAsync("PrayerTimesWidget")
+            }
+        </div>
+        <p style="text-align: center; margin-top: 20px; color: #666;">
+            <small><i class="fas fa-info-circle"></i> Calculated with 16° Fajr angle and 14° Isha angle</small>
+        </p>
+    </div>
+</section>
+
+<!-- Upcoming Programs Section -->
+<section class="homepage-section" style="background: #f8f9fa;">
+    <div class="container">
+        <h2 class="section-title-wp">Upcoming Programs</h2>
+        @if (upcomingEvents != null && upcomingEvents.Any())
+        {
+            <div class="row g-4">
+                @foreach (var evt in upcomingEvents.Take(3))
+                {
+                    <div class="col-md-4">
+                        <div class="program-card-wp">
+                            @if (!string.IsNullOrEmpty(evt.ImageUrl))
+                            {
+                                <img src="@evt.ImageUrl" class="program-image" alt="@evt.Title">
+                            }
+                            <div class="program-body">
+                                <span class="program-category" style="background-color: @GetCategoryColor(evt.Category); color: white;">@evt.Category</span>
+                                <h5 style="margin: 10px 0; color: #333;">@evt.Title</h5>
+                                <p style="color: #666; font-size: 0.9rem; margin: 10px 0;">
+                                    <i class="far fa-calendar"></i> @evt.StartDateTime.ToString("MMMM dd, yyyy")<br />
+                                    <i class="far fa-clock"></i> @evt.StartDateTime.ToString("h:mm tt")
+                                </p>
+                                <a asp-controller="Calendar" asp-action="EventDetails" asp-route-id="@evt.Id" class="btn btn-sm btn-wp-primary" style="padding: 8px 20px; font-size: 0.9rem;">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div style="text-center; margin-top: 30px;">
+                <a asp-controller="Calendar" asp-action="UpcomingPrograms" class="btn-wp-primary">View All Programs</a>
+            </div>
+        }
+        else
+        {
+            <div class="announcement-feed">
+                <i class="fas fa-calendar-alt fa-3x" style="color: #B90000; margin-bottom: 20px;"></i>
+                <p style="font-size: 1.1rem; color: #666;">No upcoming programs at this time. Please check back later!</p>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Announcements Section -->
+<section class="homepage-section" style="background: #ffffff;">
+    <div class="container">
+        <h2 class="section-title-wp">Recent Announcements</h2>
+        @if (featuredAnnouncements != null && featuredAnnouncements.Any())
+        {
+            <div class="row g-4">
+                @foreach (var announcement in featuredAnnouncements.Take(3))
+                {
+                    <div class="col-md-4">
+                        <div class="program-card-wp">
+                            @if (!string.IsNullOrEmpty(announcement.ImageUrl))
+                            {
+                                <img src="@announcement.ImageUrl" class="program-image" alt="@announcement.Title">
+                            }
+                            <div class="program-body">
+                                @if (announcement.IsPinned)
+                                {
+                                    <span class="program-category" style="background-color: #B90000; color: white;">
+                                        <i class="fas fa-thumbtack"></i> Featured
+                                    </span>
+                                }
+                                <h5 style="margin: 10px 0;">
+                                    <a href="@Url.Action("Details", "Announcements", new { id = announcement.Id })" style="color: #333; text-decoration: none;">
+                                        @announcement.Title
+                                    </a>
+                                </h5>
+                                <p style="color: #999; font-size: 0.85rem; margin: 8px 0;">
+                                    <i class="fas fa-calendar"></i> @announcement.PublishedDate.ToString("MMM dd, yyyy")
+                                </p>
+                                <p style="color: #666; font-size: 0.95rem;">@announcement.Excerpt</p>
+                                <a asp-controller="Announcements" asp-action="Details" asp-route-id="@announcement.Id" class="btn btn-sm btn-wp-primary" style="padding: 8px 20px; font-size: 0.9rem;">
+                                    Read More <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <a asp-controller="Announcements" asp-action="Index" class="btn-wp-primary">View All Announcements</a>
+            </div>
+        }
+        else
+        {
+            <div class="announcement-feed">
+                <i class="fas fa-bullhorn fa-3x" style="color: #B90000; margin-bottom: 20px;"></i>
+                <p style="font-size: 1.1rem; color: #666;">No announcements available. Follow us on <a href="https://www.facebook.com/husayniais" target="_blank" style="color: #B90000;">Facebook</a> for updates!</p>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Mission Statement -->
+<section class="homepage-section" style="background: #f8f9fa;">
+    <div class="container">
+        <div class="mission-box">
+            <h3>The principal focus of Husaynia is to spread the call of Imam Husayn (AS)</h3>
+            <p>
+                Husaynia Islamic Society of Seattle is dedicated to serving the spiritual, educational, and social needs
+                of the Shia Muslim community in the Greater Seattle area. We strive to foster interfaith dialogue and community building
+                while preserving and promoting Islamic values and traditions.
+            </p>
+            <a asp-controller="About" asp-action="Overview" class="btn-wp-primary" style="margin-top: 20px;">Learn More About Us</a>
+        </div>
+    </div>
+</section>
+
+<!-- Build Husaynia Campaign -->
+<section class="homepage-section" style="background: #ffffff;">
+    <div class="container">
+        <h2 class="section-title-wp">Build Husaynia Construction Campaign</h2>
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="campaign-box">
+                    <div class="campaign-stats">
+                        @progressPercentage.ToString("F0")% Funded
+                    </div>
+                    <div class="progress-bar-wp">
+                        <div class="progress-fill-wp" style="width: @progressPercentage%;">
+                            @progressPercentage.ToString("F1")%
+                        </div>
+                    </div>
+                    <p style="font-size: 1.8rem; margin: 20px 0;">
+                        <strong style="color: #B90000;">$@((campaign?.CurrentAmount ?? 2961788m).ToString("N2"))</strong>
+                        <span style="color: #666;"> raised of </span>
+                        <strong style="color: #333;">$@((campaign?.GoalAmount ?? 6950000m).ToString("N0"))</strong>
+                        <span style="color: #666;"> goal</span>
+                    </p>
+                    <p style="color: #666; margin-bottom: 30px;">Help us build a permanent home for our growing community</p>
+                    <a asp-controller="Donations" asp-action="Donate" class="btn-wp-primary">
+                        <i class="fas fa-heart"></i> Donate Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Media Section -->
+<section class="homepage-section" style="background: #f8f9fa;">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="media-section-wp">
+                    <h4><i class="fas fa-images"></i> Photos</h4>
+                    <p style="color: #666; margin-bottom: 20px;">View our latest photos on Facebook or browse our gallery</p>
+                    <a asp-controller="Media" asp-action="Photos" class="btn-wp-primary">
+                        Browse Photo Gallery
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="media-section-wp">
+                    <h4><i class="fas fa-video"></i> Videos</h4>
+                    <p style="color: #666; margin-bottom: 20px;">Watch our latest videos and lectures</p>
+                    <a asp-controller="Media" asp-action="Videos" class="btn-wp-primary">
+                        Browse Video Gallery
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@functions {
+    string GetCategoryColor(string category)
+    {
+        return category?.ToLower() switch
+        {
+            "lecture" => "#b90000",
+            "social" => "#0066cc",
+            "religious" => "#006600",
+            "education" => "#ff8c00",
+            _ => "#666666"
+        };
+    }
+}

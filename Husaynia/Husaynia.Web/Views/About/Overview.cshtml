@@ -1,0 +1,140 @@
+@{
+    ViewData["Title"] = "About Us";
+    ViewData["Description"] = "Learn about Husaynia Islamic Society of Seattle";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4" style="color: #b90000; font-weight: 600;">About Husaynia Islamic Society</h1>
+            <p class="mb-4">Serving the Shia Muslim community in the Greater Seattle area</p>
+
+            <section class="content-section mb-4 p-4 bg-white border">
+                <h3 class="mb-3" style="color: #b90000;"><i class="fas fa-mosque"></i> Our Mission</h3>
+                <p>
+                    Husaynia Islamic Society of Seattle is dedicated to serving the spiritual, educational,
+                    and social needs of the Shia Muslim community in the Greater Seattle area. We strive to
+                    create a welcoming environment where individuals and families can deepen their faith,
+                    learn about Islamic teachings, and build strong community bonds.
+                </p>
+            </section>
+
+            <section class="content-section mb-4 p-4 bg-white border">
+                <h3 class="mb-3" style="color: #b90000;"><i class="fas fa-heart"></i> Our Values</h3>
+                <ul class="list-unstyled">
+                    <li class="mb-3">
+                        <strong>Faith:</strong> Following the teachings of the Holy Quran and the Ahlul Bayt (peace be upon them)
+                    </li>
+                    <li class="mb-3">
+                        <strong>Community:</strong> Building strong bonds among community members through regular programs and events
+                    </li>
+                    <li class="mb-3">
+                        <strong>Education:</strong> Providing Islamic education for all ages through classes, lectures, and seminars
+                    </li>
+                    <li class="mb-3">
+                        <strong>Service:</strong> Serving the community through charitable work and social support programs
+                    </li>
+                    <li class="mb-3">
+                        <strong>Unity:</strong> Promoting unity within the Muslim Ummah and interfaith dialogue
+                    </li>
+                </ul>
+            </section>
+
+            <section class="content-section mb-4 p-4 bg-white border">
+                <h3 class="mb-3" style="color: #b90000;"><i class="fas fa-users"></i> Our Community</h3>
+                <p>
+                    Husaynia Islamic Society serves a diverse community of Shia Muslims from various
+                    cultural backgrounds, primarily from South Asia, Middle East, and North America.
+                    Our congregation has grown significantly over the years, reflecting the increasing
+                    Muslim population in the Seattle metropolitan area.
+                </p>
+                <p>
+                    We welcome Muslims from all backgrounds and schools of thought who wish to learn
+                    about or practice the teachings of the Ahlul Bayt (peace be upon them).
+                </p>
+            </section>
+
+            <section class="content-section mb-4 p-4 bg-white border">
+                <h3 class="mb-3" style="color: #b90000;"><i class="fas fa-calendar-alt"></i> Our Programs</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Regular Programs:</h5>
+                        <ul>
+                            <li>Daily congregational prayers</li>
+                            <li>Friday Jummah prayers</li>
+                            <li>Islamic classes for children and adults</li>
+                            <li>Quran recitation and memorization</li>
+                            <li>Weekly lectures and discussions</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Special Events:</h5>
+                        <ul>
+                            <li>Muharram and Safar programs</li>
+                            <li>Ramadan prayers and iftars</li>
+                            <li>Eid celebrations</li>
+                            <li>Milad celebrations</li>
+                            <li>Community social gatherings</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section mb-4 p-4 border" style="background-color: #f8f9fa;">
+                <h3 class="mb-3" style="color: #b90000;"><i class="fas fa-building"></i> Building Our Future</h3>
+                <p>
+                    We are currently raising funds to build a permanent facility that will serve as a
+                    comprehensive Islamic center for our growing community. The new facility will include:
+                </p>
+                <ul>
+                    <li>Large prayer hall for men and women</li>
+                    <li>Educational classrooms and library</li>
+                    <li>Community hall for events and gatherings</li>
+                    <li>Kitchen facilities for community meals</li>
+                    <li>Administrative offices</li>
+                    <li>Ample parking space</li>
+                </ul>
+                <div class="text-center mt-4">
+                    <a asp-controller="Donations" asp-action="BuildHusaynia" class="btn btn-lg" style="background-color: #b90000; color: white;">
+                        <i class="fas fa-heart"></i> Support Our Campaign
+                    </a>
+                </div>
+            </section>
+
+            <div class="row mt-5">
+                <div class="col-md-6 mb-3">
+                    <div class="content-section p-4 border text-center h-100">
+                        <i class="fas fa-map-marker-alt" style="font-size: 3rem; color: #b90000;"></i>
+                        <h5 class="mt-3">Visit Us</h5>
+                        <p>
+                            15231 State St<br />
+                            Snohomish, WA
+                        </p>
+                        <a href="https://maps.google.com/?q=15231+State+St,+Snohomish,+WA" target="_blank" class="btn btn-sm" style="background-color: #b90000; color: white;">
+                            Get Directions
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="content-section p-4 border text-center h-100">
+                        <i class="fas fa-envelope" style="font-size: 3rem; color: #b90000;"></i>
+                        <h5 class="mt-3">Contact Us</h5>
+                        <p>
+                            Phone: +1-425-312-3196<br />
+                            Email: info@husaynia.org
+                        </p>
+                        <a asp-action="Contact" class="btn btn-sm" style="background-color: #b90000; color: white;">
+                            Send Message
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .content-section {
+        border-left: 4px solid #b90000 !important;
+    }
+</style>

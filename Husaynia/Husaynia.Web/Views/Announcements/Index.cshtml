@@ -1,0 +1,121 @@
+@model IEnumerable<Husaynia.Core.Entities.Announcement>
+@{
+    ViewData["Title"] = "Announcements";
+    ViewData["Description"] = "Latest news and announcements from Husaynia Islamic Society";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4" style="color: #b90000; font-weight: 600;">Announcements</h1>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No announcements available at this time.
+                </div>
+            }
+            else
+            {
+                @foreach (var announcement in Model)
+                {
+                    <article class="announcement-item mb-4 p-4 bg-white border">
+                        @if (announcement.IsPinned)
+                        {
+                            <span class="badge mb-2" style="background-color: #b90000;">
+                                <i class="fas fa-thumbtack"></i> Featured
+                            </span>
+                        }
+
+                        <h2 class="h4 mb-2">
+                            <a asp-action="Details" asp-route-id="@announcement.Id" style="color: #b90000; text-decoration: none;">
+                                @announcement.Title
+                            </a>
+                        </h2>
+
+                        <p class="text-muted small mb-3">
+                            <i class="far fa-calendar"></i> @announcement.PublishedDate.ToString("MMMM dd, yyyy") |
+                            <i class="far fa-user"></i> @announcement.Author
+                            @if (announcement.ViewCount > 0)
+                            {
+                                <span class="ms-2"><i class="far fa-eye"></i> @announcement.ViewCount views</span>
+                            }
+                        </p>
+
+                        @if (!string.IsNullOrEmpty(announcement.ImageUrl))
+                        {
+                            <img src="@announcement.ImageUrl" class="img-fluid mb-3" alt="@announcement.Title" style="max-height: 300px; width: auto;">
+                        }
+
+                        <p class="mb-3">@announcement.Excerpt</p>
+
+                        <a asp-action="Details" asp-route-id="@announcement.Id" class="btn btn-sm" style="background-color: #b90000; color: white;">
+                            Read More →
+                        </a>
+
+                        @if (!string.IsNullOrEmpty(announcement.Tags))
+                        {
+                            <div class="mt-3">
+                                @foreach (var tag in announcement.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                {
+                                    <span class="badge bg-secondary me-1">@tag.Trim()</span>
+                                }
+                            </div>
+                        }
+                    </article>
+                }
+
+                <!-- Pagination -->
+                @if (ViewBag.TotalPages > 1)
+                {
+                    <nav aria-label="Announcements pagination" class="mt-4">
+                        <ul class="pagination">
+                            <li class="page-item @(!ViewBag.HasPreviousPage ? "disabled" : "")">
+                                <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage - 1)">← Previous</a>
+                            </li>
+
+                            @for (int i = 1; i <= Math.Min(ViewBag.TotalPages, 10); i++)
+                            {
+                                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                    <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(!ViewBag.HasNextPage ? "disabled" : "")">
+                                <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage + 1)">Next →</a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .announcement-item {
+        border-left: 4px solid #b90000 !important;
+        transition: box-shadow 0.2s ease;
+    }
+
+    .announcement-item:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .page-link {
+        color: #b90000;
+        border-color: #dee2e6;
+    }
+
+    .page-link:hover {
+        color: #890000;
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+    }
+
+    .page-item.active .page-link {
+        background-color: #b90000;
+        border-color: #b90000;
+        color: white;
+    }
+</style>

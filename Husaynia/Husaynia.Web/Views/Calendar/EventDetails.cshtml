@@ -1,0 +1,132 @@
+@model Husaynia.Core.Entities.Event
+@{
+    ViewData["Title"] = Model.Title;
+    ViewData["Description"] = Model.Description;
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" style="color: #b90000;">Home</a></li>
+                    <li class="breadcrumb-item"><a asp-action="UpcomingPrograms" style="color: #b90000;">Events</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+                </ol>
+            </nav>
+
+            <!-- Event Content -->
+            <article class="event-detail p-4 bg-white border">
+                <span class="badge mb-3" style="background-color: @GetCategoryColor(Model.Category);">
+                    @Model.Category
+                </span>
+
+                <h1 class="mb-4" style="color: #b90000; font-weight: 600;">@Model.Title</h1>
+
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <div class="event-image mb-4">
+                        <img src="@Model.ImageUrl" alt="@Model.Title" class="img-fluid" />
+                    </div>
+                }
+
+                <div class="event-meta mb-4 p-3" style="background-color: #f8f9fa; border-left: 3px solid #b90000;">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <p class="mb-0">
+                                <i class="far fa-calendar" style="color: #b90000;"></i>
+                                <strong>@Model.StartDateTime.ToString("MMMM dd, yyyy")</strong><br />
+                                <span class="ms-4">@Model.StartDateTime.ToString("h:mm tt")@if (Model.EndDateTime.HasValue){<text> - @Model.EndDateTime.Value.ToString("h:mm tt")</text>}</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <p class="mb-0">
+                                <i class="fas fa-map-marker-alt" style="color: #b90000;"></i>
+                                @if (!string.IsNullOrEmpty(Model.Location))
+                                {
+                                    @Model.Location
+                                }
+                                else
+                                {
+                                    <span>Husaynia Islamic Society<br /><span class="ms-4">15231 State St, Snohomish, WA</span></span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="event-description mb-4">
+                    <h3 class="mb-3" style="color: #333;">About This Event</h3>
+                    @Html.Raw(Model.Description)
+                </div>
+
+                @if (Model.IsRecurring && !string.IsNullOrEmpty(Model.RecurrencePattern))
+                {
+                    <div class="alert alert-info">
+                        <i class="fas fa-redo"></i> <strong>Recurring Event:</strong> @Model.RecurrencePattern
+                    </div>
+                }
+
+                <!-- Action Buttons -->
+                <div class="mt-4 pt-3 border-top">
+                    <button class="btn btn-sm me-2" style="background-color: #b90000; color: white;" onclick="addToGoogleCalendar()">
+                        <i class="fab fa-google"></i> Add to Calendar
+                    </button>
+                    <a asp-action="UpcomingPrograms" class="btn btn-sm" style="background-color: #666; color: white;">
+                        <i class="fas fa-arrow-left"></i> Back to Events
+                    </a>
+                </div>
+            </article>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function addToGoogleCalendar() {
+            var title = '@Html.Raw(Model.Title.Replace("'", "\\'"))';
+            var details = '@Html.Raw(Model.Description.Replace("'", "\\'").Replace("\n", " ").Replace("\r", " "))';
+            var location = '@Html.Raw((Model.Location ?? "Husaynia Islamic Society, 15231 State St, Snohomish, WA").Replace("'", "\\'"))';
+            var startDate = '@Model.StartDateTime.ToString("yyyyMMddTHHmmss")';
+            var endDate = '@(Model.EndDateTime?.ToString("yyyyMMddTHHmmss") ?? Model.StartDateTime.AddHours(2).ToString("yyyyMMddTHHmmss"))';
+
+            var url = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+                '&text=' + encodeURIComponent(title) +
+                '&dates=' + startDate + '/' + endDate +
+                '&details=' + encodeURIComponent(details) +
+                '&location=' + encodeURIComponent(location);
+
+            window.open(url, '_blank');
+        }
+    </script>
+}
+
+@functions {
+    string GetCategoryColor(string category)
+    {
+        return category?.ToLower() switch
+        {
+            "lecture" => "#b90000",
+            "social" => "#0066cc",
+            "religious" => "#006600",
+            "education" => "#ff8c00",
+            _ => "#666666"
+        };
+    }
+}
+
+<style>
+    .event-detail {
+        border-left: 4px solid #b90000 !important;
+    }
+
+    .event-description {
+        font-size: 1.05rem;
+        line-height: 1.7;
+    }
+
+    .event-meta {
+        font-size: 0.95rem;
+    }
+</style>

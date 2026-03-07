@@ -1,0 +1,99 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+        <p class="text-muted">Welcome to the Husaynia Admin Panel</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card text-white" style="background-color: #0066cc;">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-bullhorn"></i> Announcements
+                </h5>
+                <h2 class="display-4">@Model.AnnouncementCount</h2>
+                <a asp-page="/Announcements/Index" class="btn btn-light btn-sm mt-2">Manage</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white" style="background-color: #006600;">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-calendar-alt"></i> Events
+                </h5>
+                <h2 class="display-4">@Model.EventCount</h2>
+                <a asp-page="/Events/Index" class="btn btn-light btn-sm mt-2">Manage</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white" style="background-color: #ff8c00;">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-photo-video"></i> Media Items
+                </h5>
+                <h2 class="display-4">@Model.MediaCount</h2>
+                <a asp-page="/Media/Index" class="btn btn-light btn-sm mt-2">Manage</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white" style="background-color: #b90000;">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-dollar-sign"></i> Total Donations
+                </h5>
+                <h2 class="display-5">$@Model.TotalDonations.ToString("N0")</h2>
+                <a asp-page="/Donations/Index" class="btn btn-light btn-sm mt-2">View Reports</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-clock"></i> Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <h6>Recent Announcements:</h6>
+                <ul class="list-group list-group-flush">
+                    @foreach (var announcement in Model.RecentAnnouncements)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            @announcement.Title
+                            <span class="badge bg-primary">@announcement.PublishedDate.ToString("MMM dd")</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-calendar-check"></i> Upcoming Events</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    @foreach (var evt in Model.UpcomingEvents)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            @evt.Title
+                            <span class="badge bg-success">@evt.StartDateTime.ToString("MMM dd")</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

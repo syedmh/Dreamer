@@ -1,0 +1,113 @@
+@model List<Husaynia.Core.Entities.MediaItem>
+@{
+    ViewData["Title"] = "Photo Gallery";
+    ViewData["Description"] = "Browse our photo gallery";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4" style="color: #b90000; font-weight: 600;">Photo Gallery</h1>
+            <p class="mb-4">Browse photos from our events and programs</p>
+
+            @if (ViewBag.Albums != null && ((List<string>)ViewBag.Albums).Any())
+            {
+                <div class="mb-4">
+                    <div class="btn-group" role="group">
+                        <a asp-action="Photos" class="btn btn-sm @(ViewBag.CurrentAlbum == null ? "" : "")"
+                           style="@(ViewBag.CurrentAlbum == null ? "background-color: #b90000; color: white; border: 1px solid #b90000;" : "background-color: white; color: #b90000; border: 1px solid #dee2e6;")">
+                            All Photos
+                        </a>
+                        @foreach (var album in (List<string>)ViewBag.Albums)
+                        {
+                            <a asp-action="Photos" asp-route-album="@album"
+                               class="btn btn-sm"
+                               style="@(ViewBag.CurrentAlbum == album ? "background-color: #b90000; color: white; border: 1px solid #b90000;" : "background-color: white; color: #b90000; border: 1px solid #dee2e6;")">
+                                @album
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No photos available yet. Check back soon!
+                </div>
+            }
+            else
+            {
+                <div class="photo-gallery-section p-4 bg-white border">
+                    <div class="row g-3" id="photo-gallery">
+                        @foreach (var photo in Model)
+                        {
+                            <div class="col-md-4 col-sm-6">
+                                <div class="photo-card">
+                                    <a href="@photo.Url"
+                                       data-pswp-width="1200"
+                                       data-pswp-height="800"
+                                       target="_blank">
+                                        <img src="@(photo.ThumbnailUrl ?? photo.Url)"
+                                             alt="@photo.Title"
+                                             class="img-fluid"
+                                             loading="lazy" />
+                                    </a>
+                                    @if (!string.IsNullOrEmpty(photo.Title))
+                                    {
+                                        <div class="photo-title mt-2">
+                                            <small class="text-muted">@photo.Title</small>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- PhotoSwipe -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@5.3.7/dist/photoswipe.css">
+    <script type="module">
+        import PhotoSwipeLightbox from 'https://cdn.jsdelivr.net/npm/photoswipe@5.3.7/dist/photoswipe-lightbox.esm.js';
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallery: '#photo-gallery',
+            children: 'a',
+            pswpModule: () => import('https://cdn.jsdelivr.net/npm/photoswipe@5.3.7/dist/photoswipe.esm.js')
+        });
+
+        lightbox.init();
+    </script>
+}
+
+<style>
+    .photo-gallery-section {
+        border-left: 4px solid #b90000 !important;
+    }
+
+    .photo-card {
+        position: relative;
+        overflow: hidden;
+        transition: opacity 0.2s ease;
+    }
+
+    .photo-card:hover {
+        opacity: 0.85;
+    }
+
+    .photo-card img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        cursor: pointer;
+    }
+
+    .photo-title {
+        padding: 0.5rem 0;
+    }
+</style>

@@ -1,0 +1,59 @@
+@page
+@model EventsIndexModel
+@{
+    ViewData["Title"] = "Manage Events";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-calendar-alt"></i> Events</h1>
+    <a asp-page="Create" class="btn btn-primary">
+        <i class="fas fa-plus"></i> New Event
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Start Date</th>
+                        <th>Location</th>
+                        <th>Published</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var evt in Model.Events)
+                    {
+                        <tr>
+                            <td>@evt.Title</td>
+                            <td><span class="badge bg-secondary">@evt.Category</span></td>
+                            <td>@evt.StartDateTime.ToString("MMM dd, yyyy h:mm tt")</td>
+                            <td>@(evt.Location ?? "Not specified")</td>
+                            <td>
+                                @if (evt.IsPublished)
+                                {
+                                    <i class="fas fa-check text-success"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-times text-muted"></i>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-page="Edit" asp-route-id="@evt.Id" class="btn btn-outline-primary">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

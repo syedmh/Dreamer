@@ -1,0 +1,48 @@
+@{
+    ViewData["Title"] = "Thank You!";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-6 mx-auto text-center">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    <h1 class="display-4 mb-3">Thank You!</h1>
+                    <h4 class="text-muted mb-4">Your donation has been successfully processed</h4>
+
+                    <div class="alert alert-success mb-4">
+                        <strong>Donation Amount:</strong> $@ViewBag.Amount.ToString("N2")
+                    </div>
+
+                    <p class="lead">
+                        May Allah (SWT) accept your generous contribution and bless you abundantly.
+                        Your support helps our community thrive and grow.
+                    </p>
+
+                    <p class="text-muted mb-4">
+                        A receipt has been sent to <strong>@ViewBag.DonorEmail</strong>
+                    </p>
+
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                            <i class="fas fa-home"></i> Return to Home
+                        </a>
+                        <a asp-action="BuildHusaynia" class="btn btn-outline-primary">
+                            <i class="fas fa-chart-line"></i> View Campaign Progress
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 text-muted small">
+                <p>
+                    <i class="fas fa-info-circle"></i> For any questions about your donation, please contact us at
+                    <a href="mailto:info@husaynia.org">info@husaynia.org</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

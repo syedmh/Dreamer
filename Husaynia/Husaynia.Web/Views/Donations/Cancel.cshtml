@@ -1,0 +1,41 @@
+@{
+    ViewData["Title"] = "Donation Cancelled";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-6 mx-auto text-center">
+            <div class="card shadow border-0">
+                <div class="card-body p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-times-circle text-warning" style="font-size: 5rem;"></i>
+                    </div>
+                    <h1 class="display-5 mb-3">Donation Cancelled</h1>
+                    <p class="lead">
+                        Your donation was not completed. No charges have been made to your account.
+                    </p>
+
+                    <p class="text-muted mb-4">
+                        If you experienced any issues or have questions, please contact us.
+                    </p>
+
+                    <div class="d-grid gap-2">
+                        <a asp-action="Donate" class="btn btn-primary">
+                            <i class="fas fa-arrow-left"></i> Try Again
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">
+                            <i class="fas fa-home"></i> Return to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 text-muted small">
+                <p>
+                    <i class="fas fa-question-circle"></i> Need assistance?
+                    Contact us at <a href="mailto:info@husaynia.org">info@husaynia.org</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

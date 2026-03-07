@@ -1,0 +1,124 @@
+@model IEnumerable<Husaynia.Core.Entities.Event>
+@{
+    ViewData["Title"] = "Upcoming Programs";
+    ViewData["Description"] = "View upcoming events and programs at Husaynia Islamic Society";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4" style="color: #b90000; font-weight: 600;">Upcoming Programs</h1>
+            <p class="mb-4">Join us for our upcoming events, lectures, and community programs</p>
+
+            <!-- Calendar View -->
+            <div class="mb-5 p-4 bg-white border calendar-section">
+                <div id="calendar"></div>
+            </div>
+
+            <!-- List View -->
+            <h2 class="mb-4" style="color: #333; font-weight: 600;">Event List</h2>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No upcoming events scheduled at this time.
+                </div>
+            }
+            else
+            {
+                @foreach (var evt in Model)
+                {
+                    <article class="event-item mb-4 p-4 bg-white border">
+                        <span class="badge mb-2" style="background-color: @GetCategoryColor(evt.Category)">
+                            @evt.Category
+                        </span>
+                        <h3 class="h5 mb-2">
+                            <a asp-action="EventDetails" asp-route-id="@evt.Id" style="color: #b90000; text-decoration: none;">
+                                @evt.Title
+                            </a>
+                        </h3>
+                        <p class="text-muted small mb-3">
+                            <i class="far fa-calendar"></i> @evt.StartDateTime.ToString("MMMM dd, yyyy") |
+                            <i class="far fa-clock"></i> @evt.StartDateTime.ToString("h:mm tt")
+                            @if (!string.IsNullOrEmpty(evt.Location))
+                            {
+                                <span>| <i class="fas fa-map-marker-alt"></i> @evt.Location</span>
+                            }
+                        </p>
+
+                        @if (!string.IsNullOrEmpty(evt.ImageUrl))
+                        {
+                            <img src="@evt.ImageUrl" class="img-fluid mb-3" alt="@evt.Title" style="max-height: 300px; width: auto;">
+                        }
+
+                        <p class="mb-3">@evt.Description</p>
+
+                        <a asp-action="EventDetails" asp-route-id="@evt.Id" class="btn btn-sm" style="background-color: #b90000; color: white;">
+                            Learn More →
+                        </a>
+                    </article>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listWeek'
+                },
+                events: '@Url.Action("GetEventsJson")',
+                eventClick: function (info) {
+                    info.jsEvent.preventDefault();
+                    if (info.event.url) {
+                        window.location.href = info.event.url;
+                    }
+                },
+                eventTimeFormat: {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    meridiem: 'short'
+                }
+            });
+            calendar.render();
+        });
+    </script>
+}
+
+@functions {
+    string GetCategoryColor(string category)
+    {
+        return category?.ToLower() switch
+        {
+            "lecture" => "#b90000",
+            "social" => "#0066cc",
+            "religious" => "#006600",
+            "education" => "#ff8c00",
+            _ => "#666666"
+        };
+    }
+}
+
+<style>
+    .calendar-section {
+        border-left: 4px solid #b90000 !important;
+    }
+
+    .event-item {
+        border-left: 4px solid #b90000 !important;
+        transition: box-shadow 0.2s ease;
+    }
+
+    .event-item:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+</style>

@@ -1,0 +1,65 @@
+@page
+@model MediaIndexModel
+@{
+    ViewData["Title"] = "Manage Media";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-photo-video"></i> Media Library</h1>
+    <div>
+        <a asp-controller="Media" asp-action="Upload" class="btn btn-primary">
+            <i class="fas fa-upload"></i> Upload Photo
+        </a>
+        <a asp-controller="Media" asp-action="AddVideo" class="btn btn-success">
+            <i class="fas fa-video"></i> Add Video
+        </a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>@Model.PhotoCount</h3>
+                <p class="text-muted">Photos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>@Model.VideoCount</h3>
+                <p class="text-muted">Videos</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5>Recent Media</h5>
+        <div class="row g-3">
+            @foreach (var item in Model.RecentMedia)
+            {
+                <div class="col-md-3">
+                    <div class="card">
+                        @if (item.Type == Husaynia.Core.Enums.MediaType.Photo)
+                        {
+                            <img src="@(item.ThumbnailUrl ?? item.Url)" class="card-img-top" alt="@item.Title" style="height: 150px; object-fit: cover;">
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-dark text-white d-flex align-items-center justify-content-center" style="height: 150px;">
+                                <i class="fas fa-video fa-3x"></i>
+                            </div>
+                        }
+                        <div class="card-body">
+                            <h6 class="card-title">@item.Title</h6>
+                            <p class="text-muted small">@item.UploadDate.ToString("MMM dd, yyyy")</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
