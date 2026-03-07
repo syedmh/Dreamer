@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MindScene.ActorSystem/MindScene.ActorSystem.csproj" />
+    <Project Path="src/MindScene.AI/MindScene.AI.csproj" />
+    <Project Path="src/MindScene.API/MindScene.API.csproj" />
+    <Project Path="src/MindScene.BookParser/MindScene.BookParser.csproj" />
+    <Project Path="src/MindScene.ConsoleDriver/MindScene.ConsoleDriver.csproj" />
+    <Project Path="src/MindScene.Core/MindScene.Core.csproj" />
+    <Project Path="src/MindScene.DialogueEngine/MindScene.DialogueEngine.csproj" />
+    <Project Path="src/MindScene.Export/MindScene.Export.csproj" />
+    <Project Path="src/MindScene.NLP/MindScene.NLP.csproj" />
+    <Project Path="src/MindScene.RenderEngine/MindScene.RenderEngine.csproj" />
+    <Project Path="src/MindScene.SceneGraph/MindScene.SceneGraph.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MindScene.Tests/MindScene.Tests.csproj" />
+  </Folder>
+</Solution>

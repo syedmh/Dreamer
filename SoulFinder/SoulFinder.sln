@@ -1,0 +1,19 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "shia-matchmaking", "shia-matchmaking\shia-matchmaking.njsproj", "{03A62E93-8FE3-4F41-8A3D-4ED74CB80474}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{03A62E93-8FE3-4F41-8A3D-4ED74CB80474}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03A62E93-8FE3-4F41-8A3D-4ED74CB80474}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03A62E93-8FE3-4F41-8A3D-4ED74CB80474}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03A62E93-8FE3-4F41-8A3D-4ED74CB80474}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

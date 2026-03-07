@@ -1,0 +1,76 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">17.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <Name>AgentDaily</Name>
+    <RootNamespace>AgentDaily</RootNamespace>
+    <Description>CLI and web agent for WorkIQ MCP - Beginning of Day routine and ad-hoc queries</Description>
+    <ProjectGuid>{4F37A9E2-CD12-4B73-BAF5-CFA076D67BEA}</ProjectGuid>
+
+    <!-- Node.js settings -->
+    <StartupFile>server.mjs</StartupFile>
+    <ScriptFile>server.mjs</ScriptFile>
+    <NodeExePath>$(ProgramFiles)\nodejs\node.exe</NodeExePath>
+    <NodeExeArguments></NodeExeArguments>
+    <LaunchUrl>http://localhost:3000</LaunchUrl>
+    <StartWebBrowser>True</StartWebBrowser>
+    <SearchPath></SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD};{349c5851-65df-11da-9384-00065b846f21};{F2A71F9B-5D33-465A-A702-920D77279786}</ProjectTypeGuids>
+    <EnableTypeScript>false</EnableTypeScript>
+    <SaveNodeJsSettingsInProjectFile>True</SaveNodeJsSettingsInProjectFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Source files -->
+    <Content Include="server.mjs" />
+    <Content Include="agent.mjs" />
+    <Content Include="mcp-client.mjs" />
+    <Content Include="commands.mjs" />
+    <Content Include="actions.mjs" />
+
+    <!-- Configuration -->
+    <Content Include="package.json" />
+    <Content Include="package-lock.json" />
+
+    <!-- Static / public files -->
+    <Content Include="public\index.html" />
+
+    <!-- Documentation / reference -->
+    <Content Include="myfile.txt" />
+    <Content Include="schema.txt" />
+    <Content Include="workiq.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="public\" />
+    <Folder Include="node_modules\" />
+  </ItemGroup>
+
+  <!-- Exclude node_modules from source control view -->
+  <ItemGroup>
+    <None Include="node_modules\**" Exclude="node_modules\**" />
+  </ItemGroup>
+
+  <!-- Import Node.js Tools targets -->
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
+
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:3000/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:3000</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

@@ -1,0 +1,23 @@
+{
+  "name": "agentdaily",
+  "version": "1.0.0",
+  "description": "CLI agent for WorkIQ MCP - Beginning of Day routine and ad-hoc queries",
+  "type": "module",
+  "main": "agent.mjs",
+  "bin": {
+    "agentdaily": "./agent.mjs"
+  },
+  "scripts": {
+    "start": "node agent.mjs",
+    "web": "node server.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "express": "^5.2.1",
+    "yaml": "^2.8.2"
+  }
+}

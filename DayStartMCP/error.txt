@@ -1,0 +1,70 @@
+[UI.SessionViewModel Warning] DualResponseViewModel or control request is null.
+[CopilotSessionProvider Information] Begin sending message (ConversationId:87c93e50-c12a-4102-beca-b42b63ea47b8, CorrelationId:6db2362f-be48-47c4-bacc-fd7717dc5d26, MessageId: fb897d00-002e-425f-a939-b9609ceeecd5)
+[CopilotSessionProvider Information] Request content: "bod-routine"
+[Conversations Information] Copilot auth status: OK. Copilot badge status: Active
+[Conversations Information] Copilot auth status: OK. Copilot badge status: Active
+[Conversations Error] [CopilotClient EventType(6)] Failed to talk to Copilot: {"error":{"message":"messages.2: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_vrtx_01A8qe1vefT1D4yi2BRY6Tmj. Each `tool_use` block must have a corresponding `tool_result` block in the next message.","code":"invalid_request_body"}}
+
+[Conversations Warning] [CopilotClient] Issue with setting up the connection to 'https://api.githubcopilot.com/chat/completions', if you are using a proxy, check if HTTPS_PROXY is set correctly. https://learn.microsoft.com/en-us/dotnet/fundamentals/networking/http/httpclient#http-proxy
+[Conversations Error] [Conversations] Unhandled exception in AskInConversationAsync: System.Exception: Error occurred while invoking intent 'Generic'.
+{"error":{"message":"messages.2: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_vrtx_01A8qe1vefT1D4yi2BRY6Tmj. Each `tool_use` block must have a corresponding `tool_result` block in the next message.","code":"invalid_request_body"}}
+
+   at Microsoft.VisualStudio.Conversations.CopilotClient.CopilotAPIClient.CheckIfResponseIsSuccessAsync(HttpResponseMessage httpResponse, ChatRequestOptions requestOptions, CancellationToken cancellationToken)
+   at Microsoft.VisualStudio.Conversations.CopilotClient.CopilotAPIClient.ChatCoreWithCompletionsAPIAsync(HttpClient httpClient, ChatRequestOptions requestOptions, CancellationToken cancellationToken)
+   at Microsoft.VisualStudio.Conversations.CopilotClient.CopilotAPIClient.ChatCoreAsync(HttpClient httpClient, CopilotAPIRequest request, Action`1 onToken, Action`1 onUpdate, CopilotInteractionId interactionId, Boolean validateRootRequestId, String sessionToken, CancellationToken cancellationToken)
+   at Conversations.Kernel.LLMClient.GetGitHubApiResponseAsync(CopilotAPIRequest request, CopilotInteractionId interactionId, Action`1 onToken, Action`1 onUpdate, String sessionToken, CancellationToken cancellationToken)
+   at Conversations.Kernel.LLMClient.GetApiResponseAsync(CopilotAPIRequest request, CopilotInteractionId interactionId, Action`1 onToken, Action`1 onUpdate, String sessionToken, CancellationToken cancellationToken)
+   at Conversations.Kernel.LLMClient.RequestAsync(CopilotAPIRequest request, CopilotInteractionId interactionId, ICopilotStreamingContentSink streamTarget, String sessionToken, CancellationToken cancellationToken);
+   at Conversations.Kernel.ConversationBase.AskAsync(CompletionRequest requestContext, CancellationToken cancellation)
+   at Conversations.Kernel.ConversationBase.AskAsync(CompletionRequest requestContext, CancellationToken cancellation)
+   at Microsoft.VisualStudio.Conversations.Service.ServiceTarget.AskInConversationAsync(CopilotSessionId sessionId, ConversationRequest conversationRequest, CancellationToken cancellation)
+[CopilotSessionProvider Error] Unhandled exception invoking responder GitHub Copilot: StreamJsonRpc.RemoteInvocationException: Error occurred while invoking intent 'Generic'.
+{"error":{"message":"messages.2: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_vrtx_01A8qe1vefT1D4yi2BRY6Tmj. Each `tool_use` block must have a corresponding `tool_result` block in the next message.","code":"invalid_request_body"}}
+
+   at Microsoft.VisualStudio.Conversations.CopilotClient.CopilotAPIClient.CheckIfResponseIsSuccessAsync(HttpResponseMessage httpResponse, ChatRequestOptions requestOptions, CancellationToken cancellationToken)
+   at Microsoft.VisualStudio.Conversations.CopilotClient.CopilotAPIClient.ChatCoreWithCompletionsAPIAsync(HttpClient httpClient, ChatRequestOptions requestOptions, CancellationToken cancellationToken)
+   at Microsoft.VisualStudio.Conversations.CopilotClient.CopilotAPIClient.ChatCoreAsync(HttpClient httpClient, CopilotAPIRequest request, Action`1 onToken, Action`1 onUpdate, CopilotInteractionId interactionId, Boolean validateRootRequestId, String sessionToken, CancellationToken cancellationToken)
+   at Conversations.Kernel.LLMClient.GetGitHubApiResponseAsync(CopilotAPIRequest request, CopilotInteractionId interactionId, Action`1 onToken, Action`1 onUpdate, String sessionToken, CancellationToken cancellationToken)
+   at Conversations.Kernel.LLMClient.GetApiResponseAsync(CopilotAPIRequest request, CopilotInteractionId interactionId, Action`1 onToken, Action`1 onUpdate, String sessionToken, CancellationToken cancellationToken)
+   at Conversations.Kernel.LLMClient.RequestAsync(CopilotAPIRequest request, CopilotInteractionId interactionId, ICopilotStreamingContentSink streamTarget, String sessionToken, CancellationToken cancellationToken);
+   at StreamJsonRpc.JsonRpc.<InvokeCoreAsync>d__171`1.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at Microsoft.VisualStudio.Copilot.ResponderBroker.<SendRequestHelperAsync>d__9.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at Microsoft.VisualStudio.Copilot.ResponderBroker.<SendRequestHelperAsync>d__9.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.VisualStudio.Copilot.ResponderBroker.<ContinueAsync>d__4.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.VisualStudio.Copilot.Core.Agents.CopilotAgentModeResponder.<RespondInternalAsync>d__14.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Threading.Tasks.Sources.ManualResetValueTaskSourceCore`1.GetResult(Int16 token)
+   at Microsoft.VisualStudio.Copilot.Core.Agents.CopilotAgentModeResponder.<ContinueAsync>d__12.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at Microsoft.VisualStudio.Copilot.Core.Agents.CopilotAgentModeResponder.<ContinueAsync>d__12.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.VisualStudio.Copilot.CopilotDefaultOrchestrator.<ContinueResponseAsync>d__8.MoveNext()
+RPC server exception:
+System.Exception: Error occurred while invoking intent 'Generic'.
+{"error":{"message":"messages.2: `tool_use` ids were found without `tool_result` blocks immediately after: toolu_vrtx_01A8qe1vefT1D4yi2BRY6Tmj. Each `tool_use` block must have a corresponding `tool_result` block in the next message.","code":"invalid_request_body"}}
+
+   at Microsoft.VisualStudio.Conversations.CopilotClient.CopilotAPIClient.CheckIfResponseIsSuccessAsync(HttpResponseMessage httpResponse, ChatRequestOptions requestOptions, CancellationToken cancellationToken)
+   at Microsoft.VisualStudio.Conversations.CopilotClient.CopilotAPIClient.ChatCoreWithCompletionsAPIAsync(HttpClient httpClient, ChatRequestOptions requestOptions, CancellationToken cancellationToken)
+   at Microsoft.VisualStudio.Conversations.CopilotClient.CopilotAPIClient.ChatCoreAsync(HttpClient httpClient, CopilotAPIRequest request, Action`1 onToken, Action`1 onUpdate, CopilotInteractionId interactionId, Boolean validateRootRequestId, String sessionToken, CancellationToken cancellationToken)
+   at Conversations.Kernel.LLMClient.GetGitHubApiResponseAsync(CopilotAPIRequest request, CopilotInteractionId interactionId, Action`1 onToken, Action`1 onUpdate, String sessionToken, CancellationToken cancellationToken)
+   at Conversations.Kernel.LLMClient.GetApiResponseAsync(CopilotAPIRequest request, CopilotInteractionId interactionId, Action`1 onToken, Action`1 onUpdate, String sessionToken, CancellationToken cancellationToken)
+   at Conversations.Kernel.LLMClient.RequestAsync(CopilotAPIRequest request, CopilotInteractionId interactionId, ICopilotStreamingContentSink streamTarget, String sessionToken, CancellationToken cancellationToken);
+      at Conversations.Kernel.ConversationBase.AskAsync(CompletionRequest requestContext, CancellationToken cancellation)
+      at Conversations.Kernel.ConversationBase.AskAsync(CompletionRequest requestContext, CancellationToken cancellation)
+      at Microsoft.VisualStudio.Conversations.Service.ServiceTarget.AskInConversationAsync(CopilotSessionId sessionId, ConversationRequest conversationRequest, CancellationToken cancellation)
+      at Microsoft.VisualStudio.Conversations.Service.CopilotServiceContainer.AskInConversationAsync(CopilotSessionId sessionId, ConversationRequest request, CancellationToken cancellationToken)
+

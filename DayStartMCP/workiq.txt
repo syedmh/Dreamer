@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "workiq": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@microsoft/workiq", "mcp"]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build:*)",
+      "Bash(timeout 5 dotnet run:*)",
+      "Bash(printf:*)",
+      "WebSearch",
+      "Bash(dotnet publish:*)",
+      "Bash(/c/Users/syedhu/source/play/DayStartMCP/publish/DayStartMCP.exe:*)",
+      "Bash(python3:*)",
+      "Bash(node:*)"
+    ]
+  }
+}

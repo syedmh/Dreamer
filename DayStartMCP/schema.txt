@@ -1,0 +1,135 @@
+# Actions YAML Schema and Project Mapping
+
+Shared reference file consumed by `mycmd-eod`, `mycmd-bod`, and `mycmd-actions`.
+
+---
+
+## 1. Actions YAML Schema
+
+**File location:** `c:/Users/syedhu/work/actions.yaml`
+
+### Structure
+
+```yaml
+# Action Item Tracker
+# Managed by: mycmd-eod, mycmd-bod, mycmd-actions
+# Schema: .claude/commands/references/actions-schema.md
+
+actions:
+  - id: 1
+    description: "Share finalized rollout schedule/ETA with Naresh"
+    owner: Syedhu
+    source: "[KG] KeyGuard Investigation Daily"
+    date_added: 2026-02-10
+    due: 2026-02-12
+    status: open
+    project: KG
+    workstream: null
+    completed_date: null
+```
+
+### Field Definitions
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | integer | yes | Auto-incrementing. Always `max(existing IDs) + 1`. Start at 1 if file is empty. IDs are never reused after deletion. |
+| `description` | string | yes | Concise action item description |
+| `owner` | string | yes | Person responsible. Default: `Syedhu` |
+| `source` | string | yes | Where captured. Format: `[PROJECT] Meeting Name` or `manual` for manually added items |
+| `date_added` | date | yes | YYYY-MM-DD format. Set to today's date when created. |
+| `due` | date | no | YYYY-MM-DD format. Set to `null` if no due date mentioned. |
+| `status` | string | yes | One of: `open`, `in-progress`, `completed`, `cancelled` |
+| `project` | string | no | Project code from the mapping table below. `null` if unknown. |
+| `workstream` | string | no | Workstream slug (without `ws-` prefix). `null` if unknown. |
+| `completed_date` | date | no | YYYY-MM-DD. Auto-populated with today's date when status is set to `completed`. |
+
+### Initialization
+
+When `actions.yaml` does not exist, create it with:
+
+```yaml
+# Action Item Tracker
+# Managed by: mycmd-eod, mycmd-bod, mycmd-actions
+# Schema: .claude/commands/references/actions-schema.md
+
+actions: []
+```
+
+---
+
+## 2. Project Mapping Rules
+
+Use these rules to classify a meeting into a project and optionally a workstream. Match against the meeting title, attendees, and content (case-insensitive).
+
+### Project Mapping Table
+
+| Project Code | Folder | Keywords (case-insensitive) |
+|---|---|---|
+| `SMI` | `projects/SMI/` | SMI, Strong Machine Identity, machine identity, hardware-rooted identity, AP-PKI, AutoPilot PKI, OS-SKU, fleet readiness, fleet monitoring, bootstrapping, claims enablement, SDP alignment, AppKI ACL, SDP, Service Deployment Framework |
+| `KG` | `projects/KG/` | KeyGuard, KG Investigation, key guard, TPM attestation, hardware-backed key, hub-spoke, KDA |
+| `certs` | `projects/certs/` | certificate, cert rotation, cert eviction, secrets management, CredSMART, bowler, MFC, Machine Function Certificate, Cosmic Certs |
+| `SAI` | `projects/SAI/` | SAI, Substrate Application Identity, application identity, FIC, Federated Identity Credentials, Cosmic native cert, SHIELD x CoreAuth |
+| `hpa` | `projects/hpa/` | HPA, High Privilege Access, high privilege, privileged access |
+| `segmentation` | `projects/segmentation/` | segmentation, network segmentation, service segmentation, global scopes |
+| `risk_register` | `projects/risk_register/` | risk register, risk review, risk tracking |
+
+### Classification Algorithm
+
+1. Normalize: lowercase all input text (meeting title + attendees + content)
+2. For each project in the mapping table, count keyword hits
+3. If the highest score is > 0, select that project
+4. On tie: use priority order: SMI > KG > certs > SAI > hpa > segmentation > risk_register
+5. If no keywords match any project, set project to `null`
+
+### Workstream Sub-Mapping (SMI)
+
+If a meeting is classified as `SMI`, attempt to classify into a workstream:
+
+| Workstream Slug | Folder | Keywords |
+|---|---|---|
+| `bootstrapping` | `ws-bootstrapping/` | bootstrap, early bootstrapping, early boot, Torus |
+| `kg-enablement` | `ws-kg-enablement/` | KG enablement, KeyGuard enablement, KG enable, KeyGuard rollout |
+| `fleet-readiness` | `ws-fleet-readiness/` | fleet readiness, fleet ready, OS-SKU |
+| `fleet-monitoring` | `ws-fleet-monitoring/` | fleet monitoring, fleet monitor, telemetry fleet |
+| `claims-enablement` | `ws-claims-enablement/` | claims enablement, claims enable, token claims |
+| `appki-acl` | `ws-appki-acl/` | AppKI, ACL, AppKI ACL |
+| `sdp-alignment` | `ws-sdp-alignment/` | SDP, SDP alignment, Service Deployment Framework, SDP Alignment |
+
+### Workstream Sub-Mapping (certs)
+
+| Workstream Slug | Folder | Keywords |
+|---|---|---|
+| `kg` | `ws-kg/` | KeyGuard, KG, KDA (when in certs context) |
+
+### Meeting Note Storage Resolution
+
+Determine the storage path in this priority order:
+
+1. **Workstream identified:** `projects/{project}/ws-{workstream}/meetings/`
+2. **Only project identified:** `projects/{project}/meetings/` (create the `meetings/` folder if it does not exist)
+3. **No project identified:** `meetings/` (the top-level folder at workspace root: `c:/Users/syedhu/work/meetings/`)
+
+### Meeting Note File Naming
+
+Format: `<mon-dd-yyyy>-<meeting-name-sanitized>.md`
+
+Sanitization rules:
+- Lowercase all text
+- Replace spaces and special characters (brackets, slashes, colons, etc.) with hyphens
+- Collapse consecutive hyphens into one
+- Remove leading/trailing hyphens
+- Truncate to 60 characters max (before the `.md` extension)
+
+Example: `[KG] KeyGuard Investigation Daily` on Feb 10, 2026 becomes `feb-10-2026-kg-keyguard-investigation-daily.md`
+
+---
+
+## 3. Deduplication Rules
+
+When adding action items (via `mycmd-eod` or `mycmd-actions sync`), check for near-duplicates:
+
+1. Compare the new item's `source` field against existing items
+2. If an existing item has the **same source** and a **description with >80% word overlap**, skip it
+3. Log skipped items: "Skipped duplicate: {description}"
+
+This prevents the same action item from being added twice when running eod or sync multiple times for the same day.
