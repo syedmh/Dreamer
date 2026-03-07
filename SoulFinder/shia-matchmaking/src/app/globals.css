@@ -1,0 +1,129 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-heading);
+  --font-arabic: var(--font-arabic);
+  --color-gold: #C9A84C;
+  --color-gold-light: #D4AF37;
+  --color-primary-red: #890000;
+  --color-primary-red-light: #A52A2A;
+  --color-karbala-red: #8B0000;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Dark Islamic theme - always dark */
+:root {
+  --background: #0A0A0A;
+  --foreground: #FFFFFF;
+  --card: #1A1A2E;
+  --card-foreground: #FFFFFF;
+  --popover: #1A1A2E;
+  --popover-foreground: #FFFFFF;
+  --primary: #890000;
+  --primary-foreground: #FFFFFF;
+  --secondary: #C9A84C;
+  --secondary-foreground: #0A0A0A;
+  --muted: #16213E;
+  --muted-foreground: #B0BEC5;
+  --accent: #A52A2A;
+  --accent-foreground: #FFFFFF;
+  --destructive: #8B0000;
+  --border: #2D2D2D;
+  --input: #2D2D2D;
+  --ring: #C9A84C;
+  --chart-1: #890000;
+  --chart-2: #C9A84C;
+  --chart-3: #A52A2A;
+  --chart-4: #D4AF37;
+  --chart-5: #8B0000;
+  --radius: 0.625rem;
+  --sidebar: #0F0F1A;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #890000;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #1A1A2E;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #2D2D2D;
+  --sidebar-ring: #C9A84C;
+}
+
+/* Islamic geometric pattern background */
+.islamic-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%23C9A84C' stroke-width='0.3' opacity='0.08'/%3E%3Cpath d='M30 10L50 30L30 50L10 30Z' fill='none' stroke='%23C9A84C' stroke-width='0.2' opacity='0.06'/%3E%3C/svg%3E");
+}
+
+.gold-gradient {
+  background: linear-gradient(135deg, #C9A84C 0%, #D4AF37 50%, #C9A84C 100%);
+}
+
+.red-gradient {
+  background: linear-gradient(135deg, #890000 0%, #A52A2A 50%, #890000 100%);
+}
+
+.gold-border-b {
+  border-bottom: 2px solid #C9A84C;
+}
+
+.gold-border-t {
+  border-top: 2px solid #C9A84C;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+  /* Fix native select dropdown colors on dark theme */
+  select option {
+    background-color: #1A1A2E;
+    color: #FFFFFF;
+  }
+}
