@@ -10,6 +10,14 @@ public class Paddle
     public int Height { get; } = 100;
     public float Speed { get; set; } = 6f;
 
+    // Power-up state
+    public bool HasGun { get; set; }
+    public int Ammo { get; set; }
+
+    // Stun state
+    public bool IsStunned => StunFramesLeft > 0;
+    public int StunFramesLeft { get; private set; }
+
     public RectangleF Bounds => new(X, Y, Width, Height);
 
     public Paddle(float x, float y)
@@ -18,10 +26,27 @@ public class Paddle
         Y = y;
     }
 
-    public void MoveUp() => Y -= Speed;
-    public void MoveDown() => Y += Speed;
-    public void MoveLeft() => X -= Speed;
-    public void MoveRight() => X += Speed;
+    public void MoveUp() { if (!IsStunned) Y -= Speed; }
+    public void MoveDown() { if (!IsStunned) Y += Speed; }
+    public void MoveLeft() { if (!IsStunned) X -= Speed; }
+    public void MoveRight() { if (!IsStunned) X += Speed; }
+
+    public void ApplyStun(int frames)
+    {
+        StunFramesLeft = frames;
+    }
+
+    public void UpdateStun()
+    {
+        if (StunFramesLeft > 0) StunFramesLeft--;
+    }
+
+    public void ResetPowerUps()
+    {
+        HasGun = false;
+        Ammo = 0;
+        StunFramesLeft = 0;
+    }
 
     public void Clamp(float minY, float maxY)
     {

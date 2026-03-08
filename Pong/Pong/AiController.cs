@@ -7,33 +7,73 @@ public class AiController
     private readonly Random _rng = new();
     private float _offset;
     private int _offsetTimer;
-    private float _predictedY;
-    private bool _hasPrediction;
 
     public AiDifficulty Difficulty { get; set; } = AiDifficulty.Medium;
+    public bool WantsToShoot { get; private set; }
 
-    public void Update(Paddle paddle, Ball ball, int gameWidth, int gameHeight)
+    public void Update(Paddle paddle, Ball ball, int gameWidth, int gameHeight,
+        PowerUp? powerUp = null, Paddle? opponent = null)
     {
+        WantsToShoot = false;
         float paddleCenter = paddle.Y + paddle.Height / 2f;
         float ballCenter = ball.Y + ball.Height / 2f;
         bool ballApproaching = ball.SpeedX > 0;
         float targetY;
         float moveSpeed;
 
-        // Horizontal AI: move forward when ball is on our side, retreat otherwise
+        // --- Power-up seeking ---
+        // If a power-up is on our side and we don't have a gun, detour to grab it
+        bool seekingPowerUp = false;
+        if (powerUp != null && powerUp.Active && !paddle.HasGun)
+        {
+            float distToPowerUp = MathF.Abs(paddleCenter - powerUp.Y) +
+                                  MathF.Abs(paddle.X + paddle.Width / 2f - powerUp.X);
+            // Only detour if power-up is reachable and ball isn't immediately threatening
+            if (distToPowerUp < 250 || !ballApproaching || ball.X < gameWidth * 0.3f)
+            {
+                seekingPowerUp = true;
+            }
+        }
+
+        // --- Shooting logic ---
+        if (paddle.HasGun && paddle.Ammo > 0 && opponent != null && !paddle.IsStunned)
+        {
+            switch (Difficulty)
+            {
+                case AiDifficulty.Easy:
+                    // Fire randomly ~2% chance per frame
+                    if (_rng.Next(50) == 0) WantsToShoot = true;
+                    break;
+                case AiDifficulty.Medium:
+                    // Fire when opponent is far from center (harder to recover)
+                    if (MathF.Abs(opponent.Y + opponent.Height / 2f - gameHeight / 2f) > 120)
+                        WantsToShoot = true;
+                    break;
+                case AiDifficulty.Hard:
+                    // Fire when ball is approaching and opponent is committed to a direction
+                    if (ballApproaching && ball.X > gameWidth * 0.4f &&
+                        MathF.Abs(opponent.Y + opponent.Height / 2f - gameHeight / 2f) > 80)
+                        WantsToShoot = true;
+                    break;
+            }
+        }
+
+        // --- Horizontal movement ---
         float halfCourt = gameWidth / 2f;
         float homeX = gameWidth - paddle.Width;
-        float forwardX = halfCourt + 80;
         float targetX;
 
-        if (ballApproaching && ball.X > halfCourt)
-            targetX = Math.Max(forwardX, ball.X - 60); // advance toward ball
+        if (seekingPowerUp && powerUp != null)
+        {
+            targetX = powerUp.X;
+        }
+        else if (ballApproaching && ball.X > halfCourt)
+            targetX = Math.Max(halfCourt + 80, ball.X - 60);
         else if (ballApproaching)
-            targetX = halfCourt + 100; // ball coming, move to mid-position
+            targetX = halfCourt + 100;
         else
-            targetX = homeX; // retreat to baseline
+            targetX = homeX;
 
-        // Clamp targetX to right side
         targetX = Math.Clamp(targetX, halfCourt + 20, gameWidth - paddle.Width);
 
         float xDiff = targetX - paddle.X;
@@ -109,6 +149,13 @@ public class AiController
 
             default:
                 return;
+        }
+
+        // Override target Y if seeking a power-up and ball isn't urgent
+        if (seekingPowerUp && powerUp != null && (!ballApproaching || ball.X < gameWidth * 0.5f))
+        {
+            targetY = powerUp.Y;
+            moveSpeed = paddle.Speed * 0.9f;
         }
 
         // Move paddle toward target Y

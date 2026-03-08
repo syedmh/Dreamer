@@ -19,7 +19,6 @@ public class GameForm : Form
     private const int ShakeDurationFrames = 4;
     private const int ShakeIntensity = 4;
 
-    private readonly Panel _gamePanel;
     private readonly System.Windows.Forms.Timer _gameTimer;
     private BufferedGraphicsContext _bufContext = null!;
     private BufferedGraphics _bufGraphics = null!;
@@ -59,6 +58,16 @@ public class GameForm : Form
 
     // Screen shake
     private int _shakeFrames;
+
+    // Power-ups and bullets
+    private readonly PowerUp _leftPowerUp = new();
+    private readonly PowerUp _rightPowerUp = new();
+    private readonly Bullet _leftBullet = new();
+    private readonly Bullet _rightBullet = new();
+    private int _powerUpSpawnTimer;
+    private const int PowerUpSpawnMinFrames = 480;  // 8s
+    private const int PowerUpSpawnMaxFrames = 720;  // 12s
+    private const int StunDurationFrames = 90;      // 1.5s
 
     // FPS counter
     private bool _showFps;
@@ -211,7 +220,17 @@ public class GameForm : Form
 
         // Right paddle: player or AI
         if (_singlePlayer)
-            _ai.Update(_rightPaddle, _ball, GameWidth, GameHeight);
+        {
+            _ai.Update(_rightPaddle, _ball, GameWidth, GameHeight, _rightPowerUp, _leftPaddle);
+            // AI shooting
+            if (_ai.WantsToShoot && _rightPaddle.HasGun && _rightPaddle.Ammo > 0 && !_rightBullet.Active)
+            {
+                _rightBullet.Fire(_rightPaddle.X, _rightPaddle.Y + _rightPaddle.Height / 2f, -1f);
+                _rightPaddle.Ammo--;
+                if (_rightPaddle.Ammo <= 0) _rightPaddle.HasGun = false;
+                SoundFx.Shoot();
+            }
+        }
         else
         {
             if (_pressedKeys.Contains(Keys.Up)) _rightPaddle.MoveUp();
@@ -223,6 +242,10 @@ public class GameForm : Form
         // Clamp each paddle to their half of the court
         _leftPaddle.ClampXY(0, GameWidth / 2 - 20, 0, GameHeight);
         _rightPaddle.ClampXY(GameWidth / 2 + 20, GameWidth, 0, GameHeight);
+
+        // Update stun timers
+        _leftPaddle.UpdateStun();
+        _rightPaddle.UpdateStun();
 
         // Record paddle trails
         _leftPaddleTrail.Enqueue(_leftPaddle.Y);
@@ -291,6 +314,90 @@ public class GameForm : Form
             if (_scoreLeft >= WinningScore) { _matchOver = true; SoundFx.Win(); }
             else { SoundFx.Score(); ResetBall(); }
         }
+
+        // --- Power-up spawn ---
+        _powerUpSpawnTimer--;
+        if (_powerUpSpawnTimer <= 0)
+        {
+            _powerUpSpawnTimer = PowerUpSpawnMinFrames + _rng.Next(PowerUpSpawnMaxFrames - PowerUpSpawnMinFrames);
+            // Spawn on a random side if that side doesn't already have one
+            bool spawnLeft = _rng.Next(2) == 0;
+            if (spawnLeft && !_leftPowerUp.Active)
+            {
+                float px = 40 + _rng.Next(GameWidth / 2 - 80);
+                float py = 40 + _rng.Next(GameHeight - 80);
+                _leftPowerUp.Spawn(px, py, CourtSide.Left);
+            }
+            else if (!spawnLeft && !_rightPowerUp.Active)
+            {
+                float px = GameWidth / 2 + 40 + _rng.Next(GameWidth / 2 - 80);
+                float py = 40 + _rng.Next(GameHeight - 80);
+                _rightPowerUp.Spawn(px, py, CourtSide.Right);
+            }
+        }
+
+        // Animate active power-ups
+        if (_leftPowerUp.Active) _leftPowerUp.AnimFrame++;
+        if (_rightPowerUp.Active) _rightPowerUp.AnimFrame++;
+
+        // --- Power-up pickup ---
+        if (_leftPowerUp.Active && _leftPaddle.Bounds.IntersectsWith(_leftPowerUp.Bounds))
+        {
+            _leftPaddle.HasGun = true;
+            _leftPaddle.Ammo = 1;
+            _leftPowerUp.Deactivate();
+            SoundFx.PowerUpPickup();
+        }
+        if (_rightPowerUp.Active && _rightPaddle.Bounds.IntersectsWith(_rightPowerUp.Bounds))
+        {
+            _rightPaddle.HasGun = true;
+            _rightPaddle.Ammo = 1;
+            _rightPowerUp.Deactivate();
+            SoundFx.PowerUpPickup();
+        }
+
+        // --- Shooting ---
+        // P1 shoots with Q
+        if (_justPressed.Contains(Keys.Q) && _leftPaddle.HasGun && _leftPaddle.Ammo > 0 && !_leftBullet.Active)
+        {
+            _leftBullet.Fire(_leftPaddle.X + _leftPaddle.Width, _leftPaddle.Y + _leftPaddle.Height / 2f, 1f);
+            _leftPaddle.Ammo--;
+            if (_leftPaddle.Ammo <= 0) _leftPaddle.HasGun = false;
+            SoundFx.Shoot();
+        }
+        // P2 shoots with RShift (or AI shoots)
+        if (!_singlePlayer && _justPressed.Contains(Keys.RShiftKey) && _rightPaddle.HasGun && _rightPaddle.Ammo > 0 && !_rightBullet.Active)
+        {
+            _rightBullet.Fire(_rightPaddle.X, _rightPaddle.Y + _rightPaddle.Height / 2f, -1f);
+            _rightPaddle.Ammo--;
+            if (_rightPaddle.Ammo <= 0) _rightPaddle.HasGun = false;
+            SoundFx.Shoot();
+        }
+
+        // --- Bullet movement and collision ---
+        _leftBullet.Update();
+        _rightBullet.Update();
+
+        // Left bullet hits right paddle
+        if (_leftBullet.Active && _leftBullet.Bounds.IntersectsWith(_rightPaddle.Bounds))
+        {
+            _rightPaddle.ApplyStun(StunDurationFrames);
+            _leftBullet.Deactivate();
+            TriggerShake();
+            SoundFx.Stun();
+        }
+        // Right bullet hits left paddle
+        if (_rightBullet.Active && _rightBullet.Bounds.IntersectsWith(_leftPaddle.Bounds))
+        {
+            _leftPaddle.ApplyStun(StunDurationFrames);
+            _rightBullet.Deactivate();
+            TriggerShake();
+            SoundFx.Stun();
+        }
+
+        // Remove bullets that go off-screen
+        if (_leftBullet.Active && _leftBullet.X > GameWidth) _leftBullet.Deactivate();
+        if (_rightBullet.Active && _rightBullet.X + _rightBullet.Width < 0) _rightBullet.Deactivate();
     }
 
     private void BounceOffPaddle(Paddle paddle, float directionX)
@@ -320,6 +427,13 @@ public class GameForm : Form
         _leftPaddle.Y = (GameHeight - _leftPaddle.Height) / 2f;
         _rightPaddle.X = GameWidth - _rightPaddle.Width;
         _rightPaddle.Y = (GameHeight - _rightPaddle.Height) / 2f;
+        _leftPaddle.ResetPowerUps();
+        _rightPaddle.ResetPowerUps();
+        _leftPowerUp.Deactivate();
+        _rightPowerUp.Deactivate();
+        _leftBullet.Deactivate();
+        _rightBullet.Deactivate();
+        _powerUpSpawnTimer = PowerUpSpawnMinFrames;
         _ballTrail.Clear();
         _leftPaddleTrail.Clear();
         _rightPaddleTrail.Clear();
@@ -429,11 +543,25 @@ public class GameForm : Form
         DrawPaddleTrail(g, _leftPaddle, _leftPaddleTrail);
         DrawPaddleTrail(g, _rightPaddle, _rightPaddleTrail);
 
-        // Paddle glow + paddles
+        // Paddle glow + paddles (with stun coloring)
         DrawPaddleGlow(g, _leftPaddle);
         DrawPaddleGlow(g, _rightPaddle);
-        g.FillRectangle(Brushes.White, _leftPaddle.Bounds);
-        g.FillRectangle(Brushes.White, _rightPaddle.Bounds);
+        DrawPaddleWithState(g, _leftPaddle);
+        DrawPaddleWithState(g, _rightPaddle);
+
+        // Power-ups
+        DrawPowerUp(g, _leftPowerUp);
+        DrawPowerUp(g, _rightPowerUp);
+
+        // Bullets
+        DrawBullet(g, _leftBullet);
+        DrawBullet(g, _rightBullet);
+
+        // Gun indicators
+        if (_leftPaddle.HasGun && _leftPaddle.Ammo > 0)
+            DrawGunIndicator(g, _leftPaddle, 1);
+        if (_rightPaddle.HasGun && _rightPaddle.Ammo > 0)
+            DrawGunIndicator(g, _rightPaddle, -1);
 
         // Scores
         using var scoreFont = new Font("Consolas", 36, FontStyle.Bold);
@@ -516,9 +644,91 @@ public class GameForm : Form
 
     private static void DrawPaddleGlow(Graphics g, Paddle paddle)
     {
-        using var glow = new SolidBrush(Color.FromArgb(30, 100, 180, 255));
+        Color glowColor = paddle.IsStunned
+            ? Color.FromArgb(50, 255, 60, 60)
+            : Color.FromArgb(30, 100, 180, 255);
+        using var glow = new SolidBrush(glowColor);
         g.FillRectangle(glow, paddle.X - 2, paddle.Y - 2,
             paddle.Width + 4, paddle.Height + 4);
+    }
+
+    private static void DrawPaddleWithState(Graphics g, Paddle paddle)
+    {
+        if (paddle.IsStunned)
+        {
+            // Flashing red/white when stunned
+            bool flash = (paddle.StunFramesLeft / 4) % 2 == 0;
+            using var brush = new SolidBrush(flash ? Color.Red : Color.DarkRed);
+            g.FillRectangle(brush, paddle.Bounds);
+        }
+        else if (paddle.HasGun && paddle.Ammo > 0)
+        {
+            // Yellow tint when armed
+            using var brush = new SolidBrush(Color.FromArgb(255, 255, 220, 100));
+            g.FillRectangle(brush, paddle.Bounds);
+        }
+        else
+        {
+            g.FillRectangle(Brushes.White, paddle.Bounds);
+        }
+    }
+
+    private void DrawPowerUp(Graphics g, PowerUp pu)
+    {
+        if (!pu.Active) return;
+
+        float pulse = 1f + 0.15f * MathF.Sin(pu.AnimFrame * 0.1f);
+        float halfSize = pu.Size / 2f * pulse;
+
+        // Outer glow
+        int glowAlpha = (int)(30 + 20 * MathF.Sin(pu.AnimFrame * 0.08f));
+        using (var glowBrush = new SolidBrush(Color.FromArgb(glowAlpha, 255, 200, 50)))
+            g.FillEllipse(glowBrush, pu.X - halfSize - 4, pu.Y - halfSize - 4,
+                (halfSize + 4) * 2, (halfSize + 4) * 2);
+
+        // Diamond shape
+        var diamond = new PointF[]
+        {
+            new(pu.X, pu.Y - halfSize),
+            new(pu.X + halfSize, pu.Y),
+            new(pu.X, pu.Y + halfSize),
+            new(pu.X - halfSize, pu.Y)
+        };
+        using var fill = new SolidBrush(Color.FromArgb(220, 255, 200, 50));
+        g.FillPolygon(fill, diamond);
+        using var outline = new Pen(Color.FromArgb(255, 255, 240, 120), 1.5f);
+        g.DrawPolygon(outline, diamond);
+    }
+
+    private static void DrawBullet(Graphics g, Bullet b)
+    {
+        if (!b.Active) return;
+
+        // Trail glow
+        float dir = b.SpeedX > 0 ? -1f : 1f;
+        for (int i = 1; i <= 3; i++)
+        {
+            int alpha = 60 - i * 15;
+            using var trail = new SolidBrush(Color.FromArgb(alpha, 255, 100, 100));
+            g.FillRectangle(trail, b.X + dir * i * 4, b.Y - b.Height / 2f,
+                b.Width, b.Height);
+        }
+
+        // Bullet
+        using var bulletBrush = new SolidBrush(Color.FromArgb(255, 255, 80, 80));
+        g.FillRectangle(bulletBrush, b.Bounds);
+    }
+
+    private static void DrawGunIndicator(Graphics g, Paddle paddle, int direction)
+    {
+        // Small arrow/gun icon next to paddle
+        float cx = paddle.X + (direction > 0 ? paddle.Width + 5 : -8);
+        float cy = paddle.Y + paddle.Height / 2f;
+
+        using var pen = new Pen(Color.FromArgb(180, 255, 200, 50), 2f);
+        g.DrawLine(pen, cx, cy, cx + direction * 6, cy);
+        g.DrawLine(pen, cx + direction * 6, cy, cx + direction * 3, cy - 3);
+        g.DrawLine(pen, cx + direction * 6, cy, cx + direction * 3, cy + 3);
     }
 
     private void DrawCenteredText(Graphics g, string text, float fontSize, FontStyle style, Brush brush, float yOffset)
