@@ -1,0 +1,202 @@
+@page "/products"
+@inject ApiClient Api
+@inject NavigationManager Nav
+
+<PageTitle>Collection — KHILAT</PageTitle>
+
+<div class="collection-page">
+    <div class="collection-header">
+        <h1>The Collection</h1>
+        <p>Premium women's fashion — handcrafted with care</p>
+    </div>
+
+    @if (loading)
+    {
+        <div class="loading-spinner"></div>
+    }
+    else if (product != null)
+    {
+        <div class="collection-showcase">
+            <div class="showcase-image">
+                <img src="@currentImagePath" alt="@product.Name in @selectedColor" class="showcase-product-img" />
+            </div>
+
+            <div class="showcase-details">
+                <h2>@product.Name</h2>
+                <p class="showcase-desc">@product.Description</p>
+
+                <div class="showcase-section">
+                    <h4>Color — <span class="text-gold">@FormatColorName(selectedColor)</span></h4>
+                    <div class="color-swatches">
+                        @foreach (var color in availableColors)
+                        {
+                            <button class="color-swatch @(selectedColor == color.Key ? "active" : "")"
+                                    style="background-color: @color.Value;"
+                                    title="@FormatColorName(color.Key)"
+                                    @onclick="() => OnColorSelected(color.Key)"></button>
+                        }
+                    </div>
+                </div>
+
+                <div class="showcase-section">
+                    <h4>Size</h4>
+                    <div class="size-options">
+                        @foreach (var size in availableSizes)
+                        {
+                            <button class="size-btn @(selectedSize == size ? "active" : "")"
+                                    @onclick="() => OnSizeSelected(size)">@size</button>
+                        }
+                    </div>
+                </div>
+
+                <div class="showcase-section">
+                    <h4>Craftsmanship</h4>
+                    <div class="craftsmanship-toggle">
+                        <button class="craft-btn @(selectedCraft == "HandStitched" ? "active" : "")"
+                                @onclick='() => OnCraftSelected("HandStitched")'>
+                            <span class="craft-label">Hand-Stitched</span>
+                            <span class="craft-price">From $@GetPrice("HandStitched").ToString("N0")</span>
+                        </button>
+                        <button class="craft-btn @(selectedCraft == "MachineProduced" ? "active" : "")"
+                                @onclick='() => OnCraftSelected("MachineProduced")'>
+                            <span class="craft-label">Machine-Produced</span>
+                            <span class="craft-price">From $@GetPrice("MachineProduced").ToString("N0")</span>
+                        </button>
+                    </div>
+                </div>
+
+                @if (selectedVariant != null)
+                {
+                    <div class="showcase-price">
+                        <span class="price-amount">$@selectedVariant.Price.ToString("N2")</span>
+                        <span class="price-stock @(selectedVariant.IsAvailable ? "" : "out-of-stock")">
+                            @(selectedVariant.IsAvailable ? "In Stock" : "Out of Stock")
+                        </span>
+                    </div>
+
+                    <button class="btn-primary btn-add-to-cart" @onclick="ViewDetails">
+                        View Full Details & Add to Cart
+                    </button>
+                }
+            </div>
+        </div>
+
+        <div class="collection-sizechart">
+            <h3 class="text-center">Size Guide</h3>
+            <p class="text-center section-subtitle">All measurements in inches</p>
+            @if (product.SizeChart?.Any() == true)
+            {
+                <div class="sizechart-table-wrapper">
+                    <table class="sizechart-table">
+                        <thead>
+                            <tr>
+                                <th>Size</th><th>Front</th><th>Back</th><th>Arm</th><th>Shoulder</th><th>Chest</th><th>Waist</th><th>Hip</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var s in product.SizeChart)
+                            {
+                                <tr class="@(s.Size == selectedSize ? "active-row" : "")">
+                                    <td><strong>@s.Size</strong></td>
+                                    <td>@s.FrontLengthInches</td><td>@s.BackLengthInches</td>
+                                    <td>@s.ArmLengthInches</td><td>@s.ShoulderInches</td>
+                                    <td>@s.ChestInches</td><td>@s.WaistInches</td><td>@s.HipInches</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <p>No products available at the moment.</p>
+        </div>
+    }
+</div>
+
+@code {
+    private ProductDto? product;
+    private bool loading = true;
+    private string selectedColor = "Ivory";
+    private string selectedSize = "M";
+    private string selectedCraft = "HandStitched";
+    private string currentImagePath = "/images/khilat-ivory.svg";
+    private ProductVariantDto? selectedVariant;
+
+    private readonly Dictionary<string, string> availableColors = new()
+    {
+        ["Ivory"] = "#FFFFF0", ["Champagne"] = "#F7E7CE", ["DustyRose"] = "#DCAE96",
+        ["SageGreen"] = "#B2AC88", ["MidnightNavy"] = "#191970", ["Burgundy"] = "#800020",
+        ["Charcoal"] = "#36454F", ["PearlWhite"] = "#F0EAD6", ["Emerald"] = "#50C878",
+        ["Mauve"] = "#E0B0FF", ["SlateBlue"] = "#6A5ACD", ["Terracotta"] = "#E2725B"
+    };
+
+    private readonly string[] availableSizes = { "XS", "S", "M", "L", "XL", "XXL" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        loading = true;
+        try
+        {
+            var response = await Api.GetAsync<ApiResponse<List<ProductDto>>>("api/products");
+            if (response?.Success == true && response.Data?.Count > 0)
+            {
+                var p = response.Data[0];
+                var detail = await Api.GetAsync<ApiResponse<ProductDto>>($"api/products/{p.Id}");
+                if (detail?.Success == true && detail.Data != null)
+                    product = detail.Data;
+                else
+                    product = p;
+            }
+        }
+        catch { }
+        loading = false;
+        UpdateSelection();
+    }
+
+    private void OnColorSelected(string color)
+    {
+        selectedColor = color;
+        currentImagePath = $"/images/khilat-{color.ToLowerInvariant()}.svg";
+        UpdateSelection();
+    }
+
+    private void OnSizeSelected(string size)
+    {
+        selectedSize = size;
+        UpdateSelection();
+    }
+
+    private void OnCraftSelected(string craft)
+    {
+        selectedCraft = craft;
+        UpdateSelection();
+    }
+
+    private void UpdateSelection()
+    {
+        selectedVariant = product?.Variants?.FirstOrDefault(v =>
+            v.Color == selectedColor && v.Size == selectedSize && v.Craftsmanship == selectedCraft);
+    }
+
+    private decimal GetPrice(string craft)
+    {
+        var variant = product?.Variants?.Where(v => v.Craftsmanship == craft).MinBy(v => v.Price);
+        return variant?.Price ?? 0;
+    }
+
+    private void ViewDetails()
+    {
+        if (product != null)
+            Nav.NavigateTo($"/products/{product.Id}");
+    }
+
+    private static string FormatColorName(string color)
+    {
+        // Insert space before uppercase letters: "DustyRose" → "Dusty Rose"
+        return string.Concat(color.Select((c, i) => i > 0 && char.IsUpper(c) ? " " + c : c.ToString()));
+    }
+}

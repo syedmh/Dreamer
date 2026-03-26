@@ -1,0 +1,190 @@
+@page "/checkout"
+@attribute [Authorize]
+@inject ApiClient Api
+@inject CartStateService CartState
+@inject NavigationManager Nav
+
+<PageTitle>Checkout — KHILAT</PageTitle>
+
+<div class="checkout-page">
+    <h1>Checkout</h1>
+
+    <div class="checkout-steps">
+        <div class="step @(currentStep >= 1 ? "active" : "") @(currentStep > 1 ? "completed" : "")">
+            <span class="step-number">1</span>
+            <span class="step-label">Shipping</span>
+        </div>
+        <div class="step-line @(currentStep > 1 ? "active" : "")"></div>
+        <div class="step @(currentStep >= 2 ? "active" : "") @(currentStep > 2 ? "completed" : "")">
+            <span class="step-number">2</span>
+            <span class="step-label">Review</span>
+        </div>
+        <div class="step-line @(currentStep > 2 ? "active" : "")"></div>
+        <div class="step @(currentStep >= 3 ? "active" : "")">
+            <span class="step-number">3</span>
+            <span class="step-label">Payment</span>
+        </div>
+    </div>
+
+    @if (orderPlaced)
+    {
+        <div class="order-confirmation text-center">
+            <h2 class="text-gold">Order Confirmed!</h2>
+            <p>Order Number: <strong>@confirmedOrder?.OrderNumber</strong></p>
+            <p>Total: <strong>$@confirmedOrder?.TotalAmount.ToString("N2")</strong></p>
+            <p>Thank you for shopping with Khilat.</p>
+            <a href="/account" class="btn-primary mt-2">View My Orders</a>
+        </div>
+    }
+    else if (currentStep == 1)
+    {
+        <div class="checkout-form">
+            <h2>Shipping Address</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Street Address</label>
+                    <input class="form-input" @bind="address.Street" placeholder="123 Main St" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">City</label>
+                    <input class="form-input" @bind="address.City" placeholder="City" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">State</label>
+                    <input class="form-input" @bind="address.State" placeholder="State" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">ZIP Code</label>
+                    <input class="form-input" @bind="address.ZipCode" placeholder="ZIP" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Country</label>
+                    <input class="form-input" @bind="address.Country" placeholder="Country" />
+                </div>
+            </div>
+            <button class="btn-primary" @onclick="GoToReview">Continue to Review</button>
+        </div>
+    }
+    else if (currentStep == 2)
+    {
+        <div class="checkout-form">
+            <h2>Order Review</h2>
+            <div class="review-items">
+                @foreach (var item in CartState.Cart.Items)
+                {
+                    <div class="review-item">
+                        <span>@item.ProductName — @item.Color, @item.Size (@item.Craftsmanship)</span>
+                        <span>@item.Quantity × $@item.UnitPrice.ToString("N2")</span>
+                    </div>
+                }
+            </div>
+            <div class="review-address">
+                <h4>Shipping To:</h4>
+                <p>@address.Street, @address.City, @address.State @address.ZipCode, @address.Country</p>
+            </div>
+            <div class="summary-row total">
+                <span>Total</span>
+                <span>$@CartState.Cart.TotalAmount.ToString("N2")</span>
+            </div>
+            <div class="checkout-nav">
+                <button class="btn-outline" @onclick="() => currentStep = 1">← Back</button>
+                <button class="btn-primary" @onclick="GoToPayment">Continue to Payment</button>
+            </div>
+        </div>
+    }
+    else if (currentStep == 3)
+    {
+        <div class="checkout-form">
+            <h2>Payment</h2>
+            <div class="form-group">
+                <label class="form-label">Card Number</label>
+                <input class="form-input" placeholder="4242 4242 4242 4242" @bind="cardNumber" />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Expiry</label>
+                    <input class="form-input" placeholder="MM/YY" @bind="cardExpiry" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">CVC</label>
+                    <input class="form-input" placeholder="123" @bind="cardCvc" />
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <p class="text-rose">@errorMessage</p>
+            }
+
+            <div class="checkout-nav">
+                <button class="btn-outline" @onclick="() => currentStep = 2">← Back</button>
+                <button class="btn-primary" @onclick="PlaceOrder" disabled="@processing">
+                    @(processing ? "Processing..." : $"Pay ${CartState.Cart.TotalAmount.ToString("N2")}")
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private int currentStep = 1;
+    private ShippingAddressDto address = new();
+    private string cardNumber = "";
+    private string cardExpiry = "";
+    private string cardCvc = "";
+    private bool processing;
+    private bool orderPlaced;
+    private OrderDto? confirmedOrder;
+    private string? errorMessage;
+
+    private void GoToReview()
+    {
+        if (string.IsNullOrWhiteSpace(address.Street) || string.IsNullOrWhiteSpace(address.City) ||
+            string.IsNullOrWhiteSpace(address.State) || string.IsNullOrWhiteSpace(address.ZipCode))
+        {
+            errorMessage = "Please fill in all address fields.";
+            return;
+        }
+        errorMessage = null;
+        currentStep = 2;
+    }
+
+    private void GoToPayment()
+    {
+        currentStep = 3;
+    }
+
+    private async Task PlaceOrder()
+    {
+        processing = true;
+        errorMessage = null;
+        try
+        {
+            var request = new CheckoutRequest
+            {
+                ShippingAddress = address,
+                PaymentMethodId = "pm_placeholder"
+            };
+            var response = await Api.PostAsync<CheckoutRequest, ApiResponse<PaymentResponse>>("api/orders/checkout", request);
+            if (response?.Success == true && response.Data?.Success == true)
+            {
+                confirmedOrder = response.Data.Order;
+                orderPlaced = true;
+                await CartState.LoadCartAsync();
+            }
+            else
+            {
+                errorMessage = response?.Data?.ErrorMessage ?? response?.Message ?? "Payment failed. Please try again.";
+            }
+        }
+        catch
+        {
+            errorMessage = "An error occurred. Please try again.";
+        }
+        processing = false;
+    }
+}

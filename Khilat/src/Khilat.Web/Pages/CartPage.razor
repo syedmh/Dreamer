@@ -1,0 +1,93 @@
+@page "/cart"
+@inject CartStateService CartState
+@inject NavigationManager Nav
+
+<PageTitle>Shopping Cart — KHILAT</PageTitle>
+
+<div class="cart-page">
+    <h1>Shopping Cart</h1>
+
+    @if (CartState.Cart.Items.Any())
+    {
+        <div class="cart-layout">
+            <div class="cart-items">
+                @foreach (var item in CartState.Cart.Items)
+                {
+                    <div class="cart-item">
+                        <div class="cart-item-image">
+                            <img src="@GetColorImagePath(item.Color)" alt="@item.ProductName" class="cart-item-image" />
+                        </div>
+                        <div class="cart-item-details">
+                            <h3>@item.ProductName</h3>
+                            <p>Color: <span class="color-dot" style="background-color: @item.ColorHex;"></span> @item.Color</p>
+                            <p>Size: @item.Size</p>
+                            <p>@item.Craftsmanship</p>
+                        </div>
+                        <div class="cart-item-qty">
+                            <button class="qty-btn" @onclick="() => UpdateQty(item.Id, item.Quantity - 1)" disabled="@(item.Quantity <= 1)">−</button>
+                            <span>@item.Quantity</span>
+                            <button class="qty-btn" @onclick="() => UpdateQty(item.Id, item.Quantity + 1)">+</button>
+                        </div>
+                        <div class="cart-item-price">
+                            <span>$@item.Subtotal.ToString("N2")</span>
+                        </div>
+                        <button class="btn-remove" @onclick="() => RemoveItem(item.Id)">✕</button>
+                    </div>
+                }
+            </div>
+
+            <div class="cart-summary">
+                <div class="order-summary-card">
+                    <h3>Order Summary</h3>
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span>$@CartState.Cart.TotalAmount.ToString("N2")</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span>Calculated at checkout</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Estimated Total</span>
+                        <span>$@CartState.Cart.TotalAmount.ToString("N2")</span>
+                    </div>
+                    <button class="btn-primary btn-full" @onclick='() => Nav.NavigateTo("/checkout")'>Proceed to Checkout</button>
+                    <button class="btn-outline btn-full mt-2" @onclick="ClearCart">Clear Cart</button>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="cart-empty">
+            <p>Your cart is empty</p>
+            <a href="/products" class="btn-primary">Browse the Collection</a>
+        </div>
+    }
+</div>
+
+@code {
+    private static string GetColorImagePath(string? colorName)
+    {
+        if (string.IsNullOrEmpty(colorName))
+            return "/images/khilat-front.svg";
+        var normalized = colorName.Replace(" ", "").ToLowerInvariant();
+        return $"/images/khilat-{normalized}.svg";
+    }
+
+    private async Task UpdateQty(Guid itemId, int qty)
+    {
+        if (qty >= 1)
+            await CartState.UpdateQuantityAsync(itemId, qty);
+    }
+
+    private async Task RemoveItem(Guid itemId)
+    {
+        await CartState.RemoveItemAsync(itemId);
+    }
+
+    private async Task ClearCart()
+    {
+        await CartState.ClearCartAsync();
+    }
+}

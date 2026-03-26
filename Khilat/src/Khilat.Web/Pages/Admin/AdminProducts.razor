@@ -1,0 +1,88 @@
+@page "/admin/products"
+@attribute [Authorize(Roles = "Admin")]
+@inject ApiClient Api
+
+<PageTitle>Manage Products — KHILAT</PageTitle>
+
+<div class="admin-dashboard">
+    <div class="admin-header">
+        <h1>Product Management</h1>
+        <div class="admin-nav">
+            <a href="/admin" class="nav-link">Overview</a>
+            <a href="/admin/orders" class="nav-link">Orders</a>
+            <a href="/admin/products" class="nav-link active">Products</a>
+        </div>
+    </div>
+
+    @if (loading)
+    {
+        <div class="loading-spinner"></div>
+    }
+    else
+    {
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Price Range</th>
+                    <th>Variants</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in products)
+                {
+                    <tr>
+                        <td>@product.Name</td>
+                        <td>$@product.MinPrice.ToString("N2") – $@product.MaxPrice.ToString("N2")</td>
+                        <td>@product.Variants.Count</td>
+                        <td><span class="status-badge status-@product.Status.ToLower()">@product.Status</span></td>
+                        <td>
+                            <button class="btn-outline btn-sm"
+                                    @onclick="() => ToggleStatus(product)">
+                                @(product.Status == "Active" ? "Suspend" : "Activate")
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private List<ProductDto> products = new();
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        loading = true;
+        try
+        {
+            var response = await Api.GetAsync<ApiResponse<PagedResult<ProductDto>>>("api/products?pageSize=100");
+            if (response?.Success == true && response.Data != null)
+                products = response.Data.Items;
+        }
+        catch { products = new(); }
+        loading = false;
+    }
+
+    private async Task ToggleStatus(ProductDto product)
+    {
+        var newStatus = product.Status == "Active" ? "Suspended" : "Active";
+        try
+        {
+            await Api.PutAsync<UpdateProductStatusRequest, ApiResponse<ProductDto>>(
+                $"api/admin/products/{product.Id}/status",
+                new UpdateProductStatusRequest { Status = newStatus });
+            await LoadProducts();
+        }
+        catch { }
+    }
+}

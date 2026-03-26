@@ -1,0 +1,119 @@
+@page "/"
+
+<PageTitle>KHILAT — Premium Boutique</PageTitle>
+
+<section class="hero-section">
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1 class="hero-title">KHILAT</h1>
+            <p class="hero-tagline">Where Tradition Meets Modern Elegance</p>
+            <p class="hero-subtitle">Premium women's kurta — hand-stitched artisan luxury &amp; modern craftsmanship</p>
+            <a href="/products" class="hero-cta">Explore the Collection</a>
+        </div>
+        <div class="hero-image-wrapper">
+            <img src="/images/khilat-front.svg" alt="Khilat — Premium Modest Fashion" class="product-hero-image" />
+        </div>
+    </div>
+</section>
+
+<section class="section-animate craftsmanship-section">
+    <div class="section-container">
+        <h2 class="text-center">The Art of Craftsmanship</h2>
+        <p class="text-center section-subtitle">Every piece tells a story of heritage and precision</p>
+        <div class="comparison-table">
+            <div class="comparison-col">
+                <h3 class="text-gold">Hand-Stitched</h3>
+                <p class="comparison-price">From $189</p>
+                <ul>
+                    <li>Artisan-crafted by master tailors</li>
+                    <li>Superior thread tension &amp; durability</li>
+                    <li>Unique character in every piece</li>
+                    <li>Premium finishing details</li>
+                </ul>
+            </div>
+            <div class="comparison-col">
+                <h3>Machine-Produced</h3>
+                <p class="comparison-price">From $89</p>
+                <ul>
+                    <li>Precision-engineered consistency</li>
+                    <li>Excellent value proposition</li>
+                    <li>Quick production turnaround</li>
+                    <li>Modern manufacturing standards</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-animate palette-section">
+    <div class="section-container">
+        <h2 class="text-center">12 Signature Colors</h2>
+        <p class="text-center section-subtitle">Curated for timeless elegance — click to explore</p>
+        <div class="color-showcase-grid">
+            @foreach (var color in colorVariants)
+            {
+                <a href="/products" class="color-showcase-item">
+                    <img src="/images/khilat-@(color.Key).svg" alt="Khilat in @color.Value" />
+                    <span>@color.Value</span>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="section-animate story-section">
+    <div class="section-container">
+        <div class="story-layout">
+            <div class="story-image">
+                <img src="/images/khilat-sketch.jpg" alt="Original Khilat design sketch" class="sketch-image" />
+            </div>
+            <div class="story-text">
+                <h2>From Sketch to Reality</h2>
+                <p>Every Khilat begins with a hand-drawn design — capturing the perfect proportions of collar, cuffs, and that signature curved hemline.</p>
+                <p>Our artisans bring each sketch to life with meticulous attention to detail, ensuring every stitch honors the original vision.</p>
+                <a href="/products" class="btn-outline">Shop Now</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-animate features-section">
+    <div class="section-container">
+        <h2 class="text-center">Designed for the Modern Woman</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🧵</div>
+                <h3>Premium Fabrics</h3>
+                <p>Sourced from the finest mills — drapes beautifully, stands the test of time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👗</div>
+                <h3>Modest &amp; Modern</h3>
+                <p>Tradition meets contemporary silhouettes for today's confident woman.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📏</div>
+                <h3>Perfect Fit</h3>
+                <p>6 sizes (XS–XXL) with detailed measurements from our original sketch.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private readonly Dictionary<string, string> colorVariants = new()
+    {
+        ["ivory"] = "Ivory",
+        ["champagne"] = "Champagne",
+        ["dustyrose"] = "Dusty Rose",
+        ["sagegreen"] = "Sage Green",
+        ["midnightnavy"] = "Midnight Navy",
+        ["burgundy"] = "Burgundy",
+        ["charcoal"] = "Charcoal",
+        ["pearlwhite"] = "Pearl White",
+        ["emerald"] = "Emerald",
+        ["mauve"] = "Mauve",
+        ["slateblue"] = "Slate Blue",
+        ["terracotta"] = "Terracotta"
+    };
+}

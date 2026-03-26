@@ -1,0 +1,106 @@
+@page "/admin/orders"
+@attribute [Authorize(Roles = "Admin")]
+@inject ApiClient Api
+
+<PageTitle>Manage Orders — KHILAT</PageTitle>
+
+<div class="admin-dashboard">
+    <div class="admin-header">
+        <h1>Order Management</h1>
+        <div class="admin-nav">
+            <a href="/admin" class="nav-link">Overview</a>
+            <a href="/admin/orders" class="nav-link active">Orders</a>
+            <a href="/admin/products" class="nav-link">Products</a>
+        </div>
+    </div>
+
+    <div class="filter-bar">
+        <select class="form-input filter-select" @bind="statusFilter" @bind:after="LoadOrders">
+            <option value="">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Processing">Processing</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
+        </select>
+    </div>
+
+    @if (loading)
+    {
+        <div class="loading-spinner"></div>
+    }
+    else
+    {
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Update</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in orders)
+                {
+                    <tr>
+                        <td>@order.OrderNumber</td>
+                        <td>@order.CreatedAt.ToString("MMM dd, yyyy")</td>
+                        <td>@order.Items.Count</td>
+                        <td>$@order.TotalAmount.ToString("N2")</td>
+                        <td><span class="status-badge status-@order.Status.ToLower()">@order.Status</span></td>
+                        <td>
+                            <select class="form-input" @onchange="(e) => UpdateStatus(order.Id, e)">
+                                <option value="">Change...</option>
+                                <option value="Confirmed">Confirmed</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Shipped">Shipped</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private List<OrderDto> orders = new();
+    private string statusFilter = "";
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync() => await LoadOrders();
+
+    private async Task LoadOrders()
+    {
+        loading = true;
+        try
+        {
+            var url = string.IsNullOrEmpty(statusFilter) ? "api/admin/orders" : $"api/admin/orders?status={statusFilter}";
+            var response = await Api.GetAsync<ApiResponse<List<OrderDto>>>(url);
+            if (response?.Success == true && response.Data != null)
+                orders = response.Data;
+        }
+        catch { orders = new(); }
+        loading = false;
+    }
+
+    private async Task UpdateStatus(Guid orderId, ChangeEventArgs e)
+    {
+        var newStatus = e.Value?.ToString();
+        if (string.IsNullOrEmpty(newStatus)) return;
+        try
+        {
+            await Api.PutAsync<UpdateOrderStatusRequest, ApiResponse<OrderDto>>(
+                $"api/admin/orders/{orderId}/status",
+                new UpdateOrderStatusRequest { Status = newStatus });
+            await LoadOrders();
+        }
+        catch { }
+    }
+}

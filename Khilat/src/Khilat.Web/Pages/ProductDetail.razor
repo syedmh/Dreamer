@@ -1,0 +1,240 @@
+@page "/products/{Id:guid}"
+@inject ApiClient Api
+@inject CartStateService CartState
+@inject NavigationManager Nav
+
+<PageTitle>@(product?.Name ?? "Product") — KHILAT</PageTitle>
+
+@if (loading)
+{
+    <div class="loading-spinner"></div>
+}
+else if (product != null)
+{
+    <div class="product-detail-page">
+        <div class="product-gallery">
+            <div class="gallery-main">
+                <img src="@selectedImage" alt="@product.Name" class="product-hero-image" />
+            </div>
+            <div class="thumbnail-strip">
+                <img src="@GetCurrentColorImagePath()" alt="Front view"
+                     class="@(selectedImage == GetCurrentColorImagePath() ? "active" : "")"
+                     @onclick="SelectFrontView" />
+                <img src="/images/khilat-back.svg" alt="Back view"
+                     class="@(selectedImage == "/images/khilat-back.svg" ? "active" : "")"
+                     @onclick='() => selectedImage = "/images/khilat-back.svg"' />
+                <img src="/images/khilat-detail.svg" alt="Detail view"
+                     class="@(selectedImage == "/images/khilat-detail.svg" ? "active" : "")"
+                     @onclick='() => selectedImage = "/images/khilat-detail.svg"' />
+                <img src="/images/khilat-sketch.jpg" alt="Original sketch"
+                     class="@(selectedImage == "/images/khilat-sketch.jpg" ? "active" : "")"
+                     @onclick='() => selectedImage = "/images/khilat-sketch.jpg"' />
+            </div>
+        </div>
+
+        <div class="product-info">
+            <h1>@product.Name</h1>
+            <p class="product-description">@product.Description</p>
+
+            <div class="price-tag">
+                <span class="price-label">@selectedCraftsmanship</span>
+                <span class="price-amount">$@(selectedVariant?.Price.ToString("N2") ?? product.MinPrice.ToString("N2"))</span>
+            </div>
+
+            <div class="selector-group">
+                <h4>Color</h4>
+                <div class="color-swatches">
+                    @foreach (var color in product.Variants.Select(v => new { v.Color, v.ColorHex }).DistinctBy(c => c.Color))
+                    {
+                        <button class="color-swatch @(selectedColor == color.Color ? "active" : "")"
+                                style="background-color: @color.ColorHex;"
+                                title="@color.Color"
+                                @onclick="() => SelectColor(color.Color)"></button>
+                    }
+                </div>
+            </div>
+
+            <div class="selector-group">
+                <h4>Size</h4>
+                <div class="size-options">
+                    @foreach (var size in product.Variants.Where(v => string.IsNullOrEmpty(selectedColor) || v.Color == selectedColor).Select(v => v.Size).Distinct())
+                    {
+                        <button class="size-btn @(selectedSize == size ? "active" : "")"
+                                @onclick="() => SelectSize(size)">@size</button>
+                    }
+                </div>
+            </div>
+
+            <div class="selector-group">
+                <h4>Craftsmanship</h4>
+                <div class="craftsmanship-toggle">
+                    <button class="size-btn @(selectedCraftsmanship == "HandStitched" ? "active" : "")"
+                            @onclick='() => SelectCraftsmanship("HandStitched")'>Hand-Stitched</button>
+                    <button class="size-btn @(selectedCraftsmanship == "MachineProduced" ? "active" : "")"
+                            @onclick='() => SelectCraftsmanship("MachineProduced")'>Machine-Produced</button>
+                </div>
+            </div>
+
+            @if (selectedVariant != null)
+            {
+                <p class="stock-info">
+                    @if (selectedVariant.IsAvailable)
+                    {
+                        <span class="text-gold">✓ In Stock (@selectedVariant.StockQuantity available)</span>
+                    }
+                    else
+                    {
+                        <span class="text-rose">Out of Stock</span>
+                    }
+                </p>
+            }
+
+            <button class="btn-primary btn-add-cart"
+                    disabled="@(selectedVariant == null || !selectedVariant.IsAvailable || addingToCart)"
+                    @onclick="AddToCart">
+                @(addingToCart ? "Adding..." : "Add to Cart")
+            </button>
+
+            @if (addedToCart)
+            {
+                <p class="text-gold mt-2">✓ Added to cart!</p>
+            }
+
+            @if (product.SizeChart.Any())
+            {
+                <div class="size-chart-section">
+                    <h3>Size Chart (inches)</h3>
+                    <table class="size-chart-table">
+                        <thead>
+                            <tr>
+                                <th>Size</th>
+                                <th>Front Length</th>
+                                <th>Back Length</th>
+                                <th>Arm</th>
+                                <th>Shoulder</th>
+                                <th>Chest</th>
+                                <th>Waist</th>
+                                <th>Hip</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var sc in product.SizeChart)
+                            {
+                                <tr>
+                                    <td>@sc.Size</td>
+                                    <td>@sc.FrontLengthInches</td>
+                                    <td>@sc.BackLengthInches</td>
+                                    <td>@sc.ArmLengthInches</td>
+                                    <td>@sc.ShoulderInches</td>
+                                    <td>@sc.ChestInches</td>
+                                    <td>@sc.WaistInches</td>
+                                    <td>@sc.HipInches</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <p>Product not found.</p>
+        <a href="/products" class="btn-primary">Browse Collection</a>
+    </div>
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private ProductDto? product;
+    private bool loading = true;
+    private string? selectedColor;
+    private string? selectedSize;
+    private string selectedCraftsmanship = "MachineProduced";
+    private string? selectedImage;
+    private ProductVariantDto? selectedVariant;
+    private bool addingToCart;
+    private bool addedToCart;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loading = true;
+        try
+        {
+            var response = await Api.GetAsync<ApiResponse<ProductDto>>($"api/products/{Id}");
+            if (response?.Success == true)
+            {
+                product = response.Data;
+                var firstColor = product?.Variants?.Select(v => v.Color).FirstOrDefault();
+                selectedImage = !string.IsNullOrEmpty(firstColor)
+                    ? GetColorImagePath(firstColor)
+                    : "/images/khilat-front.svg";
+            }
+        }
+        catch { }
+        loading = false;
+    }
+
+    private void SelectColor(string color)
+    {
+        selectedColor = color;
+        selectedImage = GetColorImagePath(color);
+        UpdateSelectedVariant();
+    }
+
+    private void SelectSize(string size)
+    {
+        selectedSize = size;
+        UpdateSelectedVariant();
+    }
+
+    private void SelectCraftsmanship(string craft)
+    {
+        selectedCraftsmanship = craft;
+        UpdateSelectedVariant();
+    }
+
+    private void UpdateSelectedVariant()
+    {
+        addedToCart = false;
+        selectedVariant = product?.Variants.FirstOrDefault(v =>
+            (string.IsNullOrEmpty(selectedColor) || v.Color == selectedColor) &&
+            (string.IsNullOrEmpty(selectedSize) || v.Size == selectedSize) &&
+            v.Craftsmanship == selectedCraftsmanship);
+    }
+
+    private static string GetColorImagePath(string colorName)
+    {
+        var normalized = colorName.Replace(" ", "").ToLowerInvariant();
+        return $"/images/khilat-{normalized}.svg";
+    }
+
+    private string GetCurrentColorImagePath()
+    {
+        var color = selectedColor
+            ?? product?.Variants?.Select(v => v.Color).FirstOrDefault()
+            ?? "ivory";
+        return GetColorImagePath(color);
+    }
+
+    private void SelectFrontView()
+    {
+        selectedImage = GetCurrentColorImagePath();
+    }
+
+    private async Task AddToCart()
+    {
+        if (selectedVariant == null) return;
+        addingToCart = true;
+        try
+        {
+            await CartState.AddToCartAsync(selectedVariant.Id);
+            addedToCart = true;
+        }
+        catch { }
+        addingToCart = false;
+    }
+}

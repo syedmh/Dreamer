@@ -1,0 +1,6 @@
+@Khilat.Api_HostAddress = http://localhost:5263
+
+GET {{Khilat.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

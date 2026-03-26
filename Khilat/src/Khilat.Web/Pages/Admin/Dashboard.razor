@@ -1,0 +1,117 @@
+@page "/admin"
+@attribute [Authorize(Roles = "Admin")]
+@inject ApiClient Api
+
+<PageTitle>Admin Dashboard — KHILAT</PageTitle>
+
+<div class="admin-dashboard">
+    <div class="admin-header">
+        <h1>Dashboard</h1>
+        <div class="admin-nav">
+            <a href="/admin" class="nav-link active">Overview</a>
+            <a href="/admin/orders" class="nav-link">Orders</a>
+            <a href="/admin/products" class="nav-link">Products</a>
+        </div>
+    </div>
+
+    @if (loading)
+    {
+        <div class="loading-spinner"></div>
+    }
+    else if (dashboard != null)
+    {
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-value">$@dashboard.TotalRevenue.ToString("N0")</span>
+                <span class="stat-label">Total Revenue</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">$@dashboard.RevenueThisMonth.ToString("N0")</span>
+                <span class="stat-label">Revenue This Month</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">@dashboard.TotalOrders</span>
+                <span class="stat-label">Total Orders</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">@dashboard.PendingOrders</span>
+                <span class="stat-label">Pending Orders</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">@dashboard.TotalCustomers</span>
+                <span class="stat-label">Total Customers</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">@dashboard.OrdersThisMonth</span>
+                <span class="stat-label">Orders This Month</span>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2>Top Selling Variants</h2>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Color</th>
+                        <th>Size</th>
+                        <th>Craftsmanship</th>
+                        <th>Units Sold</th>
+                        <th>Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var v in dashboard.TopSellingVariants)
+                    {
+                        <tr>
+                            <td>@v.Color</td>
+                            <td>@v.Size</td>
+                            <td>@v.Craftsmanship</td>
+                            <td>@v.TotalSold</td>
+                            <td>$@v.TotalRevenue.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="admin-section">
+            <h2>Revenue by Month</h2>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Revenue</th>
+                        <th>Orders</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in dashboard.RevenueByMonth)
+                    {
+                        <tr>
+                            <td>@r.Month</td>
+                            <td>$@r.Revenue.ToString("N2")</td>
+                            <td>@r.OrderCount</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@code {
+    private AdminDashboardDto? dashboard;
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await Api.GetAsync<ApiResponse<AdminDashboardDto>>("api/admin/dashboard");
+            if (response?.Success == true)
+                dashboard = response.Data;
+        }
+        catch { }
+        loading = false;
+    }
+}

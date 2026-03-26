@@ -1,0 +1,102 @@
+@page "/register"
+@inject ApiClient Api
+@inject AuthenticationStateProvider AuthState
+@inject NavigationManager Nav
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<PageTitle>Create Account — KHILAT</PageTitle>
+
+<div class="auth-page">
+    <div class="auth-card">
+        <h1 class="auth-title">Join Khilat</h1>
+        <p class="text-center">Create your account for exclusive access</p>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input class="form-input" @bind="request.FirstName" placeholder="First Name" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input class="form-input" @bind="request.LastName" placeholder="Last Name" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" @bind="request.Email" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Phone (optional)</label>
+            <input class="form-input" type="tel" @bind="request.Phone" placeholder="+1 (555) 123-4567" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Password</label>
+            <input class="form-input" type="password" @bind="request.Password" placeholder="••••••••" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Confirm Password</label>
+            <input class="form-input" type="password" @bind="request.ConfirmPassword" placeholder="••••••••" />
+        </div>
+
+        @if (errors.Any())
+        {
+            <div class="error-list">
+                @foreach (var e in errors)
+                {
+                    <p class="text-rose">@e</p>
+                }
+            </div>
+        }
+
+        <button class="btn-primary btn-full" @onclick="HandleRegister" disabled="@loading">
+            @(loading ? "Creating Account..." : "Create Account")
+        </button>
+
+        <p class="text-center mt-2">
+            Already have an account? <a href="/login" class="text-gold">Sign in</a>
+        </p>
+    </div>
+</div>
+
+@code {
+    private RegisterRequest request = new();
+    private List<string> errors = new();
+    private bool loading;
+
+    private async Task HandleRegister()
+    {
+        loading = true;
+        errors.Clear();
+
+        if (string.IsNullOrWhiteSpace(request.FirstName)) errors.Add("First name is required.");
+        if (string.IsNullOrWhiteSpace(request.LastName)) errors.Add("Last name is required.");
+        if (string.IsNullOrWhiteSpace(request.Email)) errors.Add("Email is required.");
+        if (string.IsNullOrWhiteSpace(request.Password)) errors.Add("Password is required.");
+        if (request.Password != request.ConfirmPassword) errors.Add("Passwords do not match.");
+
+        if (errors.Any()) { loading = false; return; }
+
+        try
+        {
+            var response = await Api.PostAsync<RegisterRequest, AuthResponse>("api/auth/register", request);
+            if (response?.Success == true && !string.IsNullOrEmpty(response.Token))
+            {
+                await LocalStorage.SetItemAsStringAsync("authToken", response.Token);
+                if (!string.IsNullOrEmpty(response.RefreshToken))
+                    await LocalStorage.SetItemAsStringAsync("refreshToken", response.RefreshToken);
+
+                ((AuthStateProvider)AuthState).NotifyAuthStateChanged();
+                Nav.NavigateTo("/");
+            }
+            else
+            {
+                errors.Add(response?.ErrorMessage ?? "Registration failed.");
+            }
+        }
+        catch
+        {
+            errors.Add("An error occurred. Please try again.");
+        }
+        loading = false;
+    }
+}

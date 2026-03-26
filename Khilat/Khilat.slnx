@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Khilat.Api/Khilat.Api.csproj" />
+    <Project Path="src/Khilat.Core/Khilat.Core.csproj" />
+    <Project Path="src/Khilat.Infrastructure/Khilat.Infrastructure.csproj" />
+    <Project Path="src/Khilat.Shared/Khilat.Shared.csproj" />
+    <Project Path="src/Khilat.Web/Khilat.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Khilat.E2ETests/Khilat.E2ETests.csproj" />
+    <Project Path="tests/Khilat.IntegrationTests/Khilat.IntegrationTests.csproj" />
+    <Project Path="tests/Khilat.UnitTests/Khilat.UnitTests.csproj" />
+  </Folder>
+</Solution>

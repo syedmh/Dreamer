@@ -1,0 +1,92 @@
+@inherits LayoutComponentBase
+@inject CartStateService CartState
+@inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthState
+
+<div class="khilat-app">
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a class="navbar-brand" href="/">
+                <span class="brand-text">KHILAT</span>
+                <span class="brand-tagline">Premium Boutique</span>
+            </a>
+            <div class="navbar-links">
+                <a href="/products" class="nav-link">Collection</a>
+            </div>
+            <div class="navbar-actions">
+                <AuthorizeView>
+                    <Authorized>
+                        <a href="/account" class="nav-link">My Account</a>
+                        <AuthorizeView Roles="Admin" Context="adminContext">
+                            <a href="/admin" class="nav-link nav-admin">Admin</a>
+                        </AuthorizeView>
+                        <button class="btn-logout" @onclick="Logout">Logout</button>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a href="/login" class="nav-link">Sign In</a>
+                        <a href="/register" class="btn-nav-register">Join</a>
+                    </NotAuthorized>
+                </AuthorizeView>
+                <a href="/cart" class="cart-icon">
+                    🛒
+                    @if (CartState.Cart.TotalItems > 0)
+                    {
+                        <span class="cart-badge">@CartState.Cart.TotalItems</span>
+                    }
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        @Body
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3>KHILAT</h3>
+                <p>Where Tradition Meets Modern Elegance</p>
+            </div>
+            <div class="footer-links">
+                <h4>Shop</h4>
+                <a href="/products">Collection</a>
+            </div>
+            <div class="footer-links">
+                <h4>Account</h4>
+                <a href="/login">Sign In</a>
+                <a href="/register">Create Account</a>
+                <a href="/account">Order Tracking</a>
+            </div>
+            <div class="footer-links">
+                <h4>Contact</h4>
+                <p>support@khilat.com</p>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024–2026 Khilat. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        CartState.OnCartChanged += StateHasChanged;
+        try { await CartState.LoadCartAsync(); } catch { }
+    }
+
+    private async Task Logout()
+    {
+        var provider = (AuthStateProvider)AuthState;
+        await provider.LocalStorage.RemoveItemAsync("authToken");
+        await provider.LocalStorage.RemoveItemAsync("refreshToken");
+        provider.NotifyAuthStateChanged();
+        Nav.NavigateTo("/login", true);
+    }
+
+    public void Dispose()
+    {
+        CartState.OnCartChanged -= StateHasChanged;
+    }
+}

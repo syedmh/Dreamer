@@ -1,0 +1,83 @@
+@page "/account"
+@attribute [Authorize]
+@inject ApiClient Api
+
+<PageTitle>My Account — KHILAT</PageTitle>
+
+<div class="account-page">
+    <h1>My Account</h1>
+
+    @if (loading)
+    {
+        <div class="loading-spinner"></div>
+    }
+    else
+    {
+        @if (profile != null)
+        {
+            <div class="profile-card">
+                <h2>Profile</h2>
+                <p><strong>Name:</strong> @profile.FirstName @profile.LastName</p>
+                <p><strong>Email:</strong> @profile.Email</p>
+                <p><strong>Phone:</strong> @(string.IsNullOrEmpty(profile.Phone) ? "Not provided" : profile.Phone)</p>
+            </div>
+        }
+
+        <div class="orders-section">
+            <h2>Order History</h2>
+            @if (orders.Any())
+            {
+                <table class="order-history-table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                            <th>Items</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in orders)
+                        {
+                            <tr>
+                                <td>@order.OrderNumber</td>
+                                <td>@order.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                <td><span class="status-badge status-@order.Status.ToLower()">@order.Status</span></td>
+                                <td>$@order.TotalAmount.ToString("N2")</td>
+                                <td>@order.Items.Count item(s)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>You haven't placed any orders yet.</p>
+                <a href="/products" class="btn-primary">Start Shopping</a>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private CustomerProfileDto? profile;
+    private List<OrderDto> orders = new();
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var profileResponse = await Api.GetAsync<ApiResponse<CustomerProfileDto>>("api/auth/profile");
+            if (profileResponse?.Success == true)
+                profile = profileResponse.Data;
+
+            var ordersResponse = await Api.GetAsync<ApiResponse<List<OrderDto>>>("api/orders");
+            if (ordersResponse?.Success == true && ordersResponse.Data != null)
+                orders = ordersResponse.Data;
+        }
+        catch { }
+        loading = false;
+    }
+}

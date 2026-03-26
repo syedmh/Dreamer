@@ -1,0 +1,70 @@
+@page "/login"
+@inject ApiClient Api
+@inject AuthenticationStateProvider AuthState
+@inject NavigationManager Nav
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<PageTitle>Sign In — KHILAT</PageTitle>
+
+<div class="auth-page">
+    <div class="auth-card">
+        <h1 class="auth-title">Welcome Back</h1>
+        <p class="text-center">Sign in to your Khilat account</p>
+
+        <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" @bind="loginRequest.Email" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Password</label>
+            <input class="form-input" type="password" @bind="loginRequest.Password" placeholder="••••••••" />
+        </div>
+
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <p class="text-rose">@error</p>
+        }
+
+        <button class="btn-primary btn-full" @onclick="HandleLogin" disabled="@loading">
+            @(loading ? "Signing in..." : "Sign In")
+        </button>
+
+        <p class="text-center mt-2">
+            Don't have an account? <a href="/register" class="text-gold">Create one</a>
+        </p>
+    </div>
+</div>
+
+@code {
+    private LoginRequest loginRequest = new();
+    private string? error;
+    private bool loading;
+
+    private async Task HandleLogin()
+    {
+        loading = true;
+        error = null;
+        try
+        {
+            var response = await Api.PostAsync<LoginRequest, AuthResponse>("api/auth/login", loginRequest);
+            if (response?.Success == true && !string.IsNullOrEmpty(response.Token))
+            {
+                await LocalStorage.SetItemAsStringAsync("authToken", response.Token);
+                if (!string.IsNullOrEmpty(response.RefreshToken))
+                    await LocalStorage.SetItemAsStringAsync("refreshToken", response.RefreshToken);
+
+                ((AuthStateProvider)AuthState).NotifyAuthStateChanged();
+                Nav.NavigateTo("/");
+            }
+            else
+            {
+                error = response?.ErrorMessage ?? "Invalid credentials.";
+            }
+        }
+        catch
+        {
+            error = "Unable to sign in. Please try again.";
+        }
+        loading = false;
+    }
+}
