@@ -181,6 +181,83 @@
       margin-bottom: 4px;
     }
 
+    /* Collapsible meeting items */
+    .meeting-item {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .meeting-item:last-child { border-bottom: none; }
+
+    .meeting-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.1s;
+    }
+
+    .meeting-header:hover { background: #1f2937; }
+
+    .meeting-chevron {
+      font-size: 12px;
+      color: var(--muted);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+      width: 16px;
+    }
+
+    .meeting-item.open .meeting-chevron { transform: rotate(90deg); }
+
+    .meeting-time {
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 600;
+      min-width: 130px;
+      flex-shrink: 0;
+    }
+
+    .meeting-title {
+      font-size: 14px;
+      flex: 1;
+    }
+
+    .meeting-leadership-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--orange);
+      border-radius: 50%;
+      flex-shrink: 0;
+      title: "Leadership attendee";
+    }
+
+    .meeting-details {
+      display: none;
+      padding: 0 16px 14px 42px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .meeting-item.open .meeting-details { display: block; }
+
+    .meeting-details a { color: var(--accent); text-decoration: none; }
+    .meeting-details a:hover { text-decoration: underline; }
+    .meeting-details strong { color: var(--text); }
+
+    .expand-all-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .expand-all-btn:hover { color: var(--text); border-color: var(--muted); }
+
     /* Action items */
     .action-item {
       padding: 12px 16px;
@@ -309,7 +386,18 @@
 
     <!-- Dashboard / BOD -->
     <div class="panel active" id="panel-bod">
-      <div style="margin-bottom:16px; text-align:right;">
+      <div style="margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="font-size:13px; color:var(--muted);">Look back:</span>
+          <button class="expand-all-btn" onclick="loadBODForDate(0)" style="font-weight:600; color:var(--accent); border-color:var(--accent);">Today</button>
+          <button class="expand-all-btn" onclick="loadBODForDate(-1)">Yesterday</button>
+          <button class="expand-all-btn" onclick="loadBODForDate(-2)">2d ago</button>
+          <button class="expand-all-btn" onclick="loadBODForDate(-3)">3d ago</button>
+          <button class="expand-all-btn" onclick="loadBODForDate(-4)">4d ago</button>
+          <button class="expand-all-btn" onclick="loadBODForDate(-5)">5d ago</button>
+          <button class="expand-all-btn" onclick="loadBODForDate(-6)">6d ago</button>
+          <button class="expand-all-btn" onclick="loadBODForDate(-7)">7d ago</button>
+        </div>
         <button class="btn" onclick="loadBOD()">🔄 Run Beginning of Day</button>
       </div>
       <div id="bod-content">
@@ -420,6 +508,95 @@
       return `<div class="card"><div class="card-body" style="color:var(--red);">⚠️ ${msg}</div></div>`;
     }
 
+    // --- Collapsible calendar renderer ---
+    const LEADERSHIP_NAMES = ['kristi','anand','jayu','brad','pretish','vanessa','jason','perry','rajesh'];
+
+    function renderCalendarCollapsible(text) {
+      if (!text) return '<span style="color:var(--muted)">Unable to fetch calendar via WorkIQ.</span>';
+
+      // Split into individual meeting blocks
+      // WorkIQ returns formats like:
+      //   "1. **Title**\n   ⏰ **9:30 AM – 10:00 AM**\n..."  (numbered list)
+      //   "### 9:30 AM – 10:00 AM\n**Title**\n..."           (heading style)
+      //   Separated by "---" or double newlines
+
+      const meetings = [];
+      let intro = '';
+
+      // Try splitting by --- first
+      let blocks = text.split(/\n---\n/).filter(s => s.trim());
+      // If only one block, try splitting by numbered list items
+      if (blocks.length <= 1) {
+        blocks = text.split(/\n(?=\d+\.\s+\*\*)/).filter(s => s.trim());
+      }
+      // Also try splitting by ### headings
+      if (blocks.length <= 1) {
+        blocks = text.split(/\n(?=###\s)/).filter(s => s.trim());
+      }
+
+      for (const block of blocks) {
+        // Extract time: "⏰ **9:30 AM – 10:00 AM**" or "### 9:30 AM – 10:00 AM" or inline
+        const timeMatch = block.match(/(\d{1,2}:\d{2}\s*(?:AM|PM)\s*[–\-—]\s*\d{1,2}:\d{2}\s*(?:AM|PM))/i);
+
+        // Extract title: first **bold** text that isn't a time
+        const boldMatches = [...block.matchAll(/\*\*([^*]+)\*\*/g)];
+        let title = '';
+        for (const m of boldMatches) {
+          const val = m[1].trim();
+          // Skip if it looks like a time, a label, or is too short
+          if (/^\d{1,2}:\d{2}/.test(val)) continue;
+          if (/^(Organizer|Attendees|Location|Agenda|Description|TLDR|Required|Optional):?$/i.test(val)) continue;
+          if (val.length < 3) continue;
+          title = val;
+          break;
+        }
+
+        if (timeMatch || title) {
+          const time = timeMatch ? timeMatch[1].trim() : '';
+          if (!title) title = 'Meeting';
+          const lower = block.toLowerCase();
+          const hasLeadership = LEADERSHIP_NAMES.some(n => lower.includes(n));
+          meetings.push({ time, title, body: block.trim(), hasLeadership });
+        } else if (meetings.length === 0) {
+          intro += block;
+        }
+      }
+
+      if (meetings.length === 0) {
+        return `<div class="card-body rendered">${md(text)}</div>`;
+      }
+
+      let html = '';
+      if (intro.trim()) {
+        html += `<div style="padding:12px 16px; font-size:13px; color:var(--muted); border-bottom:1px solid var(--border);">${md(intro)}</div>`;
+      }
+
+      for (const m of meetings) {
+        html += `<div class="meeting-item" onclick="this.classList.toggle('open')">
+          <div class="meeting-header">
+            <span class="meeting-chevron">▶</span>
+            <span class="meeting-time">${m.time}</span>
+            <span class="meeting-title">${m.title}</span>
+            ${m.hasLeadership ? '<span class="meeting-leadership-dot" title="Leadership attendee"></span>' : ''}
+          </div>
+          <div class="meeting-details rendered">${md(m.body)}</div>
+        </div>`;
+      }
+
+      return html;
+    }
+
+    function toggleAllMeetings(btn) {
+      const card = btn.closest('.card');
+      const items = card.querySelectorAll('.meeting-item');
+      const anyOpen = card.querySelector('.meeting-item.open');
+      items.forEach(item => {
+        if (anyOpen) item.classList.remove('open');
+        else item.classList.add('open');
+      });
+      btn.textContent = anyOpen ? '⊞ Expand all' : '⊟ Collapse all';
+    }
+
     // --- API calls ---
     async function loadBOD() {
       const el = document.getElementById('bod-content');
@@ -436,10 +613,13 @@
           html += `<div class="leadership-alert">⚡ <strong>Leadership detected:</strong> ${data.calendarLeadership.join(', ')} appear in today's schedule. Content is flagged as high-priority.</div>`;
         }
 
-        // Calendar card
+        // Calendar card (collapsible)
         html += `<div class="card">
-          <div class="card-header"><h2>📅 Today's Calendar</h2></div>
-          <div class="card-body rendered">${data.calendar ? md(data.calendar) : '<span style="color:var(--muted)">Unable to fetch calendar via WorkIQ.</span>'}</div>
+          <div class="card-header">
+            <h2>📅 Today's Calendar</h2>
+            ${data.calendar ? '<button class="expand-all-btn" onclick="event.stopPropagation(); toggleAllMeetings(this)">⊞ Expand all</button>' : ''}
+          </div>
+          ${renderCalendarCollapsible(data.calendar)}
         </div>`;
 
         // Messages card
@@ -464,6 +644,45 @@
       }
     }
 
+    async function loadBODForDate(offset) {
+      const el = document.getElementById('bod-content');
+      if (offset === 0) { loadBOD(); return; }
+
+      const target = new Date();
+      target.setDate(target.getDate() + offset);
+      const label = target.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+      el.innerHTML = loadingHTML(`Fetching calendar and messages for ${label}...`);
+      try {
+        const res = await fetch(`/api/lookback?offset=${offset}`);
+        const data = await res.json();
+        if (data.error) { el.innerHTML = errorHTML(data.error); return; }
+
+        let html = `<div style="padding:10px 16px; font-size:14px; color:var(--accent); background:var(--surface); border:1px solid var(--border); border-radius:6px; margin-bottom:16px;">📆 Showing data for <strong>${data.date}</strong></div>`;
+
+        if (data.calendarLeadership && data.calendarLeadership.length > 0) {
+          html += `<div class="leadership-alert">⚡ <strong>Leadership detected:</strong> ${data.calendarLeadership.join(', ')} in the schedule.</div>`;
+        }
+
+        html += `<div class="card">
+          <div class="card-header">
+            <h2>📅 Calendar</h2>
+            ${data.calendar ? '<button class="expand-all-btn" onclick="event.stopPropagation(); toggleAllMeetings(this)">⊞ Expand all</button>' : ''}
+          </div>
+          ${renderCalendarCollapsible(data.calendar)}
+        </div>`;
+
+        html += `<div class="card">
+          <div class="card-header"><h2>💬 Messages</h2></div>
+          <div class="card-body rendered">${data.messages ? md(data.messages) : '<span style="color:var(--muted)">No messages available for this date.</span>'}</div>
+        </div>`;
+
+        el.innerHTML = html;
+      } catch (e) {
+        el.innerHTML = errorHTML('Failed to load data: ' + e.message);
+      }
+    }
+
     async function loadCalendar() {
       const el = document.getElementById('calendar-content');
       el.innerHTML = loadingHTML('Fetching today\'s calendar from WorkIQ...');
@@ -472,8 +691,11 @@
         const data = await res.json();
         if (data.error) { el.innerHTML = errorHTML(data.error); return; }
         el.innerHTML = `<div class="card">
-          <div class="card-header"><h2>📅 Today's Calendar</h2></div>
-          <div class="card-body rendered">${md(data.answer)}</div>
+          <div class="card-header">
+            <h2>📅 Today's Calendar</h2>
+            ${data.answer ? '<button class="expand-all-btn" onclick="event.stopPropagation(); toggleAllMeetings(this)">⊞ Expand all</button>' : ''}
+          </div>
+          ${renderCalendarCollapsible(data.answer)}
         </div>`;
       } catch (e) {
         el.innerHTML = errorHTML('Failed to fetch calendar: ' + e.message);

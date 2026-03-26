@@ -32,6 +32,12 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.static(join(__dirname, "public")));
 
+const CALENDAR_PROMPT =
+  "What meetings do I have scheduled on my calendar today? For each meeting, provide: the meeting title, start time, end time, attendees, and any agenda or description available. List them in chronological order.";
+
+const MESSAGES_PROMPT =
+  "What emails and Teams messages have I received since 6pm yesterday evening that are important or require my attention? Exclude any automated approval request emails such as Lockbox, UMS (Unified Management System), Customer Lockbox, Azure Privileged Access, or similar automated systems. For each remaining message, provide: sender, subject or topic, time received, and a brief summary of the content. Prioritize messages that require a response or action.";
+
 // Persistent MCP connection (lazy-initialized)
 let mcpConn = null;
 
@@ -63,7 +69,7 @@ app.get("/api/calendar", async (_req, res) => {
     const client = await getMCP();
     const answer = await askWorkIQ(
       client,
-      "What meetings do I have scheduled on my calendar today? For each meeting, provide: the meeting title, start time, end time, attendees, and any agenda or description available. List them in chronological order."
+      CALENDAR_PROMPT
     );
     res.json({ answer });
   } catch (e) {
@@ -77,7 +83,7 @@ app.get("/api/messages", async (_req, res) => {
     const client = await getMCP();
     const answer = await askWorkIQ(
       client,
-      "What emails and Teams messages have I received since 6pm yesterday evening that are important or require my attention? For each message, provide: sender, subject or topic, time received, and a brief summary of the content. Prioritize messages that require a response or action."
+      MESSAGES_PROMPT
     );
     res.json({ answer });
   } catch (e) {
@@ -133,11 +139,11 @@ app.get("/api/bod", async (_req, res) => {
       const [calResult, msgResult] = await Promise.all([
         askWorkIQ(
           client,
-          "What meetings do I have scheduled on my calendar today? For each meeting, provide: the meeting title, start time, end time, attendees, and any agenda or description available. List them in chronological order."
+          CALENDAR_PROMPT
         ).catch(() => null),
         askWorkIQ(
           client,
-          "What emails and Teams messages have I received since 6pm yesterday evening that are important or require my attention? For each message, provide: sender, subject or topic, time received, and a brief summary of the content. Prioritize messages that require a response or action."
+          MESSAGES_PROMPT
         ).catch(() => null),
       ]);
       calendar = calResult;
@@ -179,7 +185,65 @@ app.get("/api/bod", async (_req, res) => {
   }
 });
 
-// API: Yesterday's meeting recap (two sequential queries)
+// API: Lookback - calendar and messages for a past date (up to 7 days back)
+app.get("/api/lookback", async (req, res) => {
+  try {
+    const offset = parseInt(req.query.offset || "0", 10);
+    if (isNaN(offset) || offset > 0 || offset < -7) {
+      return res.status(400).json({ error: "Offset must be 0 to -7" });
+    }
+
+    const target = new Date();
+    target.setDate(target.getDate() + offset);
+    const dateHeader = target.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    const dateStr = target.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+
+    const calPrompt = offset === 0
+      ? CALENDAR_PROMPT
+      : `What meetings did I have on my calendar on ${dateStr}? For each meeting, provide: the meeting title, start time, end time, attendees, and any agenda or description available. List them in chronological order.`;
+
+    const msgPrompt = offset === 0
+      ? MESSAGES_PROMPT
+      : `What emails and Teams messages did I receive on ${dateStr} that were important or required my attention? Exclude any automated approval request emails such as Lockbox, UMS (Unified Management System), Customer Lockbox, Azure Privileged Access, or similar automated systems. For each remaining message, provide: sender, subject or topic, time received, and a brief summary of the content. Prioritize messages that required a response or action.`;
+
+    let calendar = null;
+    let messages = null;
+    let calendarLeadership = [];
+
+    try {
+      const client = await getMCP();
+      calendar = await askWorkIQ(client, calPrompt).catch(() => null);
+      messages = await askWorkIQ(client, msgPrompt).catch(() => null);
+
+      if (calendar && containsLeadership(calendar)) {
+        calendarLeadership = findLeadershipNames(calendar);
+      }
+    } catch {
+      // MCP unavailable
+    }
+
+    res.json({
+      date: dateHeader,
+      offset,
+      calendar,
+      calendarLeadership,
+      messages,
+    });
+  } catch (e) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 app.get("/api/recap", async (_req, res) => {
   try {
     const client = await getMCP();

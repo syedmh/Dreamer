@@ -13,7 +13,7 @@ const CALENDAR_PROMPT =
   "What meetings do I have scheduled on my calendar today? For each meeting, provide: the meeting title, start time, end time, attendees, and any agenda or description available. List them in chronological order.";
 
 const MESSAGES_PROMPT =
-  "What emails and Teams messages have I received since 6pm yesterday evening that are important or require my attention? For each message, provide: sender, subject or topic, time received, and a brief summary of the content. Prioritize messages that require a response or action.";
+  "What emails and Teams messages have I received since 6pm yesterday evening that are important or require my attention? Exclude any automated approval request emails such as Lockbox, UMS (Unified Management System), Customer Lockbox, Azure Privileged Access, or similar automated systems. For each remaining message, provide: sender, subject or topic, time received, and a brief summary of the content. Prioritize messages that require a response or action.";
 
 const BOD_DIR = "c:/Users/syedhu/work/syedhu/bod";
 
