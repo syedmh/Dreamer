@@ -79,7 +79,7 @@ export function ReligiousBackgroundStep({ data, onUpdate, onNext, onPrev }: Step
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Practicing Muslim */}
             <div className="space-y-2">
-              <Label htmlFor="practicingMuslim">Practicing Muslim *</Label>
+              <Label htmlFor="practicingMuslim">Practicing Muslim</Label>
               <select id="practicingMuslim" {...register("practicingMuslim")} className={selectClasses}>
                 <option value="">Select...</option>
                 {PRACTICING_OPTIONS.map((opt) => (
@@ -93,7 +93,7 @@ export function ReligiousBackgroundStep({ data, onUpdate, onNext, onPrev }: Step
 
             {/* Sect */}
             <div className="space-y-2">
-              <Label htmlFor="sect">Sect *</Label>
+              <Label htmlFor="sect">Sect</Label>
               <select id="sect" {...register("sect")} className={selectClasses}>
                 <option value="">Select...</option>
                 {SECT_OPTIONS.map((opt) => (
@@ -107,7 +107,7 @@ export function ReligiousBackgroundStep({ data, onUpdate, onNext, onPrev }: Step
 
             {/* Prayer Frequency */}
             <div className="space-y-2">
-              <Label htmlFor="prayerFrequency">Prayer Frequency *</Label>
+              <Label htmlFor="prayerFrequency">Prayer Frequency</Label>
               <select id="prayerFrequency" {...register("prayerFrequency")} className={selectClasses}>
                 <option value="">Select...</option>
                 {PRAYER_FREQUENCY.map((opt) => (
@@ -121,7 +121,7 @@ export function ReligiousBackgroundStep({ data, onUpdate, onNext, onPrev }: Step
 
             {/* Fasting */}
             <div className="space-y-2">
-              <Label htmlFor="fastingRamadan">Fasting in Ramadan *</Label>
+              <Label htmlFor="fastingRamadan">Fasting in Ramadan</Label>
               <select id="fastingRamadan" {...register("fastingRamadan")} className={selectClasses}>
                 <option value="">Select...</option>
                 {FASTING_OPTIONS.map((opt) => (
@@ -135,7 +135,7 @@ export function ReligiousBackgroundStep({ data, onUpdate, onNext, onPrev }: Step
 
             {/* Attends Majalis */}
             <div className="space-y-2">
-              <Label htmlFor="attendsMajalis">Attends Majalis *</Label>
+              <Label htmlFor="attendsMajalis">Attends Majalis</Label>
               <select id="attendsMajalis" {...register("attendsMajalis")} className={selectClasses}>
                 <option value="">Select...</option>
                 {MAJALIS_OPTIONS.map((opt) => (
@@ -150,7 +150,7 @@ export function ReligiousBackgroundStep({ data, onUpdate, onNext, onPrev }: Step
             {/* Hijab Status */}
             <div className="space-y-2">
               <Label htmlFor="hijabStatus">
-                {gender === "FEMALE" ? "Hijab Status" : "Hijab Preference"} *
+                {gender === "FEMALE" ? "Hijab Status" : "Hijab Preference"}
               </Label>
               <select id="hijabStatus" {...register("hijabStatus")} className={selectClasses}>
                 <option value="">Select...</option>
@@ -165,7 +165,7 @@ export function ReligiousBackgroundStep({ data, onUpdate, onNext, onPrev }: Step
 
             {/* Religious Knowledge */}
             <div className="space-y-2">
-              <Label htmlFor="religiousKnowledge">Religious Knowledge *</Label>
+              <Label htmlFor="religiousKnowledge">Religious Knowledge</Label>
               <select id="religiousKnowledge" {...register("religiousKnowledge")} className={selectClasses}>
                 <option value="">Select...</option>
                 {RELIGIOUS_KNOWLEDGE.map((opt) => (
@@ -179,7 +179,7 @@ export function ReligiousBackgroundStep({ data, onUpdate, onNext, onPrev }: Step
 
             {/* Hajj */}
             <div className="space-y-2">
-              <Label htmlFor="performedHajj">Performed Hajj *</Label>
+              <Label htmlFor="performedHajj">Performed Hajj</Label>
               <select id="performedHajj" {...register("performedHajj")} className={selectClasses}>
                 <option value="">Select...</option>
                 {HAJJ_OPTIONS.map((opt) => (
@@ -195,7 +195,7 @@ export function ReligiousBackgroundStep({ data, onUpdate, onNext, onPrev }: Step
           {/* Ziyarat */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="performedZiyarat">Performed Ziyarat *</Label>
+              <Label htmlFor="performedZiyarat">Performed Ziyarat</Label>
               <select id="performedZiyarat" {...register("performedZiyarat")} className={selectClasses}>
                 <option value="">Select...</option>
                 {HAJJ_OPTIONS.map((opt) => (
