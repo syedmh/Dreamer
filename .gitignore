@@ -57,3 +57,8 @@ Thumbs.db
 *.tmp
 *.log
 .claude/
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal
