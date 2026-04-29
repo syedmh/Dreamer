@@ -48,9 +48,10 @@ public class DeliveryJob : BaseEntity
         else
         {
             ErrorMessage = error;
-            if (CanRetry)
+            Status = DeliveryStatus.Failed;
+
+            if (Attempts < MaxAttempts)
             {
-                Status = DeliveryStatus.Failed;
                 // Exponential backoff: 1min, 5min, 25min, 2h, 10h
                 var delayMinutes = Math.Pow(5, Attempts - 1);
                 NextRetryAt = DateTime.UtcNow.AddMinutes(delayMinutes);
