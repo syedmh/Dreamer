@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/WillVault.API/WillVault.API.csproj" />
+    <Project Path="src/WillVault.Application/WillVault.Application.csproj" />
+    <Project Path="src/WillVault.Domain/WillVault.Domain.csproj" />
+    <Project Path="src/WillVault.Infrastructure/WillVault.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/WillVault.API.Tests/WillVault.API.Tests.csproj" />
+    <Project Path="tests/WillVault.Application.Tests/WillVault.Application.Tests.csproj" />
+    <Project Path="tests/WillVault.Domain.Tests/WillVault.Domain.Tests.csproj" />
+  </Folder>
+</Solution>
