@@ -55,6 +55,9 @@ public static class DependencyInjection
         services.AddScoped<INotificationService, EmailNotificationService>();
         services.AddScoped<ITokenService, TokenService>();
 
+        // Background services
+        services.AddHostedService<DeliveryBackgroundService>();
+
         return services;
     }
 }
