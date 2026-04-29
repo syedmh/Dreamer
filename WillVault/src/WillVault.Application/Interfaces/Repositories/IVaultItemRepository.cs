@@ -24,4 +24,14 @@ public interface IVaultItemRepository : IRepository<VaultItem>
     /// Retrieves a vault item with its associated recipients eagerly loaded.
     /// </summary>
     Task<VaultItem?> GetWithRecipientsAsync(Guid id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Adds a vault item recipient assignment directly.
+    /// </summary>
+    Task AddVaultItemRecipientAsync(VaultItemRecipient assignment, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Removes a vault item recipient assignment directly.
+    /// </summary>
+    Task RemoveVaultItemRecipientAsync(VaultItemRecipient assignment, CancellationToken cancellationToken = default);
 }

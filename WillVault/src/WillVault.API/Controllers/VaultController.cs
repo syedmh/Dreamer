@@ -208,8 +208,7 @@ public class VaultController : ControllerBase
                 : null
         };
 
-        item.VaultItemRecipients.Add(assignment);
-        await _vaultItemRepository.SaveChangesAsync();
+        await _vaultItemRepository.AddVaultItemRecipientAsync(assignment);
 
         await _auditService.LogAsync(
             owner.Id, ActorType.Owner, "RecipientAssignedToItem",
@@ -233,7 +232,7 @@ public class VaultController : ControllerBase
             return NotFound();
 
         item.VaultItemRecipients.Remove(assignment);
-        await _vaultItemRepository.SaveChangesAsync();
+        await _vaultItemRepository.RemoveVaultItemRecipientAsync(assignment);
 
         await _auditService.LogAsync(
             owner.Id, ActorType.Owner, "RecipientRemovedFromItem",

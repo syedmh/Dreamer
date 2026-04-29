@@ -41,4 +41,16 @@ public class VaultItemRepository : Repository<VaultItem>, IVaultItemRepository
                 .ThenInclude(vr => vr.Recipient)
             .FirstOrDefaultAsync(v => v.Id == id, cancellationToken);
     }
+
+    public async Task AddVaultItemRecipientAsync(VaultItemRecipient assignment, CancellationToken cancellationToken = default)
+    {
+        await Context.Set<VaultItemRecipient>().AddAsync(assignment, cancellationToken);
+        await Context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task RemoveVaultItemRecipientAsync(VaultItemRecipient assignment, CancellationToken cancellationToken = default)
+    {
+        Context.Set<VaultItemRecipient>().Remove(assignment);
+        await Context.SaveChangesAsync(cancellationToken);
+    }
 }

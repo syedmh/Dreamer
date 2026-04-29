@@ -34,6 +34,7 @@ public static class DependencyInjection
                 options.Password.RequireLowercase = true;
                 options.User.RequireUniqueEmail = true;
             })
+            .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<WillVaultDbContext>();
 
         // Repositories
