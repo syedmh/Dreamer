@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#078447">
+  <title>Build a Brighter Future — TCF Fundraiser</title>
+  <link rel="icon" href="/Logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/Logo.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="fundraiser"
+        tabindex="-1"
+        data-building-percent="0"
+        data-visible-blocks="0"
+        data-goal-achieved="false"
+        data-student-percent="0"
+        data-visible-students="0"
+        data-swing-percent="0"
+        data-teacher-percent="0"
+        data-visible-teachers="0"
+        data-playground-percent="0">
+    <section class="stage" aria-labelledby="event-title">
+      <svg id="school-scene" viewBox="0 0 1600 900" role="img"
+           aria-labelledby="scene-title scene-description"
+           preserveAspectRatio="xMidYMid meet">
+        <title id="scene-title">Fundraiser progress building a school</title>
+        <desc id="scene-description">A sunny landscape where a red-brick TCF School Seattle is constructed block by block. At the goal, a Pakistan flag is raised; above the goal, students and teachers arrive while a hillside swing set grows into a finished playground.</desc>
+      </svg>
+
+      <header class="scoreboard">
+        <div class="brand-card" aria-hidden="true">
+          <img class="brand-logo" src="/Logo.png" alt="" width="430" height="332" draggable="false">
+        </div>
+        <div>
+          <p class="eyebrow">THE CITIZENS FOUNDATION</p>
+          <h1 id="event-title">Build a Brighter Future</h1>
+        </div>
+      </header>
+
+      <section class="progress-card" aria-label="Fundraiser total">
+        <p class="progress-label">Together we've raised</p>
+        <p id="raised-display" class="raised-display">$0</p>
+        <div class="meter" aria-hidden="true">
+          <span id="meter-fill" class="meter-fill"></span>
+        </div>
+        <div class="progress-meta">
+          <span id="percent-display">0% complete</span>
+          <span id="goal-display">Goal $100,000</span>
+        </div>
+        <p id="over-goal-message" class="over-goal-message" hidden>
+          The school is open — every extra gift welcomes more students!
+        </p>
+      </section>
+
+      <p class="keyboard-hint">Press <kbd>C</kbd> for controls · <kbd>Space</kbd> kite · <kbd>1</kbd> firework · <kbd>2</kbd> continuous · <kbd>F</kbd> fullscreen</p>
+
+      <aside id="operator-panel" class="operator-panel" hidden aria-label="Operator controls">
+        <form id="operator-form">
+          <div class="control-heading">
+            <strong>Event controls</strong>
+            <button id="close-controls" type="button" aria-label="Close controls">×</button>
+          </div>
+          <label>Raised
+            <input id="raised-input" name="raised" type="number" min="0" max="9007199254740991" step="any" required>
+          </label>
+          <label>Goal
+            <input id="goal-input" name="goal" type="number" min="0.01" max="7205759403792793" step="any" required>
+          </label>
+          <label class="slider-label">Quick progress
+            <input id="raised-slider" type="range" min="0" max="125000" step="any">
+          </label>
+          <button class="apply-button" type="submit">Apply</button>
+          <p class="shortcuts">Space add kite · 1 firework · 2 continuous fireworks · F fullscreen · D demo · ←/→ 1% · Shift 5% · Home 0 · End 100%</p>
+        </form>
+      </aside>
+
+      <div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    </section>
+  </main>
+  <script type="module" src="src/app.mjs"></script>
+</body>
+</html>
