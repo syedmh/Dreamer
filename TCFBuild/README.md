@@ -40,8 +40,8 @@ Keyboard controls:
 - Shift + Arrow keys — adjust by 5% of goal
 - `Home` — set 0%
 - `End` — set 100%
-- `1` — launch a firework
-- `2` — start or stop continuous randomized fireworks
+- `Q` — launch a firework
+- `W` — start or stop continuous randomized fireworks
 - `F` — enter or leave fullscreen
 
 Continuous mode distributes classic radial, ring, star, chrysanthemum, and willow bursts across safe left, center, upper, and right sky regions. It pauses while the page is hidden, resumes when visible, limits active effects, and automatically slows to single bursts when reduced motion is requested.

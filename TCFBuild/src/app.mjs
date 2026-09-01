@@ -184,11 +184,11 @@ function isSpaceKey(event) {
 }
 
 function isFireworkKey(event) {
-  return event.key === "1";
+  return String(event.key).toLowerCase() === "q";
 }
 
 function isContinuousFireworksKey(event) {
-  return event.key === "2";
+  return String(event.key).toLowerCase() === "w";
 }
 
 function isFullscreenKey(event) {
@@ -312,7 +312,6 @@ document.addEventListener("keydown", (event) => {
 document.addEventListener("keydown", (event) => {
   if (!isFireworkKey(event)) return;
   if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
-  if (isEditingTarget(event.target)) return;
   event.preventDefault();
   view.addFirework({
     reducedMotion: reducedMotion(),
@@ -324,7 +323,6 @@ document.addEventListener("keydown", (event) => {
 document.addEventListener("keydown", (event) => {
   if (!isContinuousFireworksKey(event)) return;
   if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
-  if (isEditingTarget(event.target)) return;
   event.preventDefault();
   const enabled = toggleContinuousFireworks();
   announcer.textContent = enabled
