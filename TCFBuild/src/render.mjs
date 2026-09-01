@@ -148,6 +148,12 @@ const FIREWORK_PALETTES = Object.freeze([
 const FIREWORK_FULL_DURATION_MS = 1450;
 const FIREWORK_REDUCED_DURATION_MS = 680;
 const FIREWORK_MAX_ACTIVE = 14;
+const THANK_YOU_MESSAGES = Object.freeze([
+  Object.freeze({ text: "Thank You", language: "en", direction: "ltr" }),
+  Object.freeze({ text: "شکریہ", language: "ur", direction: "rtl" }),
+  Object.freeze({ text: "مہربانی", language: "ur", direction: "rtl" }),
+  Object.freeze({ text: "تشکر", language: "ur", direction: "rtl" })
+]);
 
 function svg(name, attributes = {}, parent) {
   const element = document.createElementNS(SVG_NS, name);
@@ -1852,6 +1858,7 @@ function createStudentNode(student, parent) {
     fill: student.shirt
   }, group);
   svg("line", {
+    class: "student-arm student-arm--left",
     x1: -11,
     y1: 2,
     x2: -22,
@@ -1861,6 +1868,7 @@ function createStudentNode(student, parent) {
     "stroke-linecap": "round"
   }, group);
   svg("line", {
+    class: "student-arm student-arm--right",
     x1: 11,
     y1: 2,
     x2: 22,
@@ -1874,6 +1882,51 @@ function createStudentNode(student, parent) {
     d: "M-13 -22 Q0 -37 13 -22 L11 -13 Q0 -22 -11 -13Z",
     fill: "#17352A"
   }, group);
+
+  const messageY = -62 - (student.index % 2) * 10;
+  const messageContent = randomItem(THANK_YOU_MESSAGES);
+  const message = svg("g", {
+    class: "student-thank-you",
+    "data-message": messageContent.text,
+    "aria-hidden": "true"
+  }, group);
+  const messageInterval = randomBetween(1, 5);
+  const messageCycle = messageInterval * 2;
+  message.style.setProperty("--thank-you-cycle", `${messageCycle.toFixed(2)}s`);
+  message.style.setProperty(
+    "--thank-you-delay",
+    `${(-randomBetween(0, messageCycle)).toFixed(2)}s`
+  );
+  message.dataset.intervalSeconds = messageInterval.toFixed(2);
+  svg("rect", {
+    x: -34,
+    y: messageY,
+    width: 68,
+    height: 20,
+    rx: 8,
+    fill: "#FFF7DF",
+    stroke: "#078447",
+    "stroke-width": 2
+  }, message);
+  svg("path", {
+    d: `M-5 ${messageY + 19} L2 ${messageY + 28} L7 ${messageY + 19} Z`,
+    fill: "#FFF7DF",
+    stroke: "#078447",
+    "stroke-width": 1.5,
+    "stroke-linejoin": "round"
+  }, message);
+  const messageText = svg("text", {
+    x: 0,
+    y: messageY + 14,
+    "text-anchor": "middle",
+    direction: messageContent.direction,
+    lang: messageContent.language,
+    fill: "#17352A",
+    "font-family": "'Noto Nastaliq Urdu', 'Noto Sans Arabic', 'Segoe UI', Arial, sans-serif",
+    "font-size": messageContent.language === "ur" ? 10 : 9,
+    "font-weight": 900
+  }, message);
+  messageText.textContent = messageContent.text;
   return group;
 }
 
@@ -2199,11 +2252,25 @@ export function createFundraiserView(root, scene, config) {
     root.dataset.timeOfDay = night ? "night" : "day";
   }
 
+  function setStudentsClapping(enabled) {
+    const clapping = Boolean(enabled);
+    studentLayer.classList.toggle("is-clapping", clapping);
+    root.dataset.studentsClapping = String(clapping);
+  }
+
+  function setThankYouVisible(enabled) {
+    const visible = Boolean(enabled);
+    studentLayer.classList.toggle("thank-you-enabled", visible);
+    root.dataset.thankYouEnabled = String(visible);
+  }
+
   return Object.freeze({
     addFirework: fireworkController.addFirework,
     clearFireworks: fireworkController.clearFireworks,
     addKite: kiteController.addKite,
     setNightMode,
+    setStudentsClapping,
+    setThankYouVisible,
     update,
     blockCount: blockNodes.length,
     studentCount: studentNodes.length,

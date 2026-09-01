@@ -38,6 +38,8 @@ Keyboard controls:
 - `C` — show or hide the operator controls
 - `D` — start or pause the 90-second demo
 - `E` — switch between day and night
+- `T` — start or stop visible students clapping
+- `Y` — show or hide student “Thank You” messages after the goal
 - `R` — add a kite to the sky
 - Arrow keys — adjust by 1% of goal
 - Shift + Arrow keys — adjust by 5% of goal

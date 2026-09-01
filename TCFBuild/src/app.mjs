@@ -42,6 +42,8 @@ let continuousFireworksEnabled = false;
 let continuousFireworksTimeoutId = 0;
 let fireworksCleanupComplete = false;
 let nightMode = false;
+let studentsClapping = false;
+let thankYouVisible = true;
 
 const mediaReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
 const reducedMotion = () => config.motion === "reduce"
@@ -204,6 +206,14 @@ function isFullscreenKey(event) {
 
 function isNightKey(event) {
   return String(event.key).toLowerCase() === "e";
+}
+
+function isClappingKey(event) {
+  return String(event.key).toLowerCase() === "t";
+}
+
+function isThankYouKey(event) {
+  return String(event.key).toLowerCase() === "y";
 }
 
 function formatKiteAnnouncement(count) {
@@ -372,6 +382,28 @@ document.addEventListener("keydown", (event) => {
 }, true);
 
 document.addEventListener("keydown", (event) => {
+  if (!isClappingKey(event)) return;
+  if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
+  event.preventDefault();
+  studentsClapping = !studentsClapping;
+  view.setStudentsClapping(studentsClapping);
+  announcer.textContent = studentsClapping
+    ? "Students started clapping."
+    : "Students stopped clapping.";
+}, true);
+
+document.addEventListener("keydown", (event) => {
+  if (!isThankYouKey(event)) return;
+  if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
+  event.preventDefault();
+  thankYouVisible = !thankYouVisible;
+  view.setThankYouVisible(thankYouVisible);
+  announcer.textContent = thankYouVisible
+    ? "Student thank-you messages enabled."
+    : "Student thank-you messages hidden.";
+}, true);
+
+document.addEventListener("keydown", (event) => {
   if (event.ctrlKey || event.metaKey || event.altKey) return;
   const editing = isEditingTarget(event.target);
   if (isControlsKey(event)) return;
@@ -381,6 +413,8 @@ document.addEventListener("keydown", (event) => {
     || isContinuousFireworksKey(event)
     || isFullscreenKey(event)
     || isNightKey(event)
+    || isClappingKey(event)
+    || isThankYouKey(event)
   ) return;
   if (editing && !["Escape", "Enter", "c", "C"].includes(event.key)) return;
   const stepFraction = event.shiftKey ? .05 : .01;
@@ -478,5 +512,7 @@ setControlsVisible(config.controls);
 synchronizeControls();
 synchronizeMotionState();
 view.setNightMode(nightMode);
+view.setStudentsClapping(studentsClapping);
+view.setThankYouVisible(thankYouVisible);
 setContinuousFireworksState("stopped");
 scheduleFrame();

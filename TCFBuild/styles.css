@@ -278,6 +278,64 @@ kbd {
   filter: brightness(.72) saturate(.7);
 }
 
+.student-arm {
+  transform-box: view-box;
+  animation-duration: .54s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-play-state: paused;
+}
+
+.student-arm--left {
+  transform-origin: -11px 2px;
+}
+
+.student-arm--right {
+  transform-origin: 11px 2px;
+}
+
+.students.is-clapping .student-arm {
+  animation-play-state: running;
+}
+
+.students.is-clapping .student-arm--left {
+  animation-name: student-clap-left;
+}
+
+.students.is-clapping .student-arm--right {
+  animation-name: student-clap-right;
+}
+
+@keyframes student-clap-left {
+  from { transform: rotate(-78deg); }
+  to { transform: rotate(-98deg); }
+}
+
+@keyframes student-clap-right {
+  from { transform: rotate(78deg); }
+  to { transform: rotate(98deg); }
+}
+
+.student-thank-you {
+  opacity: 0;
+  transform: translateY(5px) scale(.92);
+  transform-origin: center;
+  transition: opacity 220ms ease, transform 220ms ease;
+  pointer-events: none;
+}
+
+#fundraiser[data-goal-achieved="true"] .students.thank-you-enabled .student-thank-you {
+  animation: student-thank-you-cycle var(--thank-you-cycle, 4s) steps(1, end) infinite;
+  animation-delay: var(--thank-you-delay, 0s);
+  transform: translateY(0) scale(1);
+}
+
+@keyframes student-thank-you-cycle {
+  0%, 49.999% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
 .kite-layer,
 .sky-kite,
 .firework-layer,
@@ -457,6 +515,24 @@ kbd {
 #fundraiser[data-motion="reduce"] .cloud {
   animation: none !important;
   transform: none !important;
+}
+
+#fundraiser[data-motion="reduce"] .students.is-clapping .student-arm {
+  animation: none !important;
+}
+
+#fundraiser[data-motion="reduce"] .students.is-clapping .student-arm--left {
+  transform: rotate(-90deg);
+}
+
+#fundraiser[data-motion="reduce"] .students.is-clapping .student-arm--right {
+  transform: rotate(90deg);
+}
+
+#fundraiser[data-motion="reduce"][data-goal-achieved="true"]
+  .students.thank-you-enabled .student-thank-you {
+  animation: none !important;
+  opacity: 1;
 }
 
 #fundraiser[data-motion="reduce"] .sky-kite .kite-fly {
