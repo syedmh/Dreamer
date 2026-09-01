@@ -337,15 +337,15 @@ function addLandscape(root) {
     fill: "url(#sky-gradient)"
   }, landscape);
   svg("circle", {
-    cx: 1325,
-    cy: 140,
+    cx: 265,
+    cy: 280,
     r: 64,
     fill: "#FFD45F",
     opacity: .95
   }, landscape);
   svg("circle", {
-    cx: 1325,
-    cy: 140,
+    cx: 265,
+    cy: 280,
     r: 90,
     fill: "none",
     stroke: "#FFD45F",
@@ -354,18 +354,29 @@ function addLandscape(root) {
   }, landscape);
 
   const clouds = [
-    [280, 190, 1.15, false],
-    [1160, 270, .75, true],
-    [710, 135, .58, true]
+    [280, 190, 1.15, .84, false, -450, 1500, 34, -8],
+    [1160, 270, .75, .60, true, -1350, 620, 48, -31],
+    [710, 135, .58, .56, true, -900, 1070, 41, -19],
+    [90, 92, .42, .42, true, -270, 1690, 58, -44],
+    [1420, 118, .48, .46, true, -1600, 360, 63, -13],
+    [510, 305, .88, .72, false, -700, 1270, 39, -27],
+    [940, 350, .50, .48, true, -1120, 840, 55, -49],
+    [1380, 205, .96, .76, false, -1580, 400, 45, -22]
   ];
-  for (const [x, y, scale, far] of clouds) {
+  for (
+    const [x, y, scale, opacity, far, startX, endX, duration, delay] of clouds
+  ) {
     const position = svg("g", {
       transform: `translate(${x} ${y}) scale(${scale})`,
-      opacity: far ? .62 : .82
+      opacity
     }, landscape);
     const group = svg("g", {
       class: `cloud${far ? " cloud--far" : ""}`
     }, position);
+    group.style.setProperty("--cloud-start-x", `${startX}px`);
+    group.style.setProperty("--cloud-end-x", `${endX}px`);
+    group.style.setProperty("--cloud-duration", `${duration}s`);
+    group.style.setProperty("--cloud-delay", `${delay}s`);
     svg("ellipse", {
       cx: 0,
       cy: 20,
