@@ -278,6 +278,16 @@ function addDefinitions(root) {
   svg("stop", { offset: "0%", "stop-color": "#68C9F2" }, sky);
   svg("stop", { offset: "100%", "stop-color": "#D9F3FA" }, sky);
 
+  const nightSky = svg("linearGradient", {
+    id: "night-sky-gradient",
+    x1: 0,
+    y1: 0,
+    x2: 0,
+    y2: 1
+  }, defs);
+  svg("stop", { offset: "0%", "stop-color": "#07142F" }, nightSky);
+  svg("stop", { offset: "100%", "stop-color": "#28476F" }, nightSky);
+
   const grass = svg("linearGradient", {
     id: "grass-gradient",
     x1: 0,
@@ -336,13 +346,60 @@ function addLandscape(root) {
     height: 900,
     fill: "url(#sky-gradient)"
   }, landscape);
+  svg("rect", {
+    class: "night-sky",
+    width: 1600,
+    height: 900,
+    fill: "url(#night-sky-gradient)"
+  }, landscape);
+
+  const stars = svg("g", {
+    class: "night-stars",
+    "aria-hidden": "true"
+  }, landscape);
+  const starPoints = [
+    [105, 250, 3], [170, 335, 2], [350, 105, 3], [430, 245, 2],
+    [520, 90, 2], [610, 205, 3], [755, 75, 2], [830, 285, 2],
+    [900, 155, 3], [1040, 75, 2], [1115, 215, 3], [1210, 105, 2],
+    [1300, 310, 3], [1430, 225, 2], [1510, 85, 3], [1550, 350, 2]
+  ];
+  for (const [cx, cy, radius] of starPoints) {
+    svg("circle", {
+      cx,
+      cy,
+      r: radius,
+      fill: "#FFF7DF"
+    }, stars);
+  }
+
+  const moon = svg("g", {
+    class: "night-moon",
+    "aria-hidden": "true"
+  }, landscape);
+  svg("circle", {
+    cx: 740,
+    cy: 245,
+    r: 52,
+    fill: "#FFF2B8"
+  }, moon);
+  svg("circle", {
+    cx: 762,
+    cy: 228,
+    r: 48,
+    fill: "#122746"
+  }, moon);
+
+  const sun = svg("g", {
+    class: "day-sun",
+    "aria-hidden": "true"
+  }, landscape);
   svg("circle", {
     cx: 265,
     cy: 280,
     r: 64,
     fill: "#FFD45F",
     opacity: .95
-  }, landscape);
+  }, sun);
   svg("circle", {
     cx: 265,
     cy: 280,
@@ -351,7 +408,7 @@ function addLandscape(root) {
     stroke: "#FFD45F",
     "stroke-width": 4,
     opacity: .3
-  }, landscape);
+  }, sun);
 
   const clouds = [
     [280, 190, 1.15, .84, false, -450, 1500, 34, -8],
@@ -420,6 +477,15 @@ function addLandscape(root) {
     svg("circle", { cx: -34, cy: 18, r: 35, fill: "#149956" }, tree);
     svg("circle", { cx: 34, cy: 20, r: 38, fill: "#0A713E" }, tree);
   }
+
+  svg("rect", {
+    class: "night-ground-shade",
+    x: 0,
+    y: 430,
+    width: 1600,
+    height: 470,
+    fill: "#07142F"
+  }, landscape);
 }
 
 function createKiteBounds({
@@ -2127,10 +2193,17 @@ export function createFundraiserView(root, scene, config) {
       : SETTLED_RENDER_RESULT;
   }
 
+  function setNightMode(enabled) {
+    const night = Boolean(enabled);
+    sceneSvg.classList.toggle("is-night", night);
+    root.dataset.timeOfDay = night ? "night" : "day";
+  }
+
   return Object.freeze({
     addFirework: fireworkController.addFirework,
     clearFireworks: fireworkController.clearFireworks,
     addKite: kiteController.addKite,
+    setNightMode,
     update,
     blockCount: blockNodes.length,
     studentCount: studentNodes.length,

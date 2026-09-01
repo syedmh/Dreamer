@@ -241,6 +241,43 @@ kbd {
   to { transform: translateX(var(--cloud-end-x, 1500px)); }
 }
 
+.night-sky,
+.night-stars,
+.night-moon,
+.night-ground-shade,
+.day-sun {
+  transition: opacity 700ms ease;
+}
+
+.night-sky,
+.night-stars,
+.night-moon,
+.night-ground-shade {
+  opacity: 0;
+}
+
+.night-ground-shade {
+  pointer-events: none;
+}
+
+#school-scene.is-night .night-sky,
+#school-scene.is-night .night-stars,
+#school-scene.is-night .night-moon {
+  opacity: 1;
+}
+
+#school-scene.is-night .night-ground-shade {
+  opacity: .32;
+}
+
+#school-scene.is-night .day-sun {
+  opacity: 0;
+}
+
+#school-scene.is-night .cloud {
+  filter: brightness(.72) saturate(.7);
+}
+
 .kite-layer,
 .sky-kite,
 .firework-layer,

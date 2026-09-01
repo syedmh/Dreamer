@@ -24,6 +24,8 @@ const raisedInput = document.querySelector("#raised-input");
 const goalInput = document.querySelector("#goal-input");
 const raisedSlider = document.querySelector("#raised-slider");
 const announcer = document.querySelector("#announcer");
+const keyboardHint = document.querySelector("#keyboard-hint");
+const operatorShortcuts = document.querySelector("#operator-shortcuts");
 const money = createCurrencyFormatter(config.locale, config.currency);
 
 let goal = config.goal;
@@ -39,6 +41,7 @@ let focusRestoreTimeoutId = 0;
 let continuousFireworksEnabled = false;
 let continuousFireworksTimeoutId = 0;
 let fireworksCleanupComplete = false;
+let nightMode = false;
 
 const mediaReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
 const reducedMotion = () => config.motion === "reduce"
@@ -177,7 +180,11 @@ function isEditingTarget(target) {
     || document.designMode === "on";
 }
 
-function isSpaceKey(event) {
+function isKiteKey(event) {
+  return String(event.key).toLowerCase() === "r";
+}
+
+function isControlsKey(event) {
   return event.key === " "
     || event.key === "Spacebar"
     || event.code === "Space";
@@ -193,6 +200,10 @@ function isContinuousFireworksKey(event) {
 
 function isFullscreenKey(event) {
   return String(event.key).toLowerCase() === "f";
+}
+
+function isNightKey(event) {
+  return String(event.key).toLowerCase() === "e";
 }
 
 function formatKiteAnnouncement(count) {
@@ -302,7 +313,19 @@ function cleanupFireworks() {
 }
 
 document.addEventListener("keydown", (event) => {
-  if (!isSpaceKey(event)) return;
+  if (!isControlsKey(event)) return;
+  if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
+  event.preventDefault();
+  const hidden = !keyboardHint.hidden;
+  keyboardHint.hidden = hidden;
+  operatorShortcuts.hidden = hidden;
+  announcer.textContent = hidden
+    ? "Keyboard legends hidden."
+    : "Keyboard legends shown.";
+}, true);
+
+document.addEventListener("keydown", (event) => {
+  if (!isKiteKey(event)) return;
   if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
   event.preventDefault();
   const kiteCount = view.addKite();
@@ -338,13 +361,26 @@ document.addEventListener("keydown", (event) => {
 }, true);
 
 document.addEventListener("keydown", (event) => {
+  if (!isNightKey(event)) return;
+  if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
+  event.preventDefault();
+  nightMode = !nightMode;
+  view.setNightMode(nightMode);
+  announcer.textContent = nightMode
+    ? "Night mode enabled."
+    : "Day mode enabled.";
+}, true);
+
+document.addEventListener("keydown", (event) => {
   if (event.ctrlKey || event.metaKey || event.altKey) return;
   const editing = isEditingTarget(event.target);
-  if (isSpaceKey(event)) return;
+  if (isControlsKey(event)) return;
+  if (isKiteKey(event)) return;
   if (
     isFireworkKey(event)
     || isContinuousFireworksKey(event)
     || isFullscreenKey(event)
+    || isNightKey(event)
   ) return;
   if (editing && !["Escape", "Enter", "c", "C"].includes(event.key)) return;
   const stepFraction = event.shiftKey ? .05 : .01;
@@ -355,9 +391,12 @@ document.addEventListener("keydown", (event) => {
       setControlsVisible(operatorPanel.hidden);
       break;
     case "d":
+      event.preventDefault();
       demoActive = !demoActive;
       demoStartedAt = performance.now();
-      announcer.textContent = demoActive ? "Fundraiser demonstration started." : "Fundraiser demonstration paused.";
+      announcer.textContent = demoActive
+        ? "Fundraiser demonstration started."
+        : "Fundraiser demonstration paused.";
       scheduleFrame();
       break;
     case "arrowright":
@@ -438,5 +477,6 @@ function frame(now) {
 setControlsVisible(config.controls);
 synchronizeControls();
 synchronizeMotionState();
+view.setNightMode(nightMode);
 setContinuousFireworksState("stopped");
 scheduleFrame();

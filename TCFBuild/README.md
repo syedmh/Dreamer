@@ -34,8 +34,11 @@ URL parameters:
 
 Keyboard controls:
 
-- `C` — show or hide operator controls
-- `D` — start or stop the 90-second demo
+- `Space` — show or hide both keyboard legends
+- `C` — show or hide the operator controls
+- `D` — start or pause the 90-second demo
+- `E` — switch between day and night
+- `R` — add a kite to the sky
 - Arrow keys — adjust by 1% of goal
 - Shift + Arrow keys — adjust by 5% of goal
 - `Home` — set 0%
