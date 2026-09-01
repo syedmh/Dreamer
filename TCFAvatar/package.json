@@ -1,0 +1,24 @@
+{
+  "name": "tcf-avatar-platformer",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Side-scrolling platform game starring the TCF avatar.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "sprites": "python tools/build_hero_sprites.py",
+    "smoke": "node tools/smoke.mjs",
+    "verify": "node tools/verify_walk.mjs",
+    "shots": "node tools/shot.mjs",
+    "test": "npm run verify && npm run smoke && npm run shots"
+  },
+  "dependencies": {
+    "phaser": "^4.2.1"
+  },
+  "devDependencies": {
+    "playwright": "^1.62.1",
+    "vite": "^8.2.2"
+  }
+}

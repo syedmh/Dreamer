@@ -1,0 +1,41 @@
+{
+  "frameWidth": 400,
+  "frameHeight": 742,
+  "centerX": 200,
+  "baselineY": 696,
+  "characterHeightPx": 650,
+  "source": "Walking.png",
+  "standSource": "art/avatar-front.png",
+  "rotationSource": "Walking2.png (authored three-quarter views)",
+  "directions": [
+    "right",
+    "left"
+  ],
+  "walk": {
+    "frames": 24,
+    "strideLengthPx": 419.27
+  },
+  "idle": {
+    "frames": 12,
+    "fps": 9,
+    "facing": "camera"
+  },
+  "turn": {
+    "frames": 8,
+    "startFrame": 7,
+    "note": "turn<Dir>_i morphs the stand onto walk frame startFrame + i, so turn<Dir>_{n-1} is that walk frame exactly"
+  },
+  "stop": {
+    "frames": 8,
+    "variants": {
+      "A": 7,
+      "B": 19
+    },
+    "note": "stop<Dir><V>_i morphs the stand onto walk frame variants[V], so stop<Dir><V>_{n-1} is that walk frame exactly; played backwards when settling.  The runtime closes the gait to the nearer passing pose first, then hands over to the matching variant"
+  },
+  "hitbox": {
+    "width": 170,
+    "height": 653
+  },
+  "reach": 186
+}
