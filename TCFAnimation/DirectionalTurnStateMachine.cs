@@ -8,6 +8,20 @@ public enum TurnDirection
     Right,
 }
 
+public enum FrontGesture
+{
+    None,
+    Clap,
+}
+
+public enum CrossArmPhase
+{
+    None,
+    Crossing,
+    Held,
+    Releasing,
+}
+
 public sealed class DirectionalTurnStateMachine
 {
     public const int FrontFrame = 0;
@@ -17,11 +31,22 @@ public sealed class DirectionalTurnStateMachine
     public const int LeftWalkFrameCount = 6;
     public const double RightWalkAnimationFps = 6.0;
     public const int RightWalkFrameCount = 6;
+    public const double ClapAnimationFps = 8.0;
+    public const int ClapFrameCount = 6;
+    public const double CrossArmAnimationFps = 8.0;
+    public const int CrossArmFrameCount = 3;
+    public const double CrossArmReleaseAnimationFps = 8.0;
+    public const int CrossArmReleaseFrameCount = 6;
 
     private double _elapsedSeconds;
     private double _walkElapsedSeconds;
+    private double _gestureElapsedSeconds;
+    private double _crossArmElapsedSeconds;
     private TurnRequest _lastRequest;
     private TurnDirection? _walkingDirection;
+    private bool _directionsBlockedUntilReleased;
+    private static readonly int[] ClapPlaybackOrder =
+        [0, 1, 2, 3, 4, 3, 2, 1, 2, 3, 4, 3, 2, 1, 0];
 
     public DirectionalTurnStateMachine(double animationFramesPerSecond)
     {
@@ -35,6 +60,10 @@ public sealed class DirectionalTurnStateMachine
         FrameDurationSeconds = 1.0 / animationFramesPerSecond;
         LeftWalkFrameDurationSeconds = 1.0 / LeftWalkAnimationFps;
         RightWalkFrameDurationSeconds = 1.0 / RightWalkAnimationFps;
+        ClapFrameDurationSeconds = 1.0 / ClapAnimationFps;
+        CrossArmFrameDurationSeconds = 1.0 / CrossArmAnimationFps;
+        CrossArmReleaseFrameDurationSeconds =
+            1.0 / CrossArmReleaseAnimationFps;
     }
 
     public TurnDirection CurrentDirection { get; private set; } = TurnDirection.Left;
@@ -51,6 +80,36 @@ public sealed class DirectionalTurnStateMachine
 
     public int CurrentWalkFrame { get; private set; }
 
+    public FrontGesture ActiveGesture { get; private set; }
+
+    public bool IsClapping => ActiveGesture == FrontGesture.Clap;
+
+    public int CurrentGestureStep { get; private set; }
+
+    public int CurrentClapFrame =>
+        IsClapping ? ClapPlaybackOrder[CurrentGestureStep] : 0;
+
+    public CrossArmPhase CrossArmState { get; private set; }
+
+    public bool IsCrossingArms => CrossArmState == CrossArmPhase.Crossing;
+
+    public bool IsCrossArmsHeld => CrossArmState == CrossArmPhase.Held;
+
+    public bool IsReleasingCrossArms =>
+        CrossArmState == CrossArmPhase.Releasing;
+
+    public bool IsCrossArmActive => CrossArmState != CrossArmPhase.None;
+
+    public int CurrentCrossArmStep { get; private set; }
+
+    public int CurrentCrossArmFrame =>
+        IsCrossingArms || IsCrossArmsHeld
+            ? CurrentCrossArmStep
+            : 0;
+
+    public int CurrentCrossArmReleaseFrame =>
+        IsReleasingCrossArms ? CurrentCrossArmStep : 0;
+
     public bool IsLeftEdgeLatched { get; private set; }
 
     public bool IsRightEdgeLatched { get; private set; }
@@ -58,6 +117,64 @@ public sealed class DirectionalTurnStateMachine
     public double LeftWalkFrameDurationSeconds { get; }
 
     public double RightWalkFrameDurationSeconds { get; }
+
+    public double ClapFrameDurationSeconds { get; }
+
+    public static int ClapPlaybackStepCount => ClapPlaybackOrder.Length;
+
+    public double CrossArmFrameDurationSeconds { get; }
+
+    public double CrossArmReleaseFrameDurationSeconds { get; }
+
+    public static int GetClapFrameForStep(int step)
+    {
+        if (step < 0 || step >= ClapPlaybackOrder.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(step));
+        }
+
+        return ClapPlaybackOrder[step];
+    }
+
+    public bool TryStartClap(bool leftHeld = false, bool rightHeld = false)
+    {
+        return TryStartGesture(FrontGesture.Clap, leftHeld, rightHeld);
+    }
+
+    public bool TryToggleCrossArms(
+        bool leftHeld = false,
+        bool rightHeld = false)
+    {
+        if (CrossArmState == CrossArmPhase.Held)
+        {
+            CrossArmState = CrossArmPhase.Releasing;
+            CurrentCrossArmStep = 0;
+            _crossArmElapsedSeconds = 0.0;
+            _directionsBlockedUntilReleased |= leftHeld || rightHeld;
+            return true;
+        }
+
+        if (
+            CrossArmState != CrossArmPhase.None
+            || ActiveGesture != FrontGesture.None
+            || leftHeld
+            || rightHeld
+            || IsWalking
+            || CurrentFrame != FrontFrame
+            || _lastRequest != TurnRequest.Neutral
+            || IsLeftEdgeLatched
+            || IsRightEdgeLatched
+            || _directionsBlockedUntilReleased
+        )
+        {
+            return false;
+        }
+
+        CrossArmState = CrossArmPhase.Crossing;
+        CurrentCrossArmStep = 0;
+        _crossArmElapsedSeconds = 0.0;
+        return true;
+    }
 
     public bool Advance(
         bool leftHeld,
@@ -82,6 +199,23 @@ public sealed class DirectionalTurnStateMachine
                 "Walk playback multiplier must be a finite positive number.");
         }
 
+        if (IsCrossArmActive)
+        {
+            _directionsBlockedUntilReleased |= leftHeld || rightHeld;
+            return AdvanceCrossArm(deltaSeconds);
+        }
+
+        if (_directionsBlockedUntilReleased)
+        {
+            if (leftHeld || rightHeld)
+            {
+                return false;
+            }
+
+            _directionsBlockedUntilReleased = false;
+            _lastRequest = TurnRequest.Neutral;
+        }
+
         if (!leftHeld)
         {
             IsLeftEdgeLatched = false;
@@ -101,6 +235,40 @@ public sealed class DirectionalTurnStateMachine
         if (IsRightEdgeLatched && rightHeld)
         {
             request = TurnRequest.Neutral;
+        }
+
+        bool gestureCancelled = false;
+        if (ActiveGesture != FrontGesture.None)
+        {
+            if (leftHeld || rightHeld)
+            {
+                CancelGesture();
+                gestureCancelled = true;
+            }
+            else
+            {
+                double gestureFrameDurationSeconds =
+                    GetGestureFrameDurationSeconds();
+                _gestureElapsedSeconds += deltaSeconds;
+                int elapsedFrames =
+                    (int)(_gestureElapsedSeconds / gestureFrameDurationSeconds);
+                if (elapsedFrames == 0)
+                {
+                    return false;
+                }
+
+                int nextStep = CurrentGestureStep + elapsedFrames;
+                if (nextStep >= GetGestureStepCount())
+                {
+                    CancelGesture();
+                    return true;
+                }
+
+                CurrentGestureStep = nextStep;
+                _gestureElapsedSeconds -=
+                    elapsedFrames * gestureFrameDurationSeconds;
+                return true;
+            }
         }
 
         if (_walkingDirection.HasValue)
@@ -181,7 +349,7 @@ public sealed class DirectionalTurnStateMachine
         if (CurrentFrame == targetFrame)
         {
             _elapsedSeconds = 0.0;
-            return false;
+            return gestureCancelled;
         }
 
         _elapsedSeconds += deltaSeconds;
@@ -202,7 +370,7 @@ public sealed class DirectionalTurnStateMachine
             _elapsedSeconds = 0.0;
         }
 
-        return changed;
+        return changed || gestureCancelled;
     }
 
     public bool NotifyLeftEdgeReached()
@@ -244,11 +412,121 @@ public sealed class DirectionalTurnStateMachine
         CurrentFrame = frame;
         _elapsedSeconds = 0.0;
         _walkElapsedSeconds = 0.0;
+        _gestureElapsedSeconds = 0.0;
+        _crossArmElapsedSeconds = 0.0;
         _lastRequest = TurnRequest.Neutral;
         _walkingDirection = null;
+        _directionsBlockedUntilReleased = false;
         CurrentWalkFrame = 0;
+        ActiveGesture = FrontGesture.None;
+        CurrentGestureStep = 0;
+        CrossArmState = CrossArmPhase.None;
+        CurrentCrossArmStep = 0;
         IsLeftEdgeLatched = false;
         IsRightEdgeLatched = false;
+    }
+
+    private bool TryStartGesture(
+        FrontGesture gesture,
+        bool leftHeld,
+        bool rightHeld)
+    {
+        if (gesture == FrontGesture.None)
+        {
+            throw new ArgumentOutOfRangeException(nameof(gesture));
+        }
+
+        if (
+            ActiveGesture != FrontGesture.None
+            || CrossArmState != CrossArmPhase.None
+            || leftHeld
+            || rightHeld
+            || IsWalking
+            || CurrentFrame != FrontFrame
+            || _lastRequest != TurnRequest.Neutral
+            || IsLeftEdgeLatched
+            || IsRightEdgeLatched
+            || _directionsBlockedUntilReleased
+        )
+        {
+            return false;
+        }
+
+        ActiveGesture = gesture;
+        CurrentGestureStep = 0;
+        _gestureElapsedSeconds = 0.0;
+        return true;
+    }
+
+    private void CancelGesture()
+    {
+        ActiveGesture = FrontGesture.None;
+        CurrentGestureStep = 0;
+        _gestureElapsedSeconds = 0.0;
+    }
+
+    private bool AdvanceCrossArm(double deltaSeconds)
+    {
+        if (CrossArmState == CrossArmPhase.Held)
+        {
+            return false;
+        }
+
+        double frameDurationSeconds = IsCrossingArms
+            ? CrossArmFrameDurationSeconds
+            : CrossArmReleaseFrameDurationSeconds;
+        int frameCount = IsCrossingArms
+            ? CrossArmFrameCount
+            : CrossArmReleaseFrameCount;
+
+        _crossArmElapsedSeconds += deltaSeconds;
+        int elapsedFrames =
+            (int)(_crossArmElapsedSeconds / frameDurationSeconds);
+        if (elapsedFrames == 0)
+        {
+            return false;
+        }
+
+        int nextStep = CurrentCrossArmStep + elapsedFrames;
+        if (nextStep < frameCount)
+        {
+            CurrentCrossArmStep = nextStep;
+            _crossArmElapsedSeconds -= elapsedFrames * frameDurationSeconds;
+            return true;
+        }
+
+        _crossArmElapsedSeconds = 0.0;
+        if (IsCrossingArms)
+        {
+            CrossArmState = CrossArmPhase.Held;
+            CurrentCrossArmStep = CrossArmFrameCount - 1;
+            return true;
+        }
+
+        CrossArmState = CrossArmPhase.None;
+        CurrentCrossArmStep = 0;
+        _lastRequest = TurnRequest.Neutral;
+        return true;
+    }
+
+    private double GetGestureFrameDurationSeconds()
+    {
+        if (!IsClapping)
+        {
+            throw new InvalidOperationException("No active gesture.");
+        }
+
+        return ClapFrameDurationSeconds;
+    }
+
+    private int GetGestureStepCount()
+    {
+        if (!IsClapping)
+        {
+            throw new InvalidOperationException("No active gesture.");
+        }
+
+        return ClapPlaybackOrder.Length;
     }
 
     private void ExitWalking()

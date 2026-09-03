@@ -1,9 +1,13 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://TurnController.cs" id="1_controller"]
+[ext_resource type="Script" path="res://DialogueUi.cs" id="2_dialogue"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_controller")
 
 [node name="Character" type="Sprite2D" parent="."]
 centered = true
+
+[node name="DialogueUi" type="CanvasLayer" parent="."]
+script = ExtResource("2_dialogue")

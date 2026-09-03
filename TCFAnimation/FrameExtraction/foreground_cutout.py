@@ -25,6 +25,9 @@ class CutoutConfig:
     shoe_rects: tuple[Rect, ...]
     floor_start_y: int
     minimum_shoe_pixels: int = 90
+    minimum_shoe_retention: float = 0.96
+    minimum_dark_shoe_retention: float = 0.95
+    minimum_visible_shoe_retention: float = MINIMUM_VISIBLE_SHOE_RETENTION
 
 
 @dataclass(frozen=True)
@@ -539,7 +542,7 @@ def validate_cutout(
         retained_shoe = required_shoe & (matte != 0)
         retention = int(np.count_nonzero(retained_shoe)) / required_count
         shoe_retention.append(retention)
-        if retention < 0.96:
+        if retention < config.minimum_shoe_retention:
             raise RuntimeError(
                 f"{config.name}: shoe region {rect} retained only "
                 f"{retention:.4f} of calibrated source support."
@@ -555,7 +558,7 @@ def validate_cutout(
             np.count_nonzero(required_dark & (matte != 0))
         ) / required_dark_count
         shoe_dark_retention.append(dark_retention)
-        if dark_retention < 0.95:
+        if dark_retention < config.minimum_dark_shoe_retention:
             raise RuntimeError(
                 f"{config.name}: shoe region {rect} retained only "
                 f"{dark_retention:.4f} of dark source support."
@@ -587,7 +590,7 @@ def validate_cutout(
         visible_count = int(np.count_nonzero(visible_shoe))
         visible_retention = visible_count / required_count
         shoe_visible_retention.append(visible_retention)
-        if visible_retention < MINIMUM_VISIBLE_SHOE_RETENTION:
+        if visible_retention < config.minimum_visible_shoe_retention:
             raise RuntimeError(
                 f"{config.name}: shoe region {rect} has only "
                 f"{visible_retention:.4f} visibly non-black calibrated "

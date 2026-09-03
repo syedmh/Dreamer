@@ -7,5 +7,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\DirectionalTurnStateMachine.cs" Link="DirectionalTurnStateMachine.cs" />
+    <Compile Include="..\DialogueModel.cs" Link="DialogueModel.cs" />
   </ItemGroup>
 </Project>

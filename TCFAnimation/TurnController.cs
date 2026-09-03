@@ -24,10 +24,17 @@ public partial class TurnController : Node2D
         new Texture2D[DirectionalTurnStateMachine.LeftWalkFrameCount];
     private readonly Texture2D[] _rightWalkFrames =
         new Texture2D[DirectionalTurnStateMachine.RightWalkFrameCount];
+    private readonly Texture2D[] _clapFrames =
+        new Texture2D[DirectionalTurnStateMachine.ClapFrameCount];
+    private readonly Texture2D[] _crossArmFrames =
+        new Texture2D[DirectionalTurnStateMachine.CrossArmFrameCount];
+    private readonly Texture2D[] _crossArmReleaseFrames =
+        new Texture2D[DirectionalTurnStateMachine.CrossArmReleaseFrameCount];
     private readonly DirectionalTurnStateMachine _turn =
         new(TurnAnimationFps);
 
     private Sprite2D _character = null!;
+    private DialogueUi _dialogueUi = null!;
     private string? _capturePath;
     private int _captureCountdown;
     private double _walkSpeedMultiplier = 1.0;
@@ -35,11 +42,18 @@ public partial class TurnController : Node2D
     public override void _Ready()
     {
         _character = GetNode<Sprite2D>("Character");
+        _dialogueUi = GetNode<DialogueUi>("DialogueUi");
 
         LoadFrames("LeftTurn", _leftFrames);
         LoadFrames("RightTurn", _rightFrames);
         LoadWalkFrames("LeftWalk", _leftWalkFrames);
         LoadWalkFrames("RightWalk", _rightWalkFrames);
+        LoadGestureFrames("Clap", "clap", _clapFrames);
+        LoadGestureFrames("CrossArm", "cross", _crossArmFrames);
+        LoadGestureFrames(
+            "CrossArmRelease",
+            "release",
+            _crossArmReleaseFrames);
 
         _character.Position = new Vector2(ViewportWidth / 2.0f, ViewportHeight / 2.0f);
         _character.Scale = Vector2.One * CharacterScale;
@@ -58,6 +72,11 @@ public partial class TurnController : Node2D
                 CaptureFrameAndQuit();
             }
 
+            return;
+        }
+
+        if (_dialogueUi.IsEditing)
+        {
             return;
         }
 
@@ -121,8 +140,35 @@ public partial class TurnController : Node2D
             @event is not InputEventKey keyEvent
             || !keyEvent.Pressed
             || keyEvent.Echo
+            || _dialogueUi.IsEditing
         )
         {
+            return;
+        }
+
+        if (keyEvent.PhysicalKeycode == Key.X)
+        {
+            bool stateChanged = _turn.TryToggleCrossArms(
+                Input.IsPhysicalKeyPressed(Key.Left),
+                Input.IsPhysicalKeyPressed(Key.Right));
+            if (stateChanged)
+            {
+                ApplyCurrentFrame();
+            }
+
+            return;
+        }
+
+        if (keyEvent.PhysicalKeycode == Key.C)
+        {
+            bool clapStarted = _turn.TryStartClap(
+                Input.IsPhysicalKeyPressed(Key.Left),
+                Input.IsPhysicalKeyPressed(Key.Right));
+            if (clapStarted)
+            {
+                ApplyCurrentFrame();
+            }
+
             return;
         }
 
@@ -185,8 +231,45 @@ public partial class TurnController : Node2D
         }
     }
 
+    private static void LoadGestureFrames(
+        string directory,
+        string prefix,
+        Texture2D[] destination)
+    {
+        for (int index = 0; index < destination.Length; index++)
+        {
+            string path =
+                $"res://Frames/{directory}/{prefix}_{index:00}.png";
+            destination[index] = GD.Load<Texture2D>(path)
+                ?? throw new InvalidOperationException(
+                    $"Could not load required frame: {path}");
+        }
+    }
+
     private void ApplyCurrentFrame()
     {
+        if (_turn.IsCrossingArms || _turn.IsCrossArmsHeld)
+        {
+            // The held state pins this index to cross_02, the third and final
+            // crossing frame (human source pose 6 from CrossArm3.png).
+            _character.Texture =
+                _crossArmFrames[_turn.CurrentCrossArmFrame];
+            return;
+        }
+
+        if (_turn.IsReleasingCrossArms)
+        {
+            _character.Texture =
+                _crossArmReleaseFrames[_turn.CurrentCrossArmReleaseFrame];
+            return;
+        }
+
+        if (_turn.IsClapping)
+        {
+            _character.Texture = _clapFrames[_turn.CurrentClapFrame];
+            return;
+        }
+
         if (_turn.IsWalkingLeft)
         {
             _character.Texture = _leftWalkFrames[_turn.CurrentWalkFrame];
@@ -209,12 +292,14 @@ public partial class TurnController : Node2D
     {
         int? captureFrame = null;
         TurnDirection captureDirection = TurnDirection.Left;
+        string? dialoguePreview = null;
 
         foreach (string argument in OS.GetCmdlineUserArgs())
         {
             const string framePrefix = "--capture-frame=";
             const string directionPrefix = "--capture-direction=";
             const string pathPrefix = "--capture-path=";
+            const string dialoguePrefix = "--dialogue-preview=";
 
             if (argument.StartsWith(framePrefix, StringComparison.Ordinal))
             {
@@ -241,6 +326,10 @@ public partial class TurnController : Node2D
             {
                 _capturePath = argument[pathPrefix.Length..];
             }
+            else if (argument.StartsWith(dialoguePrefix, StringComparison.Ordinal))
+            {
+                dialoguePreview = argument[dialoguePrefix.Length..];
+            }
         }
 
         if (captureFrame.HasValue != (_capturePath is not null))
@@ -255,7 +344,39 @@ public partial class TurnController : Node2D
         }
 
         _turn.Reset(captureDirection, captureFrame.Value);
+        ConfigureDialoguePreview(dialoguePreview);
         _captureCountdown = 3;
+    }
+
+    private void ConfigureDialoguePreview(string? preview)
+    {
+        switch (preview)
+        {
+            case null:
+                return;
+            case "short":
+                _dialogueUi.ShowPreviewText("Dream big!");
+                return;
+            case "long":
+                _dialogueUi.ShowPreviewText(
+                    "A brave idea becomes real one careful step at a time, "
+                    + "especially when friends build it together.");
+                return;
+            case "left":
+                _character.Position = new Vector2(221.25f, _character.Position.Y);
+                _dialogueUi.ShowPreviewText("Still inside the edge!");
+                return;
+            case "right":
+                _character.Position = new Vector2(1700.0f, _character.Position.Y);
+                _dialogueUi.ShowPreviewText("The tail still points to me.");
+                return;
+            case "input":
+                _dialogueUi.OpenPreviewInput();
+                return;
+            default:
+                throw new ArgumentException(
+                    $"Invalid dialogue preview: {preview}");
+        }
     }
 
     private void CaptureFrameAndQuit()
