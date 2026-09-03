@@ -1,10 +1,4 @@
-"""Generate opaque full-body left- and right-turn panels.
-
-Each frame keeps the source character, shoes, studio floor, shadow, and
-reflection together. Only source labels/dividers are excluded; no character
-segmentation, color recovery, transparency extraction, or artwork scaling is
-performed.
-"""
+"""Generate opaque full-body turn frames on uniform pure black."""
 
 from __future__ import annotations
 
@@ -22,24 +16,18 @@ if SUPPORT_PACKAGES.is_dir():
 import cv2  # type: ignore  # noqa: E402
 import numpy as np  # type: ignore  # noqa: E402
 from PIL import Image  # type: ignore  # noqa: E402
-
-
-EVIDENCE_DIR = (
-    ROOT / ".ai-org" / "missions" / "2026-09-02-add-right-turn-cecc239c"
+from foreground_cutout import (  # noqa: E402
+    CutoutConfig,
+    CutoutResult,
+    isolate_character,
 )
+
 
 SOURCE_SHAPE = (1448, 1086, 3)
 CANVAS_WIDTH = 512
 CANVAS_HEIGHT = 864
 TARGET_TORSO_CENTER_X = 256
 TARGET_FLOOR_BASELINE_Y = CANVAS_HEIGHT - 1
-
-# Fade only the outer studio-background edges. Every character starts well
-# inside these ramps, so they do not touch hair, clothing, shoes, the floor
-# directly beneath the character, or reflection.
-SIDE_FEATHER_PIXELS = 28
-TOP_FEATHER_PIXELS = 16
-
 
 @dataclass(frozen=True)
 class SheetConfig:
@@ -50,6 +38,7 @@ class SheetConfig:
     label_rect: tuple[int, int, int, int]
     panel_offsets: tuple[tuple[int, int], ...]
     torso_centers: tuple[int, ...]
+    cutouts: tuple[CutoutConfig, ...]
     normalize_container: bool = False
 
 
@@ -57,6 +46,7 @@ class SheetConfig:
 class GeneratedFrame:
     panel: np.ndarray
     frame: np.ndarray
+    cutout: CutoutResult
     offset_x: int
     offset_y: int
 
@@ -80,6 +70,29 @@ LEFT_CONFIG = SheetConfig(
         (72, 140),
     ),
     torso_centers=(190, 187, 184),
+    cutouts=(
+        CutoutConfig(
+            "LeftTurn/turn_0",
+            (70, 160, 395, 860),
+            (145, 270, 355, 575),
+            ((145, 620, 270, 860), (250, 620, 385, 860)),
+            620,
+        ),
+        CutoutConfig(
+            "LeftTurn/turn_1",
+            (115, 160, 390, 860),
+            (150, 270, 350, 575),
+            ((155, 620, 270, 860), (250, 620, 375, 860)),
+            620,
+        ),
+        CutoutConfig(
+            "LeftTurn/turn_2",
+            (145, 160, 345, 860),
+            (170, 270, 330, 575),
+            ((165, 620, 275, 860), (220, 620, 345, 860)),
+            620,
+        ),
+    ),
 )
 
 # RTurning uses different native cell widths. Its antialiased vertical
@@ -103,6 +116,29 @@ RIGHT_CONFIG = SheetConfig(
         (79, 139),
     ),
     torso_centers=(183, 188, 177),
+    cutouts=(
+        CutoutConfig(
+            "RightTurn/turn_0",
+            (95, 155, 405, 860),
+            (145, 265, 365, 575),
+            ((150, 620, 270, 860), (250, 620, 385, 860)),
+            620,
+        ),
+        CutoutConfig(
+            "RightTurn/turn_1",
+            (120, 155, 390, 860),
+            (155, 265, 360, 575),
+            ((155, 620, 275, 860), (250, 620, 375, 860)),
+            620,
+        ),
+        CutoutConfig(
+            "RightTurn/turn_2",
+            (145, 155, 350, 860),
+            (175, 265, 335, 575),
+            ((165, 620, 275, 860), (220, 620, 350, 860)),
+            620,
+        ),
+    ),
     normalize_container=True,
 )
 
@@ -146,49 +182,19 @@ def normalize_png_container(path: Path) -> None:
     )
 
 
-def edge_feather(panel: np.ndarray) -> np.ndarray:
-    """Fade only outer left/right/top panel edges into viewport black."""
-
-    height, width = panel.shape[:2]
-    weights = np.ones((height, width), dtype=np.float32)
-
-    side_ramp = np.linspace(
-        0.0,
-        1.0,
-        SIDE_FEATHER_PIXELS,
-        endpoint=True,
-        dtype=np.float32,
-    )
-    weights[:, :SIDE_FEATHER_PIXELS] *= side_ramp
-    weights[:, -SIDE_FEATHER_PIXELS:] *= side_ramp[::-1]
-
-    top_ramp = np.linspace(
-        0.0,
-        1.0,
-        TOP_FEATHER_PIXELS,
-        endpoint=True,
-        dtype=np.float32,
-    )
-    weights[:TOP_FEATHER_PIXELS, :] *= top_ramp[:, np.newaxis]
-
-    return np.rint(panel.astype(np.float32) * weights[:, :, np.newaxis]).astype(
-        np.uint8
-    )
-
-
 def prepare_panel(
     source: np.ndarray,
     crop: tuple[int, int, int, int],
     label_rect: tuple[int, int, int, int],
 ) -> np.ndarray:
-    """Crop one complete source cell, remove its label, and soften outer edges."""
+    """Crop one complete source cell and remove its label."""
 
     x0, y0, x1, y1 = crop
     panel = source[y0:y1, x0:x1].copy()
 
     label_x0, label_y0, label_x1, label_y1 = label_rect
     panel[label_y0:label_y1, label_x0:label_x1] = 0
-    return edge_feather(panel)
+    return panel
 
 
 def place_panel(panel: np.ndarray, offset: tuple[int, int]) -> np.ndarray:
@@ -222,14 +228,18 @@ def generate_frames(
     config: SheetConfig,
 ) -> list[GeneratedFrame]:
     generated: list[GeneratedFrame] = []
-    for crop, offset in zip(
+    for crop, offset, cutout_config in zip(
         config.panel_crops,
         config.panel_offsets,
+        config.cutouts,
         strict=True,
     ):
         panel = prepare_panel(source, crop, config.label_rect)
-        frame = place_panel(panel, offset)
-        generated.append(GeneratedFrame(panel, frame, *offset))
+        placed = place_panel(panel, offset)
+        cutout = isolate_character(placed, cutout_config)
+        generated.append(
+            GeneratedFrame(panel, cutout.frame, cutout, *offset)
+        )
     return generated
 
 
@@ -266,27 +276,11 @@ def validate_frames(
                 f"{config.name} panel {index} label rectangle is not black."
             )
 
-        # The complete body/floor interior must be byte-identical to source.
-        interior_actual = panel[
-            TOP_FEATHER_PIXELS:,
-            SIDE_FEATHER_PIXELS:-SIDE_FEATHER_PIXELS,
-        ]
-        interior_expected = source_panel[
-            TOP_FEATHER_PIXELS:,
-            SIDE_FEATHER_PIXELS:-SIDE_FEATHER_PIXELS,
-        ].copy()
-        interior_label_x0 = max(0, label_x0 - SIDE_FEATHER_PIXELS)
-        interior_label_y0 = max(0, label_y0 - TOP_FEATHER_PIXELS)
-        interior_label_x1 = label_x1 - SIDE_FEATHER_PIXELS
-        interior_label_y1 = label_y1 - TOP_FEATHER_PIXELS
-        interior_expected[
-            interior_label_y0:interior_label_y1,
-            interior_label_x0:interior_label_x1,
-        ] = 0
-        if not np.array_equal(interior_actual, interior_expected):
+        expected_panel = source_panel.copy()
+        expected_panel[label_y0:label_y1, label_x0:label_x1] = 0
+        if not np.array_equal(panel, expected_panel):
             raise RuntimeError(
-                f"{config.name} panel {index} altered source pixels outside "
-                "label/edge regions."
+                f"{config.name} panel {index} altered source pixels outside label."
             )
 
         torso_x = item.offset_x + config.torso_centers[index]
@@ -302,15 +296,17 @@ def validate_frames(
                 f"expected {TARGET_FLOOR_BASELINE_Y}."
             )
 
-        occupied = np.zeros((CANVAS_HEIGHT, CANVAS_WIDTH), dtype=bool)
-        occupied[
-            item.offset_y : item.offset_y + panel.shape[0],
-            item.offset_x : item.offset_x + panel.shape[1],
-        ] = True
-        if np.any(frame[:, :, :3][~occupied]):
-            raise RuntimeError(
-                f"{config.name} frame {index} exposed canvas is not black."
-            )
+        print(
+            f"cutout={item.cutout.black_ratio:.4f}_black "
+            f"foreground_pixels={item.cutout.foreground_pixels} "
+            f"shoe_pixels={item.cutout.shoe_pixels} "
+            f"shoe_retention={item.cutout.shoe_retention} "
+            f"shoe_dark_retention={item.cutout.shoe_dark_retention} "
+            f"shoe_extent_retention={item.cutout.shoe_extent_retention} "
+            f"shoe_visible_retention={item.cutout.shoe_visible_retention} "
+            "shoe_visible_extent_retention="
+            f"{item.cutout.shoe_visible_extent_retention}"
+        )
 
     differences = [
         float(
@@ -338,10 +334,7 @@ def validate_frames(
         f"torso_x:{TARGET_TORSO_CENTER_X} "
         f"floor_baseline_y:{TARGET_FLOOR_BASELINE_Y}"
     )
-    print(
-        "edge_feather="
-        f"left/right:{SIDE_FEATHER_PIXELS}px top:{TOP_FEATHER_PIXELS}px"
-    )
+    print("background=pure_black segmentation=mask_initialized_grabcut")
     print(f"adjacent_mean_color_differences={differences}")
 
 
@@ -358,44 +351,6 @@ def validate_output_directory(config: SheetConfig) -> None:
             "Unexpected runtime frame assets must be removed explicitly: "
             + ", ".join(str(path.relative_to(ROOT)) for path in unexpected)
         )
-
-
-def make_contact_sheet(
-    generated_by_sheet: list[tuple[SheetConfig, list[GeneratedFrame]]],
-) -> np.ndarray:
-    """Render all six frames in direction-specific rows on a 4K canvas."""
-
-    sheet = np.zeros((2160, 3840, 3), dtype=np.uint8)
-    cell_width = 1280
-    cell_height = 1080
-    evidence_scale = 1.25
-
-    for row, (config, generated) in enumerate(generated_by_sheet):
-        for column, item in enumerate(generated):
-            scaled = cv2.resize(
-                item.frame[:, :, :3],
-                (
-                    round(item.frame.shape[1] * evidence_scale),
-                    round(item.frame.shape[0] * evidence_scale),
-                ),
-                interpolation=cv2.INTER_NEAREST,
-            )
-            x = column * cell_width + (cell_width - scaled.shape[1]) // 2
-            y = row * cell_height + (cell_height - scaled.shape[0]) // 2
-            sheet[y : y + scaled.shape[0], x : x + scaled.shape[1]] = scaled
-
-            cv2.putText(
-                sheet,
-                f"{config.name} {column * 45} deg",
-                (column * cell_width + 36, row * cell_height + 70),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                1.25,
-                (220, 220, 220),
-                2,
-                cv2.LINE_AA,
-            )
-
-    return sheet
 
 
 def write_png(path: Path, image: np.ndarray) -> None:
@@ -417,7 +372,6 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    generated_by_sheet: list[tuple[SheetConfig, list[GeneratedFrame]]] = []
     for config in SHEET_CONFIGS:
         if config.normalize_container:
             normalize_png_container(config.source_path)
@@ -443,13 +397,11 @@ def main() -> int:
                 f"shape={item.frame.shape}"
             )
 
-        generated_by_sheet.append((config, generated))
-
     if args.evidence:
-        EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
-        contact_path = EVIDENCE_DIR / "directional-turn-contact-sheet-4k.png"
-        write_png(contact_path, make_contact_sheet(generated_by_sheet))
-        print(f"evidence={contact_path.relative_to(ROOT)}")
+        print(
+            "evidence=combined 18-frame contact sheet is refreshed by "
+            "extract_right_walk.py"
+        )
 
     return 0
 

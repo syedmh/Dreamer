@@ -87,25 +87,23 @@ the extractor rewrites it as a valid PNG container and verifies that every
 decoded RGB pixel remains unchanged.
 
 Both turn directions use calibrated native whole-panel crops on identical opaque
-512x864 black canvases. The generator keeps each complete character together
-with the original studio floor, shadow, and reflection. It only excludes panel
-dividers, blacks out each sheet's calibrated label rectangle, translates the
-complete native-size panels to a stable torso center and floor baseline, and
-gently fades only the outer left/right/top studio-background edges into black.
-At the existing 1.25x runtime scale, the canvases fill the 1080-pixel viewport
-height so the retained floor ends naturally at the viewport edge. The process
-does not segment the character, separate shoes from the floor, restore colors,
-create transparency, deform the artwork, or scale source artwork during frame
-generation.
+512x864 black canvases. After divider and label removal and calibrated placement,
+the extractor uses deterministic OpenCV foreground seeds plus mask-initialized
+GrabCut to retain the complete character, including dark hair and both shoes.
+The retained source RGB is composited onto exact opaque pure black; studio
+panels, floor, shadows, and reflections are removed. Retained nonzero shoe
+pixels with a source value below 22 receive an equal-channel lift to a maximum
+channel value of 22. This shoe-box-only charcoal floor preserves the source hue,
+leaves zero-valued connectivity pixels invisible, and does not alter trousers,
+skin, hair, other artwork, or any pixel outside the final matte.
 
 Regeneration requires Python, NumPy, OpenCV, and Pillow as listed in
 `requirements.txt`.
 
-Development contact-sheet evidence is written under:
+The combined 18-frame development contact sheet is written to:
 
 ```text
-.ai-org\missions\2026-09-02-add-right-turn-cecc239c\
-.ai-org\missions\2026-09-03-mirror-left-walk-cecc239c\
+.ai-org\missions\2026-09-03-black-backgrounds-cecc239c\black-background-contact-sheet.png
 ```
 
 ### Shared walk extraction
@@ -115,7 +113,8 @@ walk directions. It extracts the approved six-pose sequence from
 `RWalking2.png` into `Frames\RightWalk\walk_00.png` through `walk_05.png`, then
 writes `Frames\LeftWalk\walk_00.png` through `walk_05.png` as byte-exact
 horizontal mirrors of the corresponding right RGBA canvases. Pose ordering is
-identical and both directions run at 6 FPS.
+identical and both directions run at 6 FPS. Each right pose is isolated once
+onto opaque pure black before the exact left mirror is written.
 
 Regenerate the preview frames and numbered review sheet with:
 
@@ -123,8 +122,8 @@ Regenerate the preview frames and numbered review sheet with:
 python FrameExtraction\extract_right_walk.py --evidence
 ```
 
-The optional two-row review sheet is written to
-`.ai-org\missions\2026-09-03-mirror-left-walk-cecc239c\mirrored-walk-contact-sheet.png`.
+The optional review sheet contains all six turns, six right-walk poses, and six
+exact mirrored-left poses at the combined contact-sheet path above.
 `RWalking2.png` contains JPEG data under its `.png` extension, remains unchanged
 during extraction, and uses keep-only Godot import metadata because the source
 sheet itself is not a runtime texture.

@@ -16,6 +16,11 @@ if SUPPORT_PACKAGES.is_dir():
 import cv2  # type: ignore  # noqa: E402
 import numpy as np  # type: ignore  # noqa: E402
 from PIL import Image  # type: ignore  # noqa: E402
+from foreground_cutout import (  # noqa: E402
+    CutoutConfig,
+    CutoutResult,
+    isolate_character,
+)
 
 
 SOURCE_PATH = ROOT / "RWalking2.png"
@@ -25,9 +30,9 @@ EVIDENCE_DIR = (
     ROOT
     / ".ai-org"
     / "missions"
-    / "2026-09-03-mirror-left-walk-cecc239c"
+    / "2026-09-03-black-backgrounds-cecc239c"
 )
-CONTACT_SHEET_PATH = EVIDENCE_DIR / "mirrored-walk-contact-sheet.png"
+CONTACT_SHEET_PATH = EVIDENCE_DIR / "black-background-contact-sheet.png"
 
 SOURCE_SHA256 = (
     "CD56287A4830D068292793256DBEB5A29E1EB9D888520A5339FE3957E7B7FA3A"
@@ -63,6 +68,54 @@ EXPECTED_HEIGHT = 751
 EXPECTED_OFFSETS_X = (90, 89, 94, 104, 102, 111)
 FRAME_COUNT = 6
 
+# Calibrated after panel placement. The broad person boxes admit moving limbs;
+# separate shoe boxes keep both dark shoes in every pose without admitting the
+# studio-floor band.
+CUTOUT_CONFIGS = (
+    CutoutConfig(
+        "RightWalk/walk_00",
+        (105, 165, 455, 850),
+        (165, 280, 345, 570),
+        ((105, 590, 270, 850), (245, 590, 455, 850)),
+        590,
+    ),
+    CutoutConfig(
+        "RightWalk/walk_01",
+        (105, 165, 450, 850),
+        (165, 280, 345, 570),
+        ((105, 590, 270, 850), (245, 590, 450, 850)),
+        590,
+    ),
+    CutoutConfig(
+        "RightWalk/walk_02",
+        (115, 165, 410, 850),
+        (165, 280, 345, 570),
+        ((115, 590, 265, 850), (235, 590, 410, 850)),
+        590,
+    ),
+    CutoutConfig(
+        "RightWalk/walk_03",
+        (135, 165, 370, 850),
+        (170, 280, 340, 570),
+        ((135, 590, 260, 850), (220, 590, 370, 850)),
+        590,
+    ),
+    CutoutConfig(
+        "RightWalk/walk_04",
+        (135, 165, 420, 850),
+        (165, 280, 345, 570),
+        ((135, 590, 290, 850), (230, 590, 420, 850)),
+        590,
+    ),
+    CutoutConfig(
+        "RightWalk/walk_05",
+        (125, 165, 390, 850),
+        (165, 280, 345, 570),
+        ((125, 590, 275, 850), (230, 590, 390, 850)),
+        590,
+    ),
+)
+
 ADJACENT_DIFFERENCE_MIN = 1.0
 SOURCE_TOP_MARGIN_ROWS = 48
 SOURCE_BOTTOM_FLOOR_ROWS = 8
@@ -76,6 +129,7 @@ PERSON_PIXEL_MIN = 30
 class GeneratedFrame:
     panel: np.ndarray
     frame: np.ndarray
+    cutout: CutoutResult
     offset_x: int
 
 
@@ -128,8 +182,8 @@ def generate_frames(source: np.ndarray) -> list[GeneratedFrame]:
     generated: list[GeneratedFrame] = []
     crop_y0, crop_y1 = SOURCE_CROP_Y
 
-    for index, ((x0, x1), torso_center) in enumerate(
-        zip(X_INTERVALS, TORSO_CENTERS, strict=True)
+    for index, ((x0, x1), torso_center, cutout_config) in enumerate(
+        zip(X_INTERVALS, TORSO_CENTERS, CUTOUT_CONFIGS, strict=True)
     ):
         clean_cell = source[crop_y0:crop_y1, x0:x1].copy()
 
@@ -160,7 +214,10 @@ def generate_frames(source: np.ndarray) -> list[GeneratedFrame]:
             offset_x : offset_x + resized_width,
             :3,
         ] = panel
-        generated.append(GeneratedFrame(panel, frame, offset_x))
+        cutout = isolate_character(frame, cutout_config)
+        generated.append(
+            GeneratedFrame(panel, cutout.frame, cutout, offset_x)
+        )
 
     return generated
 
@@ -209,15 +266,17 @@ def validate_generated_frames(generated: list[GeneratedFrame]) -> list[float]:
                 f"expected {TARGET_TORSO_X}."
             )
 
-        occupied = np.zeros((CANVAS_HEIGHT, CANVAS_WIDTH), dtype=bool)
-        occupied[
-            OUTPUT_Y : OUTPUT_Y + item.panel.shape[0],
-            item.offset_x : item.offset_x + item.panel.shape[1],
-        ] = True
-        if np.any(item.frame[:, :, :3][~occupied]):
-            raise RuntimeError(
-                f"Frame {index} exposed canvas contains non-black pixels."
-            )
+        print(
+            f"cutout={item.cutout.black_ratio:.4f}_black "
+            f"foreground_pixels={item.cutout.foreground_pixels} "
+            f"shoe_pixels={item.cutout.shoe_pixels} "
+            f"shoe_retention={item.cutout.shoe_retention} "
+            f"shoe_dark_retention={item.cutout.shoe_dark_retention} "
+            f"shoe_extent_retention={item.cutout.shoe_extent_retention} "
+            f"shoe_visible_retention={item.cutout.shoe_visible_retention} "
+            "shoe_visible_extent_retention="
+            f"{item.cutout.shoe_visible_extent_retention}"
+        )
 
     differences = [
         float(
@@ -428,15 +487,32 @@ def validate_written_outputs() -> None:
 
 def make_contact_sheet(generated: list[GeneratedFrame]) -> np.ndarray:
     sheet_width = 3840
-    sheet_height = 2160
-    cell_width = sheet_width // FRAME_COUNT
-    cell_height = sheet_height // 2
-    display_scale = 0.92
+    sheet_height = 2880
+    columns = 6
+    cell_width = sheet_width // columns
+    cell_height = sheet_height // 3
+    display_scale = 0.82
     sheet = np.zeros((sheet_height, sheet_width, 3), dtype=np.uint8)
 
-    for row, direction in enumerate(("RIGHT", "LEFT (EXACT MIRROR)")):
-        for index, item in enumerate(generated):
-            frame = item.frame if row == 0 else item.frame[:, ::-1]
+    turn_paths = [
+        ROOT / "Frames" / direction / f"turn_{index}.png"
+        for direction in ("LeftTurn", "RightTurn")
+        for index in range(3)
+    ]
+    turn_frames = [
+        cv2.imread(str(path), cv2.IMREAD_UNCHANGED)
+        for path in turn_paths
+    ]
+    if any(frame is None for frame in turn_frames):
+        raise RuntimeError("Run extract_directional_turns.py before evidence.")
+
+    rows = (
+        ("TURNS", turn_frames),
+        ("RIGHT WALK", [item.frame for item in generated]),
+        ("LEFT WALK (EXACT MIRROR)", [item.frame[:, ::-1] for item in generated]),
+    )
+    for row, (label, frames) in enumerate(rows):
+        for index, frame in enumerate(frames):
             display_width = round(CANVAS_WIDTH * display_scale)
             display_height = round(CANVAS_HEIGHT * display_scale)
             display = cv2.resize(
@@ -447,12 +523,12 @@ def make_contact_sheet(generated: list[GeneratedFrame]) -> np.ndarray:
             cell_x = index * cell_width
             cell_y = row * cell_height
             x = cell_x + (cell_width - display_width) // 2
-            y = cell_y + 150
+            y = cell_y + 145
             sheet[y : y + display_height, x : x + display_width] = display
             cv2.putText(
                 sheet,
-                f"{direction} {POSE_LABELS[index]}",
-                (cell_x + 120, cell_y + 82),
+                f"{label} {index + 1:02d}",
+                (cell_x + 85, cell_y + 82),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.9,
                 (235, 235, 235),
@@ -508,14 +584,14 @@ def main() -> int:
         EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
         write_png(CONTACT_SHEET_PATH, make_contact_sheet(generated))
         with Image.open(CONTACT_SHEET_PATH) as contact_sheet:
-            if contact_sheet.format != "PNG" or contact_sheet.size != (3840, 2160):
+            if contact_sheet.format != "PNG" or contact_sheet.size != (3840, 2880):
                 raise RuntimeError(
                     f"Contact sheet is {contact_sheet.format} "
-                    f"{contact_sheet.size}; expected PNG (3840, 2160)."
+                    f"{contact_sheet.size}; expected PNG (3840, 2880)."
                 )
         print(
             f"evidence={CONTACT_SHEET_PATH.relative_to(ROOT)} "
-            "shape=(2160, 3840, 3)"
+            "shape=(2880, 3840, 3)"
         )
 
     hash_after = source_sha256()
@@ -526,7 +602,7 @@ def main() -> int:
         )
 
     print(f"x_intervals={X_INTERVALS} crop_y={SOURCE_CROP_Y}")
-    print("labels=none dividers=none feather=disabled")
+    print("labels=none dividers=none background=pure_black")
     print(f"scale={SCALE} interpolation=INTER_LANCZOS4")
     print(
         f"panel_widths={EXPECTED_WIDTHS} panel_height={EXPECTED_HEIGHT} "
