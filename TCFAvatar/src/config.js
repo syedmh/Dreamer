@@ -58,25 +58,28 @@ export const SCENERY = false;
  *
  * This is also an animation-safety knob: one walk cycle covers
  * `strideLengthPx * (height / characterHeightPx)` world pixels, so a taller
- * character gives each of the 24 baked frames more distance and therefore more
- * headroom before a slow frame could skip one.
+ * character gives each baked frame more distance and therefore more headroom
+ * before a slow frame could skip one.
  *
- * The atlas is baked at 650px of character, above this, so the sprite is only
+ * The atlas is baked at 651px of character, above this, so the sprite is only
  * ever reduced on screen — the sharp direction to resample in.
  */
 export const CHARACTER_DISPLAY_HEIGHT = 406;
 
 /**
- * The profile rig strides 419.2 sprite px per cycle, which at the display
- * height above is ~262 world px.
+ * The authored walk covers 211.2 sprite px per cycle, which at the display
+ * height above is ~132 world px. One cycle is one *step*, not a full stride:
+ * the six drawings carry him from one foot's contact to the other's, and the
+ * artist drew them to loop there.
  *
- * Showing all 24 baked frames requires the cycle to last at least 24 ticks, so
- * the binding constraint is `topSpeed <= strideWorldPx * fps / 24`, i.e. 327
- * px/s at 30 fps against a top speed of 273. At that speed the gait advances
- * 0.84 frames per tick at 30 fps, which is the design floor; at a normal 60 fps
- * refresh it is 0.42. Walking takes 1.30 s per cycle and running 0.96 s, both
- * natural cadences for a man of this height — the speeds are scaled with the
- * character so the cadence is unchanged by his size.
+ * That is the same ground per step as the rig it replaces — which measured
+ * 419.3px over a two-step cycle from entirely different art — so the cadence
+ * the game has always had is unchanged: 1.5 steps/s walking, 2.1 running.
+ *
+ * Showing all 6 baked frames requires the cycle to last at least 6 ticks, so the
+ * binding constraint is `topSpeed <= strideWorldPx * fps / 6`, i.e. 659 px/s at
+ * 30 fps against a top speed of 273 — far more headroom than the 24-frame rig
+ * had, because each frame now owns four times the distance.
  */
 export const WALK_SPEED = 202;
 export const RUN_MULTIPLIER = 1.35;
@@ -85,35 +88,74 @@ export const RUN_MULTIPLIER = 1.35;
 export const ACCELERATION = 4060;
 export const FRICTION = 5000;
 
-export const WALK_FRAME_COUNT = 24;
-export const IDLE_FRAME_COUNT = 12;
-export const IDLE_FPS = 9;
+/**
+ * Six drawn poses per step, and no synthesised frames between them.
+ *
+ * In-betweening was tried first and rejected on measurement, not taste. Optical
+ * flow registers the large-motion pairs no better than a third of the way —
+ * DIS, Farneback and a coarse-to-fine pyramid all leave a residual of ~33 out of
+ * ~70 — because a swinging leg uncovers kurta that exists in neither of its
+ * neighbours. Blending two warped neighbours turns the legs translucent; warping
+ * a single neighbour tears the shoes into the doubled smear that was already
+ * rejected once. A drawn pose beats an invented one.
+ */
+export const WALK_FRAME_COUNT = 6;
+
+/**
+ * The stand is one drawing, held still.
+ *
+ * The previous idle breathed across twelve synthesised frames, which read as the
+ * character drifting up and down while standing. He is now simply still.
+ */
+export const IDLE_FRAME_COUNT = 1;
+export const IDLE_FPS = 1;
 
 /**
  * Standing, the character faces the camera; walking, he is in profile.
  *
- * Setting off is not a separate event from walking. `turn<Dir>_i` morphs the
- * stand onto walk frame `WALK_START_FRAME + i`, so the sequence is played on the
- * same distance lock as the walk itself and `turn<Dir>_07` *is* walk frame 14 —
- * the baker asserts the two are pixel-identical. Nothing is gated, so no foot
- * slides; the frame index advances at the walk's own rate, so nothing is skipped.
+ * `turn<Dir>_00` is the idle frame itself and `turn<Dir>_01/02` are the artist's
+ * three-quarter and profile drawings, so coming round is three real renders
+ * rather than a morph. They play on the walk's own distance lock, so the frame
+ * index advances at the gait's rate and nothing is gated or skipped.
  *
- * The first attempt at this ran a timed turn with the walk suspended underneath.
- * That forces a choice between a turn short enough not to slide his feet and a
- * turn long enough to show its own frames — there is no value that does both,
- * which is why frames went missing. Deriving the turn from distance removes the
- * choice.
+ * The turn no longer ends *on* a walk frame — authored art cannot be made to,
+ * and faking it is what produced the bad turn frames before. It does not need
+ * to: the profile stand measures 68.6 from walk frame 3, against 30–70 for the
+ * walk's own frame-to-frame steps, so arriving there is a smaller change than
+ * the gait routinely makes by itself.
  */
-export const TURN_FRAME_COUNT = 8;
+export const TURN_FRAME_COUNT = 3;
+
+/**
+ * Seconds to come round from facing the camera to full profile.
+ *
+ * The turn is timed rather than distance-locked, which is the opposite of what
+ * the synthesised rig did — and the reason is the art. Those turn frames were
+ * morphs of the stand onto successive *walk* frames, so his legs walked while
+ * his body came round and the distance lock was exactly right. The artist's
+ * three drawings are a rotation on the spot with both feet planted, so
+ * advancing the gait underneath them would slide those planted feet across the
+ * floor: at the gait's own rate the three frames would cover 66 world px, a
+ * sixth of his height.
+ *
+ * Holding the gait still instead confines that slide to whatever he travels
+ * while accelerating away, which this constant bounds to about 27 px.
+ *
+ * The old note that a timed turn cannot be both short enough to avoid sliding
+ * and long enough to show its frames was written against eight frames, needing
+ * 0.27 s at 30 fps. Three frames need 0.1 s, so the conflict is gone; at this
+ * length every frame still lands on its own tick at 30 fps.
+ */
+export const TURN_SECONDS = 0.15;
 
 /**
  * Walk frame the character sets off from and returns to.
  *
- * At frame 7 the gait function has both ankles under the hips — the passing
- * pose, legs together — which is the one point in the cycle that resembles
- * standing. Frame 0 is the contact pose, feet at their widest.
+ * Frame 3 is the passing pose — the feet are 104px apart against 319 at contact,
+ * the closest the cycle comes to standing — and it is also the walk frame
+ * nearest the profile stand of every one of the six, by a clear margin.
  */
-export const WALK_START_FRAME = 7;
+export const WALK_START_FRAME = 3;
 
 /**
  * Seconds to settle back to facing the camera.
@@ -130,26 +172,42 @@ export const STOP_SECONDS = 0.34;
  * Stopping mid-stride and cutting straight to a standing pose snaps the legs shut
  * in a single frame.  A person does not do that; he finishes bringing his back
  * foot up alongside the front one.  The gait is therefore carried on to the
- * nearest passing pose -- the one point in the cycle where both ankles are under
- * the hips -- before the settle begins, which is at most six frames away and
- * usually about three.  Fast enough not to feel like input lag, and below one
- * frame per tick even at 30 fps, so the same no-skip guarantee holds here.
+ * passing pose -- the point in the cycle where both ankles are under the hips --
+ * before the settle begins, which is at most three frames away.
+ *
+ * A frame of the authored cycle covers four times the ground a frame of the old
+ * synthesised cycle did, so this is a quarter of the old rate: the trailing foot
+ * closes at the same speed across the floor as it always has, which is what the
+ * eye actually judges.  Still below one frame per tick at 30 fps, so the same
+ * no-skip guarantee holds here.
  */
-export const CLOSE_FRAME_RATE = 26;
+export const CLOSE_FRAME_RATE = 13;
 
 /**
- * Walk frames the closing step aims for: the gait's two passing poses, where both
- * ankles are already under the hips.  `stop<Dir><V>_07` was baked *as* the walk
- * frame in `STOP_TARGETS[V]`, pixel for pixel, so handing over to the settle at
- * that point changes nothing on screen -- the same trick that makes setting off
- * seamless, run in reverse.
+ * Walk frames the closing step aims for: the gait's passing pose, where both
+ * ankles are already under the hips.  One cycle of the authored art is one step,
+ * so it passes through that pose once rather than twice, and there is a single
+ * settle family to aim at instead of two.
  */
-export const STOP_TARGETS = [7, 19];
-export const STOP_VARIANTS = ['A', 'B'];
+export const STOP_TARGETS = [WALK_START_FRAME];
+export const STOP_VARIANTS = ['A'];
 
 /**
- * How far the gait may be wound *backwards* to reach a passing pose.  At rest a
- * frame or two back reads as the foot settling; more than that reads as the foot
- * sliding backwards, so beyond this the step is completed forwards instead.
+ * The closing step always takes the shorter way round to the passing pose, in
+ * whichever direction that is.
+ *
+ * The synthesised rig would never wind the gait backwards by more than a frame
+ * or so, on the reasoning that a reversed walk reads as the foot sliding back.
+ * That reasoning does not survive contact with this art. One cycle here is a
+ * single step, so the feet are apart at the ends and together in the middle --
+ * measured spans of 319, 305, 104, 104, 137 and 234 sprite px across frames 0
+ * to 5. The passing pose therefore sits in the middle of the cycle and is
+ * reached by the legs *closing* from either side; going "backwards" through
+ * 5 -> 4 -> 3 brings the trailing foot in exactly as 0 -> 1 -> 2 does.
+ *
+ * Confirmed both ways: `tools/measure_stop.mjs` puts the foot slide at 52.8 px
+ * either side, and `tools/capture_stop.mjs` renders the two strips, in which
+ * both show the legs coming together and neither reads as a walk in reverse.
+ * Halving the worst-case travel is worth more than a direction preference, so
+ * there is no rewind limit.
  */
-export const CLOSE_REWIND_MAX = 3;

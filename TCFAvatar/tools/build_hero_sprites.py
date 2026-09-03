@@ -76,6 +76,9 @@ FOOT_OVERLAP = 26       # rows shared by leg and shoe so the split never opens
 HEM_FLARE = 1.16        # the kurta widens over its lowest rows to cover the swinging leg
 HEM_FLARE_TOP = 96      # rows above the hem over which the flare ramps in
 FAR_LIMB_TINT = 0.70    # the far side sits in the body's own shadow
+FAR_LIMB_FILL = 0.34    # ...lit by ambient fill only, so it keeps this much of its
+                        # key-lit contrast; without it the far shoe's specular streak
+                        # survives and reads as the near shoe double-exposed
 CYAN_CHROMA = 20        # how far green and blue must lead red before a pixel reads cool
 CYAN_BALANCE = 10       # green's lead over blue, below which that cool pixel is cyan
 
@@ -365,8 +368,35 @@ def _tint(rgba, factor):
     most of the cycle and read as a blue line drawn down the character's arm.  A
     shadow under this diffuse a key light is neutral, so all three channels are
     scaled together and the far sleeve now reads as plain grey.
+
+    Gain alone is not enough for a *dark, glossy* layer.  Multiplying preserves the
+    ratio between a surface and its own highlights, so at 0.70 the far shoe kept 148
+    of its 212 levels of internal contrast: its specular streak still peaked at 160,
+    brighter than the **near** shoe's median of 63, and its laces, stitching and red
+    heel tab all survived at full relative strength.  Two shoes carrying the same
+    highlight pattern read as one shoe drawn twice wherever they overlap -- which is
+    every passing pose, twice a cycle, and the gait is right to put them there (the
+    ankles cross 19.7px apart with the far foot 78px in the air).  The far trouser
+    never showed this because a white garment's brightness is diffuse albedo, not
+    specular: the same 0.70 moved its median 49 levels against the shoe's 19.
+
+    A surface in shadow is lit by ambient fill, which carries no specular, so the far
+    side loses the key light's *contrast* as well as its gain.  Each channel is
+    compressed toward the layer's own diffuse tone -- the mean of the solid pixels at
+    or below its median luminance, which is the population the highlights are absent
+    from.  The anchor is per channel, so the average colour, and with it the
+    neutrality above, is preserved exactly.  The far shoe becomes a soft dark
+    silhouette 31 levels below the near one and 158 below its highlights, while the
+    near shoe keeps every highlight it had.
     """
     out = rgba.astype(np.float32).copy()
+    rgb, alpha = out[..., :3], out[..., 3]
+    solid = alpha > 200
+    if solid.any():
+        lum = rgb @ np.array([0.299, 0.587, 0.114], np.float32)
+        diffuse = solid & (lum <= np.median(lum[solid]))
+        anchor = rgb[diffuse].mean(axis=0)
+        out[..., :3] = anchor + (rgb - anchor) * FAR_LIMB_FILL
     out[..., :3] *= factor
     return np.clip(out, 0, 255).astype(np.uint8)
 

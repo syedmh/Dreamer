@@ -1,41 +1,41 @@
 {
-  "frameWidth": 400,
-  "frameHeight": 742,
+  "frameWidth": 401,
+  "frameHeight": 731,
   "centerX": 200,
-  "baselineY": 696,
-  "characterHeightPx": 650,
-  "source": "Walking.png",
-  "standSource": "art/avatar-front.png",
-  "rotationSource": "Walking2.png (authored three-quarter views)",
+  "baselineY": 704,
+  "characterHeightPx": 650.8,
+  "source": "Frames/ (authored walk and turn art)",
+  "standSource": "Frames/RightTurn/turn_0.png",
+  "rotationSource": "Frames/RightTurn, Frames/LeftTurn",
   "directions": [
     "right",
     "left"
   ],
   "walk": {
-    "frames": 24,
-    "strideLengthPx": 419.27
+    "frames": 6,
+    "strideLengthPx": 211.2
   },
   "idle": {
-    "frames": 12,
-    "fps": 9,
-    "facing": "camera"
+    "frames": 1,
+    "fps": 1,
+    "facing": "camera",
+    "note": "the authored front stand, held still"
   },
   "turn": {
-    "frames": 8,
-    "startFrame": 7,
-    "note": "turn<Dir>_i morphs the stand onto walk frame startFrame + i, so turn<Dir>_{n-1} is that walk frame exactly"
+    "frames": 3,
+    "startFrame": 3,
+    "note": "turn<Dir>_00 is the idle frame itself; turn<Dir>_02 is the authored profile stand, which measures 68.6 from walk_03 against 30-70 for the walk's own frame steps"
   },
   "stop": {
-    "frames": 8,
+    "frames": 3,
     "variants": {
-      "A": 7,
-      "B": 19
+      "A": 3
     },
-    "note": "stop<Dir><V>_i morphs the stand onto walk frame variants[V], so stop<Dir><V>_{n-1} is that walk frame exactly; played backwards when settling.  The runtime closes the gait to the nearer passing pose first, then hands over to the matching variant"
+    "note": "the same three images as the turn, played backwards"
   },
   "hitbox": {
-    "width": 170,
-    "height": 653
+    "width": 135,
+    "height": 678
   },
-  "reach": 186
+  "reach": 175
 }

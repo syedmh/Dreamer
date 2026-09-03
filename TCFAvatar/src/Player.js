@@ -9,10 +9,10 @@ import {
   IDLE_FRAME_COUNT,
   IDLE_FPS,
   TURN_FRAME_COUNT,
+  TURN_SECONDS,
   WALK_START_FRAME,
   STOP_SECONDS,
   CLOSE_FRAME_RATE,
-  CLOSE_REWIND_MAX,
   STOP_TARGETS,
   STOP_VARIANTS
 } from './config.js';
@@ -48,14 +48,14 @@ const framesTo = (phase, target) =>
  * parting in his hair, the side his waistcoat buttons on and the hand he leads
  * with; swapping keeps every one of those correct.
  *
- * Standing, he faces the camera. Setting off runs on the *same* distance lock:
- * the turn frames were baked onto successive walk frames, so `walkPhase` alone
- * drives the stand, the turn and the walk as one continuous quantity. There is
- * no moment at which the walk is suspended, so there is no moment at which a
- * frame can go missing or a foot can slide.
+ * Standing, he faces the camera. Coming round to profile is the artist's three
+ * drawings, and they are a rotation on the spot: both feet stay planted while
+ * the body turns. So the turn runs on a short timer and the gait is *held* at
+ * the frame it hands over to, rather than advancing underneath it. Advancing it
+ * would walk his legs through a drawing in which they do not move.
  *
- * Settling is the one timed transition, because a stationary character has no
- * distance left to lock to.
+ * Settling back to the stand is timed for the same reason, plus the plainer one
+ * that a stationary character has no distance left to lock to.
  */
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, rig) {
@@ -71,11 +71,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.idleTime = 0;
     this.facing = 1;
     /**
-     * Walk frames elapsed since he set off. Deliberately *not* wrapped: the turn
-     * plays over the first `TURN_FRAME_COUNT - 1` of them and must not reappear
-     * when the gait comes round again a cycle later.
+     * Seconds spent coming round since he set off, capped at `TURN_SECONDS`.
+     * Deliberately *not* wrapped: the turn plays once and must not reappear when
+     * the gait comes round again a cycle later.
      */
-    this.startFrames = 0;
+    this.turnTime = 0;
     /** 1 while settling back to the stand, 0 once square to the camera. */
     this.settle = 0;
     /** Frames still to run to bring the trailing foot in, or 0. */
@@ -115,25 +115,25 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   /**
-   * How far into setting off he is, in walk frames. Below `TURN_FRAME_COUNT - 1`
-   * the turn is still playing; at or beyond it he is simply walking, and because
-   * the last turn frame is the walk frame it targets, crossing that boundary
-   * changes nothing on screen.
+   * How far into coming round he is, 0 to 1. At 1 the turn is finished and he is
+   * simply walking, entering the gait at `WALK_START_FRAME` — the walk pose
+   * closest to the profile the last turn drawing leaves him in.
    */
   get startProgress() {
-    return this.startFrames;
+    return Math.min(1, this.turnTime / TURN_SECONDS);
   }
 
   /** 0 = square to the camera, 1 = full profile. Drives the shadow's spread. */
   get turn() {
     if (this.settle > 0) return this.settle;
-    return Math.min(1, this.startFrames / (TURN_FRAME_COUNT - 1));
+    return this.startProgress;
   }
 
   /**
    * Maximum walk frames a single tick may advance. Staying below 1 is what
-   * guarantees every baked frame is actually presented — of the walk *and* of
-   * the turn, which advances on the same quantity.
+   * guarantees every baked walk frame is actually presented. The turn is timed,
+   * not distance-locked, so it is bounded separately: `TURN_SECONDS` must be at
+   * least `TURN_FRAME_COUNT` render ticks long for every turn drawing to show.
    */
   framesPerTick(deltaSeconds) {
     return (this.topSpeed * deltaSeconds * WALK_FRAME_COUNT) / this.strideWorldPx;
@@ -168,55 +168,57 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
           // frame, so rejoin the gait exactly there: nothing changes on screen at
           // all. This is the common case -- releasing and re-pressing within a tick
           // or two -- so it is the one worth making free.
-          this.startFrames = TURN_FRAME_COUNT;
+          this.turnTime = TURN_SECONDS;
           this.walkPhase =
             STOP_TARGETS[STOP_VARIANTS.indexOf(this.stopVariant)] / WALK_FRAME_COUNT;
         } else {
           // Part-way round: rejoin the turn at the frame with the same body angle as
           // the one already on screen, rather than snapping back to the stand.
-          this.startFrames = this.stopIndex;
-          this.walkPhase = (START_PHASE + this.stopIndex / WALK_FRAME_COUNT) % 1;
+          this.turnTime = (this.stopIndex / TURN_FRAME_COUNT) * TURN_SECONDS;
+          this.walkPhase = START_PHASE;
         }
         this.settle = 0;
       }
       this.closing = 0;
 
-      const advance = (speed * deltaSeconds) / this.strideWorldPx;
-      const frames = advance * WALK_FRAME_COUNT;
-      this.maxFramesPerTick = Math.max(this.maxFramesPerTick, frames);
-      this.walkPhase = (this.walkPhase + advance) % 1;
-      if (this.walkPhase < 0) this.walkPhase += 1;
-      this.startFrames += frames;
       this.idleTime = 0;
 
-      const turnIndex = Math.floor(this.startFrames);
-      if (turnIndex < TURN_FRAME_COUNT) {
-        // Still setting off. The last of these frames was baked as walk frame
-        // WALK_START_FRAME + 7 exactly, so leaving this branch changes nothing on
-        // screen -- the gait simply carries on.
-        this.stopIndex = turnIndex;
-        this.setFrame(turnFrameName(dir, turnIndex));
+      if (this.turnTime < TURN_SECONDS) {
+        // Still coming round. The gait is pinned to the frame the turn hands over
+        // to, because these three drawings rotate him on the spot with both feet
+        // planted -- running the walk underneath them would slide those feet.
+        this.turnTime = Math.min(TURN_SECONDS, this.turnTime + deltaSeconds);
+        this.walkPhase = START_PHASE;
+        this.stopIndex = Math.min(
+          TURN_FRAME_COUNT - 1,
+          Math.floor((this.turnTime / TURN_SECONDS) * TURN_FRAME_COUNT)
+        );
+        this.setFrame(turnFrameName(dir, this.stopIndex));
       } else {
+        const advance = (speed * deltaSeconds) / this.strideWorldPx;
+        const frames = advance * WALK_FRAME_COUNT;
+        this.maxFramesPerTick = Math.max(this.maxFramesPerTick, frames);
+        this.walkPhase = (this.walkPhase + advance) % 1;
+        if (this.walkPhase < 0) this.walkPhase += 1;
         this.stopIndex = TURN_FRAME_COUNT - 1;
         this.setFrame(
           walkFrameName(dir, Math.floor(this.walkPhase * WALK_FRAME_COUNT) % WALK_FRAME_COUNT)
         );
       }
-    } else if (this.closing !== 0 || (this.settle <= 0 && this.startFrames >= TURN_FRAME_COUNT)) {
-      // He has stopped mid-stride. Carry the gait on to the nearer of the two passing
-      // poses so the trailing foot comes in to meet the other, instead of the legs
-      // shutting in a single frame the moment the key is released. The settle frames
+    } else if (this.closing !== 0 || (this.settle <= 0 && this.turnTime >= TURN_SECONDS)) {
+      // He has stopped mid-stride. Carry the gait on to the cycle's passing pose so
+      // the trailing foot comes in to meet the other, instead of the legs shutting
+      // in a single frame the moment the key is released. The settle frames
       // for that pose were baked from the very walk frame he lands on, so handing over
       // to them changes nothing on screen -- exactly like setting off, in reverse.
       if (this.closing === 0) {
-        // Prefer to finish the step forwards: rewinding the gait would read as the
-        // foot sliding back. A rewind of a frame or two is allowed, because at rest
-        // that reads as the foot settling rather than as travel.
+        // The cycle passes through its one feet-together pose in the middle, so
+        // the legs close whichever way round the gait is wound to reach it. Take
+        // the shorter way and halve the worst-case travel.
         let best = null;
         STOP_TARGETS.forEach((target, i) => {
           const d = framesTo(this.walkPhase, target);
-          const cost = d >= 0 ? d : -d <= CLOSE_REWIND_MAX ? -d : Infinity;
-          if (best === null || cost < best.cost) best = { cost, d, i };
+          if (best === null || Math.abs(d) < Math.abs(best.d)) best = { d, i };
         });
         this.closing = best.d;
         this.stopVariant = STOP_VARIANTS[best.i];
@@ -263,7 +265,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
       if (this.settle <= 0 && this.stopIndex <= 0) {
         this.settle = 0;
-        this.startFrames = 0;
+        this.turnTime = 0;
         this.walkPhase = START_PHASE;
         this.idleTime = 0;
         this.setFrame(standFrameName(0));
@@ -272,7 +274,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setFrame(stopFrameName(dir, this.stopVariant, this.stopIndex));
       }
     } else {
-      this.startFrames = 0;
+      this.turnTime = 0;
       this.walkPhase = START_PHASE;
       this.idleTime += deltaSeconds;
       this.setFrame(standFrameName(Math.floor(this.idleTime * IDLE_FPS) % IDLE_FRAME_COUNT));

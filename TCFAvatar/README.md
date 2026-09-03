@@ -23,10 +23,21 @@ with `GAME_URL`.
 
 **A green run is necessary, not sufficient.** The gates check frame indices,
 continuity, distance lock and alpha; none of them can see what the pixels
-*depict*. Six visual defects have passed a fully green run — translucent frames,
-a head that never turned, a double-exposed face, washed-out colour, a missing
-texture placeholder, and a character walking on three shoes. After any sprite
-change, also run `node tools/capture_turn.mjs` and look at the strip.
+*depict*. Eight visual defects have passed a fully green run — translucent
+frames, a head that never turned, a double-exposed face, washed-out colour, a
+missing texture placeholder, a character walking on three shoes, a far shoe that
+read as the near one double-exposed, and a turn that handed off to the worst pose
+in the cycle. After any sprite change, also run
+
+```powershell
+node tools/capture_walk.mjs   # a whole cycle, both directions, dpr 3
+node tools/capture_turn.mjs   # the transitions, one tile per render tick
+node tools/capture_stop.mjs   # the closing step, legs cropped, every tick
+```
+
+and **look at the strips**. `capture_walk` covers the walk body, where the
+depiction defects have been; `capture_turn` covers the transitions, where the
+sequencing defects have been.
 
 ## Tech
 
@@ -34,282 +45,233 @@ change, also run `node tools/capture_turn.mjs` and look at the strip.
 |---|---|---|
 | Engine | Phaser 3 (WebGL) | Best-in-class 2D platformer runtime — batched WebGL, arcade physics, atlas animation, texture filtering |
 | Bundler | Vite | Instant HMR while iterating on feel; single-command production build |
-| Sprite pipeline | Python + Pillow / NumPy / SciPy | The source art is a handful of still poses, so the frames are generated, not drawn |
+| Sprite pipeline | Python + Pillow / NumPy / SciPy / OpenCV | The source art is authored poses on black; the pipeline keys, aligns and packs them, and measures the stride it must be played back at |
 | Verification | Playwright (headless Chromium) | The smoothness claim is proved against the real running game, not asserted on paper |
 
 ## The source art
 
-`Walking.png` is the character sheet: a **WALK RIGHT** row and a **WALK LEFT**
-row of side-profile figures on black.
-
-It is worth being straight about what it is and is not:
-
-- **It is not a walk cycle.** Each row is ~14 variations on a single mid-stride
-  pose. The foot spread stays at 100–110 px in nearly every figure, there is no
-  passing pose, and the same leg leads throughout — a real cycle oscillates
-  through zero spread twice. Played back, it would read as a twitch. The printed
-  `01…16` labels are decorative too: their pitch shrinks from 104 px to 72 px and
-  drifts off the figures, and the rows actually hold 14 and 15 of them.
-- **It is exactly the art that was missing.** Every figure is a genuine 90°
-  profile — real ear, real nose contour, the waistcoat buttoning on the correct
-  side, one shoe in front of the other. No amount of geometry applied to a
-  front-on photograph produces that.
-
-So the sheet is used as **rig art, not as animation**: one clean neutral figure
-per direction (legs together, arm hanging, one clear shoe silhouette) is lifted
-out and driven by a continuous gait function.
-
-`Walking2.png` is a second authored sheet, and it supplies the pose the profile
-sheet cannot: the character **turning**. Alongside its own (unusable — see below)
-walk rows it holds two `walk -> idle (facing front)` transitions, and those carry
-genuine **three-quarter** views, one per direction. Those intermediate angles are
-the whole reason it is here.
-
-`Avatar.jpg` and its cut-out `art/avatar-front.png` are the original front-on
-photograph, and `art/avatar-front.png` **is** the standing pose. The stand was
-taken from `Walking2.png` for a while, so that the stand, the three-quarter views
-and the profile would all be one render pass. At 180px that pose simply had no
-eyes left in it, which is why the stand is now baked from the 959px photograph
-instead — see *The standing pose comes from the photograph* below for the
-measurements, and for the footwear that trade costs.
-
-## How the walk cycle is made
-
-### 1. `tools/walk_sheet.py` — lift the figures off the sheet
-
-- **Keying is exact, not thresholded.** The art is composited over pure black:
-  background luminance is ≤ 1 and interior luminance is ≥ 24, so
-  `alpha = clip(lum / 20, 0, 1)` is a true soft key. Rim colour is taken from the
-  nearest fully-interior pixel rather than by dividing a near-zero alpha, which
-  is what would otherwise produce a dark fringe.
-- **Figures overlap at the shoes**, so column gaps cannot separate them. Torsos
-  never overlap, so components are seeded in the top 45 % of each row and every
-  ink pixel is then assigned to its nearest seed with a distance transform. The
-  seam lands midway between two torsos, well clear of either figure's feet.
-- **Landmarks are measured, not typed in.** The waistcoat is the only strongly
-  green thing on the figure, the hand the only bare skin below the chest, the
-  shoes the only dark mass below the kurta — so shoulder, waist, hem, ankle,
-  ground, body axis, sleeve boundary and hand position all fall out of colour and
-  silhouette-width analysis.
-
-### 2. `tools/build_hero_sprites.py` — rig it and bake it
-
-Each direction is cut into a 7-part rig (torso, near/far arm, near/far leg,
-near/far foot) and posed. **Every cut follows an edge the art already has:**
-
-- The **sleeve** is whatever white lies behind the green waistcoat — a real seam,
-  not a hand-traced curve. Below the waistcoat the kurta behind the arm is the
-  same white as the sleeve and no cut could be honest, so only the bare **hand**
-  is taken; by then the sleeve has already ended at the cuff.
-- Because the arm is `_largest(sleeve | hand)`, that mask is a **connectivity
-  cliff, not a dial**. Widening the green by three pixels to chase an
-  anti-aliased seam looks like a rounding change and is not: it reconnects the
-  components, `_largest` picks a different one, and the arm layer jumps from
-  4,583px to 26,140px — the whole sleeve starts swinging, the torso slot opens
-  behind it and the fill smear that the slot rule is designed to hide comes into
-  view. Rig geometry stays *identical* while this happens, so nothing numeric
-  catches it. Change this mask only with the layer pixel count in front of you.
-- The **near shoe** is split from the far one at a single measured column
-  (`FOOT_CUT`), because the two shoes touch in both source figures.
-- The **thigh** is the only invented part — it is hidden under the kurta in the
-  source. It is extruded *upward* from the trouser it continues, and **tapers**
-  towards the hip: a full-width rectangle swings its top corner out past the hem
-  at full stride and reads as a paper flag stuck to the hip.
-- Removing the sleeve leaves a slot down the back. Filling it from each row's own
-  trailing pixel produces horizontal stripes, because that pixel flips between
-  waistcoat and collar from row to row; sampling several pixels in and smoothing
-  down the column carries the garment cleanly round the back. The hand leaves an
-  *interior* hole instead, which no edge rule reaches, so whatever is still empty
-  afterwards is closed by a small isotropic bleed.
-- The kurta widens over its lowest rows (`HEM_FLARE`) so a swinging thigh stays
-  covered.
-
-The gait:
-
-- Limbs are posed with **exact single-segment IK**: the forward matrix is
-  `A = R(α)·(I + (s−1)·u·uᵀ)`, which stretches strictly *along* the limb axis, so
-  a lengthening leg keeps its width and the ankle lands exactly on target.
-- Legs split at the ankle so the shoe rides **rigidly** on the leg instead of
-  being squashed by the leg's stretch.
-- **The trouser and the shoe layers are disjoint.** Both bands used to reach past
-  the ankle by `FOOT_OVERLAP` so no gap could open between them, but that made
-  every pixel where they met get drawn *twice* under two different transforms —
-  the shoe rigid on the ankle, the trouser stretched along its own axis by the
-  IK. The moment the leg changed length the trouser's copy of the shoe slid out
-  from behind the real one and the character walked on **doubled feet**: three
-  shoes on screen instead of two. The shoe now wins the shared band outright,
-  which costs nothing visible because it is composited after the leg and its copy
-  was always the one actually on screen. Nothing needs to be bled downward to
-  replace the trouser's copy: the leg's new bottom edge is scaled with the limb,
-  so under the worst compression in the cycle (−25%) it rides only
-  `0.75·FOOT_OVERLAP` up, still inside the shoe's own rigid reach. Measured over
-  both directions and every phase, the thinnest the trouser/shoe seal ever gets
-  is 1102px of overlap, and the layers now share **0** pixels.
-- **The rim light is taken off the waistcoat's trailing edge.** `Walking.png` is
-  lit with a cold kicker from behind, and where it grazes the green waistcoat it
-  turns the outermost pixels cyan — measured at `(77,132,141)`, blue actually
-  *ahead* of green, against `(44,106,72)` for the cloth. At sheet resolution it
-  reads as a highlight; blown up to 650px against a black stage it is a hard blue
-  line down the trailing edge of the sleeve, and because the arm swings across it
-  while the waistcoat stays put, it reads as a line drawn *on* the character
-  rather than as light. Since the costume is white, green, skin and near-black,
-  cyan is a hue it never legitimately uses, so those pixels are identified by hue
-  alone: green and blue both more than `CYAN_CHROMA` clear of red, with green
-  less than `CYAN_BALANCE` ahead of blue. Measured on the rig, that cut separates
-  238 rim pixels from 3354 waistcoat pixels with nothing in between. Each one
-  keeps its own brightness — the rim stays a highlight — and is retinted with the
-  hue of the nearest non-cyan pixel, which along this edge is the waistcoat.
-  Alpha is never touched, so the silhouette is unchanged.
-- **The far limb's shadow is neutral.** It used to lift blue 8% and green 1% to
-  "keep the shadow cool rather than muddy", but on a white sleeve that is a hue
-  shift rather than a shadow: at `FAR_LIMB_TINT` it turned white into
-  `(178,180,193)`, a distinctly cyan grey, on exactly the limbs that move.
-- The stance foot travels **exactly linearly**, so a planted foot moves backwards
-  at precisely the body's forward speed and cannot skate. The swing is a cubic
-  Hermite whose end slopes match the stance rate, making the whole foot path C¹
-  continuous — no jerk at either handover.
-- Stride is **derived, not guessed**: the foot covers `2·STEP_MAX` while planted
-  for `STANCE_FRACTION` of the cycle, so one cycle must carry the body
-  `2·STEP_MAX / STANCE_FRACTION`. `STEP_MAX` is 0.72 of leg length, which puts
-  the feet 0.39 × body height apart at contact — life-size.
-- **Both directions are baked from their own authored art. Nothing is mirrored.**
-  Mirroring would flip the parting in his hair, the side the waistcoat buttons on
-  and the hand he leads with. Both rigs are normalised to one height and one
-  baseline first, so turning around cannot pop.
-
-Re-bake with:
-
-```powershell
-cd tools
-python build_hero_sprites.py     # needs pillow + numpy + scipy
-```
-
-### 3. The stand, and the turn that reaches it
-
-Standing still, the character faces the camera — a profile statue reads as a man
-waiting for a bus, not as the hero of the scene. The stand is `idleFront_2` from
-`Walking2.png`, normalised onto the **same** rig height, ground line and body axis
-as the two profile rigs, so he cannot change size when he turns. It breathes: a
-whole-body settle of ~1.7 display px over 12 frames. There is no rig behind a
-drawing, so nothing is articulated — only enough movement to read as alive.
-
-The turn between the stand and the profile is **not** a single set played both
-ways: setting off and settling have opposite requirements, so there are two
-families, 8 frames each.
-
-`turn<Dir>_i` morphs the front stand onto **walk frame `7 + i`**. Its targets
-advance with the gait, so his legs are already walking while his body comes
-round — which is what setting off actually looks like. Frame 7 is the *passing*
-pose, where both ankles are under the hips: the one point in the cycle that
-resembles standing. The last frame, `turn<Dir>_07`, therefore **is**
-`walk<Dir>_14`, pixel for pixel; the bake asserts it and refuses to write a sheet
-where it is not true. Leaving the turn set is an ordinary one-frame step of the
-walk, not a handover.
-
-`stop<Dir>A_i` and `stop<Dir>B_i` morph the front stand onto walk frames **7 and
-19** — the two passing poses, half a cycle apart. Their targets are fixed,
-because by the time he is settling he is stationary and legs that kept walking
-would slide. Played backwards, `stop<Dir><V>_07 → 00` runs from a real walk
-frame to the front stand. The same identity holds at that end too, so the gait
-hands over to the settle without a seam.
-
-Both families are built by the same morph, and the rotation itself is carried by
-**real drawings**. The earlier version interpolated straight from the front stand
-to the profile, so every angle in between was invented — a warped front figure,
-not a man seen from that side. `Walking2.png` supplies the missing angles, so the
-turn now changes over through them in order: front stand → `turn<Dir>_8` →
-`turn<Dir>_7` → `turn<Dir>_6` → the profile walk frame. Each changeover is narrow
-and they do not overlap, so no frame is a half-and-half average of two views —
-it is one drawing, or a brief bridge between two that are already only a few
-degrees apart.
-
-Between drawings, for every scanline the current figure's leading and trailing
-edges are mapped onto the profile's, interpolated by the turn's progress. A
-uniform squash was tried first and was wrong — seen from the front the head sits
-over the body axis, in profile it projects forward, so the two never lined up.
-
-The colour transition is a **shape morph, not a cross-fade**. Averaging two
-alphas leaves anything only one figure covers at partial opacity: the daylight
-between the walking legs came out at ~80/255 and the background showed through
-him. Instead each image is converted to a signed distance field, the fields are
-interpolated, and the alpha is read back off the result — so every frame is
-fully opaque. Colour is weighted by each source's *own* coverage.
-
-Three bands change over at three different moments — **legs at 0.26, body at
-0.50, head at 0.79**. Feet commit before shoulders do when a man sets off, so
-that ordering is what a turn actually looks like; it also removes an artefact,
-because the three-quarter drawings stand with the feet together while the walk
-frame they hand over to already has them apart, and morphing one silhouette into
-the other conjured a shoe-shaped ghost in the gap. Switching the legs early means
-the frames where that gap is widest show real walk art instead of a blend.
-
-The head keeps two small extra mechanisms — it sweeps toward the leading edge,
-and its far side is drawn in behind the nose (anchored at the leading edge;
-anchoring at the centre reads as a squash). Both are now turned down to roughly a
-third of their former strength, because the three-quarter drawings do that
-rotation for real and doubling it makes the head visibly overshoot.
-
-Everything above is zero at both ends of the morph, which is what keeps the
-endpoints exact and the handoffs identities.
-
-### Why the walk is not taken from `Walking2.png` too
-
-Because it is not in there. `tools/walk2_phase.py` measures the foot spread of
-every figure in the `walkRight` row:
+`Frames/` is the character sheet, and it is the real thing: a directory of
+authored renders, one PNG per pose, 512×864, on pure black.
 
 ```
-spread: 52 56 58 58 58 58 58 61 62 46 46 46 0 0
+Frames/RightWalk/walk_00…05.png     one full step, right-facing
+Frames/LeftWalk/walk_00…05.png      the same step, left-facing
+Frames/RightTurn/turn_0…2.png       front stand -> three-quarter -> profile
+Frames/LeftTurn/turn_0…2.png        the same, to the other side
 ```
 
-A gait cycle oscillates — contact, passing, contact. This is nine near-identical
-contact poses followed by the legs closing, which is a *stop*, not a cycle. The
-sheet is variations on a pose, not animation. `walk2_analyse.py` confirms it from
-the other side: the 13 → 0 wrap is 2.3–3.2× the mean interior step, so the row
-does not even close into a loop. The gait therefore stays synthesised, where it
-is periodic by construction; only the turn comes from the authored art.
+The `.png.import` files beside them are Godot's metadata and are ignored.
+
+This replaced two earlier sheets, `Walking.png` and `Walking2.png`, which were
+**not** animation. Each was a row of variations on a single mid-stride pose:
+`Walking.png` held the foot spread at 100–110 px in nearly every figure with no
+passing pose at all, and `Walking2.png`'s walk row measured
+`52 56 58 58 58 58 58 61 62 46 46 46 0 0` — nine near-identical contact poses and
+then the legs closing, which is a *stop*, not a cycle. Neither row even closed
+into a loop. Everything the character did therefore had to be **synthesised**:
+the figures were cut into a seven-part rig (torso, near/far arm, near/far leg,
+near/far foot) and driven by a continuous gait function, and the turn was a morph
+of the front stand onto successive walk frames.
+
+`Frames/` is animation. Every pose in the game is now a render somebody made, and
+the rig, the gait function, the morph and the interpolation are all gone.
+
+### What the art actually measures
+
+Established by measurement, not assumption — worth not re-deriving:
+
+- **Six frames are one step, not a stride.** The planted foot slides backwards
+  monotonically through the cycle (bounding-box trailing edge 437 → 424 → 375 →
+  345 → 313) and the foot spread oscillates exactly once:
+  `319, 305, 104, 104, 137, 234`. So the cycle has a single passing pose, in the
+  middle, not the two a full stride would give.
+- **The loop closes.** Frame-to-frame greyscale distances are
+  `30.2, 53.1, 69.8, 69.0, 70.2` and the wrap is `66.4` — *smaller* than the
+  largest interior step, so the seam is no more visible than the cycle itself.
+  The near/far shading does not flip across it either (front leg 128.8 → 131.7,
+  brighter than the back leg at both ends), so there is no flash at the loop.
+- **`LeftWalk` is a byte-exact horizontal mirror of `RightWalk`.** The two turn
+  sets are *not* mirrors of each other; the two walk sets are. This is a real
+  cost and it is recorded under *Known scope*.
+- **There is no baked contact shadow.** Pixel counts fall to exactly 0 by row
+  832, so nothing has to be masked off the floor.
+- **The render hard-clips shadow to pure black.** A histogram of the far-shoe box
+  is bimodal: 5247 px at exactly 0, **nothing at all between 1 and 14**, then 892
+  in 15–40. Deep shadow in this art carries no recoverable detail. That is why
+  the ground plane varies by nine rows between frames, and why the far limb
+  cannot be lifted — see *The far limb is dark and stays dark*.
+- **The sets do not share a ground plane.** Walk bottoms are 830/830/838/838/839/
+  837; `RightTurn` 846/849/843; `LeftTurn` 843/859/846. Head tops are steady
+  (walk 184–186, turn 180–182), and the turn figure is ~1.7 % taller because he
+  stands upright. Each set is therefore aligned on **its own** ground, which
+  keeps the natural head bob instead of normalising it away.
+- **The two front stands are all but identical.** `RightTurn/turn_0` and
+  `LeftTurn/turn_0` differ by mean |Δ| 16.5. One of them is used as the canonical
+  stand for `idleFront_00`, `turn<Dir>_00` and `stop<Dir>A_00` in **both**
+  directions, so settling always lands on the idle frame pixel-for-pixel.
+
+## How the sprites are made
+
+### `tools/frames_source.py` — lift the figures off the black
+
+The key is a **border flood fill**, not a threshold. Black is filled inward from
+the frame edge, so background is removed while black *enclosed* by the figure —
+shoe interiors, the shadow between the legs, hair — stays opaque. Only the 1–2 px
+shell that the fill reaches keeps a soft ramp, which is what stops a dark fringe
+forming.
+
+`_largest()` keeps any connected component at least 0.2 % of the main body rather
+than the single biggest one. A strict "biggest component only" was silently
+discarding 296 lit pixels, some at luminance 240 — a detached forearm or shoe
+highlight. Component selection on this art has a **cliff**: change the input mask
+slightly and a whole limb can vanish without any error.
+
+### `tools/build_frames_sprites.py` — align it and bake it
+
+- **Integer shifts only.** Each set is aligned on its own ground plane and its
+  mean head x by whole-pixel translation. Nothing is resampled, so every frame
+  keeps the sharpness it was rendered at. This is the whole reason the new atlas
+  is 2005×2924 where the synthesised one was 6000×5936: there is no upscaling
+  pass left to carry.
+- **The stride is measured, not declared.** `measure_stride()` tracks the planted
+  shoe by template matching and fits the slope: −35.2 px per frame, so
+  **211.20 px per six-frame cycle**. `measure_step()` cross-checks it from the
+  other side with a heel-to-heel centroid span, and the assertion between them is
+  ±25 % — a "did the tracker change feet" net, not a precision check, because the
+  clipped soles bias the span outwards.
+- **Two measurement traps, both hit and both fixed.** `_planted()` needs an area
+  floor of **900 px**: at 150 it started returning a 12×32 sliver at x199–210
+  instead of the real shoe at x315–437, once `_largest()` was widened. And
+  template matching on the **binary alpha mask** does not work at all — every
+  solid blob looks alike, so the shoe matches the trouser; `TM_CCORR_NORMED` on
+  alpha stuck at the origin and an unconstrained search jumped to the *other*
+  shoe. The combination that works is a **luminance** template with
+  `TM_SQDIFF_NORMED` and the search band restricted to `[x0 − 80·i, x0 + 6]`,
+  which gives strictly monotonic offsets `0, −10, −52, −80, −141`.
+- **Names are aliased, images are not duplicated.** 25 frame names resolve to 17
+  distinct pictures: the turn and the settle are the same three drawings in
+  opposite order, and their end frame is the idle itself.
+
+Baked result: frame 401×731, `centerX` 200, `baselineY` 704,
+`characterHeightPx` 650.8, `strideLengthPx` 211.20, hitbox 135×678. The character
+height is within a pixel of the synthesised rig's 650, so nothing changed size on
+screen when the art was swapped.
+
+### In-betweening was tried three ways and rejected
+
+Six poses per step is half what the synthesised rig produced, so the obvious move
+is to interpolate. It does not work on this art, and the evidence is kept here so
+it is not attempted a fourth time. `tools/frame_interp.py` is the (unused)
+implementation.
+
+Registration residual, mean |warp(A) − B| over the union mask — "no-flow" is the
+raw distance between the two frames:
+
+| pair | no-flow | DIS medium | Farneback 7lvl/win41 | coarse ¼ | coarse+refine |
+|---|---|---|---|---|---|
+| 0→1 (small step) | 30.2 | **11.1** | 10.7 | 13.0 | 10.7 |
+| 2→3 (large step) | 69.8 | 32.9 | 32.8 | 31.3 | 34.7 |
+| 4→5 (large step) | 70.2 | 34.1 | 41.4 | 33.4 | 37.3 |
+
+Turn pairs are worse still (no-flow 68–102 → DIS 39–51), because a body rotation
+reveals pixels present in neither frame. Then, rendered and looked at:
+
+- **Blended bidirectional warp** turns the legs translucent — partly-transparent
+  pixels jump from ~1,700 in the keys to ~20,000, and magenta shows straight
+  through the leg. This is the same failure already rejected once as a runtime
+  cross-fade.
+- **Single-source warp** avoids the translucency (rim only ~3,300) and is fine on
+  the small pair, marginal on 2→3, and on 4→5 **tears the shoes into a doubled
+  black smear** — precisely the defect fixed at the shoes not long before.
+
+The cause is dis-occlusion, not tuning. A swinging leg uncovers kurta that exists
+in neither neighbouring frame, so no flow field can supply it. The cost of not
+interpolating is stated plainly under *Known scope*.
+
+### The far limb is dark and stays dark
+
+The render crushes the far leg and far shoe almost to black while leaving the far
+shoe's speculars bright, so at high magnification against the black stage the far
+limb can read as a void with a few highlights floating in it.
+
+Lifting it was tried: a local-contrast compression that lifts deep shadow toward
+a readable floor while pulling speculars down, weighted by a blurred in-silhouette
+luminance so it could not cut a halo at the edge. Rendered side by side, it
+**barely moved the far leg and visibly damaged the near shoe**, washing it to a
+muddy red. That is unsurprising given the histogram above — below luminance 15 the
+source is exactly 0, so there is nothing to lift and the operator only finds the
+near shoe's real detail to spoil.
+
+So the far limb is left as authored. At panel resolution and in motion it reads
+as a leg in shadow; it is only conspicuous under 4× nearest-neighbour zoom, which
+is a property of the zoom.
+
+The related lesson from the synthesised pipeline still holds wherever a far limb
+*is* shaded by hand: a pure multiply preserves the highlight-to-base ratio, so a
+dark glossy layer keeps its speculars and the far shoe reads as the near one
+duplicated. Compress each channel toward the layer's diffuse anchor instead.
 
 ## Why the animation cannot jerk or drop a frame
 
-Two independent guarantees.
+**1. The cycle closes on itself.** The wrap from frame 05 back to frame 00 is a
+greyscale distance of 66.4 against interior steps of `30.2, 53.1, 69.8, 69.0,
+70.2` — smaller than the largest step inside the cycle, so the loop seam is not
+merely small, it is unremarkable next to the cycle's own motion. This is a
+property of the authored art, checked rather than engineered: the synthesised rig
+guaranteed it by being C¹, and the measurement is now what replaces that
+guarantee.
 
-**1. The cycle itself is seamless.** Every frame is sampled from one continuous
-periodic function, so frame 23 wraps into frame 00 by construction. The baker
-prints the frame-to-frame pixel delta including the wrap:
-
-```
-walk right: n=24 mean=10.419 min=8.599 max=11.516 wrap=8.988 wrap/mean=0.863
-walk left:  n=24 mean=9.977 min=7.848 max=11.047 wrap=8.445 wrap/mean=0.846
-```
-
-The wrap delta sits inside the ordinary interior range, so the loop seam is not
-merely small — it is indistinguishable from a normal frame step. That is a
-consequence of the gait function being C¹, not something tuned by hand.
-
-**2. Playback is driven by distance, not by a timer.** One cycle is baked to
+**2. Playback is driven by distance, not by a timer.** One cycle is measured to
 carry the character exactly `strideLengthPx` forward, so the frame index is
-`floor((distance / stride) · 24)`. The drawn contact foot therefore cannot slide,
+`floor((distance / stride) · 6)`. The drawn contact foot therefore cannot slide,
 at any speed, under any acceleration.
 
-Showing all 24 frames requires the cycle to last at least 24 render ticks, so the
-binding constraint is `topSpeed ≤ strideWorldPx · fps / 24`. A cycle covers
-261.9 world px, giving **0.42 frames per tick at 60 Hz** and 0.84 at 30 Hz — the
-design floor. Walking takes 1.30 s per cycle and running 0.96 s. The walk and run
-speeds are scaled with the character, so his size never changes his cadence.
+Showing all six frames requires the cycle to last at least six render ticks, so
+the binding constraint is `topSpeed ≤ strideWorldPx · fps / 6`. Measured in the
+running game, the walk advances **0.207 frames per tick at 60 Hz** and 0.414 at
+30 Hz — a factor of two inside the bound at the design floor. Because the stride
+of the authored step (211.2 px) is within a per-cent of the synthesised rig's
+(419.27 px over two steps), the **cadence did not change** when the art was
+swapped: 1.5 steps per second walking, 2.1 running.
 
-**3. The transitions are inside the same sequence, not bolted onto it.** Setting
-off was originally a timed 0.08 s turn that had to finish before the walk began.
-That is an impossible brief: short enough not to slide his planted feet, or long
-enough to show its own 8 frames — no value does both. At 0.08 s and 60 Hz the
-index ran 0 → 1 → 3 → 4 → 6 → 7, which is exactly the "missing frames in
-between" it looked like. Deriving the turn from distance removes the choice, and
-baking its last frame *as* a walk frame removes the seam.
+**3. Setting off is timed, and the gait is held still through it.** This is the
+one place where the authored art forced a design change, and the reasoning
+matters because the obvious answer is wrong in both directions.
 
-Stopping is the same idea run backwards. Releasing the key mid-stride used to
-shut his legs in a single frame, so the gait first runs on to the nearer of the
-two passing poses — at most 6 frames, typically 3, at 26 frames/sec, so under
-0.23 s — and only then hands over to the settle set baked from that very frame.
-The rate is capped at half a frame per tick so the handover is covered by the
-same no-skip bound at any frame rate.
+The synthesised turn was distance-locked, and correctly so: its frames were
+morphs of the front stand onto successive *walk* frames, so his legs walked
+underneath the rotation and the lock kept his feet planted. The artist's three
+turn drawings are the opposite — a rotation **on the spot**, both feet planted.
+Running the gait underneath them slides those planted feet across the floor, and
+at the gait's own rate the three frames cover 66 world px, a sixth of his height.
+
+So the gait is pinned at `WALK_START_FRAME` for a short `TURN_SECONDS`, which
+confines the slide to what he covers while accelerating away — about 27 px.
+
+The old objection to a timed turn was real but is no longer binding: a timed turn
+had to be short enough not to slide his feet *and* long enough to show its frames,
+and at **8** frames no value did both — at 0.08 s and 60 Hz the index ran
+0 → 1 → 3 → 4 → 6 → 7, which is exactly the "missing frames in between" it looked
+like. Three frames need only three ticks, 0.1 s at 30 Hz, so the conflict is gone.
+
+**4. The handoff lands on the right pose, and this is asserted.** Coming out of
+the turn, the character enters the walk at `WALK_START_FRAME = 3` — the frame
+measured closest to the profile stand the last turn drawing leaves him in
+(distance 68.6, inside the walk's own 30–70 frame-step range).
+
+This is the defect the rebuild's first green run hid. The turn advanced the walk
+phase as it played, so the handoff arrived at `(3 + 3) mod 6 = 0` — the pose
+measured **furthest** from the profile stand, at 96.4, the worst of all six —
+while every number in the gate stayed green, because the gate only asked whether
+the gait stepped by one. It now asserts the pose by name.
+
+**5. Stopping runs the same idea backwards.** Releasing the key mid-stride used
+to shut his legs in a single frame, so the gait first runs on to the passing pose
+and only then hands over to the settle set. With a one-step cycle there is
+exactly one such pose, in the middle, so it is reached by the legs *closing* from
+either side and the shorter way round is always taken — see `CLOSE_REWIND_MAX`'s
+removal in `src/config.js`. The rate is capped at half a frame per tick so the
+handover is covered by the same no-skip bound at any frame rate.
 
 `tools/verify_walk.mjs` proves this against the real running game:
 
@@ -320,42 +282,52 @@ node tools/verify_walk.mjs     # in another
 
 It drives Chromium, holds each walk key in turn, samples the displayed frame on
 every render tick, and fails on a missing atlas, any console error, any tick that
-advances the cycle by more than one frame, or any of the 24 frames of either
-direction never being shown. Crucially it collapses the turn and walk sets onto a
-**single gait index**, so the seam between them is checked rather than skipped
-over. It also checks the stand: the character must face the camera on load; the
-closing step must be gap-free and must land on the frame its settle set was baked
-from; and the settle must run through all 8 frames in descending order, ending on
-the front-facing stand, opaque throughout.
+advances the walk or the turn by more than one frame, any of the six walk frames
+or three turn frames of either direction never being shown, a turn frame shown
+after the walk has started, or a walk entered at the wrong pose. It also checks
+the stand: the character must face the camera on load; the closing step must be
+gap-free and must land on the frame its settle set was baked from; and the settle
+must run through all three frames in descending order, ending on the front-facing
+stand, opaque throughout.
 
 ```
-atlas   loaded=true frames=108 (walkRight=24 walkLeft=24 stand=12 turnRight=8 turnLeft=8 stopRight=16 stopLeft=16) sheet=6000x5936
-right   samples=241 4.00s (60.2 fps)  walkFrames=24/24 turnFrames=8/8 maxStepPerTick=1 skips=0 handoffStep=1 minAlpha=1.000 travel=521.3px
-left    samples=241 4.00s (60.2 fps)  walkFrames=24/24 turnFrames=8/8 maxStepPerTick=1 skips=0 handoffStep=1 minAlpha=1.000 travel=-804.6px
-stop R  close=A->7 ticks=18 step=1 handoff=1 | settle ticks=21 frames=8/8 from=7 maxStep=1 wrongWay=0 minAlpha=1.000 end=idleFront_02 turn=0.00
-stop L  close=B->19 ticks=22 step=1 handoff=1 | settle ticks=21 frames=8/8 from=7 maxStep=1 wrongWay=0 minAlpha=1.000 end=idleFront_01 turn=0.00
+atlas   loaded=true frames=25 (walkRight=6 walkLeft=6 stand=1 turnRight=3 turnLeft=3 stopRight=3 stopLeft=3) sheet=2005x2924
+right   samples=241 4.01s (60.2 fps)  walkFrames=6/6 turnFrames=3/3 maxStepPerTick=1 skips=0 turnStep=1 enters=walk_3 minAlpha=1.000 travel=530.8px
+left    samples=241 4.01s (60.1 fps)  walkFrames=6/6 turnFrames=3/3 maxStepPerTick=1 skips=0 turnStep=1 enters=walk_3 minAlpha=1.000 travel=-804.7px
+stop R  close=A->3 ticks=1 step=0 handoff=0 | settle ticks=21 frames=3/3 from=2 maxStep=1 wrongWay=0 minAlpha=1.000 end=idleFront_00 turn=0.00
+stop L  close=A->3 ticks=2 step=0 handoff=0 | settle ticks=21 frames=3/3 from=2 maxStep=1 wrongWay=0 minAlpha=1.000 end=idleFront_00 turn=0.00
 errors  0
 
 PASS  standing, setting off and walking are one gap-free distance-locked sequence
       in both directions, and the character settles back to face the camera.
 ```
 
-**These gates are necessary, not sufficient.** Five separate visual defects —
+**These gates are necessary, not sufficient.** Eight separate visual defects —
 translucent frames, a head that did not turn, a double-exposed face, washed-out
-colour, and a green missing-texture placeholder at his feet — passed every number
-above. They were found by capturing the canvas on every animation frame and
-looking at the result:
+colour, a green missing-texture placeholder at his feet, a character on three
+shoes, a far shoe that read as the near one double-exposed, and a turn that
+handed off to the worst pose in the cycle — passed every number above. They were
+found by capturing the canvas on every animation frame and looking at the result:
 
 ```powershell
-node tools/capture_turn.mjs    # one tile per render tick
-python tools/strip.py          # contact strips of what actually reached the screen
+node tools/capture_walk.mjs    # a whole cycle, both directions, at dpr 3
+node tools/capture_turn.mjs    # one tile per render tick, through a transition
+node tools/capture_stop.mjs    # the closing step, legs cropped, every tick
+node tools/measure_stop.mjs    # how far the planted foot slides while stopping
 ```
 
-The capture tile is sized from the character at runtime, so raising
+Both capture tiles are sized from the character at runtime, so raising
 `CHARACTER_DISPLAY_HEIGHT` cannot quietly start cropping his head out of the
-strip — which is precisely where a mismatch shows first.
+strip — which is precisely where a mismatch shows first. `capture_walk` also
+refuses to pass unless it reached all six frames of the cycle *and* the tile is a
+plausible fraction of the canvas: a strip that silently shows the wrong band of
+the character, or three quarters of the cycle, is worse than no strip at all.
+Both traps are real — the walk is distance-locked, so a run started mid-stage
+stalls against the world bound with a quarter of the cycle unseen, and sizing the
+tile off `canvas.width / camera.width` (which is 1 at zoom 3, not 3) crops a
+chest-high band that looks perfectly clean.
 
-Anything that changes the morph or the transitions should finish there.
+Anything that changes the sprites or the transitions should finish there.
 
 ## The stage
 
@@ -410,159 +382,108 @@ before the frame count grows.
 
 ### Sharpness is capped by the source art
 
-The atlas cannot invent detail the drawings do not contain. Measured figure
-heights in the pinned art:
+The atlas cannot invent detail the drawings do not contain, so what matters is
+how many pixels of figure the source actually holds against how many the panel
+asks for.
 
-| Source | Figure height | Used for | Scale to 650px bake |
+| Source | Figure height | Used for | Scale to the 650px bake |
 |---|---|---|---|
-| `art/avatar-front.png` | 959px | the standing pose | **0.7x — a downscale** |
-| `Walking.png` | 326px | the walk cycle and profile | 2.0x |
-| `Walking2.png` | 180px | the three-quarter turn frames | 3.6x — *now super-resolved, below* |
+| `Frames/*Walk/walk_0*.png` | 645–655px | the walk cycle | **1.0x — no resampling** |
+| `Frames/*Turn/turn_*.png` | 662–678px | the turn and the stand | **1.0x — no resampling** |
 
-Both sheet parsers find their cells by measuring the art rather than assuming a
-grid, so those numbers are what the files actually hold, not an extraction
-artefact.
+This is the single largest quality gain of the rebuild, and it came for free.
+The previous art was a set of sheets whose figures were 326px (`Walking.png`,
+the walk) and 180px (`Walking2.png`, the turn), so the bake was upscaling them
+2.0× and 3.6×. `Frames/` renders each pose at roughly the height it is baked at,
+so the pipeline aligns with **integer pixel shifts only** and never resamples.
 
-This ranking is exactly what the rendered frames look like. The stand is crisp —
-eyes with catchlights, individual beard hairs, a legible crest badge. The walk is
-good. The eight turn frames were visibly softer than either, because ~30px of head
-in the source becomes ~90px in the frame.
+Superseded with it:
 
-Two things that look like they should help, and measurably do not:
+- **The Real-ESRGAN pass.** `tools/upscale_walk2.py` ran Real-ESRGAN x4 over the
+  180px turn art to get it to 720px, because unsharp masking cannot help when the
+  problem is missing information rather than softness — a ~30px head became a
+  ~90px frame. It is no longer in the pipeline. Its one hard-won finding is worth
+  keeping: use **x4plus (23-block)**, not `x4plus_anime_6B`, which erases fabric
+  detail and redraws faces.
+- **The photographic stand.** The stand was baked from the 959px `Avatar.jpg`
+  cut-out because at 180px the `Walking2.png` pose had no eyes left in it. That
+  bought sharpness at the cost of a render mismatch — the stand came from a
+  different pass than everything around it, which is what the "transition between
+  standing and moving is not smooth" complaint was actually about. The stand is
+  now `Frames/RightTurn/turn_0`, from the **same render pass** as the walk and the
+  turn, at full height. The mismatch is fixed at the root rather than blended over.
+- **Breathing.** The old stand was a 12-frame idle with a subtle vertical rise,
+  which read on a large panel as the character drifting up and down. The idle is a
+  single authored frame and is perfectly still.
 
-- *Resampling in linear light instead of gamma.* Correct in principle, worth
-  0.13/255 mean difference here — the art is smooth enough that the gamma error
-  never accumulates.
-- *More unsharp on the upscaled frames.* Rendering one turn frame at 85%, 40% and
-  0% intermediate sharpening produced three indistinguishable images. The
-  softness is missing information, not lost contrast.
-
-`FRAME_SHARPEN` is set to `(2.0, 55, 2)`. The radius tracks one *source* pixel
-measured in frame pixels — 650/326 is very nearly 2 — so it restores detail the
-art actually contains. At radius 1 it instead sharpened the gaps between real
-detail and rang the sleeve and collar edges.
-
-That unsharp pass runs on colour that has first been flood-extended past the
-silhouette to its nearest opaque neighbour, and the original alpha is put back
-untouched. Run naively over straight-alpha art it would read the transparent
-black outside the figure as shadow and cut a dark rim around him.
-
-### The turn frames are super-resolved
-
-Unsharp masking cannot help the turn, because the problem is missing information
-rather than lost contrast. A learned upscaler can, so `tools/upscale_walk2.py`
-runs **Real-ESRGAN x4** over `Walking2.png` once and writes `art/Walking2-x4.png`
-(6144x4096). `walk2_sheet.cutout()` keys each figure out of that sheet when it is
-present, so the turn is baked from a 720px figure instead of a 180px one — a 0.9x
-downscale rather than a 3.6x upscale. The pinned source is never touched, and the
-bake still works without the file.
-
-Two findings cost real time and are worth not repeating:
-
-- **The anime model is the wrong model.** `RealESRGAN_x4plus_anime_6B` is trained
-  on cel and line art. On this stylised 3D render it flattened the face to a
-  cartoon, moved the moustache, and erased both the damask weave and the crest
-  badge. Edge-energy metrics went *up* while the image got worse. The general
-  `RealESRGAN_x4plus` (23 blocks) keeps identity and fabric, and roughly doubles
-  real edge detail — mean `|dx|` 7.8 → 14.0 on a turn figure.
-- **Full strength still ruins the face.** ~30px of head means ~2-3px eyes, so the
-  model does not restore a face, it invents one, and the invention — hollow dark
-  sockets, a smeared lip — reads worse than blur. Head weights of 0.00, 0.35, 0.60
-  and 1.00 were rendered and compared side by side.
-
-`HEAD_SR_WEIGHT = 0.35` over `HEAD_SR_BAND = (0.13, 0.23)` of the figure is the
-result: the head gets a graded 35% of the super-resolved image, ramping to full
-strength below the shoulders. Hair, beard edge and collar sharpen; the face still
-reads as a face. Clothing has no such limit, and the gain there is large — the
-ringing halos and stair-stepping that unsharp used to leave along the waistcoat
-placket are gone, and the buttons are legible.
-
-`basicsr` is deliberately not a dependency: its import chain breaks against
-current torchvision, so `RRDBNet` is written out inline in the tool, and the
-block count is inferred from the checkpoint's `body.N.` keys. The pass needs
-`torch` and takes about nine minutes on CPU. It is skipped when the output
-already exists — delete `art/Walking2-x4.png` to rebuild.
-
-The remaining gap is the face during the first two turn frames. It is better, not
-solved: **re-rendering `Walking2.png` at higher resolution is still the only
-complete fix.**
-
-### The standing pose comes from the photograph
-
-The stand was sourced from `Walking2.png` so that it would match the turn frames
-exactly. At 180px that pose had no eyes left in it — a featureless smear beside a
-walk frame that showed buttons and beard hairs.
-
-It is now baked from `art/avatar-front.png` at 959px, which is a *downscale* and
-therefore the sharpest frame in the atlas. The figure is a closer identity match
-than it first appears: it carries the same damask waistcoat and gold buttons as
-`Walking.png`, where `Walking2.png` has plain green ones. The known cost is
-footwear — the photograph wears strapped sandals and the walk art wears closed
-shoes — which is spent during the first few frames of the turn, where both read
-as dark leather with a tan sole. Measured head height holds at 0.160 of the figure
-in the stand against 0.145 in the walk, and head luminance ramps smoothly from 119
-to 99 across the turn rather than stepping.
-
-`_normalise()` skips its intermediate unsharp below `FRONT_SHARPEN_MIN_SCALE`, so
-the photograph — which is being reduced, not enlarged — is sharpened once at
-output resolution instead of twice.
-
-### Breathing does not lift him off the floor
-
-The idle used to raise the whole body, feet included, by `int(round(lift))` — a
-pixel-quantised levitation that read as a bob. It is now a Gaussian horizontal
-swell across the chest band only (`FRONT_BREATH_SWELL`, `BREATH_CENTRE`,
-`BREATH_SPREAD`), which is sub-pixel smooth and leaves the feet planted.
-Frame-to-frame delta across the stand fell from 9.824 to 2.691.
-
+The remaining sharpness limit is now the source render itself, not the pipeline.
 ## Layout
 
 ```
-Walking.png                    pinned source art (profile walk) — do not modify
-Walking2.png                   pinned source art (three-quarter turn frames)
-Avatar.jpg                     original front-on photo; reference only, not baked
-art/avatar-front.png           pinned cut-out of it; baked as the standing pose
-tools/walk_sheet.py            sheet keying, figure segmentation, landmark measurement
-tools/walk2_sheet.py           Walking2 segmentation and cut-outs, used by the bake
-tools/upscale_walk2.py         Real-ESRGAN x4 pass over Walking2 -> art/Walking2-x4.png
-tools/walk2_analyse.py         proves which Walking2 sequences actually join up
-tools/walk2_phase.py           measures gait phase; proves the walk rows are not a cycle
-tools/build_hero_sprites.py    rig segmentation, gait baking, turn morph, atlas packing
-tools/verify_walk.mjs          headless proof of the smoothness claim
-tools/smoke.mjs                playability check: loads, walks, settles, holds fps
-tools/capture_turn.mjs         per-render-tick canvas capture of a transition
-tools/strip.py                 contact strips from that capture, for looking at
-tools/shot.mjs                 full-screen grabs at 1x and 3x device pixel ratio
-public/assets/hero/hero.png    6000x5936 atlas, 108 frames of 400x742
-public/assets/hero/hero.json   TexturePacker JSON-Array atlas
-public/assets/hero/rig-meta.json  runtime contract (stride, baseline, hitbox, reach)
-src/config.js                  all gameplay tuning constants
-src/Player.js                  distance-locked animation, direction frame sets, turn state
-src/backdrop.js                the character's contact shadow, and the parallax
-                               scenery layers used when SCENERY is on
-src/scenes/                    Boot (load) and Game (world)
+Frames/RightWalk/walk_00…05.png    pinned source art — one step, right — do not modify
+Frames/LeftWalk/walk_00…05.png     pinned source art — the same step, left
+Frames/RightTurn/turn_0…2.png      pinned source art — front -> three-quarter -> profile
+Frames/LeftTurn/turn_0…2.png       pinned source art — the same, to the other side
+tools/frames_source.py             border-flood keying, component keeping, alignment
+tools/build_frames_sprites.py      set alignment, stride measurement, atlas packing
+tools/frame_interp.py              optical-flow in-betweening — REJECTED, kept as record
+tools/verify_walk.mjs              headless proof of the smoothness claim
+tools/smoke.mjs                    playability check: loads, walks, settles, holds fps
+tools/capture_turn.mjs             per-render-tick canvas capture of a transition
+tools/capture_walk.mjs             whole-cycle canvas capture of the walk, both ways, dpr 3
+tools/capture_stop.mjs             per-tick capture of the closing step, legs cropped
+tools/measure_stop.mjs             planted-foot slide while coming to a halt
+tools/strip.py                     contact strips from a capture, for looking at
+tools/shot.mjs                     full-screen grabs at 1x and 3x device pixel ratio
+public/assets/hero/hero.png        2005x2924 atlas, 25 names over 17 images of 401x731
+public/assets/hero/hero.json       TexturePacker JSON-Array atlas
+public/assets/hero/rig-meta.json   runtime contract (stride, baseline, hitbox, reach)
+src/config.js                      all gameplay tuning constants
+src/Player.js                      distance-locked animation, direction frame sets, turn state
+src/backdrop.js                    the character's contact shadow, and the parallax
+                                   scenery layers used when SCENERY is on
+src/scenes/                        Boot (load) and Game (world)
 ```
 
-Frames are named `walkRight_00…23`, `walkLeft_00…23`, `idleFront_00…11`,
-`turnRight_00…07`, `turnLeft_00…07`, and `stopRightA/B_00…07` with their left
-counterparts. In every morph set frame `00` is the front stand and frame `07` is
-a real walk frame — `walk_14` for the turn sets, `walk_07` for the `A` settle
-sets and `walk_19` for the `B` ones.
+Superseded by the rebuild and no longer part of the pipeline: `Walking.png`,
+`Walking2.png`, `Avatar.jpg`, `art/avatar-front.png`, `tools/walk_sheet.py`,
+`tools/walk2_sheet.py`, `tools/walk2_analyse.py`, `tools/walk2_phase.py`,
+`tools/upscale_walk2.py` and `tools/build_hero_sprites.py`. They are kept because
+the measurements quoted above were taken with them.
+
+Frames are named `walkRight_00…05`, `walkLeft_00…05`, `idleFront_00`,
+`turnRight_00…02`, `turnLeft_00…02` and `stopRightA_00…02` with their left
+counterparts — 25 names over 17 distinct images. The settle is the turn in
+reverse under a second name, and frame `00` of both is the idle itself, so
+settling ends on the idle frame pixel-for-pixel.
 
 ## Known scope
 
-- The far arm and far leg are tinted copies of the near ones. In a true profile
-  the far limb is almost entirely occluded, so this reads correctly; it would not
-  survive a three-quarter camera.
-- The morph's middle frames are a warped photograph, not drawn art. In motion
-  they read as a turn; paused and studied, the warping is visible.
+- **`LeftWalk` is a byte-exact horizontal mirror of `RightWalk`.** Walking left
+  therefore puts his waistcoat emblem on the opposite chest, parts his hair the
+  other way and leads with the other hand. The synthesised pipeline deliberately
+  avoided this by baking each direction from its own profile art; the authored
+  art does not offer the choice, because the two walk sets are the same pixels.
+  The two *turn* sets are genuinely different renders, so this affects the walk
+  only. Fixing it needs six more rendered poses.
+- **Six poses per step, where the synthesised rig gave twelve.** Every pose is now
+  a real render rather than a sample of a gait function, but there are half as
+  many of them: the animation shows about 9 poses per second walking instead of
+  18. Cadence and on-screen size are unchanged. In-betweening cannot close the
+  gap — the measurements are under *In-betweening was tried three ways and
+  rejected*.
+- The far arm, far leg and far shoe are crushed almost to black by the source
+  render. In profile that reads correctly, but the far shoe keeps bright
+  speculars, so under heavy magnification against the black stage the far limb can
+  read as a void with highlights in it. Lifting it was measured and rejected —
+  see *The far limb is dark and stays dark*.
+- Setting off holds the gait still for `TURN_SECONDS`, so his feet slide about
+  27 world px while he accelerates away. This is inherent to turning on the spot
+  in authored art and can only be removed by drawing turn frames that walk.
 - Interrupting the settle part-way — releasing the key and pressing it again
-  within about a third of a second, after he has begun coming round — rejoins the
-  turn at the matching body angle, but the legs can be up to a few frames out.
-  Releasing and re-pressing immediately is exact; the partial case is not. Fixing
-  it properly needs a two-dimensional frame family (entry phase × morph step),
-  roughly 190 frames per direction, which was not judged worth it.
-- The turn-in takes about 0.4 s of travel. It is gap-free and locked to the
-  ground, but whether that is the right *feel* has not been judged by a human
-  playing it.
+  after he has begun coming round — rejoins the turn at the matching body angle
+  and pins the gait to the entry pose, so the legs are correct but the body angle
+  jumps by at most one drawing. Releasing and re-pressing immediately is exact.
+- Whether the turn *feels* right at 0.15 s has not been judged by a human playing
+  it, only measured and looked at frame by frame.
 - No jumping, platforms, hazards or collectibles yet — movement first, by design.

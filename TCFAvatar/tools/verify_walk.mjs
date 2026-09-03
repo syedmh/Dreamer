@@ -5,18 +5,18 @@
  * Drives the real game in Chromium, holds a walk key, and samples what the
  * player is showing on every animation tick.
  *
- * Setting off is not a separate animation from walking: `turn<Dir>_i` was baked
- * onto walk frame `WALK_START_FRAME + i`, so the stand, the turn and the walk
- * are one continuous gait sequence driven by one distance-locked quantity. The
- * checks below therefore map both frame sets onto a single gait index and assert
- * continuity across the whole of it, rather than checking the walk and the turn
- * separately and leaving the seam between them untested. The seam was where the
- * frames were going missing.
+ * Coming round from the stand is a separate, timed sequence: the artist's three
+ * turn drawings rotate him on the spot, so they hold no position in the walk
+ * cycle and the gait is pinned still underneath them. The checks below therefore
+ * verify the turn and the walk on their own terms, and then verify the seam
+ * between them explicitly -- the walk must be entered at `WALK_START_FRAME`,
+ * the pose closest to the profile the last turn drawing leaves him in. The seam
+ * is where the frames have gone missing every time.
  *
- * Fails on a missing atlas, any console error, any tick that advances the gait
- * by more than one frame anywhere from standing still to steady walking, any of
- * the 24 frames of either direction never being shown, a settle that skips or
- * reverses, a character that does not end up square to the camera, or a
+ * Fails on a missing atlas, any console error, any tick that advances the walk
+ * or the turn by more than one frame, any of the walk or turn frames of either
+ * direction never being shown, a walk entered in the wrong pose, a settle that
+ * skips or reverses, a character that does not end up square to the camera, or a
  * character that is ever drawn at less than full opacity.
  */
 import { chromium } from 'playwright';
@@ -24,13 +24,18 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 
 const URL = process.env.GAME_URL ?? 'http://127.0.0.1:5173/';
 const OUT = '.build/verify';
-const WALK_FRAMES = 24;
-const STAND_FRAMES = 12;
-const TURN_FRAMES = 8;
-const STOP_FRAMES = 8;
-const STOP_VARIANTS = ['A', 'B'];
-const STOP_TARGETS = [7, 19];
-const WALK_START_FRAME = 7;
+const WALK_FRAMES = 6;
+const STAND_FRAMES = 1;
+const TURN_FRAMES = 3;
+const STOP_FRAMES = 3;
+const STOP_VARIANTS = ['A'];
+const STOP_TARGETS = [3];
+const WALK_START_FRAME = 3;
+/**
+ * Named entries in the atlas, not distinct images. The turn and the settle are
+ * the same three drawings under two names, and their first frame is the idle
+ * itself, so the sheet holds 17 pictures for these 25 names.
+ */
 const ATLAS_FRAMES =
   2 * WALK_FRAMES + STAND_FRAMES + 2 * TURN_FRAMES + 2 * STOP_VARIANTS.length * STOP_FRAMES;
 
@@ -68,57 +73,69 @@ const sample = (page, ms) =>
   );
 
 /**
- * Position in the gait cycle, whichever frame set is on screen.
+ * Which walk frame is on screen, or null if this is not a walk frame.
  *
- * `turn<Dir>_i` is walk frame `WALK_START_FRAME + i` with the front-facing stand
- * morphed over it, so it occupies that slot in the cycle. Collapsing both sets
- * onto one index is what lets the seam between them be checked at all.
+ * The turn is deliberately *not* mapped onto the gait any more. Its three
+ * drawings are a rotation on the spot with both feet planted, so they occupy no
+ * position in the walk cycle at all; the gait is held still underneath them and
+ * resumes at `WALK_START_FRAME`. Folding the two together, as this file used to,
+ * would assert a continuity that the art does not have -- and it hid a real
+ * defect: the handoff was landing on walk frame 0, the pose furthest from the
+ * profile the turn ends on, while every numeric check stayed green.
  */
-const gaitIndex = (frame, dir) => {
-  if (frame.startsWith(`walk${dir}_`)) {
-    return Number(frame.slice(`walk${dir}_`.length));
-  }
-  if (frame.startsWith(`turn${dir}_`)) {
-    return (WALK_START_FRAME + Number(frame.slice(`turn${dir}_`.length))) % WALK_FRAMES;
-  }
-  return null;
-};
+const walkIndex = (frame, dir) =>
+  frame.startsWith(`walk${dir}_`) ? Number(frame.slice(`walk${dir}_`.length)) : null;
+
+const turnIndex = (frame, dir) =>
+  frame.startsWith(`turn${dir}_`) ? Number(frame.slice(`turn${dir}_`.length)) : null;
 
 const analyse = (label, samples, dir) => {
-  // Every sample from the moment he starts moving is part of the gait -- the
-  // turn included. That is the point of the design, and the point of this check.
   const moving = samples.filter(
-    (s) => gaitIndex(s.frame, dir) !== null && Math.abs(s.v) > 6
+    (s) =>
+      Math.abs(s.v) > 6 &&
+      (walkIndex(s.frame, dir) !== null || turnIndex(s.frame, dir) !== null)
   );
   if (moving.length < 60) {
     fail(`${label}: only ${moving.length} moving samples captured`);
     return;
   }
 
-  const idx = moving.map((s) => gaitIndex(s.frame, dir));
-  const walkOnly = moving.filter((s) => s.frame.startsWith(`walk${dir}_`));
-  const seen = new Set(walkOnly.map((s) => Number(s.frame.slice(`walk${dir}_`.length))));
+  // Coming round: must run 0,1,2 without skipping or repeating a frame out of
+  // order, and must be over before the walk starts.
+  const turns = moving.map((s) => turnIndex(s.frame, dir));
+  let lastTurn = -1;
+  let turnStep = 0;
+  let prevTurn = null;
+  for (let i = 0; i < turns.length; i += 1) {
+    const t = turns[i];
+    if (t === null) continue;
+    lastTurn = i;
+    if (prevTurn !== null) turnStep = Math.max(turnStep, t - prevTurn);
+    prevTurn = t;
+  }
+  const turnSeen = new Set(turns.filter((t) => t !== null));
 
+  const walks = moving.map((s) => walkIndex(s.frame, dir));
+  const firstWalk = walks.findIndex((w) => w !== null);
+  const seen = new Set(walks.filter((w) => w !== null));
+
+  // Every tick of the walk itself, once entered.
   let maxStep = 0;
   let jumps = 0;
-  for (let i = 1; i < idx.length; i += 1) {
-    const step = (idx[i] - idx[i - 1] + WALK_FRAMES) % WALK_FRAMES;
-    maxStep = Math.max(maxStep, step);
-    if (step > 1) jumps += 1;
+  let prevWalk = null;
+  for (const w of walks) {
+    if (w === null) continue;
+    if (prevWalk !== null) {
+      const step = (w - prevWalk + WALK_FRAMES) % WALK_FRAMES;
+      maxStep = Math.max(maxStep, step);
+      if (step > 1) jumps += 1;
+    }
+    prevWalk = w;
   }
 
-  // The last turn frame was baked pixel-identical to walk frame
-  // WALK_START_FRAME + TURN_FRAMES - 1, so crossing from one frame set to the
-  // other is an ordinary one-frame step of the gait and nothing else.
-  const handoff = moving.findIndex(
-    (s, i) => i > 0 && s.frame.startsWith(`walk${dir}_`) && moving[i - 1].frame.startsWith(`turn${dir}_`)
-  );
-  const handoffStep =
-    handoff > 0 ? (idx[handoff] - idx[handoff - 1] + WALK_FRAMES) % WALK_FRAMES : null;
-
-  const turnIdx = moving
-    .filter((s) => s.frame.startsWith(`turn${dir}_`))
-    .map((s) => Number(s.frame.slice(`turn${dir}_`.length)));
+  // The turn leaves him in full profile; the gait must be entered at the walk
+  // pose closest to that profile, not wherever the phase happens to have drifted.
+  const handoff = firstWalk >= 0 ? walks[firstWalk] : null;
 
   const worstAlpha = moving.reduce((worst, s) => Math.min(worst, s.alpha), 1);
 
@@ -128,25 +145,34 @@ const analyse = (label, samples, dir) => {
 
   console.log(
     `${label}  samples=${moving.length} ${seconds.toFixed(2)}s (${fps.toFixed(1)} fps)  ` +
-      `walkFrames=${seen.size}/${WALK_FRAMES} turnFrames=${new Set(turnIdx).size}/${TURN_FRAMES} ` +
-      `maxStepPerTick=${maxStep} skips=${jumps} handoffStep=${handoffStep} ` +
+      `walkFrames=${seen.size}/${WALK_FRAMES} turnFrames=${turnSeen.size}/${TURN_FRAMES} ` +
+      `maxStepPerTick=${maxStep} skips=${jumps} turnStep=${turnStep} enters=walk_${handoff} ` +
       `minAlpha=${worstAlpha.toFixed(3)} travel=${travelled.toFixed(1)}px`
   );
 
   if (seen.size !== WALK_FRAMES) {
     fail(`${label}: only ${seen.size}/${WALK_FRAMES} walk frames were ever displayed`);
   }
-  if (new Set(turnIdx).size !== TURN_FRAMES) {
+  if (turnSeen.size !== TURN_FRAMES) {
     fail(
-      `${label}: only ${new Set(turnIdx).size}/${TURN_FRAMES} turn frames were ever displayed ` +
+      `${label}: only ${turnSeen.size}/${TURN_FRAMES} turn frames were ever displayed ` +
         `(setting off skipped frames)`
     );
+  }
+  if (turnStep > 1) {
+    fail(`${label}: turn advanced ${turnStep} frames in one tick (visible jerk)`);
+  }
+  if (lastTurn > firstWalk && firstWalk >= 0) {
+    fail(`${label}: a turn frame was shown after the walk had started`);
   }
   if (maxStep > 1) {
     fail(`${label}: gait advanced ${maxStep} frames in one tick (visible jerk)`);
   }
-  if (handoffStep !== null && handoffStep > 1) {
-    fail(`${label}: turn handed off to the walk ${handoffStep} frames out of step`);
+  if (handoff !== WALK_START_FRAME) {
+    fail(
+      `${label}: turn handed off to walk_${handoff}, not walk_${WALK_START_FRAME} ` +
+        `-- he enters the gait in the wrong pose for the profile the turn leaves him in`
+    );
   }
   if (worstAlpha < 1) {
     fail(`${label}: character was drawn at alpha ${worstAlpha} -- it must stay opaque`);
