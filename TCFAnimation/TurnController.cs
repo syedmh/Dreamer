@@ -146,6 +146,29 @@ public partial class TurnController : Node2D
             return;
         }
 
+        bool toggleFullscreen =
+            keyEvent.PhysicalKeycode == Key.F11
+            || (
+                keyEvent.PhysicalKeycode == Key.Enter
+                && keyEvent.AltPressed
+            );
+        if (toggleFullscreen)
+        {
+            ToggleFullscreen();
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
+        if (
+            keyEvent.PhysicalKeycode == Key.Escape
+            && IsFullscreen()
+        )
+        {
+            DisplayServer.WindowSetMode(DisplayServer.WindowMode.Windowed);
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
         if (keyEvent.PhysicalKeycode == Key.X)
         {
             bool stateChanged = _turn.TryToggleCrossArms(
@@ -205,6 +228,22 @@ public partial class TurnController : Node2D
         GD.Print(
             FormattableString.Invariant(
                 $"WALK_SPEED multiplier={_walkSpeedMultiplier:0.00}x movement={movementSpeed:0.##}px/s walk_fps={walkFps:0.##}"));
+    }
+
+    private static bool IsFullscreen()
+    {
+        DisplayServer.WindowMode mode = DisplayServer.WindowGetMode();
+        return mode is
+            DisplayServer.WindowMode.Fullscreen
+            or DisplayServer.WindowMode.ExclusiveFullscreen;
+    }
+
+    private static void ToggleFullscreen()
+    {
+        DisplayServer.WindowSetMode(
+            IsFullscreen()
+                ? DisplayServer.WindowMode.Windowed
+                : DisplayServer.WindowMode.Fullscreen);
     }
 
     private static void LoadFrames(string directory, Texture2D[] destination)

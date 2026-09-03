@@ -54,6 +54,14 @@ public partial class DialogueUi : CanvasLayer
             return;
         }
 
+        if (
+            keyEvent.PhysicalKeycode == Key.Enter
+            && keyEvent.AltPressed
+        )
+        {
+            return;
+        }
+
         DialogueKey key = keyEvent.PhysicalKeycode switch
         {
             Key.Enter => DialogueKey.Enter,

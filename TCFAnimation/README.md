@@ -19,6 +19,10 @@ full path from another working directory.
 
 ## Controls
 
+- Press **F11** or **Alt+Enter** while text entry is closed to toggle
+  fullscreen mode. Press **Escape** in fullscreen to return to windowed mode.
+  Fullscreen shortcuts are ignored while typing so Enter and Escape retain
+  their dialogue behavior.
 - Press **physical Enter** while text entry is closed to open a focused,
   bottom-right message field. Type ordinary text, then press **Enter** to
   submit or **Escape** to cancel without changing the current speech bubble.
