@@ -404,11 +404,16 @@ def write_png(path: Path, image: np.ndarray) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description=(
+            "Generate only the three left-turn and three right-turn runtime "
+            "frames."
+        )
+    )
     parser.add_argument(
         "--evidence",
         action="store_true",
-        help="also refresh the six-frame mission contact sheet",
+        help="also refresh the six-frame directional-turn contact sheet",
     )
     args = parser.parse_args()
 
