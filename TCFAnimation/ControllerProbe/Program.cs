@@ -17,6 +17,8 @@ RunDialogueLayoutCases();
 RunCaptureRootCases();
 RunCapturePathCases();
 RunGlobalInputCases();
+RunSchoolGeometryCases();
+RunSchoolSceneCases();
 
 Console.WriteLine(
     $"CONTROLLER_PROBE_PASS assertions={ProbeAssertions.Count} "
@@ -34,8 +36,1006 @@ Console.WriteLine(
     + "cross_arm_direction_lock=true dialogue_input=true "
     + "dialogue_layout=true global_input=true "
     + "capture_root=true "
-    + "fixed_runtime_frames=33 wave_assets=false");
+    + "school_geometry=all_6 school_choreography=all_6 "
+    + "school_ids=1..6 invalid_ids=-1,0,7 "
+    + "school_switching=serialized dialogue_digits=true "
+    + "school_preposition_full_span_seconds=6 "
+    + "school_entry_seconds=8 school_clap_seconds=10 "
+    + "school_exit_seconds=8 entry_direction=right_to_left "
+    + "fixed_runtime_frames=33 school_overlay_frames=33 "
+    + "wave_assets=false");
 return;
+
+static void RunSchoolGeometryCases()
+{
+    foreach (int schoolNumber in Enumerable.Range(1, 6))
+    {
+        (float sourceWidth, float sourceHeight) =
+            SchoolSourceSize(schoolNumber);
+        SchoolBackgroundLayout layout = SchoolLayout(schoolNumber);
+        AssertTrue(
+            $"school {schoolNumber} 1920x1080 cover has no gaps",
+            layout.DisplayWidth + 0.001f >= 1920.0f
+            && layout.DisplayHeight + 0.001f >= 1080.0f);
+        AssertNear(
+            $"school {schoolNumber} aspect ratio preserved",
+            layout.DisplayWidth / layout.DisplayHeight,
+            sourceWidth / sourceHeight,
+            0.0001);
+        AssertNear(
+            $"school {schoolNumber} center x",
+            layout.CenterX,
+            960.0,
+            0.001);
+        AssertNear(
+            $"school {schoolNumber} off-left right edge",
+            layout.OffscreenLeftX + layout.DisplayWidth / 2.0f,
+            0.0,
+            0.001);
+        AssertNear(
+            $"school {schoolNumber} off-right left edge",
+            layout.OffscreenRightX - layout.DisplayWidth / 2.0f,
+            1920.0,
+            0.001);
+        float entryStartX =
+            SchoolSceneGeometry.BackgroundCenterX(layout, 1.0);
+        float entryMidX =
+            SchoolSceneGeometry.BackgroundCenterX(layout, 0.5);
+        float entryEndX =
+            SchoolSceneGeometry.BackgroundCenterX(layout, 0.0);
+        AssertTrue(
+            $"school {schoolNumber} entry and exit are monotonic",
+            entryStartX > entryMidX
+            && entryMidX > entryEndX
+            && entryEndX < entryMidX
+            && entryMidX < entryStartX);
+        AssertTrue(
+            $"school {schoolNumber} right endpoint is fully hidden",
+            entryStartX == layout.OffscreenRightX
+            && entryStartX - layout.DisplayWidth / 2.0f + 0.001f
+                >= 1920.0f);
+    }
+
+    AssertThrows<ArgumentOutOfRangeException>(
+        "school cover rejects zero viewport",
+        () => SchoolSceneGeometry.CalculateAspectCover(
+            0.0f,
+            1080.0f,
+            1908.0f,
+            824.0f));
+    AssertThrows<ArgumentOutOfRangeException>(
+        "school cover rejects invalid texture",
+        () => SchoolSceneGeometry.CalculateAspectCover(
+            1920.0f,
+            1080.0f,
+            float.NaN,
+            824.0f));
+    SchoolBackgroundLayout validationLayout = SchoolLayout(1);
+    AssertThrows<ArgumentOutOfRangeException>(
+        "school right-offset rejects progress above one",
+        () => SchoolSceneGeometry.BackgroundCenterX(
+            validationLayout,
+            1.01));
+    AssertThrows<ArgumentOutOfRangeException>(
+        "school right-offset rejects negative progress",
+        () => SchoolSceneGeometry.BackgroundCenterX(
+            validationLayout,
+            -0.01));
+}
+
+static void RunSchoolSceneCases()
+{
+    SchoolBackgroundLayout school1Layout = SchoolLayout(1);
+    SchoolSceneStateMachine scene = new();
+    AssertEqual(
+        "school starts in normal black",
+        scene.Phase,
+        SchoolScenePhase.NormalBlack);
+    AssertTrue(
+        "normal black enables normal controls",
+        scene.CanUseNormalTurnControls
+        && !scene.SuppressesOrdinaryInput
+        && !scene.IsSchoolVisible);
+    AssertNear(
+        "pre-position full-span timing is explicit",
+        SchoolSceneStateMachine.CharacterPrePositionFullSpanDurationSeconds,
+        6.0,
+        0.000001);
+    AssertTrue(
+        "released 1 is ignored",
+        !scene.TryStartEntry(
+            1,
+            school1Layout,
+            pressed: false,
+            echo: false,
+            dialogueEditing: false,
+            currentCharacterProgress: 0.5));
+    AssertTrue(
+        "echoed 1 is ignored",
+        !scene.TryStartEntry(
+            1,
+            school1Layout,
+            pressed: true,
+            echo: true,
+            dialogueEditing: false,
+            currentCharacterProgress: 0.5));
+    AssertTrue(
+        "1 remains typeable in dialogue",
+        !scene.TryStartEntry(
+            1,
+            school1Layout,
+            pressed: true,
+            echo: false,
+            dialogueEditing: true,
+            currentCharacterProgress: 0.5));
+
+    AssertTrue(
+        "key1 from center starts left pre-position",
+        scene.TryStartEntry(
+            1,
+            school1Layout,
+            pressed: true,
+            echo: false,
+            dialogueEditing: false,
+            currentCharacterProgress: 0.5));
+    AssertEqual(
+        "school entry preparation phase",
+        scene.Phase,
+        SchoolScenePhase.PreparingEntryLeft);
+    AssertTrue(
+        "entry preparation suppresses ordinary input on black",
+        scene.SuppressesOrdinaryInput
+        && !scene.IsSchoolVisible
+        && !scene.UsesTransparentCharacter
+        && scene.CharacterAnimation
+            == SchoolCharacterAnimation.WalkLeft);
+    AssertNear(
+        "entry preparation keeps background off-right",
+        scene.BackgroundRightOffsetProgress,
+        1.0,
+        0.000001);
+    AssertNear(
+        "entry preparation starts character center",
+        scene.CharacterProgress,
+        0.5,
+        0.000001);
+    AssertNear(
+        "center to left preparation duration is half span",
+        scene.CurrentPhaseDurationSeconds,
+        3.0,
+        0.000001);
+    AssertTrue(
+        "1 ignored during entry preparation",
+        !scene.TryStartEntry(
+            2,
+            SchoolLayout(2),
+            pressed: true,
+            echo: false,
+            dialogueEditing: false,
+            currentCharacterProgress: 0.5));
+
+    scene.Advance(1.5);
+    AssertNear(
+        "entry preparation walks left visibly",
+        scene.CharacterProgress,
+        0.25,
+        0.000001);
+    AssertNear(
+        "entry preparation background remains hidden off-right",
+        scene.BackgroundRightOffsetProgress,
+        1.0,
+        0.000001);
+    scene.Advance(1.5);
+    AssertEqual(
+        "entry preparation completes into entry",
+        scene.Phase,
+        SchoolScenePhase.Entering);
+    AssertNear(
+        "entry begins at calibrated left",
+        scene.CharacterProgress,
+        0.0,
+        0.000001);
+    AssertNear(
+        "entry begins with background offscreen right",
+        scene.BackgroundRightOffsetProgress,
+        1.0,
+        0.000001);
+
+    SchoolSceneStateMachine leftReady = new();
+    AssertTrue(
+        "key1 from left enters immediately",
+        leftReady.TryStartEntry(
+            1,
+            school1Layout,
+            true,
+            false,
+            false,
+            currentCharacterProgress: 0.0));
+    AssertEqual(
+        "left-ready key1 skips preparation",
+        leftReady.Phase,
+        SchoolScenePhase.Entering);
+
+    SchoolSceneStateMachine rightStart = new();
+    AssertTrue(
+        "key1 from right starts full left pre-position",
+        rightStart.TryStartEntry(
+            1,
+            school1Layout,
+            true,
+            false,
+            false,
+            currentCharacterProgress: 1.0));
+    AssertEqual(
+        "right-start key1 uses left walk on black",
+        rightStart.CharacterAnimation,
+        SchoolCharacterAnimation.WalkLeft);
+    AssertNear(
+        "right-start key1 uses full six-second preparation",
+        rightStart.CurrentPhaseDurationSeconds,
+        6.0,
+        0.000001);
+    rightStart.Advance(3.0);
+    AssertNear(
+        "right-start key1 reaches midpoint without background",
+        rightStart.CharacterProgress,
+        0.5,
+        0.000001);
+    AssertTrue(
+        "right-start key1 keeps school hidden",
+        !rightStart.IsSchoolVisible);
+
+    double priorEntryBackground =
+        scene.BackgroundRightOffsetProgress;
+    scene.Advance(4.0);
+    AssertNear(
+        "entry background synchronized midpoint",
+        scene.BackgroundRightOffsetProgress,
+        0.5,
+        0.000001);
+    AssertNear(
+        "entry character synchronized midpoint",
+        scene.CharacterProgress,
+        0.5,
+        0.000001);
+    AssertTrue(
+        "entry background progress decreases while avatar increases",
+        scene.BackgroundRightOffsetProgress < priorEntryBackground
+        && scene.CharacterProgress > 0.0);
+    AssertEqual(
+        "entry uses six-frame walk cadence",
+        scene.CurrentAnimationFrame,
+        0);
+
+    scene.Advance(4.0);
+    AssertEqual(
+        "entry completion starts clap immediately",
+        scene.Phase,
+        SchoolScenePhase.Clapping);
+    AssertNear(
+        "entry completion centers background",
+        scene.BackgroundRightOffsetProgress,
+        0.0,
+        0.000001);
+    AssertNear(
+        "entry completion places character right",
+        scene.CharacterProgress,
+        1.0,
+        0.000001);
+    AssertEqual(
+        "clap starts at exact first frame",
+        scene.CurrentAnimationFrame,
+        0);
+
+    for (
+        int step = 1;
+        step < DirectionalTurnStateMachine.ClapPlaybackStepCount * 2;
+        step++
+    )
+    {
+        scene.Advance(
+            1.0 / DirectionalTurnStateMachine.ClapAnimationFps);
+        AssertEqual(
+            $"school repeated clap frame step {step}",
+            scene.CurrentAnimationFrame,
+            DirectionalTurnStateMachine.GetClapFrameForStep(
+                step
+                % DirectionalTurnStateMachine.ClapPlaybackStepCount));
+    }
+
+    SchoolSceneStateMachine exactClap = new();
+    exactClap.TryStartEntry(1, school1Layout, true, false, false, 0.0);
+    exactClap.Advance(SchoolSceneStateMachine.EntryDurationSeconds);
+    exactClap.Advance(
+        SchoolSceneStateMachine.ClapDurationSeconds - 0.001);
+    AssertEqual(
+        "school clap remains active before ten seconds",
+        exactClap.Phase,
+        SchoolScenePhase.Clapping);
+    exactClap.Advance(0.001);
+    AssertEqual(
+        "school clap returns front at exactly ten seconds",
+        exactClap.Phase,
+        SchoolScenePhase.SchoolIdle);
+    AssertTrue(
+        "school idle restores ordinary controls but ignores 1",
+        exactClap.CanUseNormalTurnControls
+        && !exactClap.SuppressesOrdinaryInput
+        && !exactClap.TryStartEntry(
+            2,
+            SchoolLayout(2),
+            true,
+            false,
+            false,
+            1.0)
+        && exactClap.SelectedSchoolNumber == 1);
+
+    SchoolSceneStateMachine interruptedClap = new();
+    interruptedClap.TryStartEntry(
+        1,
+        school1Layout,
+        true,
+        false,
+        false,
+        0.0);
+    interruptedClap.Advance(
+        SchoolSceneStateMachine.EntryDurationSeconds + 2.0);
+    AssertTrue(
+        "echoed 0 is ignored",
+        !interruptedClap.TryStartExit(
+            pressed: true,
+            echo: true,
+            dialogueEditing: false,
+            currentCharacterProgress: 1.0));
+    AssertTrue(
+        "0 remains typeable in dialogue",
+        !interruptedClap.TryStartExit(
+            pressed: true,
+            echo: false,
+            dialogueEditing: true,
+            currentCharacterProgress: 1.0));
+    AssertTrue(
+        "released 0 is ignored",
+        !interruptedClap.TryStartExit(
+            pressed: false,
+            echo: false,
+            dialogueEditing: false,
+            currentCharacterProgress: 1.0));
+    AssertTrue(
+        "0 interrupts clap and exits immediately when already right",
+        interruptedClap.TryStartExit(
+            pressed: true,
+            echo: false,
+            dialogueEditing: false,
+            currentCharacterProgress: 1.0));
+    AssertEqual(
+        "right-ready key0 skips exit preparation",
+        interruptedClap.Phase,
+        SchoolScenePhase.Exiting);
+    AssertEqual(
+        "clap interruption enters left walk",
+        interruptedClap.CharacterAnimation,
+        SchoolCharacterAnimation.WalkLeft);
+    AssertNear(
+        "full school exit lasts eight seconds",
+        interruptedClap.ExitDurationSeconds,
+        SchoolSceneStateMachine.ExitTravelDurationSeconds,
+        0.000001);
+    interruptedClap.Advance(4.0);
+    AssertNear(
+        "exit background midpoint",
+        interruptedClap.BackgroundRightOffsetProgress,
+        0.5,
+        0.000001);
+    AssertNear(
+        "exit character midpoint",
+        interruptedClap.CharacterProgress,
+        0.5,
+        0.000001);
+    interruptedClap.Advance(4.0);
+    AssertEqual(
+        "exit completes to crossing",
+        interruptedClap.Phase,
+        SchoolScenePhase.CrossingFinal);
+    AssertTrue(
+        "exit completion is pure black",
+        !interruptedClap.IsSchoolVisible
+        && !interruptedClap.UsesTransparentCharacter);
+    AssertNear(
+        "exit background fully right",
+        interruptedClap.BackgroundRightOffsetProgress,
+        1.0,
+        0.000001);
+    AssertNear(
+        "exit character at calibrated left",
+        interruptedClap.CharacterProgress,
+        0.0,
+        0.000001);
+    AssertEqual(
+        "auto cross starts frame zero",
+        interruptedClap.CurrentAnimationFrame,
+        0);
+    interruptedClap.Advance(0.125);
+    AssertEqual(
+        "auto cross advances frame one",
+        interruptedClap.CurrentAnimationFrame,
+        1);
+    interruptedClap.Advance(0.125);
+    AssertEqual(
+        "auto cross advances frame two",
+        interruptedClap.CurrentAnimationFrame,
+        2);
+    interruptedClap.Advance(0.125);
+    AssertEqual(
+        "auto cross holds final frame",
+        interruptedClap.Phase,
+        SchoolScenePhase.BlackCrossHold);
+    AssertEqual(
+        "auto cross hold pins cross 02",
+        interruptedClap.CurrentAnimationFrame,
+        2);
+
+    AssertTrue(
+        "1 auto-releases final cross hold",
+        interruptedClap.TryStartEntry(
+            6,
+            SchoolLayout(6),
+            true,
+            false,
+            false,
+            0.0));
+    AssertEqual(
+        "re-entry replaces selected school identity",
+        interruptedClap.SelectedSchoolNumber,
+        6);
+    AssertEqual(
+        "re-entry begins with release",
+        interruptedClap.Phase,
+        SchoolScenePhase.ReleasingForEntry);
+    interruptedClap.Advance(
+        DirectionalTurnStateMachine.CrossArmReleaseFrameCount
+        / DirectionalTurnStateMachine.CrossArmReleaseAnimationFps);
+    AssertEqual(
+        "left-held re-entry starts immediately after complete release",
+        interruptedClap.Phase,
+        SchoolScenePhase.Entering);
+    AssertNear(
+        "re-entry restarts off-right",
+        interruptedClap.BackgroundRightOffsetProgress,
+        1.0,
+        0.000001);
+
+    SchoolSceneStateMachine existingCrossAtRight = new();
+    AssertTrue(
+        "key1 releases an existing normal-black cross hold",
+        existingCrossAtRight.TryStartEntry(
+            3,
+            SchoolLayout(3),
+            true,
+            false,
+            false,
+            currentCharacterProgress: 0.75,
+            existingCrossHold: true));
+    existingCrossAtRight.Advance(
+        DirectionalTurnStateMachine.CrossArmReleaseFrameCount
+        / DirectionalTurnStateMachine.CrossArmReleaseAnimationFps);
+    AssertEqual(
+        "existing hold release continues into left pre-position",
+        existingCrossAtRight.Phase,
+        SchoolScenePhase.PreparingEntryLeft);
+    AssertNear(
+        "existing hold keeps its character position through release",
+        existingCrossAtRight.CharacterProgress,
+        0.75,
+        0.000001);
+
+    SchoolSceneStateMachine prepareExit = new();
+    prepareExit.SetDevelopmentSnapshot(
+        1,
+        school1Layout,
+        SchoolSceneSnapshot.EntryEnd);
+    AssertTrue(
+        "key0 from left-side school idle prepares right first",
+        prepareExit.TryStartExit(true, false, false, 0.25));
+    AssertEqual(
+        "key0 enters right preparation",
+        prepareExit.Phase,
+        SchoolScenePhase.PreparingExitRight);
+    AssertTrue(
+        "exit preparation holds visible centered school",
+        prepareExit.IsSchoolVisible
+        && prepareExit.UsesTransparentCharacter
+        && prepareExit.CharacterAnimation
+            == SchoolCharacterAnimation.WalkRight);
+    AssertNear(
+        "exit preparation duration scales remaining character distance",
+        prepareExit.CurrentPhaseDurationSeconds,
+        4.5,
+        0.000001);
+    prepareExit.Advance(2.25);
+    AssertNear(
+        "exit preparation walks toward right",
+        prepareExit.CharacterProgress,
+        0.625,
+        0.000001);
+    AssertNear(
+        "exit preparation holds centered background",
+        prepareExit.BackgroundRightOffsetProgress,
+        0.0,
+        0.000001);
+    prepareExit.Advance(2.25);
+    AssertEqual(
+        "centered background exits after right preparation",
+        prepareExit.Phase,
+        SchoolScenePhase.Exiting);
+
+    SchoolSceneStateMachine reversed = new();
+    reversed.TryStartEntry(1, school1Layout, true, false, false, 0.0);
+    reversed.Advance(2.0);
+    AssertNear(
+        "partial entry has expected background progress",
+        reversed.BackgroundRightOffsetProgress,
+        0.75,
+        0.000001);
+    AssertNear(
+        "partial entry has expected character progress",
+        reversed.CharacterProgress,
+        0.25,
+        0.000001);
+    AssertTrue(
+        "0 reconciles an in-progress entry",
+        reversed.TryStartExit(true, false, false, 0.25));
+    AssertEqual(
+        "partial entry first prepares avatar right",
+        reversed.Phase,
+        SchoolScenePhase.PreparingExitRight);
+    AssertNear(
+        "partial entry background does not snap on 0",
+        reversed.BackgroundRightOffsetProgress,
+        0.75,
+        0.000001);
+    reversed.Advance(2.25);
+    AssertNear(
+        "partial entry background remains held during right preparation",
+        reversed.BackgroundRightOffsetProgress,
+        0.75,
+        0.000001);
+    AssertNear(
+        "partial entry avatar visibly moves right during preparation",
+        reversed.CharacterProgress,
+        0.625,
+        0.000001);
+    reversed.Advance(2.25);
+    AssertEqual(
+        "partial entry normalizes background after avatar reaches right",
+        reversed.Phase,
+        SchoolScenePhase.NormalizingExitBackground);
+    AssertNear(
+        "normalization starts without background teleport",
+        reversed.BackgroundRightOffsetProgress,
+        0.75,
+        0.000001);
+    AssertNear(
+        "normalization holds avatar at right",
+        reversed.CharacterProgress,
+        1.0,
+        0.000001);
+    AssertNear(
+        "normalization preserves entry background speed",
+        reversed.CurrentPhaseDurationSeconds,
+        6.0,
+        0.000001);
+    reversed.Advance(3.0);
+    AssertNear(
+        "normalization moves background smoothly toward center",
+        reversed.BackgroundRightOffsetProgress,
+        0.375,
+        0.000001);
+    reversed.Advance(3.0);
+    AssertEqual(
+        "normalization completes into synchronized exit",
+        reversed.Phase,
+        SchoolScenePhase.Exiting);
+    AssertNear(
+        "normalized exit starts centered",
+        reversed.BackgroundRightOffsetProgress,
+        0.0,
+        0.000001);
+    reversed.Advance(4.0);
+    AssertNear(
+        "reconciled exit background moves right",
+        reversed.BackgroundRightOffsetProgress,
+        0.5,
+        0.000001);
+    AssertNear(
+        "reconciled exit avatar moves left",
+        reversed.CharacterProgress,
+        0.5,
+        0.000001);
+
+    SchoolSceneStateMachine released = new();
+    released.SetDevelopmentSnapshot(
+        4,
+        SchoolLayout(4),
+        SchoolSceneSnapshot.FinalCrossHold);
+    AssertTrue(
+        "X semantics release final cross hold",
+        released.TryReleaseFinalCrossHold(true, false, false));
+    released.Advance(
+        DirectionalTurnStateMachine.CrossArmReleaseFrameCount
+        / DirectionalTurnStateMachine.CrossArmReleaseAnimationFps);
+    AssertEqual(
+        "X release returns to normal black",
+        released.Phase,
+        SchoolScenePhase.NormalBlack);
+    AssertTrue(
+        "normal black clears selected school identity and geometry",
+        released.SelectedSchoolNumber is null
+        && released.SelectedBackgroundLayout is null);
+
+    SchoolSceneStateMachine largeDelta = new();
+    largeDelta.TryStartEntry(
+        1,
+        school1Layout,
+        true,
+        false,
+        false,
+        1.0);
+    largeDelta.Advance(1000.0);
+    AssertEqual(
+        "large delta stops deterministically at school idle",
+        largeDelta.Phase,
+        SchoolScenePhase.SchoolIdle);
+    AssertThrows<ArgumentOutOfRangeException>(
+        "school rejects negative delta",
+        () => largeDelta.Advance(-0.001));
+    AssertThrows<ArgumentOutOfRangeException>(
+        "school rejects NaN delta",
+        () => largeDelta.Advance(double.NaN));
+    AssertThrows<ArgumentOutOfRangeException>(
+        "school exit rejects invalid character progress",
+        () =>
+        {
+            SchoolSceneStateMachine invalid = new();
+            invalid.TryStartEntry(
+                1,
+                school1Layout,
+                true,
+                false,
+                false,
+                0.0);
+            invalid.TryStartExit(true, false, false, double.PositiveInfinity);
+        });
+    AssertThrows<ArgumentOutOfRangeException>(
+        "school entry rejects invalid character progress",
+        () =>
+        {
+            SchoolSceneStateMachine invalid = new();
+            invalid.TryStartEntry(
+                1,
+                school1Layout,
+                true,
+                false,
+                false,
+                double.NaN);
+        });
+    SchoolSceneStateMachine largeInterruptedExit = new();
+    largeInterruptedExit.TryStartEntry(
+        1,
+        school1Layout,
+        true,
+        false,
+        false,
+        0.0);
+    largeInterruptedExit.Advance(2.0);
+    largeInterruptedExit.TryStartExit(true, false, false, 0.25);
+    largeInterruptedExit.Advance(1000.0);
+    AssertEqual(
+        "large delta completes reconciled exit deterministically",
+        largeInterruptedExit.Phase,
+        SchoolScenePhase.BlackCrossHold);
+    AssertNear(
+        "large reconciled exit ends with background off-right",
+        largeInterruptedExit.BackgroundRightOffsetProgress,
+        1.0,
+        0.000001);
+    AssertNear(
+        "large reconciled exit ends with avatar left",
+        largeInterruptedExit.CharacterProgress,
+        0.0,
+        0.000001);
+
+    (SchoolSceneSnapshot Snapshot, SchoolScenePhase Phase,
+        double Background, double Character,
+        SchoolCharacterAnimation Animation, bool Visible)[] snapshots =
+    [
+        (
+            SchoolSceneSnapshot.EntryPreparationMid,
+            SchoolScenePhase.PreparingEntryLeft,
+            1.0,
+            0.5,
+            SchoolCharacterAnimation.WalkLeft,
+            false
+        ),
+        (
+            SchoolSceneSnapshot.EntryPreparationComplete,
+            SchoolScenePhase.PreparingEntryLeft,
+            1.0,
+            0.0,
+            SchoolCharacterAnimation.WalkLeft,
+            false
+        ),
+        (
+            SchoolSceneSnapshot.EntryStart,
+            SchoolScenePhase.Entering,
+            1.0,
+            0.0,
+            SchoolCharacterAnimation.WalkRight,
+            true
+        ),
+        (
+            SchoolSceneSnapshot.EntryMid,
+            SchoolScenePhase.Entering,
+            0.5,
+            0.5,
+            SchoolCharacterAnimation.WalkRight,
+            true
+        ),
+        (
+            SchoolSceneSnapshot.EntryEnd,
+            SchoolScenePhase.SchoolIdle,
+            0.0,
+            1.0,
+            SchoolCharacterAnimation.Normal,
+            true
+        ),
+        (
+            SchoolSceneSnapshot.ExitPreparationMid,
+            SchoolScenePhase.PreparingExitRight,
+            0.0,
+            0.5,
+            SchoolCharacterAnimation.WalkRight,
+            true
+        ),
+        (
+            SchoolSceneSnapshot.ExitNormalizationMid,
+            SchoolScenePhase.NormalizingExitBackground,
+            0.375,
+            1.0,
+            SchoolCharacterAnimation.Normal,
+            true
+        ),
+        (
+            SchoolSceneSnapshot.ExitMid,
+            SchoolScenePhase.Exiting,
+            0.5,
+            0.5,
+            SchoolCharacterAnimation.WalkLeft,
+            true
+        ),
+        (
+            SchoolSceneSnapshot.ExitEnd,
+            SchoolScenePhase.CrossingFinal,
+            1.0,
+            0.0,
+            SchoolCharacterAnimation.CrossArm,
+            false
+        ),
+        (
+            SchoolSceneSnapshot.FinalCrossHold,
+            SchoolScenePhase.BlackCrossHold,
+            1.0,
+            0.0,
+            SchoolCharacterAnimation.CrossArm,
+            false
+        ),
+    ];
+    foreach (var snapshot in snapshots)
+    {
+        SchoolSceneStateMachine captured = new();
+        captured.SetDevelopmentSnapshot(
+            5,
+            SchoolLayout(5),
+            snapshot.Snapshot);
+        AssertEqual(
+            $"school snapshot {snapshot.Snapshot} phase",
+            captured.Phase,
+            snapshot.Phase);
+        AssertNear(
+            $"school snapshot {snapshot.Snapshot} background",
+            captured.BackgroundRightOffsetProgress,
+            snapshot.Background,
+            0.000001);
+        AssertNear(
+            $"school snapshot {snapshot.Snapshot} character",
+            captured.CharacterProgress,
+            snapshot.Character,
+            0.000001);
+        AssertEqual(
+            $"school snapshot {snapshot.Snapshot} animation",
+            captured.CharacterAnimation,
+            snapshot.Animation);
+        AssertEqual(
+            $"school snapshot {snapshot.Snapshot} visibility",
+            captured.IsSchoolVisible,
+            snapshot.Visible);
+        AssertEqual(
+            $"school snapshot {snapshot.Snapshot} identity",
+            captured.SelectedSchoolNumber,
+            5);
+        AssertTrue(
+            $"school snapshot {snapshot.Snapshot} suppresses ordinary input",
+            captured.SuppressesOrdinaryInput
+            || snapshot.Phase
+                is SchoolScenePhase.SchoolIdle
+                or SchoolScenePhase.BlackCrossHold);
+    }
+
+    foreach (int schoolNumber in Enumerable.Range(1, 6))
+    {
+        VerifyCompleteSchoolSequence(schoolNumber);
+    }
+    VerifyPartialEntryGeometryDoesNotSnap(1);
+    VerifyPartialEntryGeometryDoesNotSnap(2);
+
+    foreach (int invalidSchoolNumber in new[] { -1, 0, 7 })
+    {
+        AssertThrows<ArgumentOutOfRangeException>(
+            $"school rejects invalid selection {invalidSchoolNumber}",
+            () => new SchoolSceneStateMachine().TryStartEntry(
+                invalidSchoolNumber,
+                school1Layout,
+                true,
+                false,
+                false,
+                0.0));
+    }
+}
+
+static (float Width, float Height) SchoolSourceSize(int schoolNumber)
+{
+    return schoolNumber switch
+    {
+        1 => (1908.0f, 824.0f),
+        2 => (1536.0f, 1024.0f),
+        3 or 4 or 5 or 6 => (1540.0f, 1021.0f),
+        _ => throw new ArgumentOutOfRangeException(nameof(schoolNumber)),
+    };
+}
+
+static SchoolBackgroundLayout SchoolLayout(int schoolNumber)
+{
+    (float width, float height) = SchoolSourceSize(schoolNumber);
+    return SchoolSceneGeometry.CalculateAspectCover(
+        1920.0f,
+        1080.0f,
+        width,
+        height);
+}
+
+static void VerifyCompleteSchoolSequence(int schoolNumber)
+{
+    SchoolBackgroundLayout layout = SchoolLayout(schoolNumber);
+    SchoolSceneStateMachine scene = new();
+    AssertTrue(
+        $"school {schoolNumber} starts from black",
+        scene.TryStartEntry(
+            schoolNumber,
+            layout,
+            true,
+            false,
+            false,
+            0.5));
+    AssertEqual(
+        $"school {schoolNumber} selected during preparation",
+        scene.SelectedSchoolNumber,
+        schoolNumber);
+    AssertNear(
+        $"school {schoolNumber} uses selected hidden-right geometry",
+        scene.CurrentBackgroundCenterX,
+        layout.OffscreenRightX,
+        0.001);
+    scene.Advance(3.0);
+    AssertEqual(
+        $"school {schoolNumber} enters after preparation",
+        scene.Phase,
+        SchoolScenePhase.Entering);
+    scene.Advance(SchoolSceneStateMachine.EntryDurationSeconds);
+    AssertEqual(
+        $"school {schoolNumber} reaches clap",
+        scene.Phase,
+        SchoolScenePhase.Clapping);
+    AssertNear(
+        $"school {schoolNumber} is centered for clap",
+        scene.CurrentBackgroundCenterX,
+        layout.CenterX,
+        0.001);
+    AssertTrue(
+        $"school {schoolNumber} ignores another selection while active",
+        !scene.TryStartEntry(
+            schoolNumber == 6 ? 1 : schoolNumber + 1,
+            SchoolLayout(schoolNumber == 6 ? 1 : schoolNumber + 1),
+            true,
+            false,
+            false,
+            1.0)
+        && scene.SelectedSchoolNumber == schoolNumber);
+    scene.Advance(SchoolSceneStateMachine.ClapDurationSeconds);
+    AssertEqual(
+        $"school {schoolNumber} reaches idle",
+        scene.Phase,
+        SchoolScenePhase.SchoolIdle);
+    AssertTrue(
+        $"school {schoolNumber} begins visible right preparation",
+        scene.TryStartExit(true, false, false, 0.25)
+        && scene.Phase == SchoolScenePhase.PreparingExitRight
+        && scene.SelectedSchoolNumber == schoolNumber);
+    scene.Advance(4.5);
+    AssertEqual(
+        $"school {schoolNumber} exits after right preparation",
+        scene.Phase,
+        SchoolScenePhase.Exiting);
+    scene.Advance(SchoolSceneStateMachine.ExitTravelDurationSeconds);
+    AssertEqual(
+        $"school {schoolNumber} reaches final crossing",
+        scene.Phase,
+        SchoolScenePhase.CrossingFinal);
+    AssertNear(
+        $"school {schoolNumber} exit is fully offscreen right",
+        scene.CurrentBackgroundCenterX,
+        layout.OffscreenRightX,
+        0.001);
+    scene.Advance(
+        DirectionalTurnStateMachine.CrossArmFrameCount
+        / DirectionalTurnStateMachine.CrossArmAnimationFps);
+    AssertEqual(
+        $"school {schoolNumber} reaches black cross hold",
+        scene.Phase,
+        SchoolScenePhase.BlackCrossHold);
+
+    int reentrySchool = schoolNumber == 6 ? 1 : schoolNumber + 1;
+    AssertTrue(
+        $"school {reentrySchool} re-enters from final cross hold",
+        scene.TryStartEntry(
+            reentrySchool,
+            SchoolLayout(reentrySchool),
+            true,
+            false,
+            false,
+            0.0));
+    AssertEqual(
+        $"school {reentrySchool} replaces final-hold selection",
+        scene.SelectedSchoolNumber,
+        reentrySchool);
+}
+
+static void VerifyPartialEntryGeometryDoesNotSnap(int schoolNumber)
+{
+    SchoolBackgroundLayout layout = SchoolLayout(schoolNumber);
+    SchoolSceneStateMachine scene = new();
+    scene.TryStartEntry(
+        schoolNumber,
+        layout,
+        true,
+        false,
+        false,
+        0.0);
+    scene.Advance(2.0);
+    float before = scene.CurrentBackgroundCenterX;
+    scene.TryStartExit(true, false, false, 0.25);
+    float after = scene.CurrentBackgroundCenterX;
+    AssertNear(
+        $"school {schoolNumber} partial-entry 0 does not snap background",
+        after,
+        before,
+        0.001);
+    scene.Advance(4.5);
+    AssertNear(
+        $"school {schoolNumber} normalization starts at held position",
+        scene.CurrentBackgroundCenterX,
+        before,
+        0.001);
+}
 
 static void RunGlobalInputCases()
 {
@@ -2112,6 +3112,29 @@ static void AssertEqual<T>(string stepName, T actual, T expected)
     {
         throw new InvalidOperationException(
             $"{stepName}: expected {expected}, actual {actual}");
+    }
+
+    ProbeAssertions.RecordSuccess();
+    Console.WriteLine($"PASS {stepName}: value={actual}");
+}
+
+static void AssertNear(
+    string stepName,
+    double actual,
+    double expected,
+    double tolerance)
+{
+    if (
+        !double.IsFinite(actual)
+        || !double.IsFinite(expected)
+        || !double.IsFinite(tolerance)
+        || tolerance < 0.0
+        || Math.Abs(actual - expected) > tolerance
+    )
+    {
+        throw new InvalidOperationException(
+            $"{stepName}: expected {expected} +/- {tolerance}, "
+            + $"actual {actual}");
     }
 
     ProbeAssertions.RecordSuccess();

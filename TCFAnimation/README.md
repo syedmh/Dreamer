@@ -1,8 +1,8 @@
 # TCFAnimation
 
-Godot 4.5.1 Mono/C# directional turn, walking, dialogue, clap, and
-cross-arm animation. The project targets .NET 8 and uses a 1920x1080 logical
-viewport.
+Godot 4.5.1 Mono/C# directional turn, walking, dialogue, clap, cross-arm, and
+six scripted school platform-scene animations. The project targets .NET 8 and
+uses a 1920x1080 logical viewport.
 
 ## Run
 
@@ -40,6 +40,35 @@ prints `GODOT_RESOLUTION_FAIL` and exits 1.
   Press X again to play `release_00..05` at 8 FPS and return to the same
   directional front pose. Clap and directional input are blocked throughout
   crossing, hold, and release; held arrows are not queued.
+- **Physical top-row 1 through 6**: select the matching `School1.png` through
+  `School6.png`. When the school scene is inactive, first run
+  `PreparingEntryLeft` on pure black. The Avatar visibly uses the approved
+  left walk from its current x to the calibrated left x=`227.5`; a full-span
+  pre-position is 6.0 seconds and partial distances scale linearly. If already
+  left, preparation completes immediately. `Entering` then lasts 8.0 seconds:
+  the selected aspect-cover school background starts fully offscreen-right and moves
+  left to center while the approved right walk moves the Avatar from
+  x=`227.5` to x=`1693.75`. They complete together. The exact 15-step clap
+  then repeats at 8 FPS for exactly 10.0 seconds; the first update at or
+  beyond 10.0 seconds returns to front idle on the right. From a black crossed
+  hold, any physical top-row `1` through `6` first plays the normal six-frame
+  release at 8 FPS, selects the requested school, then performs the same left
+  pre-position if needed before entry.
+- **Physical top-row 0**: while a school is entering, clapping, or active,
+  first run
+  `PreparingExitRight`. The background remains at its current visible
+  position while the Avatar uses the approved right walk from its current x
+  to calibrated right x=`1693.75`; a full-span pre-position is 6.0 seconds
+  and partial distances scale linearly. If already right, preparation
+  completes immediately. If `0` interrupted a partial entry,
+  `NormalizingExitBackground` then holds the Avatar in a clean right-front
+  pose and smoothly continues the background left to exact center at the same
+  background speed as entry. Its duration is
+  `currentRightOffsetProgress * 8.0` seconds. `Exiting` then lasts 8.0 seconds:
+  the background moves right from center to fully offscreen-right while the
+  Avatar uses the left walk from x=`1693.75` to x=`227.5`; they complete
+  together. Exit ends on exact black, automatically plays `cross_00..02` at
+  8 FPS, and holds `cross_02`; **X** releases that hold.
 - **Enter**: open dialogue input. Submit with Enter or cancel with Escape.
   Input is capped at 500 Unicode scalar values (matching Godot's code-point
   character model without splitting UTF-16 surrogate pairs), normalized on
@@ -48,6 +77,26 @@ prints `GODOT_RESOLUTION_FAIL` and exits 1.
 - **P**: hide the current speech bubble while dialogue input is closed.
 - **F11** or **Alt+Enter**: toggle fullscreen. **Escape** exits fullscreen
   while dialogue input is closed.
+
+**School switching is intentionally serialized:** physical `1` through `6`
+are consumed and ignored while any school is preparing, entering, clapping,
+active, preparing exit, normalizing, exiting, or crossing. Press physical `0`
+to return to black, then press the next school key. A new school may also be
+selected directly from the final black crossed hold, which auto-releases and
+re-enters that selection.
+
+During scripted release, entry/exit pre-position, partial-entry background
+normalization, synchronized entry/exit, clap, and final crossing, arrows,
+**C**, **X**, **+/-**, and dialogue opening are suppressed. Fullscreen controls
+remain global. While dialogue is already open, numeric characters, including
+`0` through `6`, remain ordinary text input and never trigger choreography.
+At school idle, ordinary
+walk/clap/cross/speed/dialogue controls are enabled over the school background;
+`0` resets the pose to a clean front state and begins right pre-position. At
+the final black crossed hold, dialogue and speed controls remain available,
+arrows/**C** remain blocked like the normal crossed hold, **X** releases, and
+any `1` through `6` auto-releases, pre-positions left if needed, then enters
+the selected school.
 
 There is intentionally **no waving action, control, runtime state, or release
 resource**. Files whose names begin with `Waving` are obsolete, unrelated
@@ -68,9 +117,35 @@ The measured walk extrema are:
 the left edge and **x=1693.75** at the right edge of the 1920-wide viewport.
 Runtime uses these constants directly and does not scan textures.
 
+School choreography stores Avatar progress `c` over `[0,1]`, where 0 is the
+calibrated left center and 1 is the calibrated right center:
+`characterX = 227.5 + (1693.75 - 227.5) * c`. Character-only pre-position uses
+`6.0 * distanceFraction` seconds. Background right-offset progress `b` is 0
+at center and 1 fully offscreen-right:
+`backgroundX = viewportCenterX + (offscreenRightX - viewportCenterX) * b`,
+where `offscreenRightX = viewportRight + displayedBackgroundWidth / 2`.
+Entry drives `b: 1 -> 0` and `c: 0 -> 1`; exit drives `b: 0 -> 1` and
+`c: 1 -> 0`.
+
+All six `School*.png` sources are JPEG containers despite their extensions.
+The reproducible preparation step preserves each source byte-for-byte and
+writes true RGB PNGs to `Frames/Backgrounds/school1.png` through
+`school6.png`. Runtime calculates aspect-cover independently from the selected
+texture; backgrounds use linear filtering and character sprites remain nearest
+filtered.
+
+| School | Source size | Scale | Displayed size | Fully offscreen-right center x |
+|---:|---:|---:|---:|---:|
+| 1 | 1908x824 | 1.310679612 | 2500.776699x1080 | 3170.388350 |
+| 2 | 1536x1024 | 1.25 | 1920x1280 | 2880 |
+| 3 | 1540x1021 | 1.246753247 | 1920x1272.935065 | 2880 |
+| 4 | 1540x1021 | 1.246753247 | 1920x1272.935065 | 2880 |
+| 5 | 1540x1021 | 1.246753247 | 1920x1272.935065 | 2880 |
+| 6 | 1540x1021 | 1.246753247 | 1920x1272.935065 | 2880 |
+
 ## Active runtime assets
 
-The release contains exactly 33 frame PNGs:
+The release contains the original 33 opaque black-canvas frame PNGs:
 
 | Directory | Count | Files |
 |---|---:|---|
@@ -85,9 +160,17 @@ The release contains exactly 33 frame PNGs:
 Every left-walk PNG is the exact encoded horizontal mirror of its matching
 right-walk PNG.
 
+School mode adds 33 shared generated alpha-matted counterparts under
+`Frames/SchoolCharacter` plus six backgrounds under `Frames/Backgrounds`.
+Their RGB is
+identical to the validated originals, while alpha comes from the same
+regenerated extraction mattes. This removes the opaque 512x864 black rectangle
+without chroma-keying dark pixels: all matte foreground, including exact-black
+and near-black shoe/clothing pixels, stays fully opaque.
+
 ## Immutable source sheets
 
-Extraction is permitted to read, but never normalize or rewrite, these six
+Extraction is permitted to read, but never normalize or rewrite, these twelve
 authoritative source files:
 
 | Source | Container/mode | Dimensions | SHA-256 |
@@ -98,9 +181,31 @@ authoritative source files:
 | `Clapping2.png` | JPEG/RGB | 1086x1448 | `FBB46FBEAD0D5815F4E23307240535C600C29D0DF650B493137D05E762319C00` |
 | `CrossArm3.png` | JPEG/RGB | 1086x1448 | `276413B76F13D4940FD8B746D3AEA13D27922A47EACD750DCCC6FF622A6A8192` |
 | `CrossArm4.png` | JPEG/RGB | 1086x1448 | `475614A7B2DB0B7469FA88E9B7B5F5C8548F8095B56DAD99F6270098E9174A3F` |
+| `School1.png` | JPEG/RGB | 1908x824 | `2FED5C0AD5D5927BF22272634F2E879703436291962A46CBB5CB96C4434A986A` |
+| `School2.png` | JPEG/RGB | 1536x1024 | `81468B2FA3E392F0EDDBC6F4FA9C5A961597C99F83ACA7669EAAC9938CC00A4C` |
+| `School3.png` | JPEG/RGB | 1540x1021 | `D231C7EC01DC340313DF1F3E261F5EDDD138118F80DDA935E3599A1895212727` |
+| `School4.png` | JPEG/RGB | 1540x1021 | `036F8ACC3084CF2FFEF366E0E939F7802F082E2D21A4A7A236C5488FAB7C7190` |
+| `School5.png` | JPEG/RGB | 1540x1021 | `5F6CE380A5B9198B7D5B18AAF91258E9EDC57AFD78B11931E9E9ADE4B9AB7AB1` |
+| `School6.png` | JPEG/RGB | 1540x1021 | `5F6CE380A5B9198B7D5B18AAF91258E9EDC57AFD78B11931E9E9ADE4B9AB7AB1` |
 
 The files with JPEG containers retain their historical `.png` names. Godot
-import metadata keeps source sheets out of runtime use.
+`keep` import metadata keeps all source sheets, including `School1.png`
+through `School6.png`, out of
+runtime use.
+
+Regenerate or verify all six runtime backgrounds and the shared character
+overlays:
+
+```powershell
+python -B FrameExtraction\prepare_school_assets.py
+python -B FrameExtraction\prepare_school_assets.py --check
+```
+
+The script validates every school source byte count, JPEG/RGB container,
+dimensions, and SHA-256 before and after generation. It writes six
+deterministic background PNGs and reconstructs all 33 validated character
+mattes in memory without duplicating overlays per school or modifying the
+original opaque runtime frames.
 
 ## Artifact-free release validation
 
@@ -147,7 +252,7 @@ python -B FrameExtraction\validate_release.py
 Success ends with:
 
 ```text
-ASSET_RELEASE_CHECK_PASS frames=33 sources=6 read_only=true export_resources=34 artifact_manifest=checked_if_present
+ASSET_RELEASE_CHECK_PASS frames=33 school_overlays=33 backgrounds=6 sources=12 read_only=true export_resources=73 artifact_manifest=checked_if_present
 ```
 
 The validator does not create, modify, or delete files. It verifies immutable
@@ -193,7 +298,15 @@ frame counts and ordering, speed boundaries, dialogue lengths and layout
 errors (including Rune-based supplementary Unicode splitting, measurement,
 and ellipsis boundaries), capture-path policy,
 clap/cross/release interruption and reset boundaries, and the fixed
-33-frame/no-wave contract.
+33-frame/no-wave contract. It also covers all six per-image aspect-cover
+geometries; all valid and invalid school IDs; identity retention and clearing;
+physical-key restrictions; synchronized
+right-to-left background entry and left-to-right exit; six-second
+distance-scaled Avatar pre-position in both directions; repeated 15-step clap
+order and exact 10-second boundary; partial-entry interruption with held
+background, smooth same-speed normalization to center, and no teleport; final
+automatic cross/hold; auto-release/re-entry; invalid and large deltas;
+snapshot geometry; and scripted input suppression.
 
 ## Regenerate runtime frames
 
@@ -205,6 +318,7 @@ python FrameExtraction\extract_directional_turns.py
 python FrameExtraction\extract_right_walk.py
 python FrameExtraction\extract_clap.py
 python FrameExtraction\extract_cross_arm.py
+python -B FrameExtraction\prepare_school_assets.py
 python -B FrameExtraction\validate_release.py
 ```
 
@@ -223,9 +337,10 @@ release-readiness command.
 ## Export and runtime smoke test
 
 `export_presets.cfg` uses Godot selected resources. Its positive list is
-exactly `res://Main.tscn` plus the 33 active frame PNGs. It does not use broad
-include/exclude filters: both filter assignments must exist exactly once and
-be empty. Source sheets, extractors, `ControllerProbe`,
+exactly `res://Main.tscn`, the 33 original frames, the 33 shared transparent
+counterparts, and the six prepared school backgrounds (73 resources total). It
+does not use broad include/exclude filters: both filter assignments must exist
+exactly once and be empty. Source sheets, extractors, `ControllerProbe`,
 `.ai-org`, `Build`, README files, obsolete root images, and all Waving files
 are excluded from the release resource list. The preset explicitly disables
 C# script content and debug-symbol export. Release and ExportRelease builds
@@ -281,12 +396,12 @@ if ($smoke.ExitCode -ne 0) { throw "Runtime smoke failed with exit code $($smoke
 
 The release script authenticates Godot, its companion, and the release
 template before touching `Build`. It then guarded-cleans that generated
-directory and copies exactly the 50 entries in
+directory and copies exactly the 91 entries in
 `release-stage-manifest.txt` into a GUID-owned isolated stage. After proving
 that copied seed, it creates a fixed 994-byte UTF-8-without-BOM, CRLF
 `TCFAnimation.sln` inside the stage. The generated solution references only
 `TCFAnimation.csproj`; the repository solution and `ControllerProbe` never
-cross the staging boundary. The resulting 51-file pre-import inventory is
+cross the staging boundary. The resulting 92-file pre-import inventory is
 proved before Godot import, so import-generated UID/cache state remains
 stage-local and is never copied back.
 
@@ -302,16 +417,24 @@ partial generated output. The final executable path remains exactly
 The validator reads the final embedded PCK in place without extraction. It
 checks exact payload counts, bounded entry descriptors, a 4 MiB per-metadata
 limit, a 16 MiB aggregate metadata limit, all four engine metadata entries,
-all 33 import metadata entries, one-byte C# placeholders, and denied
+all 72 import metadata entries, two one-byte scene-script placeholders, and denied
 development/unrelated tokens in both single-byte and UTF-16LE forms.
 
 The exported smoke test is read-only, rejects capture arguments, loads
-`Main.tscn`, resolves the character and dialogue nodes, loads all 33 textures,
-checks the 1920x1080 viewport and 512x864 texture sizes, and exits successfully
+`Main.tscn`, resolves the background, character, and dialogue nodes, loads all
+66 character textures plus all six school backgrounds, checks every source
+dimension and aspect-cover/offscreen geometry, checks the
+1920x1080 viewport and 512x864 character texture sizes, and exits successfully
 only after printing:
 
 ```text
-RUNTIME_SMOKE_PASS frames=33 dialogue_ui=true
+RUNTIME_SMOKE_PASS character_textures=66 school_backgrounds=6 dimensions=1908x824,1536x1024,1540x1021,1540x1021,1540x1021,1540x1021 dialogue_ui=true viewport_fit=1920x1080:CanvasItems:Keep
 ```
 
-Manual visual QA is intentionally not claimed by these automated checks.
+Deterministic developer capture snapshots use
+`--capture-school=<1..6>:entry-prep-mid|entry-prep-left|entry-start|entry-mid|entry-end|clap|exit-prep-mid|exit-normalize-mid|exit-mid|exit-end|cross-hold`
+with the existing `--capture-path=<file.png>` option. Omitting `<1..6>:` keeps
+the legacy School1 default. The preparation snapshots show black
+right-to-left Avatar staging and visible-school left-to-right Avatar staging;
+`exit-normalize-mid` shows partial-entry reconciliation without changing
+release resources.

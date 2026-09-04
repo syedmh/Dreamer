@@ -11,5 +11,6 @@
     <Compile Include="..\DirectionalTurnStateMachine.cs" Link="DirectionalTurnStateMachine.cs" />
     <Compile Include="..\DialogueModel.cs" Link="DialogueModel.cs" />
     <Compile Include="..\GlobalInputPolicy.cs" Link="GlobalInputPolicy.cs" />
+    <Compile Include="..\SchoolSceneStateMachine.cs" Link="SchoolSceneStateMachine.cs" />
   </ItemGroup>
 </Project>

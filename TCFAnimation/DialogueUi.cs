@@ -21,6 +21,8 @@ public partial class DialogueUi : CanvasLayer
 
     public bool IsEditing => _model.IsEditing;
 
+    public bool OpeningSuppressed { get; set; }
+
     public override void _Ready()
     {
         Layer = 20;
@@ -59,6 +61,16 @@ public partial class DialogueUi : CanvasLayer
             && keyEvent.AltPressed
         )
         {
+            return;
+        }
+
+        if (
+            OpeningSuppressed
+            && !_model.IsEditing
+            && keyEvent.PhysicalKeycode == Key.Enter
+        )
+        {
+            GetViewport().SetInputAsHandled();
             return;
         }
 

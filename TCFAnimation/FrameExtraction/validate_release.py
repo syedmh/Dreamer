@@ -73,6 +73,48 @@ SOURCE_CONTRACTS = {
         "RGB",
         (1086, 1448),
     ),
+    "School1.png": (
+        "2FED5C0AD5D5927BF22272634F2E879703436291962A46CBB5CB96C4434A986A",
+        1186592,
+        "JPEG",
+        "RGB",
+        (1908, 824),
+    ),
+    "School2.png": (
+        "81468B2FA3E392F0EDDBC6F4FA9C5A961597C99F83ACA7669EAAC9938CC00A4C",
+        1156503,
+        "JPEG",
+        "RGB",
+        (1536, 1024),
+    ),
+    "School3.png": (
+        "D231C7EC01DC340313DF1F3E261F5EDDD138118F80DDA935E3599A1895212727",
+        1208533,
+        "JPEG",
+        "RGB",
+        (1540, 1021),
+    ),
+    "School4.png": (
+        "036F8ACC3084CF2FFEF366E0E939F7802F082E2D21A4A7A236C5488FAB7C7190",
+        1182762,
+        "JPEG",
+        "RGB",
+        (1540, 1021),
+    ),
+    "School5.png": (
+        "5F6CE380A5B9198B7D5B18AAF91258E9EDC57AFD78B11931E9E9ADE4B9AB7AB1",
+        1138687,
+        "JPEG",
+        "RGB",
+        (1540, 1021),
+    ),
+    "School6.png": (
+        "5F6CE380A5B9198B7D5B18AAF91258E9EDC57AFD78B11931E9E9ADE4B9AB7AB1",
+        1138687,
+        "JPEG",
+        "RGB",
+        (1540, 1021),
+    ),
 }
 
 FRAME_GROUPS = {
@@ -92,9 +134,58 @@ EXPECTED_FRAME_PATHS = tuple(
     for directory, names in FRAME_GROUPS.items()
     for name in names
 )
+EXPECTED_SCHOOL_CHARACTER_PATHS = tuple(
+    f"Frames/SchoolCharacter/{directory}/{name}"
+    for directory, names in FRAME_GROUPS.items()
+    for name in names
+)
+EXPECTED_BACKGROUNDS = {
+    "Frames/Backgrounds/school1.png": (
+        "FE0BB92D1BFE0172678CD317D0A5A625EE6033EF08005CDA91B3E14A7FDA2D58",
+        3_073_605,
+        (1908, 824),
+        "School1.png",
+    ),
+    "Frames/Backgrounds/school2.png": (
+        "3D721C35E45BED2FF21AE3FDC7EF2E0763901ECD9FA6D6BE6EE7942EC8AE5AE8",
+        3_007_673,
+        (1536, 1024),
+        "School2.png",
+    ),
+    "Frames/Backgrounds/school3.png": (
+        "91EF24E48C3AB3AAEC16FB29F5F4EC616EB655608CAAAADDE1EBDB5C14DCFAEA",
+        3_091_284,
+        (1540, 1021),
+        "School3.png",
+    ),
+    "Frames/Backgrounds/school4.png": (
+        "8B1A166BD1893221D6BB8B66EABBE5B66F46CFCCFB1748AB34EC10C839ECBCED",
+        3_050_404,
+        (1540, 1021),
+        "School4.png",
+    ),
+    "Frames/Backgrounds/school5.png": (
+        "115C59AE61FA2CBA75F89BEBC6BC968DB13A70EDEF52624E97F9F61FB3A892BE",
+        2_964_932,
+        (1540, 1021),
+        "School5.png",
+    ),
+    "Frames/Backgrounds/school6.png": (
+        "115C59AE61FA2CBA75F89BEBC6BC968DB13A70EDEF52624E97F9F61FB3A892BE",
+        2_964_932,
+        (1540, 1021),
+        "School6.png",
+    ),
+}
+EXPECTED_BACKGROUND_PATHS = tuple(EXPECTED_BACKGROUNDS)
+EXPECTED_TEXTURE_PATHS = (
+    *EXPECTED_FRAME_PATHS,
+    *EXPECTED_BACKGROUND_PATHS,
+    *EXPECTED_SCHOOL_CHARACTER_PATHS,
+)
 EXPECTED_EXPORT_RESOURCES = (
     "res://Main.tscn",
-    *(f"res://{path}" for path in EXPECTED_FRAME_PATHS),
+    *(f"res://{path}" for path in EXPECTED_TEXTURE_PATHS),
 )
 EXPECTED_SCRIPT_PAYLOADS = (
     "DialogueUi.cs",
@@ -877,6 +968,16 @@ def validate_sources() -> None:
             f"size={expected_size[0]}x{expected_size[1]} "
             f"bytes={expected_bytes} sha256={actual_hash}"
         )
+        if name.startswith("School"):
+            import_text = (ROOT / f"{name}.import").read_text(
+                encoding="utf-8"
+            )
+            if import_text.replace("\r\n", "\n") != (
+                '[remap]\n\nimporter="keep"\n'
+            ):
+                raise RuntimeError(
+                    f"{name}.import must be keep-only metadata."
+                )
 
 
 def validate_frame_tree() -> None:
@@ -884,10 +985,15 @@ def validate_frame_tree() -> None:
     actual_directories = {
         path.name for path in frames_root.iterdir() if path.is_dir()
     }
-    if actual_directories != set(FRAME_GROUPS):
+    expected_directories = {
+        *FRAME_GROUPS,
+        "Backgrounds",
+        "SchoolCharacter",
+    }
+    if actual_directories != expected_directories:
         raise RuntimeError(
             f"Frame directories are {sorted(actual_directories)}; "
-            f"expected {sorted(FRAME_GROUPS)}."
+            f"expected {sorted(expected_directories)}."
         )
 
     for directory, png_names in FRAME_GROUPS.items():
@@ -906,13 +1012,50 @@ def validate_frame_tree() -> None:
                 f"expected {sorted(expected_entries)}."
             )
 
+        school_directory = frames_root / "SchoolCharacter" / directory
+        school_entries = {
+            path.name
+            for path in school_directory.iterdir()
+            if path.is_file()
+        }
+        if school_entries != expected_entries:
+            raise RuntimeError(
+                f"Frames/SchoolCharacter/{directory} files are "
+                f"{sorted(school_entries)}; expected "
+                f"{sorted(expected_entries)}."
+            )
+
+    background_entries = {
+        path.name
+        for path in (frames_root / "Backgrounds").iterdir()
+        if path.is_file()
+    }
+    expected_background_entries = {
+        *(
+            f"school{school_number}.png"
+            for school_number in range(1, 7)
+        ),
+        *(
+            f"school{school_number}.png.import"
+            for school_number in range(1, 7)
+        ),
+    }
+    if background_entries != expected_background_entries:
+        raise RuntimeError(
+            f"Frames/Backgrounds files are {sorted(background_entries)}; "
+            f"expected {sorted(expected_background_entries)}."
+        )
+
     actual_pngs = tuple(
         path.relative_to(ROOT).as_posix()
         for path in sorted(frames_root.rglob("*.png"))
     )
-    if set(actual_pngs) != set(EXPECTED_FRAME_PATHS) or len(actual_pngs) != 33:
+    if (
+        set(actual_pngs) != set(EXPECTED_TEXTURE_PATHS)
+        or len(actual_pngs) != 72
+    ):
         raise RuntimeError(
-            f"Runtime PNG set has {len(actual_pngs)} files; expected exact 33."
+            f"Runtime PNG set has {len(actual_pngs)} files; expected exact 72."
         )
 
 
@@ -1231,6 +1374,91 @@ def validate_generated_contracts(
         "mirror=exact walk_extrema=74,437 "
         "components=segmented_and_bounded_lower_anatomy "
         "sole_envelopes=clear floor_runs=absent edges=clear"
+    )
+
+
+def validate_school_runtime_assets(
+    regenerated: dict[str, tuple[np.ndarray, np.ndarray]],
+) -> None:
+    background_summaries = []
+    for relative_path, contract in EXPECTED_BACKGROUNDS.items():
+        expected_hash, expected_bytes, expected_size, source_name = contract
+        background_path = ROOT / relative_path
+        actual_hash = sha256_file(background_path, expected_bytes)
+        if actual_hash != expected_hash:
+            raise RuntimeError(
+                f"{relative_path} differs from its deterministic hash."
+            )
+        with Image.open(background_path) as background:
+            if (
+                background.format != "PNG"
+                or background.mode != "RGB"
+                or background.size != expected_size
+            ):
+                raise RuntimeError(
+                    f"{relative_path} is {background.format} "
+                    f"{background.mode} {background.size}; expected PNG RGB "
+                    f"{expected_size}."
+                )
+            background_rgb = np.asarray(background, dtype=np.uint8)
+        with Image.open(ROOT / source_name) as source:
+            source_rgb = np.asarray(source.convert("RGB"), dtype=np.uint8)
+        if not np.array_equal(background_rgb, source_rgb):
+            raise RuntimeError(
+                f"{relative_path} does not preserve {source_name} RGB."
+            )
+        background_summaries.append(
+            f"{Path(relative_path).name}:{expected_size[0]}x"
+            f"{expected_size[1]}:{actual_hash}"
+        )
+
+    dark_foreground_pixels = 0
+    for relative_path, (frame, matte) in regenerated.items():
+        overlay_path = (
+            ROOT
+            / "Frames"
+            / "SchoolCharacter"
+            / Path(relative_path).relative_to("Frames")
+        )
+        overlay = cv2.imread(str(overlay_path), cv2.IMREAD_UNCHANGED)
+        if overlay is None or overlay.shape != (864, 512, 4):
+            raise RuntimeError(
+                f"{overlay_path.relative_to(ROOT).as_posix()} is not "
+                "a 512x864 RGBA PNG."
+            )
+        alpha = overlay[:, :, 3]
+        expected_alpha = (matte != 0).astype(np.uint8) * 255
+        if not np.array_equal(alpha, expected_alpha):
+            raise RuntimeError(
+                f"{overlay_path.relative_to(ROOT).as_posix()} alpha differs "
+                "from the validated extraction matte."
+            )
+        if not np.array_equal(overlay[:, :, :3], frame[:, :, :3]):
+            raise RuntimeError(
+                f"{overlay_path.relative_to(ROOT).as_posix()} changes "
+                "validated character RGB."
+            )
+        if np.any(alpha[matte == 0] != 0):
+            raise RuntimeError(
+                f"{overlay_path.relative_to(ROOT).as_posix()} retains an "
+                "opaque black canvas outside the matte."
+            )
+        dark_foreground = (
+            (np.max(frame[:, :, :3], axis=2) <= DARK_SHOE_MAXIMUM_VALUE)
+            & (matte != 0)
+        )
+        if np.any(alpha[dark_foreground] != 255):
+            raise RuntimeError(
+                f"{overlay_path.relative_to(ROOT).as_posix()} loses dark "
+                "foreground pixels."
+            )
+        dark_foreground_pixels += int(np.count_nonzero(dark_foreground))
+
+    print(
+        "school_overlay_ok=frames:33 opaque_canvas=false "
+        f"dark_foreground_preserved={dark_foreground_pixels} "
+        "backgrounds=6 aspect_source_preserved=true "
+        f"background_contracts={','.join(background_summaries)}"
     )
 
 
@@ -2287,7 +2515,7 @@ def read_pack_manifest(path: Path) -> dict[str, PackEntry]:
 
 def expected_imported_textures() -> set[str]:
     imported = set()
-    for relative_path in EXPECTED_FRAME_PATHS:
+    for relative_path in EXPECTED_TEXTURE_PATHS:
         import_path = ROOT / f"{relative_path}.import"
         text = import_path.read_text(encoding="utf-8")
         match = re.search(
@@ -2300,7 +2528,7 @@ def expected_imported_textures() -> set[str]:
                 f"{relative_path}.import has no exported texture path."
             )
         imported.add(match.group(1))
-    if len(imported) != len(EXPECTED_FRAME_PATHS):
+    if len(imported) != len(EXPECTED_TEXTURE_PATHS):
         raise RuntimeError("Imported texture paths are not one-to-one.")
     return imported
 
@@ -2459,7 +2687,7 @@ def validate_pack_payload(
     imported_textures = expected_imported_textures()
     import_metadata = {
         f"{relative_path}.import"
-        for relative_path in EXPECTED_FRAME_PATHS
+        for relative_path in EXPECTED_TEXTURE_PATHS
     }
     scene_payloads = {
         entry
@@ -2503,6 +2731,19 @@ def validate_pack_payload(
         "CrossArm3.png",
         "CrossArm4.png",
     )
+    included_school_sources = sorted(
+        source_name
+        for source_name in (
+            f"School{school_number}.png"
+            for school_number in range(1, 7)
+        )
+        if source_name in entries
+    )
+    if included_school_sources:
+        raise RuntimeError(
+            f"{path.name} contains root school source images: "
+            f"{included_school_sources}."
+        )
     denied_payloads = [
         entry
         for entry in entries
@@ -2529,7 +2770,7 @@ def validate_pack_payload(
     )
     print(
         f"pack_payload_ok={path.name} runtime_scene=1 runtime_scripts=2 "
-        "runtime_textures=33 import_metadata=33 engine_metadata=4 "
+        "runtime_textures=72 import_metadata=72 engine_metadata=4 "
         "denied_payloads=false source_content=false metadata_denied_tokens=0"
     )
 
@@ -2613,6 +2854,7 @@ def main() -> int:
     regenerated = regenerate_in_memory()
     validate_independent_lower_anatomy(regenerated)
     validate_generated_contracts(regenerated)
+    validate_school_runtime_assets(regenerated)
     validate_viewport_fit_configuration()
     validate_identity_and_continuity(regenerated)
     validate_export_hygiene()
@@ -2621,8 +2863,9 @@ def main() -> int:
     validate_built_artifacts()
     validate_sources()
     print(
-        "ASSET_RELEASE_CHECK_PASS frames=33 sources=6 "
-        "read_only=true export_resources=34 artifact_manifest=checked_if_present"
+        "ASSET_RELEASE_CHECK_PASS frames=33 school_overlays=33 "
+        "backgrounds=6 sources=12 read_only=true export_resources=73 "
+        "artifact_manifest=checked_if_present"
     )
     return 0
 

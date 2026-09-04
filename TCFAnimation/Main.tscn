@@ -6,6 +6,11 @@
 [node name="Main" type="Node2D"]
 script = ExtResource("1_controller")
 
+[node name="SchoolBackground" type="Sprite2D" parent="."]
+centered = true
+texture_filter = 1
+z_index = -1
+
 [node name="Character" type="Sprite2D" parent="."]
 centered = true
 

@@ -28,9 +28,28 @@ public partial class TurnController : Node2D
         new Texture2D[DirectionalTurnStateMachine.CrossArmFrameCount];
     private readonly Texture2D[] _crossArmReleaseFrames =
         new Texture2D[DirectionalTurnStateMachine.CrossArmReleaseFrameCount];
+    private readonly Texture2D[] _schoolLeftFrames = new Texture2D[3];
+    private readonly Texture2D[] _schoolRightFrames = new Texture2D[3];
+    private readonly Texture2D[] _schoolLeftWalkFrames =
+        new Texture2D[DirectionalTurnStateMachine.LeftWalkFrameCount];
+    private readonly Texture2D[] _schoolRightWalkFrames =
+        new Texture2D[DirectionalTurnStateMachine.RightWalkFrameCount];
+    private readonly Texture2D[] _schoolClapFrames =
+        new Texture2D[DirectionalTurnStateMachine.ClapFrameCount];
+    private readonly Texture2D[] _schoolCrossArmFrames =
+        new Texture2D[DirectionalTurnStateMachine.CrossArmFrameCount];
+    private readonly Texture2D[] _schoolCrossArmReleaseFrames =
+        new Texture2D[DirectionalTurnStateMachine.CrossArmReleaseFrameCount];
+    private readonly Texture2D[] _schoolBackgroundTextures =
+        new Texture2D[SchoolSceneStateMachine.MaximumSchoolNumber];
+    private readonly SchoolBackgroundLayout[] _schoolBackgroundLayouts =
+        new SchoolBackgroundLayout[
+            SchoolSceneStateMachine.MaximumSchoolNumber];
     private readonly DirectionalTurnStateMachine _turn =
         new(TurnAnimationFps);
+    private readonly SchoolSceneStateMachine _schoolScene = new();
 
+    private Sprite2D _schoolBackground = null!;
     private Sprite2D _character = null!;
     private DialogueUi _dialogueUi = null!;
     private string? _captureRoot;
@@ -68,6 +87,7 @@ public partial class TurnController : Node2D
             CaptureModeConfiguration? captureMode =
                 ParseCaptureMode(arguments, captureRoot?.Root);
 
+            _schoolBackground = GetNode<Sprite2D>("SchoolBackground");
             _character = GetNode<Sprite2D>("Character");
             _dialogueUi = GetNode<DialogueUi>("DialogueUi");
 
@@ -81,6 +101,55 @@ public partial class TurnController : Node2D
                 "CrossArmRelease",
                 "release",
                 _crossArmReleaseFrames);
+            LoadFrames(
+                "SchoolCharacter/LeftTurn",
+                _schoolLeftFrames);
+            LoadFrames(
+                "SchoolCharacter/RightTurn",
+                _schoolRightFrames);
+            LoadWalkFrames(
+                "SchoolCharacter/LeftWalk",
+                _schoolLeftWalkFrames);
+            LoadWalkFrames(
+                "SchoolCharacter/RightWalk",
+                _schoolRightWalkFrames);
+            LoadGestureFrames(
+                "SchoolCharacter/Clap",
+                "clap",
+                _schoolClapFrames);
+            LoadGestureFrames(
+                "SchoolCharacter/CrossArm",
+                "cross",
+                _schoolCrossArmFrames);
+            LoadGestureFrames(
+                "SchoolCharacter/CrossArmRelease",
+                "release",
+                _schoolCrossArmReleaseFrames);
+
+            for (
+                int schoolNumber =
+                    SchoolSceneStateMachine.MinimumSchoolNumber;
+                schoolNumber <=
+                    SchoolSceneStateMachine.MaximumSchoolNumber;
+                schoolNumber++
+            )
+            {
+                string path =
+                    $"res://Frames/Backgrounds/school{schoolNumber}.png";
+                Texture2D texture = GD.Load<Texture2D>(path)
+                    ?? throw new InvalidOperationException(
+                        $"Could not load required school background: {path}");
+                int index = schoolNumber - 1;
+                _schoolBackgroundTextures[index] = texture;
+                _schoolBackgroundLayouts[index] =
+                    SchoolSceneGeometry.CalculateAspectCover(
+                        AnimationGeometry.ViewportWidth,
+                        ViewportHeight,
+                        texture.GetWidth(),
+                        texture.GetHeight());
+            }
+            _schoolBackground.TextureFilter = TextureFilterEnum.Linear;
+            _schoolBackground.Visible = false;
 
             _character.Position = new Vector2(
                 AnimationGeometry.ViewportWidth / 2.0f,
@@ -96,6 +165,7 @@ public partial class TurnController : Node2D
             }
 
             ConfigureCaptureMode(captureMode);
+            UpdateSchoolVisuals();
             ApplyCurrentFrame();
         }
         catch (Exception exception) when (verifyRuntime)
@@ -135,6 +205,34 @@ public partial class TurnController : Node2D
 
         if (_dialogueUi.IsEditing)
         {
+            return;
+        }
+
+        if (_schoolScene.SuppressesOrdinaryInput)
+        {
+            _schoolScene.Advance(delta);
+            if (
+                _schoolScene.Phase == SchoolScenePhase.SchoolIdle
+                || _schoolScene.Phase == SchoolScenePhase.NormalBlack
+            )
+            {
+                _turn.Reset(
+                    _schoolScene.Phase == SchoolScenePhase.SchoolIdle
+                        ? TurnDirection.Right
+                        : TurnDirection.Left,
+                    DirectionalTurnStateMachine.FrontFrame);
+            }
+            UpdateSchoolVisuals();
+            ApplyCurrentFrame();
+            return;
+        }
+
+        UpdateDialogueSuppression();
+
+        if (!_schoolScene.CanUseNormalTurnControls)
+        {
+            UpdateSchoolVisuals();
+            ApplyCurrentFrame();
             return;
         }
 
@@ -265,8 +363,82 @@ public partial class TurnController : Node2D
             return;
         }
 
+        int? selectedSchoolNumber =
+            SchoolNumberFromPhysicalKey(keyEvent.PhysicalKeycode);
+        if (selectedSchoolNumber is not null)
+        {
+            double characterProgress = CharacterProgressFromPosition();
+            SchoolBackgroundLayout layout =
+                _schoolBackgroundLayouts[selectedSchoolNumber.Value - 1];
+            bool entryStarted = _schoolScene.TryStartEntry(
+                selectedSchoolNumber.Value,
+                layout,
+                pressed: true,
+                echo: false,
+                dialogueEditing: false,
+                currentCharacterProgress: characterProgress,
+                existingCrossHold: _turn.IsCrossArmsHeld);
+            if (entryStarted)
+            {
+                ApplySelectedSchoolBackground();
+                _turn.Reset(
+                    TurnDirection.Left,
+                    DirectionalTurnStateMachine.FrontFrame);
+                UpdateSchoolVisuals();
+                ApplyCurrentFrame();
+            }
+
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
+        if (keyEvent.PhysicalKeycode == Key.Key0)
+        {
+            double characterProgress = CharacterProgressFromPosition();
+            bool exitStarted = _schoolScene.TryStartExit(
+                pressed: true,
+                echo: false,
+                dialogueEditing: false,
+                characterProgress);
+            if (exitStarted)
+            {
+                _turn.Reset(
+                    TurnDirection.Right,
+                    DirectionalTurnStateMachine.FrontFrame);
+                UpdateSchoolVisuals();
+                ApplyCurrentFrame();
+                GetViewport().SetInputAsHandled();
+            }
+
+            return;
+        }
+
+        if (_schoolScene.SuppressesOrdinaryInput)
+        {
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
         if (keyEvent.PhysicalKeycode == Key.X)
         {
+            if (
+                _schoolScene.TryReleaseFinalCrossHold(
+                    pressed: true,
+                    echo: false,
+                    dialogueEditing: false)
+            )
+            {
+                UpdateSchoolVisuals();
+                ApplyCurrentFrame();
+                GetViewport().SetInputAsHandled();
+                return;
+            }
+
+            if (_schoolScene.IsFinalCrossHold)
+            {
+                return;
+            }
+
             bool stateChanged = _turn.TryToggleCrossArms(
                 Input.IsPhysicalKeyPressed(Key.Left),
                 Input.IsPhysicalKeyPressed(Key.Right));
@@ -280,6 +452,11 @@ public partial class TurnController : Node2D
 
         if (keyEvent.PhysicalKeycode == Key.C)
         {
+            if (_schoolScene.IsFinalCrossHold)
+            {
+                return;
+            }
+
             bool clapStarted = _turn.TryStartClap(
                 Input.IsPhysicalKeyPressed(Key.Left),
                 Input.IsPhysicalKeyPressed(Key.Right));
@@ -324,6 +501,79 @@ public partial class TurnController : Node2D
         GD.Print(
             FormattableString.Invariant(
                 $"WALK_SPEED multiplier={_walkSpeedMultiplier:0.00}x movement={movementSpeed:0.##}px/s walk_fps={walkFps:0.##}"));
+    }
+
+    private void UpdateSchoolVisuals()
+    {
+        _schoolBackground.Visible = _schoolScene.IsSchoolVisible;
+        if (_schoolScene.SelectedBackgroundLayout is { } layout)
+        {
+            _schoolBackground.Position = new Vector2(
+                _schoolScene.CurrentBackgroundCenterX,
+                layout.CenterY);
+        }
+
+        if (
+            _schoolScene.Phase is not (
+                SchoolScenePhase.NormalBlack
+                or SchoolScenePhase.SchoolIdle)
+        )
+        {
+            AnimationSafeCenters centers =
+                AnimationGeometry.DefaultSafeCenters;
+            float characterX =
+                centers.Left
+                + (centers.Right - centers.Left)
+                * (float)_schoolScene.CharacterProgress;
+            _character.Position =
+                new Vector2(characterX, _character.Position.Y);
+        }
+
+        UpdateDialogueSuppression();
+    }
+
+    private void UpdateDialogueSuppression()
+    {
+        _dialogueUi.OpeningSuppressed =
+            _schoolScene.SuppressesOrdinaryInput;
+    }
+
+    private double CharacterProgressFromPosition()
+    {
+        AnimationSafeCenters centers = AnimationGeometry.DefaultSafeCenters;
+        return Math.Clamp(
+            (_character.Position.X - centers.Left)
+            / (centers.Right - centers.Left),
+            0.0f,
+            1.0f);
+    }
+
+    private static int? SchoolNumberFromPhysicalKey(Key physicalKeycode)
+    {
+        return physicalKeycode switch
+        {
+            Key.Key1 => 1,
+            Key.Key2 => 2,
+            Key.Key3 => 3,
+            Key.Key4 => 4,
+            Key.Key5 => 5,
+            Key.Key6 => 6,
+            _ => null,
+        };
+    }
+
+    private void ApplySelectedSchoolBackground()
+    {
+        int schoolNumber = _schoolScene.SelectedSchoolNumber
+            ?? throw new InvalidOperationException(
+                "School selection is unavailable.");
+        SchoolBackgroundLayout layout =
+            _schoolScene.SelectedBackgroundLayout
+            ?? throw new InvalidOperationException(
+                "School background layout is unavailable.");
+        _schoolBackground.Texture =
+            _schoolBackgroundTextures[schoolNumber - 1];
+        _schoolBackground.Scale = Vector2.One * layout.Scale;
     }
 
     private static bool IsFullscreen()
@@ -460,6 +710,13 @@ public partial class TurnController : Node2D
             _clapFrames,
             _crossArmFrames,
             _crossArmReleaseFrames,
+            _schoolLeftFrames,
+            _schoolRightFrames,
+            _schoolLeftWalkFrames,
+            _schoolRightWalkFrames,
+            _schoolClapFrames,
+            _schoolCrossArmFrames,
+            _schoolCrossArmReleaseFrames,
         ];
         Vector2 expectedTextureSize = new(512.0f, 864.0f);
         int frameCount = 0;
@@ -485,58 +742,169 @@ public partial class TurnController : Node2D
             }
         }
 
-        if (frameCount != 33)
+        if (frameCount != 66)
         {
             throw new InvalidOperationException(
-                $"Loaded {frameCount} runtime frames; expected 33.");
+                $"Loaded {frameCount} runtime frames; expected 66.");
+        }
+
+        string[] backgroundDimensions = new string[
+            _schoolBackgroundTextures.Length];
+        for (
+            int index = 0;
+            index < _schoolBackgroundTextures.Length;
+            index++
+        )
+        {
+            Texture2D texture = _schoolBackgroundTextures[index];
+            SchoolBackgroundLayout layout = _schoolBackgroundLayouts[index];
+            if (
+                texture is null
+                || layout.DisplayWidth + 0.001f
+                    < AnimationGeometry.ViewportWidth
+                || layout.DisplayHeight + 0.001f < ViewportHeight
+                || layout.OffscreenRightX - layout.DisplayWidth / 2.0f
+                    + 0.001f
+                    < AnimationGeometry.ViewportWidth
+            )
+            {
+                throw new InvalidOperationException(
+                    $"School {index + 1} background geometry is invalid.");
+            }
+
+            backgroundDimensions[index] =
+                $"{texture.GetWidth()}x{texture.GetHeight()}";
         }
 
         GD.Print(
-            "RUNTIME_SMOKE_PASS frames=33 dialogue_ui=true "
+            "RUNTIME_SMOKE_PASS character_textures=66 "
+            + "school_backgrounds=6 dimensions="
+            + string.Join(",", backgroundDimensions)
+            + " dialogue_ui=true "
             + "viewport_fit=1920x1080:CanvasItems:Keep");
         GetTree().Quit();
     }
 
     private void ApplyCurrentFrame()
     {
+        if (
+            _schoolScene.CharacterAnimation
+            != SchoolCharacterAnimation.Normal
+        )
+        {
+            _character.Texture =
+                GetSchoolSceneCharacterTexture(
+                    _schoolScene.CharacterAnimation,
+                    _schoolScene.CurrentAnimationFrame);
+            return;
+        }
+
+        bool schoolOverlay = _schoolScene.UsesTransparentCharacter;
+        Texture2D[] crossArmFrames = schoolOverlay
+            ? _schoolCrossArmFrames
+            : _crossArmFrames;
+        Texture2D[] crossArmReleaseFrames = schoolOverlay
+            ? _schoolCrossArmReleaseFrames
+            : _crossArmReleaseFrames;
+        Texture2D[] clapFrames = schoolOverlay
+            ? _schoolClapFrames
+            : _clapFrames;
+        Texture2D[] leftWalkFrames = schoolOverlay
+            ? _schoolLeftWalkFrames
+            : _leftWalkFrames;
+        Texture2D[] rightWalkFrames = schoolOverlay
+            ? _schoolRightWalkFrames
+            : _rightWalkFrames;
+
         if (_turn.IsCrossingArms || _turn.IsCrossArmsHeld)
         {
             // The held state pins this index to cross_02, the third and final
             // crossing frame (human source pose 6 from CrossArm3.png).
             _character.Texture =
-                _crossArmFrames[_turn.CurrentCrossArmFrame];
+                crossArmFrames[_turn.CurrentCrossArmFrame];
             return;
         }
 
         if (_turn.IsReleasingCrossArms)
         {
             _character.Texture =
-                _crossArmReleaseFrames[_turn.CurrentCrossArmReleaseFrame];
+                crossArmReleaseFrames[
+                    _turn.CurrentCrossArmReleaseFrame];
             return;
         }
 
         if (_turn.IsClapping)
         {
-            _character.Texture = _clapFrames[_turn.CurrentClapFrame];
+            _character.Texture = clapFrames[_turn.CurrentClapFrame];
             return;
         }
 
         if (_turn.IsWalkingLeft)
         {
-            _character.Texture = _leftWalkFrames[_turn.CurrentWalkFrame];
+            _character.Texture = leftWalkFrames[_turn.CurrentWalkFrame];
             return;
         }
 
         if (_turn.IsWalkingRight)
         {
-            _character.Texture = _rightWalkFrames[_turn.CurrentWalkFrame];
+            _character.Texture = rightWalkFrames[_turn.CurrentWalkFrame];
             return;
         }
 
-        Texture2D[] frames = _turn.CurrentDirection == TurnDirection.Left
-            ? _leftFrames
-            : _rightFrames;
+        Texture2D[] frames = schoolOverlay
+            ? (
+                _turn.CurrentDirection == TurnDirection.Left
+                    ? _schoolLeftFrames
+                    : _schoolRightFrames
+            )
+            : (
+                _turn.CurrentDirection == TurnDirection.Left
+                    ? _leftFrames
+                    : _rightFrames
+            );
         _character.Texture = frames[_turn.CurrentFrame];
+    }
+
+    private Texture2D GetSchoolSceneCharacterTexture(
+        SchoolCharacterAnimation animation,
+        int frame)
+    {
+        bool schoolOverlay = _schoolScene.UsesTransparentCharacter;
+        return animation switch
+        {
+            SchoolCharacterAnimation.WalkRight =>
+                (
+                    schoolOverlay
+                        ? _schoolRightWalkFrames
+                        : _rightWalkFrames
+                )[frame],
+            SchoolCharacterAnimation.WalkLeft =>
+                (
+                    schoolOverlay
+                        ? _schoolLeftWalkFrames
+                        : _leftWalkFrames
+                )[frame],
+            SchoolCharacterAnimation.Clap =>
+                (
+                    schoolOverlay
+                        ? _schoolClapFrames
+                        : _clapFrames
+                )[frame],
+            SchoolCharacterAnimation.CrossArm =>
+                (
+                    schoolOverlay
+                        ? _schoolCrossArmFrames
+                        : _crossArmFrames
+                )[frame],
+            SchoolCharacterAnimation.CrossArmRelease =>
+                (
+                    schoolOverlay
+                        ? _schoolCrossArmReleaseFrames
+                        : _crossArmReleaseFrames
+                )[frame],
+            _ => throw new InvalidOperationException(
+                $"Unsupported school character animation: {animation}."),
+        };
     }
 
     private static CaptureModeConfiguration? ParseCaptureMode(
@@ -547,10 +915,12 @@ public partial class TurnController : Node2D
         TurnDirection captureDirection = TurnDirection.Left;
         string? capturePath = null;
         string? dialoguePreview = null;
+        SchoolCaptureSelection? schoolCapture = null;
         int frameOptionCount = 0;
         int directionOptionCount = 0;
         int pathOptionCount = 0;
         int dialogueOptionCount = 0;
+        int schoolOptionCount = 0;
         bool captureModeRequested = IsCaptureModeRequested(arguments);
 
         foreach (string argument in arguments)
@@ -559,6 +929,7 @@ public partial class TurnController : Node2D
             const string directionPrefix = "--capture-direction=";
             const string pathPrefix = "--capture-path=";
             const string dialoguePrefix = "--dialogue-preview=";
+            const string schoolPrefix = "--capture-school=";
 
             if (argument.StartsWith(framePrefix, StringComparison.Ordinal))
             {
@@ -609,6 +980,14 @@ public partial class TurnController : Node2D
                 dialoguePreview = argument[dialoguePrefix.Length..];
                 ValidateDialoguePreview(dialoguePreview);
             }
+            else if (argument.StartsWith(schoolPrefix, StringComparison.Ordinal))
+            {
+                EnsureSingleOption(
+                    ref schoolOptionCount,
+                    "--capture-school");
+                schoolCapture = ParseSchoolCapture(
+                    argument[schoolPrefix.Length..]);
+            }
             else if (
                 argument.StartsWith(
                     "--capture-",
@@ -634,14 +1013,19 @@ public partial class TurnController : Node2D
             return null;
         }
 
-        if (captureFrame is null || capturePath is null)
+        if (
+            capturePath is null
+            || (captureFrame is null) == (schoolCapture is null)
+        )
         {
             throw new ArgumentException(
-                "Capture mode requires both --capture-frame and --capture-path.");
+                "Capture mode requires --capture-path and exactly one of "
+                + "--capture-frame or --capture-school.");
         }
 
         if (
-            captureFrame.Value is
+            captureFrame is not null
+            && captureFrame.Value is
                 < DirectionalTurnStateMachine.FrontFrame
                 or > DirectionalTurnStateMachine.FullTurnFrame
         )
@@ -653,13 +1037,14 @@ public partial class TurnController : Node2D
         }
 
         return new CaptureModeConfiguration(
-            captureFrame.Value,
+            captureFrame,
             captureDirection,
             captureRoot
                 ?? throw new InvalidOperationException(
                     "Capture root was not resolved for capture mode."),
             capturePath,
-            dialoguePreview);
+            dialoguePreview,
+            schoolCapture);
     }
 
     private void ConfigureCaptureMode(
@@ -672,7 +1057,43 @@ public partial class TurnController : Node2D
 
         _captureRoot = captureMode.Root;
         _capturePath = captureMode.Path;
-        _turn.Reset(captureMode.Direction, captureMode.Frame);
+        if (captureMode.SchoolCapture is not null)
+        {
+            SchoolCaptureSelection schoolCapture =
+                captureMode.SchoolCapture;
+            SchoolBackgroundLayout layout =
+                _schoolBackgroundLayouts[schoolCapture.SchoolNumber - 1];
+            _schoolScene.SetDevelopmentSnapshot(
+                schoolCapture.SchoolNumber,
+                layout,
+                schoolCapture.Snapshot);
+            ApplySelectedSchoolBackground();
+            _turn.Reset(
+                _schoolScene.CharacterAnimation
+                        == SchoolCharacterAnimation.WalkRight
+                    || schoolCapture.Snapshot
+                        == SchoolSceneSnapshot.EntryEnd
+                    || schoolCapture.Snapshot
+                        == SchoolSceneSnapshot.ExitNormalizationMid
+                    ? TurnDirection.Right
+                    : TurnDirection.Left,
+                DirectionalTurnStateMachine.FrontFrame);
+            AnimationSafeCenters centers =
+                AnimationGeometry.DefaultSafeCenters;
+            _character.Position = new Vector2(
+                centers.Left
+                + (centers.Right - centers.Left)
+                * (float)_schoolScene.CharacterProgress,
+                _character.Position.Y);
+        }
+        else
+        {
+            _turn.Reset(
+                captureMode.Direction,
+                captureMode.Frame
+                    ?? throw new InvalidOperationException(
+                        "Capture frame is missing."));
+        }
         ConfigureDialoguePreview(captureMode.DialoguePreview);
         _captureCountdown = 3;
     }
@@ -703,6 +1124,52 @@ public partial class TurnController : Node2D
             throw new ArgumentException(
                 $"Invalid dialogue preview: {preview}");
         }
+    }
+
+    private static SchoolCaptureSelection ParseSchoolCapture(string value)
+    {
+        int separator = value.IndexOf(':');
+        int schoolNumber = 1;
+        string snapshotName = value;
+        if (separator >= 0)
+        {
+            if (
+                !int.TryParse(value[..separator], out schoolNumber)
+                || schoolNumber is
+                    < SchoolSceneStateMachine.MinimumSchoolNumber
+                    or > SchoolSceneStateMachine.MaximumSchoolNumber
+            )
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(value),
+                    value,
+                    "School capture number must be between 1 and 6.");
+            }
+
+            snapshotName = value[(separator + 1)..];
+        }
+
+        SchoolSceneSnapshot snapshot = snapshotName switch
+        {
+            "entry-prep-mid" =>
+                SchoolSceneSnapshot.EntryPreparationMid,
+            "entry-prep-left" =>
+                SchoolSceneSnapshot.EntryPreparationComplete,
+            "entry-start" => SchoolSceneSnapshot.EntryStart,
+            "entry-mid" => SchoolSceneSnapshot.EntryMid,
+            "entry-end" => SchoolSceneSnapshot.EntryEnd,
+            "clap" => SchoolSceneSnapshot.Clap,
+            "exit-prep-mid" =>
+                SchoolSceneSnapshot.ExitPreparationMid,
+            "exit-normalize-mid" =>
+                SchoolSceneSnapshot.ExitNormalizationMid,
+            "exit-mid" => SchoolSceneSnapshot.ExitMid,
+            "exit-end" => SchoolSceneSnapshot.ExitEnd,
+            "cross-hold" => SchoolSceneSnapshot.FinalCrossHold,
+            _ => throw new ArgumentException(
+                $"Invalid school capture snapshot: {snapshotName}"),
+        };
+        return new SchoolCaptureSelection(schoolNumber, snapshot);
     }
 
     private void ConfigureDialoguePreview(string? preview)
@@ -787,7 +1254,9 @@ public partial class TurnController : Node2D
 
             GD.Print(
                 $"CAPTURE_SAVED direction={_turn.CurrentDirection} "
-                + $"frame={_turn.CurrentFrame} path={_capturePath}");
+                + $"frame={_turn.CurrentFrame} "
+                + $"school_id={_schoolScene.SelectedSchoolNumber?.ToString() ?? "none"} "
+                + $"school_phase={_schoolScene.Phase} path={_capturePath}");
             GetTree().Quit();
         }
         catch (Exception exception)
@@ -831,9 +1300,14 @@ public partial class TurnController : Node2D
     }
 
     private sealed record CaptureModeConfiguration(
-        int Frame,
+        int? Frame,
         TurnDirection Direction,
         string Root,
         string Path,
-        string? DialoguePreview);
+        string? DialoguePreview,
+        SchoolCaptureSelection? SchoolCapture);
+
+    private sealed record SchoolCaptureSelection(
+        int SchoolNumber,
+        SchoolSceneSnapshot Snapshot);
 }
