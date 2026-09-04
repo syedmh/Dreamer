@@ -1,3 +1,9 @@
-numpy>=2.2.0
-opencv-python>=4.10.0
-Pillow>=11.0.0
+--index-url https://packagefeedproxy.microsoft.io/pypi/simple/
+--only-binary=:all:
+
+numpy==2.5.2 \
+    --hash=sha256:85aaccb24182c25df891ad0ec333585967e115269d5f1b17f2c9ae005bc96657
+opencv-python==5.0.0.93 \
+    --hash=sha256:f90ba04b8f73bc5c3814037699739f0156f597338a98f05956c684e7c3ca10d2
+Pillow==12.3.0 \
+    --hash=sha256:1cca606cd25738df4ed873d5ad46bbdb3d83b5cbca291f6b4ff13a4df6b0bbe8

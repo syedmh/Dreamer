@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -21,6 +20,7 @@ from foreground_cutout import (  # noqa: E402
     CutoutResult,
     isolate_character,
 )
+from file_integrity import sha256_file  # noqa: E402
 
 
 SOURCE_PATH = ROOT / "RWalking2.png"
@@ -37,6 +37,7 @@ CONTACT_SHEET_PATH = EVIDENCE_DIR / "black-background-contact-sheet.png"
 SOURCE_SHA256 = (
     "CD56287A4830D068292793256DBEB5A29E1EB9D888520A5339FE3957E7B7FA3A"
 )
+SOURCE_SIZE_BYTES = 495754
 SOURCE_SHAPE = (1024, 1536, 3)
 X_INTERVALS = (
     (0, 280),
@@ -76,43 +77,49 @@ CUTOUT_CONFIGS = (
         "RightWalk/walk_00",
         (105, 165, 455, 850),
         (165, 280, 345, 570),
-        ((105, 590, 270, 850), (245, 590, 455, 850)),
-        590,
+        ((115, 680, 220, 833), (295, 680, 445, 833)),
+        700,
+        maximum_component_gap=18,
     ),
     CutoutConfig(
         "RightWalk/walk_01",
         (105, 165, 450, 850),
         (165, 280, 345, 570),
-        ((105, 590, 270, 850), (245, 590, 450, 850)),
-        590,
+        ((105, 680, 210, 833), (290, 680, 435, 833)),
+        700,
+        maximum_component_gap=18,
     ),
     CutoutConfig(
         "RightWalk/walk_02",
         (115, 165, 410, 850),
         (165, 280, 345, 570),
-        ((115, 590, 265, 850), (235, 590, 410, 850)),
-        590,
+        ((110, 680, 195, 841), (255, 680, 400, 841)),
+        700,
+        maximum_component_gap=18,
     ),
     CutoutConfig(
         "RightWalk/walk_03",
         (135, 165, 370, 850),
         (170, 280, 340, 570),
-        ((135, 590, 260, 850), (220, 590, 370, 850)),
-        590,
+        ((150, 680, 225, 841), (225, 680, 365, 841)),
+        700,
+        maximum_component_gap=18,
     ),
     CutoutConfig(
         "RightWalk/walk_04",
         (135, 165, 420, 850),
         (165, 280, 345, 570),
-        ((135, 590, 290, 850), (230, 590, 420, 850)),
-        590,
+        ((170, 680, 260, 842), (250, 680, 350, 842)),
+        700,
+        maximum_component_gap=18,
     ),
     CutoutConfig(
         "RightWalk/walk_05",
         (125, 165, 390, 850),
         (165, 280, 345, 570),
-        ((125, 590, 275, 850), (230, 590, 390, 850)),
-        590,
+        ((145, 680, 230, 835), (285, 680, 385, 835)),
+        700,
+        maximum_component_gap=18,
     ),
 )
 
@@ -134,7 +141,7 @@ class GeneratedFrame:
 
 
 def source_sha256() -> str:
-    return hashlib.sha256(SOURCE_PATH.read_bytes()).hexdigest().upper()
+    return sha256_file(SOURCE_PATH, SOURCE_SIZE_BYTES)
 
 
 def validate_source() -> tuple[np.ndarray, str]:
@@ -386,50 +393,28 @@ def validate_source_geometry(source: np.ndarray) -> None:
     )
 
 
-def clean_output_sets() -> list[str]:
+def validate_output_sets() -> None:
     RIGHT_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     LEFT_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     expected_names = {f"walk_{index:02d}.png" for index in range(FRAME_COUNT)}
+    expected_imports = {f"{name}.import" for name in expected_names}
 
-    unexpected_right = [
-        path
-        for path in RIGHT_OUTPUT_DIR.glob("*.png")
-        if path.name not in expected_names
-    ]
-    if unexpected_right:
-        raise RuntimeError(
-            "Unexpected RightWalk PNG assets must be removed explicitly: "
-            + ", ".join(str(path.relative_to(ROOT)) for path in unexpected_right)
-        )
-
-    stale_paths: list[Path] = []
-    for index in range(FRAME_COUNT, 18):
-        stale_paths.extend(
-            (
-                LEFT_OUTPUT_DIR / f"walk_{index:02d}.png",
-                LEFT_OUTPUT_DIR / f"walk_{index:02d}.png.import",
+    unexpected = []
+    for output_dir in (RIGHT_OUTPUT_DIR, LEFT_OUTPUT_DIR):
+        unexpected.extend(
+            path
+            for pattern, allowed in (
+                ("*.png", expected_names),
+                ("*.png.import", expected_imports),
             )
+            for path in output_dir.glob(pattern)
+            if path.name not in allowed
         )
-    removed_paths = [path for path in stale_paths if path.is_file()]
-    for path in removed_paths:
-        if path.is_file():
-            path.unlink()
-
-    unexpected_left = [
-        path
-        for path in LEFT_OUTPUT_DIR.glob("*.png")
-        if path.name not in expected_names
-    ]
-    if unexpected_left:
+    if unexpected:
         raise RuntimeError(
-            "Unexpected LeftWalk PNG assets must be removed explicitly: "
-            + ", ".join(str(path.relative_to(ROOT)) for path in unexpected_left)
+            "Unexpected walk assets must be removed explicitly: "
+            + ", ".join(str(path.relative_to(ROOT)) for path in unexpected)
         )
-
-    return sorted(
-        str(path.relative_to(ROOT))
-        for path in removed_paths
-    )
 
 
 def write_png(path: Path, image: np.ndarray) -> None:
@@ -555,11 +540,10 @@ def main() -> int:
 
     source, hash_before = validate_source()
     validate_source_geometry(source)
+    cv2.setRNGSeed(0)
     generated = generate_frames(source)
     differences = validate_generated_frames(generated)
-    cleaned = clean_output_sets()
-    if cleaned:
-        print(f"cleaned_stale_outputs={cleaned}")
+    validate_output_sets()
 
     for index, item in enumerate(generated):
         name = f"walk_{index:02d}.png"

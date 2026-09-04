@@ -13,7 +13,6 @@ Runtime therefore uses human frames 1,2,3,4,5,6 once, at a fixed 8 FPS.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import sys
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -29,8 +28,11 @@ from PIL import Image  # type: ignore  # noqa: E402
 from foreground_cutout import (  # noqa: E402
     CutoutConfig,
     CutoutResult,
+    Polygon,
     isolate_character,
+    project_source_exclusion_mask,
 )
+from file_integrity import sha256_file  # noqa: E402
 
 
 SOURCE_PATH = ROOT / "Clapping2.png"
@@ -53,6 +55,7 @@ MOTION_STRIP_PATH = EVIDENCE_DIR / "clapping2-motion-strip.png"
 SOURCE_SHA256 = (
     "FBB46FBEAD0D5815F4E23307240535C600C29D0DF650B493137D05E762319C00"
 )
+SOURCE_SIZE_BYTES = 654450
 SOURCE_SHAPE = (1448, 1086, 3)
 SOURCE_LAYOUT = "3x2_labeled"
 SOURCE_READING_ORDER = "left_to_right_top_to_bottom"
@@ -75,7 +78,7 @@ PLAYBACK_FPS = 8.0
 WORKING_SCALE = 1.22
 TARGET_TORSO_X = 256
 TARGET_WORKING_SHOE_Y = 847
-TARGET_VISIBLE_SHOE_Y = 843
+TARGET_VISIBLE_SHOE_Y = 842
 HEIGHT_TOLERANCE = 4
 LANDMARK_TOLERANCE = 14
 TORSO_TOLERANCE = 4
@@ -110,12 +113,24 @@ SOURCE_SHOE_BASELINES = (664, 664, 665, 1383, 1383, 1383)
 # head-to-shoe span so the final head top and total body height match the
 # canonical front texture while the visible shoe baseline stays fixed.
 CANONICAL_HEIGHT_SCALES = (
-    0.846547,
-    0.847631,
-    0.845467,
+    0.857513,
     0.858625,
-    0.857328,
-    0.856034,
+    0.857513,
+    0.867628,
+    0.867628,
+    0.867628,
+)
+
+# Absolute source-sheet masks remove the repeated left-shoe floor reflection
+# before lower-anatomy evidence is built. Top- and bottom-row poses share the
+# same local source geometry but retain explicit per-pose records.
+SOURCE_EXCLUSIONS: tuple[tuple[Polygon, ...], ...] = (
+    (((114, 650), (161, 650), (161, 663), (114, 663)),),
+    (((477, 650), (524, 650), (524, 663), (477, 663)),),
+    (((840, 650), (887, 650), (887, 663), (840, 663)),),
+    (((114, 1368), (161, 1368), (161, 1380), (114, 1380)),),
+    (((477, 1368), (524, 1368), (524, 1380), (477, 1380)),),
+    (((840, 1368), (887, 1368), (887, 1380), (840, 1380)),),
 )
 
 
@@ -142,7 +157,7 @@ class GeneratedFrame:
 
 
 def source_sha256() -> str:
-    return hashlib.sha256(SOURCE_PATH.read_bytes()).hexdigest().upper()
+    return sha256_file(SOURCE_PATH, SOURCE_SIZE_BYTES)
 
 
 def validate_source() -> tuple[np.ndarray, str]:
@@ -195,6 +210,7 @@ def validate_source_geometry() -> None:
         TORSO_CENTERS,
         SOURCE_SHOE_BASELINES,
         CANONICAL_HEIGHT_SCALES,
+        SOURCE_EXCLUSIONS,
     )
     if any(len(record) != FRAME_COUNT for record in records):
         raise RuntimeError("Clapping2 pose records are inconsistent.")
@@ -239,7 +255,7 @@ def make_cutout_config(index: int) -> CutoutConfig:
         f"Clap/clap_{index:02d}",
         (55, 35, 460, 860),
         (105, 145, 415, 650),
-        ((150, 700, 245, 855), (305, 700, 390, 855)),
+        ((155, 680, 255, 842), (285, 680, 360, 842)),
         700,
         minimum_shoe_pixels=50,
         minimum_dark_shoe_retention=0.90,
@@ -346,12 +362,14 @@ def generate_frames(source: np.ndarray) -> list[GeneratedFrame]:
         torso_center,
         shoe_baseline,
         height_scale,
+        source_exclusions,
     ) in enumerate(
         zip(
             SOURCE_CROPS,
             TORSO_CENTERS,
             SOURCE_SHOE_BASELINES,
             CANONICAL_HEIGHT_SCALES,
+            SOURCE_EXCLUSIONS,
             strict=True,
         )
     ):
@@ -386,7 +404,18 @@ def generate_frames(source: np.ndarray) -> list[GeneratedFrame]:
             offset_x : offset_x + resized_width,
             :3,
         ] = panel
-        cutout = isolate_character(canvas, make_cutout_config(index))
+        exclusion_mask = project_source_exclusion_mask(
+            (CANVAS_HEIGHT, CANVAS_WIDTH),
+            crop,
+            panel.shape[:2],
+            (offset_x, offset_y),
+            source_exclusions,
+        )
+        cutout = isolate_character(
+            canvas,
+            make_cutout_config(index),
+            source_exclusion_mask=exclusion_mask,
+        )
         uncalibrated = measure_anatomy(
             cutout.frame, f"clap_{index:02d} uncalibrated"
         )
@@ -491,18 +520,24 @@ def validate_generated(generated: list[GeneratedFrame]) -> None:
         )
 
 
-def remove_stale_outputs() -> None:
+def validate_output_set() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     expected = {f"clap_{index:02d}.png" for index in range(FRAME_COUNT)}
     expected_imports = {f"{name}.import" for name in expected}
-    for path in sorted(OUTPUT_DIR.glob("clap_*.png")):
-        if path.name not in expected:
-            path.unlink()
-            print(f"removed_stale={path.relative_to(ROOT)}")
-    for path in sorted(OUTPUT_DIR.glob("clap_*.png.import")):
-        if path.name not in expected_imports:
-            path.unlink()
-            print(f"removed_stale={path.relative_to(ROOT)}")
+    unexpected = [
+        path
+        for pattern, allowed in (
+            ("clap_*.png", expected),
+            ("clap_*.png.import", expected_imports),
+        )
+        for path in sorted(OUTPUT_DIR.glob(pattern))
+        if path.name not in allowed
+    ]
+    if unexpected:
+        raise RuntimeError(
+            "Unexpected clap assets must be removed explicitly: "
+            + ", ".join(str(path.relative_to(ROOT)) for path in unexpected)
+        )
 
 
 def write_png(path: Path, image: np.ndarray) -> None:
@@ -787,7 +822,7 @@ def main() -> int:
     validate_source_geometry()
     generated = generate_frames(source)
     validate_generated(generated)
-    remove_stale_outputs()
+    validate_output_set()
     write_frames(generated)
     validate_written_outputs()
     validate_existing_height_assets()

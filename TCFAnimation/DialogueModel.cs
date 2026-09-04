@@ -1,5 +1,7 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
+using System.Text;
 
 namespace TCFAnimation;
 
@@ -42,7 +44,8 @@ public sealed class DialogueModel
         {
             if (key == DialogueKey.Enter)
             {
-                string normalized = DialogueLayout.NormalizeText(draftText);
+                string boundedDraft = BoundDraftText(draftText);
+                string normalized = DialogueLayout.NormalizeText(boundedDraft);
                 IsEditing = false;
                 if (normalized.Length == 0)
                 {
@@ -89,6 +92,27 @@ public sealed class DialogueModel
     {
         IsEditing = true;
     }
+
+    private static string BoundDraftText(string draftText)
+    {
+        StringBuilder bounded = new(
+            Math.Min(
+                draftText.Length,
+                DialogueLayout.MaximumInputCharacters));
+        int characterCount = 0;
+        foreach (Rune character in draftText.EnumerateRunes())
+        {
+            if (characterCount == DialogueLayout.MaximumInputCharacters)
+            {
+                break;
+            }
+
+            bounded.Append(character.ToString());
+            characterCount++;
+        }
+
+        return bounded.ToString();
+    }
 }
 
 public readonly record struct DialogueSize(float Width, float Height);
@@ -132,9 +156,15 @@ public static class DialogueLayout
             return string.Empty;
         }
 
+        StringBuilder validText = new(text.Length);
+        foreach (Rune character in text.EnumerateRunes())
+        {
+            validText.Append(character.ToString());
+        }
+
         return string.Join(
             ' ',
-            text.Split(
+            validText.ToString().Split(
                 (char[]?)null,
                 StringSplitOptions.RemoveEmptyEntries
                 | StringSplitOptions.TrimEntries));
@@ -251,27 +281,30 @@ public static class DialogueLayout
         Func<string, float> measureWidth,
         float maximumWidth)
     {
-        string segment = string.Empty;
-        foreach (char character in word)
+        StringBuilder segment = new(word.Length);
+        foreach (Rune character in word.EnumerateRunes())
         {
-            string candidate = segment + character;
+            string characterText = character.ToString();
+            string candidate = segment.ToString() + characterText;
             if (
                 segment.Length > 0
                 && measureWidth(candidate) > maximumWidth
             )
             {
-                yield return segment;
-                segment = character.ToString();
+                yield return segment.ToString();
+                segment.Clear();
+                segment.Append(characterText);
             }
             else
             {
-                segment = candidate;
+                segment.Clear();
+                segment.Append(candidate);
             }
         }
 
         if (segment.Length > 0)
         {
-            yield return segment;
+            yield return segment.ToString();
         }
     }
 
@@ -287,7 +320,17 @@ public static class DialogueLayout
             && measureWidth(fitted + ellipsis) > maximumWidth
         )
         {
-            fitted = fitted[..^1].TrimEnd();
+            OperationStatus status = Rune.DecodeLastFromUtf16(
+                fitted.AsSpan(),
+                out _,
+                out int charsConsumed);
+            if (status != OperationStatus.Done)
+            {
+                throw new InvalidOperationException(
+                    "Dialogue text was not valid UTF-16.");
+            }
+
+            fitted = fitted[..^charsConsumed].TrimEnd();
         }
 
         return fitted + ellipsis;

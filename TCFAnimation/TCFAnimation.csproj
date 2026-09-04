@@ -5,6 +5,10 @@
     <Nullable>enable</Nullable>
     <RootNamespace>TCFAnimation</RootNamespace>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'ExportRelease'">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>None</DebugType>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="ControllerProbe\**\*.cs" />
   </ItemGroup>

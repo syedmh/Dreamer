@@ -1,8 +1,10 @@
 using TCFAnimation;
+using System.Text;
 
 const double TurnFps = 8.0;
 
 RunTurnCases();
+RunAnimationGeometryCases();
 RunLeftWalkCases();
 RunRightWalkCases();
 RunWalkPlaybackSpeedCases();
@@ -12,13 +14,17 @@ RunEdgeCases();
 RunValidationCases();
 RunDialogueCases();
 RunDialogueLayoutCases();
+RunCaptureRootCases();
+RunCapturePathCases();
+RunGlobalInputCases();
 
 Console.WriteLine(
-    "CONTROLLER_PROBE_PASS "
+    $"CONTROLLER_PROBE_PASS assertions={ProbeAssertions.Count} "
     + "left_turn=true right_turn=true returns=true "
     + "direct_reversal_both_ways=true both_held_neutral=true "
     + "left_walk_6_frames=true right_walk_6_frames=true "
     + "left_edge_latch=true right_edge_latch=true "
+    + "geometry_extrema=74,437 geometry_centers=227.5,1693.75 "
     + "fps_turn=8 fps_left_walk=6 fps_right_walk=6 "
     + "adjustable_walk_speed=true "
     + "clap_6_frames=true clap_15_steps=true fps_clap=8 clap_one_shot=true "
@@ -26,8 +32,275 @@ Console.WriteLine(
     + "cross_arm_3_frames=true fps_cross_arm=8 crossed_hold_cross_02=true "
     + "release_6_frames=true release_source=CrossArm4 fps_cross_arm_release=8 "
     + "cross_arm_direction_lock=true dialogue_input=true "
-    + "dialogue_layout=true");
+    + "dialogue_layout=true global_input=true "
+    + "capture_root=true "
+    + "fixed_runtime_frames=33 wave_assets=false");
 return;
+
+static void RunGlobalInputCases()
+{
+    AssertSingleGlobalRoute(
+        "Alt+Enter closed routes once before focused controls",
+        GlobalInputKey.Enter,
+        altPressed: true,
+        dialogueEditing: false,
+        fullscreen: false,
+        GlobalInputAction.ToggleFullscreen);
+    AssertSingleGlobalRoute(
+        "Alt+Enter editing routes once before focused controls",
+        GlobalInputKey.Enter,
+        altPressed: true,
+        dialogueEditing: true,
+        fullscreen: true,
+        GlobalInputAction.ToggleFullscreen);
+    AssertSingleGlobalRoute(
+        "F11 editing routes once before focused controls",
+        GlobalInputKey.F11,
+        altPressed: false,
+        dialogueEditing: true,
+        fullscreen: false,
+        GlobalInputAction.ToggleFullscreen);
+
+    DialogueModel routeDialogue = new();
+    DialogueAction opened = routeDialogue.HandleKey(
+        DialogueKey.Enter,
+        echo: false);
+    const string exactDraft = "  Keep\tthis exact text!  ";
+    GlobalInputAction editingToggle = GlobalInputPolicy.Resolve(
+        GlobalInputPhase.EarlyInput,
+        GlobalInputKey.Enter,
+        pressed: true,
+        echo: false,
+        altPressed: true,
+        dialogueEditing: routeDialogue.IsEditing,
+        fullscreen: true);
+    AssertTrue(
+        "Alt+Enter preserves open editor state without dialogue action",
+        opened.Opened
+        && editingToggle == GlobalInputAction.ToggleFullscreen
+        && routeDialogue.IsEditing
+        && routeDialogue.SuppressCharacterInput
+        && !routeDialogue.IsBubbleVisible
+        && routeDialogue.BubbleText.Length == 0);
+
+    GlobalInputAction firstEscape = GlobalInputPolicy.Resolve(
+        GlobalInputPhase.EarlyInput,
+        GlobalInputKey.Escape,
+        pressed: true,
+        echo: false,
+        altPressed: false,
+        dialogueEditing: routeDialogue.IsEditing,
+        fullscreen: true);
+    DialogueAction cancelled = routeDialogue.HandleKey(
+        DialogueKey.Escape,
+        echo: false,
+        exactDraft);
+    GlobalInputAction secondEscape = GlobalInputPolicy.Resolve(
+        GlobalInputPhase.EarlyInput,
+        GlobalInputKey.Escape,
+        pressed: true,
+        echo: false,
+        altPressed: false,
+        dialogueEditing: routeDialogue.IsEditing,
+        fullscreen: true);
+    AssertTrue(
+        "Escape remains two-stage while editing fullscreen",
+        firstEscape == GlobalInputAction.None
+        && cancelled.Closed
+        && !routeDialogue.IsEditing
+        && secondEscape == GlobalInputAction.ExitFullscreen);
+
+    GlobalInputAction plainEnter = GlobalInputPolicy.Resolve(
+        GlobalInputPhase.EarlyInput,
+        GlobalInputKey.Enter,
+        pressed: true,
+        echo: false,
+        altPressed: false,
+        dialogueEditing: false,
+        fullscreen: false);
+    DialogueAction plainEnterAction = routeDialogue.HandleKey(
+        DialogueKey.Enter,
+        echo: false);
+    AssertTrue(
+        "plain Enter remains owned by dialogue",
+        plainEnter == GlobalInputAction.None
+        && plainEnterAction.Opened
+        && routeDialogue.IsEditing);
+
+    bool[] booleanValues = [false, true];
+    foreach (bool dialogueEditing in booleanValues)
+    {
+        foreach (bool fullscreen in booleanValues)
+        {
+            foreach (bool altPressed in booleanValues)
+            {
+                AssertEqual(
+                    $"F11 toggles fullscreen dialogue={dialogueEditing} "
+                    + $"fullscreen={fullscreen} alt={altPressed}",
+                    GlobalInputPolicy.Resolve(
+                        GlobalInputPhase.EarlyInput,
+                        GlobalInputKey.F11,
+                        pressed: true,
+                        echo: false,
+                        altPressed,
+                        dialogueEditing,
+                        fullscreen),
+                    GlobalInputAction.ToggleFullscreen);
+            }
+
+            AssertEqual(
+                $"Alt+Enter toggles fullscreen dialogue={dialogueEditing} "
+                + $"fullscreen={fullscreen}",
+                GlobalInputPolicy.Resolve(
+                    GlobalInputPhase.EarlyInput,
+                    GlobalInputKey.Enter,
+                    pressed: true,
+                    echo: false,
+                    altPressed: true,
+                    dialogueEditing,
+                    fullscreen),
+                GlobalInputAction.ToggleFullscreen);
+            AssertEqual(
+                $"Escape arbitration dialogue={dialogueEditing} "
+                + $"fullscreen={fullscreen}",
+                GlobalInputPolicy.Resolve(
+                    GlobalInputPhase.EarlyInput,
+                    GlobalInputKey.Escape,
+                    pressed: true,
+                    echo: false,
+                    altPressed: false,
+                    dialogueEditing,
+                    fullscreen),
+                !dialogueEditing && fullscreen
+                    ? GlobalInputAction.ExitFullscreen
+                    : GlobalInputAction.None);
+            AssertEqual(
+                $"plain Enter is not global dialogue={dialogueEditing} "
+                + $"fullscreen={fullscreen}",
+                GlobalInputPolicy.Resolve(
+                    GlobalInputPhase.EarlyInput,
+                    GlobalInputKey.Enter,
+                    pressed: true,
+                    echo: false,
+                    altPressed: false,
+                    dialogueEditing,
+                    fullscreen),
+                GlobalInputAction.None);
+            AssertEqual(
+                $"other key is not global dialogue={dialogueEditing} "
+                + $"fullscreen={fullscreen}",
+                GlobalInputPolicy.Resolve(
+                    GlobalInputPhase.EarlyInput,
+                    GlobalInputKey.Other,
+                    pressed: true,
+                    echo: false,
+                    altPressed: true,
+                    dialogueEditing,
+                    fullscreen),
+                GlobalInputAction.None);
+        }
+    }
+
+    AssertEqual(
+        "released global key is ignored",
+        GlobalInputPolicy.Resolve(
+            GlobalInputPhase.EarlyInput,
+            GlobalInputKey.F11,
+            pressed: false,
+            echo: false,
+            altPressed: false,
+            dialogueEditing: true,
+            fullscreen: false),
+        GlobalInputAction.None);
+    AssertEqual(
+        "echoed global key is ignored",
+        GlobalInputPolicy.Resolve(
+            GlobalInputPhase.EarlyInput,
+            GlobalInputKey.Enter,
+            pressed: true,
+            echo: true,
+            altPressed: true,
+            dialogueEditing: true,
+            fullscreen: true),
+        GlobalInputAction.None);
+}
+
+static void AssertSingleGlobalRoute(
+    string stepName,
+    GlobalInputKey key,
+    bool altPressed,
+    bool dialogueEditing,
+    bool fullscreen,
+    GlobalInputAction expectedAction)
+{
+    GlobalInputAction earlyAction = GlobalInputPolicy.Resolve(
+        GlobalInputPhase.EarlyInput,
+        key,
+        pressed: true,
+        echo: false,
+        altPressed,
+        dialogueEditing,
+        fullscreen);
+    GlobalInputAction unhandledAction = GlobalInputPolicy.Resolve(
+        GlobalInputPhase.UnhandledKeyInput,
+        key,
+        pressed: true,
+        echo: false,
+        altPressed,
+        dialogueEditing,
+        fullscreen);
+    AssertTrue(
+        stepName,
+        earlyAction == expectedAction
+        && unhandledAction == GlobalInputAction.None);
+}
+
+static void RunAnimationGeometryCases()
+{
+    AnimationSafeCenters centers = AnimationGeometry.DefaultSafeCenters;
+    AssertEqual("left walk visible extremum", AnimationGeometry.LeftWalkVisibleX, 74.0f);
+    AssertEqual("right walk visible extremum", AnimationGeometry.RightWalkVisibleX, 437.0f);
+    AssertEqual("left safe center", centers.Left, 227.5f);
+    AssertEqual("right safe center", centers.Right, 1693.75f);
+
+    AnimationSafeCenters shifted = AnimationGeometry.CalculateSafeCenters(
+        viewportLeft: 50.0f,
+        viewportWidth: AnimationGeometry.ViewportWidth,
+        canvasCenterX: AnimationGeometry.CanvasCenterX,
+        characterScale: AnimationGeometry.CharacterScale,
+        leftVisibleX: AnimationGeometry.LeftWalkVisibleX,
+        rightVisibleX: AnimationGeometry.RightWalkVisibleX);
+    AssertEqual("shifted left safe center", shifted.Left, 277.5f);
+    AssertEqual("shifted right safe center", shifted.Right, 1743.75f);
+
+    AssertThrows<ArgumentOutOfRangeException>(
+        "geometry rejects zero viewport width",
+        () => AnimationGeometry.CalculateSafeCenters(
+            0.0f,
+            0.0f,
+            256.0f,
+            1.25f,
+            74.0f,
+            437.0f));
+    AssertThrows<ArgumentOutOfRangeException>(
+        "geometry rejects nonpositive scale",
+        () => AnimationGeometry.CalculateSafeCenters(
+            0.0f,
+            1920.0f,
+            256.0f,
+            0.0f,
+            74.0f,
+            437.0f));
+    AssertThrows<ArgumentOutOfRangeException>(
+        "geometry rejects extrema that do not bracket center",
+        () => AnimationGeometry.CalculateSafeCenters(
+            0.0f,
+            1920.0f,
+            256.0f,
+            1.25f,
+            300.0f,
+            437.0f));
+}
 
 static void RunTurnCases()
 {
@@ -730,6 +1003,24 @@ static void RunEdgeCases()
 
 static void RunValidationCases()
 {
+    int runtimeFrameCount =
+        3
+        + 3
+        + DirectionalTurnStateMachine.LeftWalkFrameCount
+        + DirectionalTurnStateMachine.RightWalkFrameCount
+        + DirectionalTurnStateMachine.ClapFrameCount
+        + DirectionalTurnStateMachine.CrossArmFrameCount
+        + DirectionalTurnStateMachine.CrossArmReleaseFrameCount;
+    AssertEqual("runtime frame count remains fixed", runtimeFrameCount, 33);
+    AssertTrue(
+        "runtime state contract has no wave",
+        Enum.GetNames<TurnDirection>().All(
+            name => !name.Contains("wave", StringComparison.OrdinalIgnoreCase))
+        && Enum.GetNames<FrontGesture>().All(
+            name => !name.Contains("wave", StringComparison.OrdinalIgnoreCase))
+        && Enum.GetNames<CrossArmPhase>().All(
+            name => !name.Contains("wave", StringComparison.OrdinalIgnoreCase)));
+
     AssertThrows<ArgumentOutOfRangeException>(
         "constructor rejects zero fps",
         () => new DirectionalTurnStateMachine(0.0));
@@ -795,6 +1086,103 @@ static void RunDialogueCases()
 {
     DialogueModel dialogue = new();
 
+    AssertEqual(
+        "empty dialogue normalizes empty",
+        DialogueLayout.NormalizeText(string.Empty),
+        string.Empty);
+    AssertEqual(
+        "one-character dialogue remains intact",
+        DialogueLayout.NormalizeText("x"),
+        "x");
+
+    foreach (int length in new[] { 0, 1, 499, 500, 501 })
+    {
+        DialogueModel boundary = new();
+        boundary.HandleKey(DialogueKey.Enter, echo: false);
+        DialogueAction boundaryAction = boundary.HandleKey(
+            DialogueKey.Enter,
+            echo: false,
+            new string('x', length));
+        int expectedLength = Math.Min(
+            length,
+            DialogueLayout.MaximumInputCharacters);
+        AssertTrue(
+            $"dialogue length {length} is bounded to {expectedLength}",
+            boundaryAction.Closed
+            && boundaryAction.Submitted == (expectedLength > 0)
+            && boundary.IsBubbleVisible == (expectedLength > 0)
+            && boundary.BubbleText.Length == expectedLength);
+    }
+
+    const string supplementaryCharacter = "\U0001F600";
+    foreach (
+        (
+            string name,
+            string draft,
+            string expected,
+            int expectedScalarCount
+        ) in new[]
+        {
+            (
+                "500 supplementary characters",
+                string.Concat(
+                    Enumerable.Repeat(
+                        supplementaryCharacter,
+                        DialogueLayout.MaximumInputCharacters)),
+                string.Concat(
+                    Enumerable.Repeat(
+                        supplementaryCharacter,
+                        DialogueLayout.MaximumInputCharacters)),
+                DialogueLayout.MaximumInputCharacters
+            ),
+            (
+                "501 supplementary characters",
+                string.Concat(
+                    Enumerable.Repeat(
+                        supplementaryCharacter,
+                        DialogueLayout.MaximumInputCharacters + 1)),
+                string.Concat(
+                    Enumerable.Repeat(
+                        supplementaryCharacter,
+                        DialogueLayout.MaximumInputCharacters)),
+                DialogueLayout.MaximumInputCharacters
+            ),
+            (
+                "499 ASCII and one supplementary character",
+                new string(
+                    'x',
+                    DialogueLayout.MaximumInputCharacters - 1)
+                    + supplementaryCharacter,
+                new string(
+                    'x',
+                    DialogueLayout.MaximumInputCharacters - 1)
+                    + supplementaryCharacter,
+                DialogueLayout.MaximumInputCharacters
+            ),
+        }
+    )
+    {
+        DialogueModel boundary = new();
+        boundary.HandleKey(DialogueKey.Enter, echo: false);
+        DialogueAction boundaryAction = boundary.HandleKey(
+            DialogueKey.Enter,
+            echo: false,
+            draft);
+        AssertTrue(
+            $"{name} submits successfully",
+            boundaryAction.Closed
+            && boundaryAction.Submitted
+            && boundary.IsBubbleVisible);
+        AssertTrue(
+            $"{name} retains valid UTF-16",
+            IsValidUtf16(boundary.BubbleText));
+        AssertTrue(
+            $"{name} retains expected Unicode scalars",
+            boundary.BubbleText == expected
+            && boundary.BubbleText.EnumerateRunes().Count()
+                == expectedScalarCount);
+    }
+
     DialogueAction action = dialogue.HandleKey(DialogueKey.Enter, echo: false);
     AssertTrue("Enter closed opens input", action.Opened && dialogue.IsEditing);
     AssertTrue(
@@ -855,6 +1243,32 @@ static void RunDialogueCases()
     dialogue.HandleKey(DialogueKey.Escape, echo: false);
 }
 
+static bool IsValidUtf16(string text)
+{
+    for (int index = 0; index < text.Length; index++)
+    {
+        char current = text[index];
+        if (char.IsHighSurrogate(current))
+        {
+            if (
+                index + 1 >= text.Length
+                || !char.IsLowSurrogate(text[index + 1])
+            )
+            {
+                return false;
+            }
+
+            index++;
+        }
+        else if (char.IsLowSurrogate(current))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 static void RunDialogueLayoutCases()
 {
     static float Measure(string text) => text.Length * 18.0f;
@@ -886,6 +1300,80 @@ static void RunDialogueLayoutCases()
         longText.Split('\n').Length == DialogueLayout.MaximumLines
         && longText.EndsWith('…'));
 
+    string oversizedWord = DialogueLayout.WrapText(
+        new string('x', 20),
+        text => text.Length * 10.0f,
+        35.0f,
+        10);
+    AssertTrue(
+        "oversized word is split into bounded segments",
+        oversizedWord.Split('\n').All(line => MeasureWidth(line) <= 35.0f));
+
+    List<string> supplementarySplitMeasurements = [];
+    string supplementaryOversizedWord = DialogueLayout.WrapText(
+        "😀😀",
+        text =>
+        {
+            supplementarySplitMeasurements.Add(text);
+            return text.Length * 10.0f;
+        },
+        10.0f,
+        10);
+    List<string> supplementaryEllipsisMeasurements = [];
+    string supplementaryEllipsis = DialogueLayout.WrapText(
+        "ab😀 z",
+        text =>
+        {
+            supplementaryEllipsisMeasurements.Add(text);
+            return text.Length * 10.0f;
+        },
+        40.0f,
+        1);
+    AssertTrue(
+        "supplementary ellipsis preserves Unicode scalar boundaries",
+        IsValidUtf16(supplementaryEllipsis)
+        && supplementaryEllipsisMeasurements.All(IsValidUtf16));
+    AssertTrue(
+        "supplementary oversized word preserves Unicode scalar boundaries",
+        IsValidUtf16(supplementaryOversizedWord)
+        && supplementaryOversizedWord
+            .Split('\n')
+            .All(line => line.EnumerateRunes().Count() == 1)
+        && supplementarySplitMeasurements.All(IsValidUtf16));
+
+    List<string> invalidInputMeasurements = [];
+    string sanitizedInvalidInput = DialogueLayout.WrapText(
+        "a\uD83Db",
+        text =>
+        {
+            invalidInputMeasurements.Add(text);
+            return text.Length * 10.0f;
+        },
+        100.0f,
+        2);
+    AssertTrue(
+        "invalid UTF-16 input is sanitized before measurement",
+        IsValidUtf16(sanitizedInvalidInput)
+        && sanitizedInvalidInput.Contains(Rune.ReplacementChar.ToString())
+        && invalidInputMeasurements.All(IsValidUtf16));
+
+    AssertThrows<ArgumentNullException>(
+        "wrap rejects null width measurement",
+        () => DialogueLayout.WrapText("text", null!, 100.0f, 4));
+    AssertThrows<ArgumentOutOfRangeException>(
+        "wrap rejects zero maximum width",
+        () => DialogueLayout.WrapText("text", Measure, 0.0f, 4));
+    AssertThrows<ArgumentOutOfRangeException>(
+        "wrap rejects nonfinite maximum width",
+        () => DialogueLayout.WrapText(
+            "text",
+            Measure,
+            float.PositiveInfinity,
+            4));
+    AssertThrows<ArgumentOutOfRangeException>(
+        "wrap rejects zero maximum lines",
+        () => DialogueLayout.WrapText("text", Measure, 100.0f, 0));
+
     foreach (
         (string name, DialoguePoint anchor) in new[]
         {
@@ -910,6 +1398,411 @@ static void RunDialogueLayoutCases()
             $"{name} tail target remains character anchor",
             layout.TailTarget == anchor);
     }
+
+    static float MeasureWidth(string text) => text.Length * 10.0f;
+}
+
+static void RunCapturePathCases()
+{
+    string projectRoot = Path.GetFullPath(
+        Path.Combine("probe-root", "TCFAnimation"));
+    string expectedCapturePath = Path.Combine(
+        projectRoot,
+        CapturePathPolicy.CaptureDirectoryName,
+        "front.png");
+    string capturePath = CapturePathPolicy.Resolve(
+        projectRoot,
+        "front.png",
+        _ => false);
+    AssertEqual(
+        "capture path resolves under project-local directory",
+        capturePath,
+        expectedCapturePath);
+    AssertTrue(
+        "capture path accepts case-insensitive PNG extension",
+        CapturePathPolicy.Resolve(projectRoot, "front.PNG", _ => false)
+            .EndsWith("front.PNG", StringComparison.Ordinal));
+
+    const string stagingToken = "0123456789abcdef0123456789abcdef";
+    string stagingPath = CapturePathPolicy.CreateStagingPath(
+        projectRoot,
+        capturePath,
+        stagingToken);
+    AssertEqual(
+        "capture staging path stays beside final path",
+        Path.GetDirectoryName(stagingPath)!,
+        Path.GetDirectoryName(capturePath)!);
+    AssertEqual(
+        "capture staging path uses deterministic safe name",
+        Path.GetFileName(stagingPath),
+        $".front.png.{stagingToken}{CapturePathPolicy.StagingFileExtension}");
+
+    foreach (
+        (string name, string requestedPath) in new[]
+        {
+            ("empty", string.Empty),
+            ("absolute", @"C:\outside.png"),
+            ("UNC", @"\\server\share\outside.png"),
+            ("device", @"\\?\C:\outside.png"),
+            ("parent traversal", @"..\outside.png"),
+            ("nested directory", @"nested\outside.png"),
+            ("drive-relative", @"C:outside.png"),
+            ("reserved device name", "CON.png"),
+            ("reserved printer device", "PRN.png"),
+            ("reserved auxiliary device", "AUX.png"),
+            ("reserved null device", "NUL.png"),
+            ("reserved console input", "CONIN$.png"),
+            ("reserved console output", "CONOUT$.png"),
+            ("reserved clock device", "CLOCK$.png"),
+            ("reserved COM1 device", "COM1.png"),
+            ("reserved COM9 device", "COM9.png"),
+            ("reserved LPT1 device", "LPT1.png"),
+            ("reserved LPT9 device", "LPT9.png"),
+            ("reserved superscript COM1 device", "COM¹.png"),
+            ("reserved superscript COM2 device", "COM².png"),
+            ("reserved superscript COM3 device", "COM³.png"),
+            ("reserved superscript LPT1 device", "LPT¹.png"),
+            ("reserved superscript LPT2 device", "LPT².png"),
+            ("reserved superscript LPT3 device", "LPT³.png"),
+            ("reserved device with trailing stem space", "CON .png"),
+            ("alternate data stream", "front.png:payload"),
+            ("trailing space", "front.png "),
+            ("trailing dot", "front.png."),
+            ("invalid file-name character", "outside?.png"),
+            ("non-PNG", "outside.jpg"),
+        }
+    )
+    {
+        AssertThrows<ArgumentException>(
+            $"capture path rejects {name} input",
+            () => CapturePathPolicy.Resolve(
+                projectRoot,
+                requestedPath,
+                _ => false));
+    }
+
+    AssertThrows<IOException>(
+        "capture path refuses overwrite",
+        () => CapturePathPolicy.Resolve(
+            projectRoot,
+            "existing.png",
+            _ => true));
+
+    AssertThrows<ArgumentException>(
+        "capture staging rejects final path outside Captures",
+        () => CapturePathPolicy.CreateStagingPath(
+            projectRoot,
+            Path.Combine(projectRoot, "outside.png"),
+            stagingToken));
+    AssertThrows<ArgumentException>(
+        "capture staging rejects unsafe unique token",
+        () => CapturePathPolicy.CreateStagingPath(
+            projectRoot,
+            capturePath,
+            @"..\unsafe"));
+    AssertThrows<ArgumentException>(
+        "capture publication rejects staging name for another final",
+        () => CapturePathPolicy.EnsureSafeToPublish(
+            projectRoot,
+            capturePath,
+            CapturePathPolicy.CreateStagingPath(
+                projectRoot,
+                CapturePathPolicy.Resolve(
+                    projectRoot,
+                    "other.png",
+                    _ => false),
+                stagingToken),
+            _ => FileAttributes.Normal,
+            _ => false));
+
+    List<string> inspectedComponents = [];
+    CapturePathPolicy.EnsureNoReparsePoints(
+        projectRoot,
+        path =>
+        {
+            inspectedComponents.Add(path);
+            return FileAttributes.Directory;
+        });
+    AssertTrue(
+        "capture reparse inspection includes project root and Captures",
+        inspectedComponents.Contains(projectRoot)
+        && inspectedComponents.Contains(
+            CapturePathPolicy.GetCaptureDirectory(projectRoot)));
+
+    AssertThrows<IOException>(
+        "capture policy rejects project-root reparse point",
+        () => CapturePathPolicy.EnsureNoReparsePoints(
+            projectRoot,
+            path => string.Equals(
+                path,
+                projectRoot,
+                StringComparison.OrdinalIgnoreCase)
+                ? FileAttributes.Directory | FileAttributes.ReparsePoint
+                : FileAttributes.Directory));
+    string projectParent = Path.GetDirectoryName(projectRoot)!;
+    AssertThrows<IOException>(
+        "capture policy rejects ancestor reparse point",
+        () => CapturePathPolicy.EnsureNoReparsePoints(
+            projectRoot,
+            path => string.Equals(
+                path,
+                projectParent,
+                StringComparison.OrdinalIgnoreCase)
+                ? FileAttributes.Directory | FileAttributes.ReparsePoint
+                : FileAttributes.Directory));
+    string captureDirectory =
+        CapturePathPolicy.GetCaptureDirectory(projectRoot);
+    AssertThrows<IOException>(
+        "capture policy rejects Captures reparse point",
+        () => CapturePathPolicy.EnsureNoReparsePoints(
+            projectRoot,
+            path => string.Equals(
+                path,
+                captureDirectory,
+                StringComparison.OrdinalIgnoreCase)
+                ? FileAttributes.Directory | FileAttributes.ReparsePoint
+                : FileAttributes.Directory));
+
+    CapturePathPolicy.EnsureSafeToPublish(
+        projectRoot,
+        capturePath,
+        stagingPath,
+        path => string.Equals(
+            path,
+            stagingPath,
+            StringComparison.OrdinalIgnoreCase)
+            ? FileAttributes.Normal
+            : FileAttributes.Directory,
+        _ => false);
+    AssertTrue(
+        "capture publication accepts regular staging file",
+        true);
+    AssertThrows<IOException>(
+        "capture publication refuses final-file race",
+        () => CapturePathPolicy.EnsureSafeToPublish(
+            projectRoot,
+            capturePath,
+            stagingPath,
+            path => string.Equals(
+                path,
+                stagingPath,
+                StringComparison.OrdinalIgnoreCase)
+                ? FileAttributes.Normal
+                : FileAttributes.Directory,
+            _ => true));
+    AssertThrows<IOException>(
+        "capture publication rejects staging reparse point",
+        () => CapturePathPolicy.EnsureSafeToPublish(
+            projectRoot,
+            capturePath,
+            stagingPath,
+            path => string.Equals(
+                path,
+                stagingPath,
+                StringComparison.OrdinalIgnoreCase)
+                ? FileAttributes.ReparsePoint
+                : FileAttributes.Directory,
+            _ => false));
+}
+
+static void RunCaptureRootCases()
+{
+    string developmentRoot = Path.GetFullPath(
+        Path.Combine("probe-root", "development"));
+    string standaloneRoot = Path.GetFullPath(
+        Path.Combine("probe-root", "standalone"));
+    string standaloneExecutable = Path.Combine(
+        standaloneRoot,
+        "TCFAnimation.exe");
+    string standaloneManagedRoot = Path.Combine(
+        standaloneRoot,
+        "data_TCFAnimation_windows_x86_64");
+    Func<string, bool> exists = _ => true;
+    Func<string, FileAttributes> attributes = path =>
+        string.Equals(
+            path,
+            standaloneExecutable,
+            StringComparison.OrdinalIgnoreCase)
+            ? FileAttributes.Normal
+            : FileAttributes.Directory;
+
+    CaptureRootContext standaloneFeatureContext =
+        CaptureRootContext.FromGodotFeatures(
+            hasStandaloneFeature: true,
+            hasTemplateFeature: false,
+            standaloneExecutable,
+            standaloneManagedRoot,
+            developmentRoot);
+    AssertEqual(
+        "Godot standalone feature selects standalone context",
+        standaloneFeatureContext.IsStandalone,
+        true);
+    CaptureRootContext templateFeatureContext =
+        CaptureRootContext.FromGodotFeatures(
+            hasStandaloneFeature: false,
+            hasTemplateFeature: true,
+            standaloneExecutable,
+            standaloneManagedRoot,
+            developmentRoot);
+    AssertEqual(
+        "Godot 4 template feature selects standalone context",
+        templateFeatureContext.IsStandalone,
+        true);
+    AssertEqual(
+        "Godot editor feature set selects project context",
+        CaptureRootContext.FromGodotFeatures(
+            hasStandaloneFeature: false,
+            hasTemplateFeature: false,
+            standaloneExecutable,
+            standaloneRoot,
+            developmentRoot).IsStandalone,
+        false);
+
+    AssertEqual(
+        "development capture root uses globalized res filesystem root",
+        CaptureRootResolver.ResolveRoot(
+            new CaptureRootContext(
+                IsStandalone: false,
+                ExecutablePath: standaloneExecutable,
+                ApplicationBaseDirectory: standaloneRoot,
+                ProjectResourceRoot: developmentRoot),
+            exists,
+            exists,
+            attributes).Root,
+        Path.TrimEndingDirectorySeparator(developmentRoot));
+    AssertEqual(
+        "development capture root kind is project resource",
+        CaptureRootResolver.ResolveRoot(
+            new CaptureRootContext(
+                IsStandalone: false,
+                ExecutablePath: standaloneExecutable,
+                ApplicationBaseDirectory: standaloneRoot,
+                ProjectResourceRoot: developmentRoot),
+            exists,
+            exists,
+            attributes).Kind,
+        CaptureRootResolver.ProjectResourceKind);
+    AssertEqual(
+        "standalone capture root ignores nonempty project resource root",
+        CaptureRootResolver.ResolveRoot(
+            new CaptureRootContext(
+                IsStandalone: true,
+                ExecutablePath: standaloneExecutable,
+                ApplicationBaseDirectory: standaloneManagedRoot,
+                ProjectResourceRoot: developmentRoot),
+            exists,
+            exists,
+            attributes).Root,
+        Path.TrimEndingDirectorySeparator(standaloneRoot));
+    AssertEqual(
+        "standalone capture root kind is executable adjacent",
+        CaptureRootResolver.ResolveRoot(
+            new CaptureRootContext(
+                IsStandalone: true,
+                ExecutablePath: standaloneExecutable,
+                ApplicationBaseDirectory: standaloneManagedRoot,
+                ProjectResourceRoot: developmentRoot),
+            exists,
+            exists,
+            attributes).Kind,
+        CaptureRootResolver.ExecutableAdjacentKind);
+    AssertEqual(
+        "standalone capture root accepts direct executable base directory",
+        CaptureRootResolver.ResolveRoot(
+            new CaptureRootContext(
+                IsStandalone: true,
+                ExecutablePath: standaloneExecutable,
+                ApplicationBaseDirectory: standaloneRoot,
+                ProjectResourceRoot: developmentRoot),
+            exists,
+            exists,
+            attributes).Root,
+        Path.TrimEndingDirectorySeparator(standaloneRoot));
+
+    AssertThrows<ArgumentException>(
+        "standalone capture root rejects empty executable base",
+        () => CaptureRootResolver.ResolveRoot(
+            new CaptureRootContext(
+                IsStandalone: true,
+                ExecutablePath: standaloneExecutable,
+                ApplicationBaseDirectory: string.Empty,
+                ProjectResourceRoot: developmentRoot),
+            exists,
+            exists,
+            attributes));
+    AssertThrows<ArgumentException>(
+        "capture root rejects relative filesystem path",
+        () => CaptureRootResolver.ResolveRoot(
+            new CaptureRootContext(
+                IsStandalone: false,
+                ExecutablePath: standaloneExecutable,
+                ApplicationBaseDirectory: standaloneRoot,
+                ProjectResourceRoot: "relative-root"),
+            exists,
+            exists,
+            attributes));
+    AssertThrows<DirectoryNotFoundException>(
+        "capture root rejects missing selected directory without fallback",
+        () => CaptureRootResolver.ResolveRoot(
+            new CaptureRootContext(
+                IsStandalone: true,
+                ExecutablePath: standaloneExecutable,
+                ApplicationBaseDirectory: standaloneRoot,
+                ProjectResourceRoot: developmentRoot),
+            _ => false,
+            exists,
+            attributes));
+    AssertThrows<IOException>(
+        "capture root rejects selected root reparse point",
+        () => CaptureRootResolver.ResolveRoot(
+            new CaptureRootContext(
+                IsStandalone: true,
+                ExecutablePath: standaloneExecutable,
+                ApplicationBaseDirectory: standaloneRoot,
+                ProjectResourceRoot: developmentRoot),
+            exists,
+            exists,
+            path => string.Equals(
+                path,
+                standaloneRoot,
+                StringComparison.OrdinalIgnoreCase)
+                ? FileAttributes.Directory | FileAttributes.ReparsePoint
+                : attributes(path)));
+    AssertThrows<IOException>(
+        "capture root rejects selected root that is not a directory",
+        () => CaptureRootResolver.ResolveRoot(
+            new CaptureRootContext(
+                IsStandalone: false,
+                ExecutablePath: standaloneExecutable,
+                ApplicationBaseDirectory: standaloneRoot,
+                ProjectResourceRoot: developmentRoot),
+            exists,
+            exists,
+            _ => FileAttributes.Normal));
+    AssertThrows<FileNotFoundException>(
+        "standalone capture root rejects missing process executable",
+        () => CaptureRootResolver.ResolveRoot(
+            new CaptureRootContext(
+                IsStandalone: true,
+                ExecutablePath: standaloneExecutable,
+                ApplicationBaseDirectory: standaloneManagedRoot,
+                ProjectResourceRoot: developmentRoot),
+            exists,
+            _ => false,
+            attributes));
+    AssertThrows<IOException>(
+        "standalone capture root rejects unexpected managed layout",
+        () => CaptureRootResolver.ResolveRoot(
+            new CaptureRootContext(
+                IsStandalone: true,
+                ExecutablePath: standaloneExecutable,
+                ApplicationBaseDirectory: Path.Combine(
+                    standaloneRoot,
+                    "unexpected"),
+                ProjectResourceRoot: developmentRoot),
+            exists,
+            exists,
+            attributes));
 }
 
 static void AssertBubbleSize(
@@ -925,12 +1818,21 @@ static void AssertBubbleSize(
         .Max();
     DialogueSize size = DialogueLayout.CalculateBodySize(
         new DialogueSize(widestLine, measuredHeight));
-    AssertTrue(
-        stepName,
+    bool isWithinBounds =
         size.Width >= DialogueLayout.MinimumBodyWidth
         && size.Width <= DialogueLayout.MaximumBodyWidth
         && size.Height >= DialogueLayout.MinimumBodyHeight
-        && size.Height <= DialogueLayout.MaximumBodyHeight);
+        && size.Height <= DialogueLayout.MaximumBodyHeight;
+    if (!isWithinBounds)
+    {
+        throw new InvalidOperationException(
+            $"{stepName}: bubble size {size.Width}x{size.Height} was outside "
+            + "the supported layout bounds.");
+    }
+
+    ProbeAssertions.RecordSuccess();
+    Console.WriteLine(
+        $"PASS {stepName}: size={size.Width}x{size.Height}");
 }
 
 static DirectionalTurnStateMachine NewState()
@@ -986,6 +1888,7 @@ static void AssertPose(
             + $"crossArmState={state.CrossArmState}");
     }
 
+    ProbeAssertions.RecordSuccess();
     Console.WriteLine(
         $"PASS {stepName}: direction={state.CurrentDirection} "
         + $"frame={state.CurrentFrame}");
@@ -1019,6 +1922,7 @@ static void AssertWalk(
             + $"walkFrame={state.CurrentWalkFrame}");
     }
 
+    ProbeAssertions.RecordSuccess();
     Console.WriteLine(
         $"PASS {stepName}: direction={state.CurrentDirection} "
         + $"walkFrame={state.CurrentWalkFrame}");
@@ -1047,6 +1951,7 @@ static void AssertClap(
             + $"turnFrame={state.CurrentFrame} walking={state.IsWalking}");
     }
 
+    ProbeAssertions.RecordSuccess();
     Console.WriteLine(
         $"PASS {stepName}: clapStep={state.CurrentGestureStep} "
         + $"sourceFrame={state.CurrentClapFrame}");
@@ -1076,6 +1981,7 @@ static void AssertCrossing(
             + $"turnFrame={state.CurrentFrame}");
     }
 
+    ProbeAssertions.RecordSuccess();
     Console.WriteLine(
         $"PASS {stepName}: crossArmFrame={state.CurrentCrossArmFrame}");
 }
@@ -1109,6 +2015,7 @@ static void AssertCrossedHold(
             + $"frame={state.CurrentCrossArmFrame}");
     }
 
+    ProbeAssertions.RecordSuccess();
     Console.WriteLine(
         $"PASS {stepName}: crossArmHoldFrame={state.CurrentCrossArmFrame}");
 }
@@ -1137,6 +2044,7 @@ static void AssertReleasing(
             + $"turnFrame={state.CurrentFrame}");
     }
 
+    ProbeAssertions.RecordSuccess();
     Console.WriteLine(
         $"PASS {stepName}: crossArmReleaseFrame="
         + $"{state.CurrentCrossArmReleaseFrame}");
@@ -1155,6 +2063,7 @@ static void AssertWalkReset(
             + $"walkFrame={state.CurrentWalkFrame}");
     }
 
+    ProbeAssertions.RecordSuccess();
     Console.WriteLine($"PASS {stepName}");
 }
 
@@ -1167,6 +2076,7 @@ static void AssertNotWalking(
         throw new InvalidOperationException($"{stepName}: unexpectedly walking.");
     }
 
+    ProbeAssertions.RecordSuccess();
     Console.WriteLine($"PASS {stepName}");
 }
 
@@ -1181,6 +2091,7 @@ static void AssertChanged(
             $"{stepName}: expected changed={expected}, actual={actual}");
     }
 
+    ProbeAssertions.RecordSuccess();
     Console.WriteLine($"PASS {stepName}: changed={actual}");
 }
 
@@ -1191,7 +2102,20 @@ static void AssertTrue(string stepName, bool condition)
         throw new InvalidOperationException($"{stepName}: condition was false.");
     }
 
+    ProbeAssertions.RecordSuccess();
     Console.WriteLine($"PASS {stepName}");
+}
+
+static void AssertEqual<T>(string stepName, T actual, T expected)
+{
+    if (!EqualityComparer<T>.Default.Equals(actual, expected))
+    {
+        throw new InvalidOperationException(
+            $"{stepName}: expected {expected}, actual {actual}");
+    }
+
+    ProbeAssertions.RecordSuccess();
+    Console.WriteLine($"PASS {stepName}: value={actual}");
 }
 
 static void AssertThrows<TException>(string stepName, Action action)
@@ -1203,10 +2127,21 @@ static void AssertThrows<TException>(string stepName, Action action)
     }
     catch (TException)
     {
+        ProbeAssertions.RecordSuccess();
         Console.WriteLine($"PASS {stepName}: threw {typeof(TException).Name}");
         return;
     }
 
     throw new InvalidOperationException(
         $"{stepName}: expected {typeof(TException).Name}");
+}
+
+static class ProbeAssertions
+{
+    public static int Count { get; private set; }
+
+    public static void RecordSuccess()
+    {
+        Count++;
+    }
 }

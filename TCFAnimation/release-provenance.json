@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "supportedVersion": "4.5.1",
+  "requiredVersionToken": "mono",
+  "executables": [
+    {
+      "id": "godot-console-win64",
+      "fileName": "Godot_v4.5.1-stable_mono_win64_console.exe",
+      "size": 197640,
+      "sha256": "FD5C88FD05AFC7C2D965777320DEAEC5A80C31363C0BB33D7B48025376F96C5F",
+      "companionId": "godot-editor-win64"
+    },
+    {
+      "id": "godot-editor-win64",
+      "fileName": "Godot_v4.5.1-stable_mono_win64.exe",
+      "size": 163933704,
+      "sha256": "C369B7B92C30100F3EEDE92410BD02A4BB024562860DEE94C33399BEA1C77C9B"
+    }
+  ],
+  "exportTemplate": {
+    "id": "windows-release-x86_64",
+    "relativePath": "editor_data/export_templates/4.5.1.stable.mono/windows_release_x86_64.exe",
+    "size": 96965120,
+    "sha256": "9186C4AA21D659035A6BCC33BEA644D7399DDA42AC24F9E0D3A9E5965E92E00F"
+  }
+}

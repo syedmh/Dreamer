@@ -6,7 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\AnimationGeometry.cs" Link="AnimationGeometry.cs" />
+    <Compile Include="..\CapturePathPolicy.cs" Link="CapturePathPolicy.cs" />
     <Compile Include="..\DirectionalTurnStateMachine.cs" Link="DirectionalTurnStateMachine.cs" />
     <Compile Include="..\DialogueModel.cs" Link="DialogueModel.cs" />
+    <Compile Include="..\GlobalInputPolicy.cs" Link="GlobalInputPolicy.cs" />
   </ItemGroup>
 </Project>

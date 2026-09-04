@@ -4,8 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-from dataclasses import dataclass
-from io import BytesIO
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,8 +18,11 @@ from PIL import Image  # type: ignore  # noqa: E402
 from foreground_cutout import (  # noqa: E402
     CutoutConfig,
     CutoutResult,
+    Polygon,
     isolate_character,
+    project_source_exclusion_mask,
 )
+from file_integrity import sha256_file  # noqa: E402
 
 
 SOURCE_SHAPE = (1448, 1086, 3)
@@ -33,13 +35,18 @@ TARGET_FLOOR_BASELINE_Y = CANVAS_HEIGHT - 1
 class SheetConfig:
     name: str
     source_path: Path
+    source_sha256: str
+    source_size_bytes: int
+    source_format: str
+    source_mode: str
     output_dir: Path
     panel_crops: tuple[tuple[int, int, int, int], ...]
     label_rect: tuple[int, int, int, int]
     panel_offsets: tuple[tuple[int, int], ...]
     torso_centers: tuple[int, ...]
     cutouts: tuple[CutoutConfig, ...]
-    normalize_container: bool = False
+    source_exclusions: tuple[tuple[Polygon, ...], ...]
+    final_translations: tuple[tuple[int, int], ...]
 
 
 @dataclass(frozen=True)
@@ -57,6 +64,12 @@ class GeneratedFrame:
 LEFT_CONFIG = SheetConfig(
     name="LeftTurn",
     source_path=ROOT / "LTurning.png",
+    source_sha256=(
+        "9EDD38F303B17CD043EDCCABF2E6C2BC50F182B9A2B918B4BDECF1B2861E3A91"
+    ),
+    source_size_bytes=1502641,
+    source_format="PNG",
+    source_mode="RGBA",
     output_dir=ROOT / "Frames" / "LeftTurn",
     panel_crops=(
         (0, 0, 359, 724),
@@ -75,24 +88,36 @@ LEFT_CONFIG = SheetConfig(
             "LeftTurn/turn_0",
             (70, 160, 395, 860),
             (145, 270, 355, 575),
-            ((145, 620, 270, 860), (250, 620, 385, 860)),
-            620,
+            ((165, 700, 255, 844), (275, 700, 355, 844)),
+            730,
+            floor_reject_rects=((185, 764, 205, 791),),
         ),
         CutoutConfig(
             "LeftTurn/turn_1",
             (115, 160, 390, 860),
             (150, 270, 350, 575),
-            ((155, 620, 270, 860), (250, 620, 375, 860)),
-            620,
+            ((165, 700, 258, 845), (265, 700, 350, 845)),
+            780,
         ),
         CutoutConfig(
             "LeftTurn/turn_2",
             (145, 160, 345, 860),
             (170, 270, 330, 575),
-            ((165, 620, 275, 860), (220, 620, 345, 860)),
-            620,
+            ((195, 700, 260, 835), (235, 700, 325, 835)),
+            730,
+            maximum_component_gap=6,
+            cool_reject_rects=((205, 730, 229, 805),),
         ),
     ),
+    source_exclusions=(
+        (((138, 686), (172, 686), (172, 704), (138, 704)),),
+        (((485, 680), (552, 680), (552, 705), (485, 705)),),
+        (
+            ((856, 695), (876, 695), (876, 705), (856, 705)),
+            ((863, 668), (874, 668), (874, 672), (863, 672)),
+        ),
+    ),
+    final_translations=((0, 0), (0, 0), (2, 0)),
 )
 
 # RTurning uses different native cell widths. Its antialiased vertical
@@ -103,6 +128,12 @@ LEFT_CONFIG = SheetConfig(
 RIGHT_CONFIG = SheetConfig(
     name="RightTurn",
     source_path=ROOT / "RTurning.png",
+    source_sha256=(
+        "2D20B97B4BC630DBFF9D6DD932F3314A9BC6FE0587013E6C12E72BF1D40D5840"
+    ),
+    source_size_bytes=1390487,
+    source_format="PNG",
+    source_mode="RGB",
     output_dir=ROOT / "Frames" / "RightTurn",
     panel_crops=(
         (0, 0, 356, 725),
@@ -121,65 +152,83 @@ RIGHT_CONFIG = SheetConfig(
             "RightTurn/turn_0",
             (95, 155, 405, 860),
             (145, 265, 365, 575),
-            ((150, 620, 270, 860), (250, 620, 385, 860)),
-            620,
+            ((155, 700, 260, 843), (285, 700, 350, 843)),
+            780,
         ),
         CutoutConfig(
             "RightTurn/turn_1",
             (120, 155, 390, 860),
             (155, 265, 360, 575),
-            ((155, 620, 275, 860), (250, 620, 375, 860)),
-            620,
+            ((190, 700, 255, 848), (265, 700, 375, 833)),
+            730,
+            garment_rects=((168, 570, 190, 675),),
         ),
         CutoutConfig(
             "RightTurn/turn_2",
             (145, 155, 350, 860),
             (175, 265, 335, 575),
-            ((165, 620, 275, 860), (220, 620, 350, 860)),
-            620,
+            ((195, 700, 275, 842), (255, 700, 335, 842)),
+            780,
         ),
     ),
-    normalize_container=True,
+    source_exclusions=(
+        (
+            ((135, 687), (184, 687), (184, 705), (135, 705)),
+            ((174, 627), (180, 627), (180, 636), (174, 636)),
+        ),
+        (),
+        (((862, 697), (976, 697), (976, 704), (862, 704)),),
+    ),
+    final_translations=((0, 0), (0, -6), (2, 0)),
 )
 
 SHEET_CONFIGS = (LEFT_CONFIG, RIGHT_CONFIG)
 
 
-def normalize_png_container(path: Path) -> None:
-    """Replace a mislabeled image container with PNG without changing pixels."""
+def source_sha256(config: SheetConfig) -> str:
+    return sha256_file(config.source_path, config.source_size_bytes)
 
-    with Image.open(path) as source_image:
-        source_format = source_image.format
-        decoded_rgb = np.asarray(source_image.convert("RGB"), dtype=np.uint8).copy()
 
-    if source_format == "PNG":
-        print(f"container={path.name} format=PNG already_normalized=true")
-        return
+def validate_source(config: SheetConfig) -> tuple[np.ndarray, str]:
+    if not config.source_path.is_file():
+        raise FileNotFoundError(config.source_path)
 
-    encoded = BytesIO()
-    Image.fromarray(decoded_rgb, mode="RGB").save(
-        encoded,
-        format="PNG",
-        compress_level=9,
-    )
-    path.write_bytes(encoded.getvalue())
-
-    with Image.open(path) as normalized_image:
-        normalized_rgb = np.asarray(
-            normalized_image.convert("RGB"),
-            dtype=np.uint8,
+    hash_before = source_sha256(config)
+    if hash_before != config.source_sha256:
+        raise RuntimeError(
+            f"{config.source_path.name} SHA-256 is {hash_before}; "
+            f"expected {config.source_sha256}."
         )
-        normalized_format = normalized_image.format
 
-    if normalized_format != "PNG":
-        raise RuntimeError(f"Failed to normalize {path.name} to a PNG container.")
-    if not np.array_equal(decoded_rgb, normalized_rgb):
-        raise RuntimeError(f"Normalizing {path.name} changed decoded artwork.")
+    with Image.open(config.source_path) as image:
+        source_format = image.format
+        source_mode = image.mode
+        source_size = image.size
+    if source_format != config.source_format or source_mode != config.source_mode:
+        raise RuntimeError(
+            f"{config.source_path.name} is {source_format} {source_mode}; "
+            f"expected {config.source_format} {config.source_mode}."
+        )
+    if source_size != (SOURCE_SHAPE[1], SOURCE_SHAPE[0]):
+        raise RuntimeError(
+            f"{config.source_path.name} size is {source_size}; "
+            f"expected {(SOURCE_SHAPE[1], SOURCE_SHAPE[0])}."
+        )
+
+    source = cv2.imread(str(config.source_path), cv2.IMREAD_COLOR)
+    if source is None:
+        raise RuntimeError(f"OpenCV could not decode {config.source_path}.")
+    if source.shape != SOURCE_SHAPE:
+        raise RuntimeError(
+            f"{config.name} source has shape {source.shape}; "
+            f"expected {SOURCE_SHAPE}."
+        )
 
     print(
-        f"container={path.name} format={source_format}->PNG "
-        "decoded_pixels_unchanged=true"
+        f"source={config.source_path.name} format={source_format} "
+        f"mode={source_mode} shape={source.shape} sha256={hash_before}"
     )
+    return source, hash_before
 
 
 def prepare_panel(
@@ -228,19 +277,114 @@ def generate_frames(
     config: SheetConfig,
 ) -> list[GeneratedFrame]:
     generated: list[GeneratedFrame] = []
-    for crop, offset, cutout_config in zip(
+    for crop, offset, cutout_config, source_exclusions, translation in zip(
         config.panel_crops,
         config.panel_offsets,
         config.cutouts,
+        config.source_exclusions,
+        config.final_translations,
         strict=True,
     ):
         panel = prepare_panel(source, crop, config.label_rect)
         placed = place_panel(panel, offset)
-        cutout = isolate_character(placed, cutout_config)
+        exclusion_mask = project_source_exclusion_mask(
+            (CANVAS_HEIGHT, CANVAS_WIDTH),
+            crop,
+            panel.shape[:2],
+            offset,
+            source_exclusions,
+        )
+        cutout = isolate_character(
+            placed,
+            cutout_config,
+            source_exclusion_mask=exclusion_mask,
+        )
+        cutout = translate_cutout(cutout, *translation)
         generated.append(
             GeneratedFrame(panel, cutout.frame, cutout, *offset)
         )
     return generated
+
+
+def translate_cutout(
+    cutout: CutoutResult,
+    delta_x: int,
+    delta_y: int,
+) -> CutoutResult:
+    """Translate retained source pixels by whole pixels without resampling."""
+
+    if delta_x == 0 and delta_y == 0:
+        return cutout
+    height, width = cutout.matte.shape
+    source_x0 = max(0, -delta_x)
+    source_y0 = max(0, -delta_y)
+    source_x1 = min(width, width - delta_x)
+    source_y1 = min(height, height - delta_y)
+    target_x0 = source_x0 + delta_x
+    target_y0 = source_y0 + delta_y
+    target_x1 = source_x1 + delta_x
+    target_y1 = source_y1 + delta_y
+    frame = np.zeros_like(cutout.frame)
+    frame[:, :, 3] = 255
+    matte = np.zeros_like(cutout.matte)
+    frame[target_y0:target_y1, target_x0:target_x1, :3] = cutout.frame[
+        source_y0:source_y1,
+        source_x0:source_x1,
+        :3,
+    ]
+    matte[target_y0:target_y1, target_x0:target_x1] = cutout.matte[
+        source_y0:source_y1,
+        source_x0:source_x1,
+    ]
+    if (
+        np.any(frame[0, :, :3])
+        or np.any(frame[-1, :, :3])
+        or np.any(frame[:, 0, :3])
+        or np.any(frame[:, -1, :3])
+    ):
+        raise RuntimeError(
+            f"Integer translation {(delta_x, delta_y)} clips visible pixels."
+        )
+    return replace(
+        cutout,
+        frame=frame,
+        matte=matte,
+        foreground_pixels=int(np.count_nonzero(matte)),
+        black_ratio=1.0 - np.count_nonzero(matte) / matte.size,
+    )
+
+
+def canonicalize_front_identity(
+    generated_by_name: dict[str, list[GeneratedFrame]],
+) -> None:
+    """Make both front runtime files the exact canonical right-front image."""
+
+    left = generated_by_name["LeftTurn"]
+    right = generated_by_name["RightTurn"]
+    canonical = right[0]
+    left_cutout = replace(
+        left[0].cutout,
+        frame=canonical.frame.copy(),
+        matte=canonical.cutout.matte.copy(),
+        black_ratio=canonical.cutout.black_ratio,
+        foreground_pixels=canonical.cutout.foreground_pixels,
+        shoe_pixels=canonical.cutout.shoe_pixels,
+        shoe_retention=canonical.cutout.shoe_retention,
+        shoe_dark_retention=canonical.cutout.shoe_dark_retention,
+        shoe_extent_retention=canonical.cutout.shoe_extent_retention,
+        shoe_visible_retention=canonical.cutout.shoe_visible_retention,
+        shoe_visible_extent_retention=(
+            canonical.cutout.shoe_visible_extent_retention
+        ),
+        visible_component_count=canonical.cutout.visible_component_count,
+    )
+    left[0] = replace(
+        left[0],
+        frame=canonical.frame.copy(),
+        cutout=left_cutout,
+    )
+    if not np.array_equal(left[0].frame, right[0].frame):
+        raise RuntimeError("Canonical front pixel identity failed.")
 
 
 def validate_frames(
@@ -251,6 +395,13 @@ def validate_frames(
     if len(generated) != 3:
         raise RuntimeError(
             f"{config.name}: expected exactly 3 frames, got {len(generated)}."
+        )
+    if (
+        len(config.source_exclusions) != len(generated)
+        or len(config.final_translations) != len(generated)
+    ):
+        raise RuntimeError(
+            f"{config.name}: source exclusion/translation records changed."
         )
 
     label_x0, label_y0, label_x1, label_y1 = config.label_rect
@@ -372,23 +523,21 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    cv2.setRNGSeed(0)
+    generated_by_name: dict[str, list[GeneratedFrame]] = {}
+    source_records: dict[str, tuple[SheetConfig, str]] = {}
     for config in SHEET_CONFIGS:
-        if config.normalize_container:
-            normalize_png_container(config.source_path)
-
-        source = cv2.imread(str(config.source_path), cv2.IMREAD_COLOR)
-        if source is None:
-            raise FileNotFoundError(config.source_path)
-        if source.shape != SOURCE_SHAPE:
-            raise RuntimeError(
-                f"{config.name} source has shape {source.shape}; "
-                f"expected {SOURCE_SHAPE}."
-            )
+        source, hash_before = validate_source(config)
 
         generated = generate_frames(source, config)
         validate_frames(source, generated, config)
         validate_output_directory(config)
+        generated_by_name[config.name] = generated
+        source_records[config.name] = (config, hash_before)
 
+    canonicalize_front_identity(generated_by_name)
+    for config in SHEET_CONFIGS:
+        generated = generated_by_name[config.name]
         for index, item in enumerate(generated):
             output_path = config.output_dir / f"turn_{index}.png"
             write_png(output_path, item.frame)
@@ -396,6 +545,24 @@ def main() -> int:
                 f"wrote={output_path.relative_to(ROOT)} "
                 f"shape={item.frame.shape}"
             )
+        hash_before = source_records[config.name][1]
+        hash_after = source_sha256(config)
+        if hash_after != hash_before:
+            raise RuntimeError(
+                f"{config.source_path.name} changed during extraction: "
+                f"{hash_before} -> {hash_after}."
+            )
+        print(
+            f"source_sha256={hash_after} source_unchanged=true"
+        )
+    left_front = LEFT_CONFIG.output_dir / "turn_0.png"
+    right_front = RIGHT_CONFIG.output_dir / "turn_0.png"
+    if left_front.read_bytes() != right_front.read_bytes():
+        raise RuntimeError("Canonical front PNG bytes are not identical.")
+    print(
+        "canonical_front=RightTurn/turn_0 "
+        "LeftTurn/turn_0 pixels_and_png_bytes_identical=true"
+    )
 
     if args.evidence:
         print(
