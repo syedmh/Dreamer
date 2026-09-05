@@ -155,6 +155,7 @@ public sealed class SchoolSceneStateMachine
     private double _phaseDurationSeconds;
     private double _phaseStartBackgroundProgress;
     private double _phaseStartCharacterProgress;
+    private bool _entryEndpointReached;
 
     public SchoolScenePhase Phase { get; private set; } =
         SchoolScenePhase.NormalBlack;
@@ -175,6 +176,9 @@ public sealed class SchoolSceneStateMachine
             BackgroundRightOffsetProgress);
 
     public double PhaseElapsedSeconds => _phaseElapsedSeconds;
+
+    public bool EntryEndpointReachedOnLastAdvance =>
+        _entryEndpointReached;
 
     public double CurrentPhaseDurationSeconds =>
         GetCurrentPhaseDurationSeconds();
@@ -373,6 +377,7 @@ public sealed class SchoolSceneStateMachine
                 "Frame delta must be finite and non-negative.");
         }
 
+        _entryEndpointReached = false;
         SchoolScenePhase initialPhase = Phase;
         double initialBackground = BackgroundRightOffsetProgress;
         double initialCharacter = CharacterProgress;
@@ -407,6 +412,19 @@ public sealed class SchoolSceneStateMachine
                 BackgroundRightOffsetProgress - initialBackground) > Epsilon
             || Math.Abs(CharacterProgress - initialCharacter) > Epsilon
             || CurrentAnimationFrame != initialFrame;
+    }
+
+    public void CancelToBlack(double currentCharacterProgress)
+    {
+        ValidateProgress(
+            currentCharacterProgress,
+            nameof(currentCharacterProgress));
+        CharacterProgress = currentCharacterProgress;
+        BackgroundRightOffsetProgress = 1.0;
+        SelectedSchoolNumber = null;
+        SelectedBackgroundLayout = null;
+        _entryEndpointReached = false;
+        SetPhase(SchoolScenePhase.NormalBlack);
     }
 
     public void SetDevelopmentSnapshot(
@@ -652,6 +670,7 @@ public sealed class SchoolSceneStateMachine
             case SchoolScenePhase.Entering:
                 BackgroundRightOffsetProgress = 0.0;
                 CharacterProgress = 1.0;
+                _entryEndpointReached = true;
                 SetPhase(SchoolScenePhase.Clapping);
                 break;
             case SchoolScenePhase.Clapping:

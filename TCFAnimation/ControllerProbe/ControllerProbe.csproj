@@ -7,10 +7,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\AnimationGeometry.cs" Link="AnimationGeometry.cs" />
+    <Compile Include="..\ActionLegendLayout.cs" Link="ActionLegendLayout.cs" />
+    <Compile Include="..\ActionMessageCatalog.cs" Link="ActionMessageCatalog.cs" />
     <Compile Include="..\CapturePathPolicy.cs" Link="CapturePathPolicy.cs" />
+    <Compile Include="..\CelebrationStateMachine.cs" Link="CelebrationStateMachine.cs" />
     <Compile Include="..\DirectionalTurnStateMachine.cs" Link="DirectionalTurnStateMachine.cs" />
     <Compile Include="..\DialogueModel.cs" Link="DialogueModel.cs" />
+    <Compile Include="..\FireworksSimulation.cs" Link="FireworksSimulation.cs" />
     <Compile Include="..\GlobalInputPolicy.cs" Link="GlobalInputPolicy.cs" />
+    <Compile Include="..\PresentationInputPolicy.cs" Link="PresentationInputPolicy.cs" />
     <Compile Include="..\SchoolSceneStateMachine.cs" Link="SchoolSceneStateMachine.cs" />
   </ItemGroup>
 </Project>

@@ -106,6 +106,18 @@ public partial class DialogueUi : CanvasLayer
         _model.SetPreviewText(text);
     }
 
+    public bool ShowActionText(string? text)
+    {
+        return _model.ShowActionText(text);
+    }
+
+    public bool HideBubble()
+    {
+        return _model.HideBubble();
+    }
+
+    public bool IsBubbleVisible => _model.IsBubbleVisible;
+
     public void OpenPreviewInput()
     {
         _model.OpenPreviewInput();

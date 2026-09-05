@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import struct
 import sys
@@ -185,6 +186,7 @@ EXPECTED_TEXTURE_PATHS = (
 )
 EXPECTED_EXPORT_RESOURCES = (
     "res://Main.tscn",
+    "res://ActionMessages.json",
     *(f"res://{path}" for path in EXPECTED_TEXTURE_PATHS),
 )
 EXPECTED_SCRIPT_PAYLOADS = (
@@ -1057,6 +1059,36 @@ def validate_frame_tree() -> None:
         raise RuntimeError(
             f"Runtime PNG set has {len(actual_pngs)} files; expected exact 72."
         )
+
+
+def validate_action_messages() -> None:
+    path = ROOT / "ActionMessages.json"
+    raw = path.read_bytes()
+    if raw.startswith(b"\xef\xbb\xbf"):
+        raise RuntimeError("ActionMessages.json must not contain a UTF-8 BOM.")
+    try:
+        document = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exception:
+        raise RuntimeError(
+            f"ActionMessages.json is invalid: {exception}."
+        ) from exception
+    expected_keys = {str(number) for number in range(1, 7)} | {"Q", "R"}
+    if not isinstance(document, dict) or set(document) != expected_keys:
+        raise RuntimeError(
+            "ActionMessages.json must contain exactly keys 1-6, Q, and R."
+        )
+    for key, value in document.items():
+        if not isinstance(value, str):
+            raise RuntimeError(
+                f"ActionMessages.json value {key} must be a string."
+            )
+        normalized = " ".join(value.split())
+        if not normalized or len(normalized) > 500:
+            raise RuntimeError(
+                f"ActionMessages.json value {key} must normalize to 1-500 "
+                "Unicode scalar values."
+            )
+    print("action_messages_ok=keys:1,2,3,4,5,6,Q,R max_scalars=500")
 
 
 def validate_runtime_pngs() -> None:
@@ -2707,6 +2739,7 @@ def validate_pack_payload(
         | import_metadata
         | scene_payloads
         | set(EXPECTED_SCRIPT_PAYLOADS)
+        | {"ActionMessages.json"}
     )
     actual_entries = set(entries)
     denied_entries = sorted(actual_entries - expected_entries)
@@ -2770,6 +2803,7 @@ def validate_pack_payload(
     )
     print(
         f"pack_payload_ok={path.name} runtime_scene=1 runtime_scripts=2 "
+        "runtime_json=1 "
         "runtime_textures=72 import_metadata=72 engine_metadata=4 "
         "denied_payloads=false source_content=false metadata_denied_tokens=0"
     )
@@ -2850,6 +2884,7 @@ def main() -> int:
     validate_extractor_segmentation_contract()
     validate_sources()
     validate_frame_tree()
+    validate_action_messages()
     validate_runtime_pngs()
     regenerated = regenerate_in_memory()
     validate_independent_lower_anatomy(regenerated)
@@ -2864,7 +2899,7 @@ def main() -> int:
     validate_sources()
     print(
         "ASSET_RELEASE_CHECK_PASS frames=33 school_overlays=33 "
-        "backgrounds=6 sources=12 read_only=true export_resources=73 "
+        "backgrounds=6 sources=12 read_only=true export_resources=74 "
         "artifact_manifest=checked_if_present"
     )
     return 0

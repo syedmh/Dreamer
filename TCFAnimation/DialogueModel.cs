@@ -44,8 +44,8 @@ public sealed class DialogueModel
         {
             if (key == DialogueKey.Enter)
             {
-                string boundedDraft = BoundDraftText(draftText);
-                string normalized = DialogueLayout.NormalizeText(boundedDraft);
+                string normalized =
+                    DialogueLayout.NormalizeAndBoundText(draftText);
                 IsEditing = false;
                 if (normalized.Length == 0)
                 {
@@ -84,34 +84,33 @@ public sealed class DialogueModel
 
     public void SetPreviewText(string text)
     {
-        BubbleText = DialogueLayout.NormalizeText(text);
+        BubbleText = DialogueLayout.NormalizeAndBoundText(text);
         IsBubbleVisible = BubbleText.Length > 0;
+    }
+
+    public bool ShowActionText(string? text)
+    {
+        string normalized = DialogueLayout.NormalizeAndBoundText(text);
+        if (normalized.Length == 0)
+        {
+            return false;
+        }
+
+        BubbleText = normalized;
+        IsBubbleVisible = true;
+        return true;
+    }
+
+    public bool HideBubble()
+    {
+        bool wasVisible = IsBubbleVisible;
+        IsBubbleVisible = false;
+        return wasVisible;
     }
 
     public void OpenPreviewInput()
     {
         IsEditing = true;
-    }
-
-    private static string BoundDraftText(string draftText)
-    {
-        StringBuilder bounded = new(
-            Math.Min(
-                draftText.Length,
-                DialogueLayout.MaximumInputCharacters));
-        int characterCount = 0;
-        foreach (Rune character in draftText.EnumerateRunes())
-        {
-            if (characterCount == DialogueLayout.MaximumInputCharacters)
-            {
-                break;
-            }
-
-            bounded.Append(character.ToString());
-            characterCount++;
-        }
-
-        return bounded.ToString();
     }
 }
 
@@ -148,6 +147,30 @@ public static class DialogueLayout
     public const float TailGap = 28.0f;
     public const int MaximumLines = 4;
     public const int MaximumInputCharacters = 500;
+
+    public static string NormalizeAndBoundText(string? text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return string.Empty;
+        }
+
+        StringBuilder bounded = new(
+            Math.Min(text.Length, MaximumInputCharacters));
+        int characterCount = 0;
+        foreach (Rune character in text.EnumerateRunes())
+        {
+            if (characterCount == MaximumInputCharacters)
+            {
+                break;
+            }
+
+            bounded.Append(character.ToString());
+            characterCount++;
+        }
+
+        return NormalizeText(bounded.ToString());
+    }
 
     public static string NormalizeText(string? text)
     {

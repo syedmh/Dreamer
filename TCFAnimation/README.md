@@ -1,8 +1,9 @@
 # TCFAnimation
 
-Godot 4.5.1 Mono/C# directional turn, walking, dialogue, clap, cross-arm, and
-six scripted school platform-scene animations. The project targets .NET 8 and
-uses a 1920x1080 logical viewport.
+Godot 4.5.1 Mono/C# directional turn, walking, dialogue, JSON-driven action
+messages, a timed celebration with procedural fireworks, a control legend,
+clap/cross-arm playback, and six scripted school platform-scene animations.
+The project targets .NET 8 and uses a 1920x1080 logical viewport.
 
 ## Run
 
@@ -33,9 +34,13 @@ prints `GODOT_RESOLUTION_FAIL` and exits 1.
 - **+/-**: adjust movement and walk playback together from `0.25x` to `3.0x`
   in `0.25x` steps. At `1.0x`, movement is 240 design pixels/second and both
   six-frame walks play at 6 FPS. Turn timing remains fixed at 8 FPS.
-- **C**: start the front-idle clap. The six clap assets are played in the
-  fixed 15-step order `0,1,2,3,4,3,2,1,2,3,4,3,2,1,0` at 8 FPS. Directional
-  input interrupts the clap.
+- **C**: from front idle, play the approved 15-step clap once at 8 FPS.
+  Directional input interrupts the clap, while scripted school and celebration
+  choreography suppress manual clapping. While dialogue input is open, typed
+  `C` remains ordinary text.
+- **L**: show or hide the high-contrast action legend. Key echo is ignored,
+  and the legend is hidden by default to preserve a clean presentation.
+  While dialogue input is open, typed `L` remains ordinary text.
 - **X**: from front idle, play `cross_00..02` at 8 FPS and hold `cross_02`.
   Press X again to play `release_00..05` at 8 FPS and return to the same
   directional front pose. Clap and directional input are blocked throughout
@@ -53,7 +58,9 @@ prints `GODOT_RESOLUTION_FAIL` and exits 1.
   beyond 10.0 seconds returns to front idle on the right. From a black crossed
   hold, any physical top-row `1` through `6` first plays the normal six-frame
   release at 8 FPS, selects the requested school, then performs the same left
-  pre-position if needed before entry.
+  pre-position if needed before entry. The matching configured action message
+  is shown only when entry reaches the exact right endpoint and the 10-second
+  clap begins. Empty or missing messages leave the existing bubble unchanged.
 - **Physical top-row 0**: while a school is entering, clapping, or active,
   first run
   `PreparingExitRight`. The background remains at its current visible
@@ -68,13 +75,34 @@ prints `GODOT_RESOLUTION_FAIL` and exits 1.
   the background moves right from center to fully offscreen-right while the
   Avatar uses the left walk from x=`1693.75` to x=`227.5`; they complete
   together. Exit ends on exact black, automatically plays `cross_00..02` at
-  8 FPS, and holds `cross_02`; **X** releases that hold.
+  8 FPS, and holds `cross_02`; **X** releases that hold. `0` always hides a
+  visible bubble immediately, even when no school exit is eligible or while
+  celebration choreography is active.
+- **Q**: cancel any school choreography, hide the school background, switch
+  to black, start procedural fireworks immediately behind the Avatar, release
+  crossed arms when necessary, and visibly walk the Avatar
+  to exact center x=`960`. The walk uses the correct directional six-frame
+  sheet at 6 FPS and a distance-scaled duration based on the existing
+  6.0-second full-span speed; it never teleports. At center, the configured
+  `Q` message is shown, the approved 15-step clap repeats at 8 FPS for exactly
+  30.0 seconds (240 frame intervals, ending on its clean front boundary), and
+  the Avatar automatically plays `cross_00..02`. Transparent celebration
+  frames allow the deterministic colorful bursts to remain visible behind
+  the Avatar throughout walking, clapping, crossing, and the final hold.
+- **R**: while celebration fireworks are active, stop, clear, and hide them
+  immediately, cancel the remaining celebration choreography, move the Avatar
+  to exact center, and restore its normal front-standing pose. The configured
+  `R` message is shown when non-empty. `R` otherwise does nothing. A later
+  **Q** starts the full celebration again from that centered standing pose.
 - **Enter**: open dialogue input. Submit with Enter or cancel with Escape.
   Input is capped at 500 Unicode scalar values (matching Godot's code-point
   character model without splitting UTF-16 surrogate pairs), normalized on
   submission, wrapped to at most four lines, and clamped inside the logical
   viewport.
 - **P**: hide the current speech bubble while dialogue input is closed.
+- The legend lists Left/Right, +/-, 1-6, 0, Q, R, X, C, Enter, P, L,
+  F11/Alt+Enter, and Escape, remains above black/school/fireworks visuals, and
+  stays visible until toggled.
 - **F11** or **Alt+Enter**: toggle fullscreen. **Escape** exits fullscreen
   while dialogue input is closed.
 
@@ -85,18 +113,44 @@ to return to black, then press the next school key. A new school may also be
 selected directly from the final black crossed hold, which auto-releases and
 re-enters that selection.
 
-During scripted release, entry/exit pre-position, partial-entry background
-normalization, synchronized entry/exit, clap, and final crossing, arrows,
-**C**, **X**, **+/-**, and dialogue opening are suppressed. Fullscreen controls
-remain global. While dialogue is already open, numeric characters, including
-`0` through `6`, remain ordinary text input and never trigger choreography.
+During scripted school release, entry/exit pre-position, partial-entry
+background normalization, synchronized entry/exit, clap, and final crossing,
+arrows, **C**, **X**, **+/-**, and dialogue opening are suppressed. **L** still
+toggles the legend and fullscreen controls remain global. While dialogue is
+already open, numeric characters, `C`, `L`, `Q`, and `R` remain ordinary text input
+and never trigger choreography.
 At school idle, ordinary
-walk/clap/cross/speed/dialogue controls are enabled over the school background;
+walk/cross/speed/dialogue controls are enabled over the school background;
 `0` resets the pose to a clean front state and begins right pre-position. At
 the final black crossed hold, dialogue and speed controls remain available,
-arrows/**C** remain blocked like the normal crossed hold, **X** releases, and
+arrows remain blocked like the normal crossed hold, **L** toggles the legend,
+**X** releases, and
 any `1` through `6` auto-releases, pre-positions left if needed, then enters
 the selected school.
+
+During Q release/walk/clap/cross/fireworks phases, arrows, **X**, **1-6**,
+school exit, **+/-**, and dialogue opening are suppressed. `0` still hides the
+bubble without changing celebration state, **L** still toggles the legend,
+fullscreen controls remain global, **Q** is ignored, and **R** can stop the
+fireworks and restore the centered front-standing pose during any active
+celebration phase.
+
+## Action message configuration
+
+`ActionMessages.json` is an editable runtime resource with exact supported
+keys `"1"` through `"6"`, `"Q"`, and `"R"`. Values are normalized with the
+same whitespace/display rules as dialogue and bounded to 500 Unicode scalar
+values without splitting surrogate pairs. At runtime, missing, null,
+non-string, empty, whitespace-only, and unknown entries are ignored safely;
+they never create an empty bubble. Invalid UTF-8, invalid JSON, or a non-object
+root logs one visible `ACTION_MESSAGES_LOAD_FAIL` and continues with no
+configured action messages. The shipped release validator requires all eight
+editable defaults to be non-empty strings.
+
+School messages appear at right-entry completion, the Q message appears at
+center before the 30-second clap, and the R message appears only when R
+actually stops active fireworks. User Enter submission still replaces action
+text, and P or 0 hides the bubble without erasing its stored text.
 
 There is intentionally **no waving action, control, runtime state, or release
 resource**. Files whose names begin with `Waving` are obsolete, unrelated
@@ -252,7 +306,7 @@ python -B FrameExtraction\validate_release.py
 Success ends with:
 
 ```text
-ASSET_RELEASE_CHECK_PASS frames=33 school_overlays=33 backgrounds=6 sources=12 read_only=true export_resources=73 artifact_manifest=checked_if_present
+ASSET_RELEASE_CHECK_PASS frames=33 school_overlays=33 backgrounds=6 sources=12 read_only=true export_resources=74 artifact_manifest=checked_if_present
 ```
 
 The validator does not create, modify, or delete files. It verifies immutable
@@ -307,6 +361,12 @@ order and exact 10-second boundary; partial-entry interruption with held
 background, smooth same-speed normalization to center, and no teleport; final
 automatic cross/hold; auto-release/re-entry; invalid and large deltas;
 snapshot geometry; and scripted input suppression.
+It additionally covers action-message schema tolerance and failure statuses,
+500-scalar normalization, school endpoint message timing, explicit school
+cancellation, left/right/center/crossed celebration starts, non-teleporting
+distance-scaled travel, the exact 30.0-second/8 FPS clap boundary, cross and
+fireworks activation, R idempotence, Q restart, deterministic bounded
+fireworks simulation, C/L/0/Q/R arbitration, and legend entries/layout bounds.
 
 ## Regenerate runtime frames
 
@@ -338,7 +398,8 @@ release-readiness command.
 
 `export_presets.cfg` uses Godot selected resources. Its positive list is
 exactly `res://Main.tscn`, the 33 original frames, the 33 shared transparent
-counterparts, and the six prepared school backgrounds (73 resources total). It
+counterparts, the six prepared school backgrounds, and
+`res://ActionMessages.json` (74 resources total). It
 does not use broad include/exclude filters: both filter assignments must exist
 exactly once and be empty. Source sheets, extractors, `ControllerProbe`,
 `.ai-org`, `Build`, README files, obsolete root images, and all Waving files
@@ -396,12 +457,12 @@ if ($smoke.ExitCode -ne 0) { throw "Runtime smoke failed with exit code $($smoke
 
 The release script authenticates Godot, its companion, and the release
 template before touching `Build`. It then guarded-cleans that generated
-directory and copies exactly the 91 entries in
+directory and copies exactly the 106 entries in
 `release-stage-manifest.txt` into a GUID-owned isolated stage. After proving
 that copied seed, it creates a fixed 994-byte UTF-8-without-BOM, CRLF
 `TCFAnimation.sln` inside the stage. The generated solution references only
 `TCFAnimation.csproj`; the repository solution and `ControllerProbe` never
-cross the staging boundary. The resulting 92-file pre-import inventory is
+cross the staging boundary. The resulting 107-file pre-import inventory is
 proved before Godot import, so import-generated UID/cache state remains
 stage-local and is never copied back.
 
@@ -417,18 +478,21 @@ partial generated output. The final executable path remains exactly
 The validator reads the final embedded PCK in place without extraction. It
 checks exact payload counts, bounded entry descriptors, a 4 MiB per-metadata
 limit, a 16 MiB aggregate metadata limit, all four engine metadata entries,
-all 72 import metadata entries, two one-byte scene-script placeholders, and denied
-development/unrelated tokens in both single-byte and UTF-16LE forms.
+all 72 import metadata entries, the runtime JSON resource, two one-byte
+scene-script placeholders, and denied development/unrelated tokens in both
+single-byte and UTF-16LE forms.
 
 The exported smoke test is read-only, rejects capture arguments, loads
 `Main.tscn`, resolves the background, character, and dialogue nodes, loads all
 66 character textures plus all six school backgrounds, checks every source
 dimension and aspect-cover/offscreen geometry, checks the
-1920x1080 viewport and 512x864 character texture sizes, and exits successfully
+1920x1080 viewport and 512x864 character texture sizes, validates all eight
+action messages, the 13-entry hidden legend, the 30-second celebration
+contract, and the inactive fireworks layer, and exits successfully
 only after printing:
 
 ```text
-RUNTIME_SMOKE_PASS character_textures=66 school_backgrounds=6 dimensions=1908x824,1536x1024,1540x1021,1540x1021,1540x1021,1540x1021 dialogue_ui=true viewport_fit=1920x1080:CanvasItems:Keep
+RUNTIME_SMOKE_PASS character_textures=66 school_backgrounds=6 dimensions=1908x824,1536x1024,1540x1021,1540x1021,1540x1021,1540x1021 dialogue_ui=true action_messages=8 legend_entries=13 celebration_seconds=30 fireworks_layer=true viewport_fit=1920x1080:CanvasItems:Keep
 ```
 
 Deterministic developer capture snapshots use
@@ -438,3 +502,11 @@ the legacy School1 default. The preparation snapshots show black
 right-to-left Avatar staging and visible-school left-to-right Avatar staging;
 `exit-normalize-mid` shows partial-entry reconciliation without changing
 release resources.
+
+`entry-end` and `clap` school snapshots show the configured school message.
+Celebration snapshots use
+`--capture-celebration=walk|clap|fireworks|stopped`; fireworks use a fixed
+capture seed. Add `--capture-legend` to any base snapshot to show the legend,
+or `--capture-hide-bubble` to prove 0-style bubble dismissal. Capture mode
+still requires exactly one base selector: `--capture-frame`,
+`--capture-school`, or `--capture-celebration`.

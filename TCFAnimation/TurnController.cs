@@ -15,6 +15,7 @@ public partial class TurnController : Node2D
     public const double MaximumWalkSpeedMultiplier = 3.0;
 
     private const int ViewportHeight = 1080;
+    private const float CelebrationCenterX = 960.0f;
 
     private readonly Texture2D[] _leftFrames = new Texture2D[3];
     private readonly Texture2D[] _rightFrames = new Texture2D[3];
@@ -48,10 +49,18 @@ public partial class TurnController : Node2D
     private readonly DirectionalTurnStateMachine _turn =
         new(TurnAnimationFps);
     private readonly SchoolSceneStateMachine _schoolScene = new();
+    private readonly CelebrationStateMachine _celebration = new();
 
     private Sprite2D _schoolBackground = null!;
     private Sprite2D _character = null!;
     private DialogueUi _dialogueUi = null!;
+    private FireworksLayer _fireworks = null!;
+    private ActionLegendUi _actionLegend = null!;
+    private ActionMessageCatalog _actionMessages =
+        ActionMessageCatalog.Empty;
+    private ActionMessageLoadStatus _actionMessageLoadStatus =
+        ActionMessageLoadStatus.MissingFile;
+    private string? _pendingSchoolActionMessage;
     private string? _captureRoot;
     private string? _capturePath;
     private int _captureCountdown;
@@ -90,6 +99,22 @@ public partial class TurnController : Node2D
             _schoolBackground = GetNode<Sprite2D>("SchoolBackground");
             _character = GetNode<Sprite2D>("Character");
             _dialogueUi = GetNode<DialogueUi>("DialogueUi");
+            _schoolBackground.ZIndex = -2;
+
+            _fireworks = new FireworksLayer
+            {
+                Name = "FireworksLayer",
+            };
+            AddChild(_fireworks);
+            MoveChild(_fireworks, _character.GetIndex());
+
+            _actionLegend = new ActionLegendUi
+            {
+                Name = "ActionLegendUi",
+            };
+            AddChild(_actionLegend);
+
+            LoadActionMessages();
 
             LoadFrames("LeftTurn", _leftFrames);
             LoadFrames("RightTurn", _rightFrames);
@@ -208,9 +233,38 @@ public partial class TurnController : Node2D
             return;
         }
 
+        if (_celebration.IsActive)
+        {
+            int centerArrivalSerial = _celebration.CenterArrivalSerial;
+            int fireworksStartSerial = _celebration.FireworksStartSerial;
+            _celebration.Advance(delta);
+            if (_celebration.CenterArrivalSerial != centerArrivalSerial)
+            {
+                ShowConfiguredActionMessage("Q");
+            }
+            if (_celebration.FireworksStartSerial != fireworksStartSerial)
+            {
+                _fireworks.Start();
+            }
+            if (_celebration.Phase == CelebrationPhase.Inactive)
+            {
+                _turn.Reset(
+                    TurnDirection.Left,
+                    DirectionalTurnStateMachine.FrontFrame);
+            }
+            UpdateSchoolVisuals();
+            ApplyCurrentFrame();
+            return;
+        }
+
         if (_schoolScene.SuppressesOrdinaryInput)
         {
             _schoolScene.Advance(delta);
+            if (_schoolScene.EntryEndpointReachedOnLastAdvance)
+            {
+                _dialogueUi.ShowActionText(
+                    _pendingSchoolActionMessage);
+            }
             if (
                 _schoolScene.Phase == SchoolScenePhase.SchoolIdle
                 || _schoolScene.Phase == SchoolScenePhase.NormalBlack
@@ -365,11 +419,105 @@ public partial class TurnController : Node2D
 
         int? selectedSchoolNumber =
             SchoolNumberFromPhysicalKey(keyEvent.PhysicalKeycode);
+        PresentationKey presentationKey =
+            keyEvent.PhysicalKeycode switch
+            {
+                Key.C => PresentationKey.C,
+                Key.L => PresentationKey.L,
+                Key.Q => PresentationKey.Q,
+                Key.R => PresentationKey.R,
+                Key.Key0 => PresentationKey.Zero,
+                _ when selectedSchoolNumber is not null =>
+                    PresentationKey.School,
+                _ => PresentationKey.Other,
+            };
+        PresentationInputDecision decision =
+            PresentationInputPolicy.Resolve(
+                presentationKey,
+                keyEvent.Pressed,
+                keyEvent.Echo,
+                dialogueEditing: false,
+                _celebration.Phase);
+
+        if (decision.ToggleLegend)
+        {
+            _actionLegend.Toggle();
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
+        if (decision.HideBubble)
+        {
+            _dialogueUi.HideBubble();
+            if (decision.AllowSchoolAction)
+            {
+                double characterProgress = CharacterProgressFromPosition();
+                bool exitStarted = _schoolScene.TryStartExit(
+                    pressed: true,
+                    echo: false,
+                    dialogueEditing: false,
+                    characterProgress);
+                if (exitStarted)
+                {
+                    _turn.Reset(
+                        TurnDirection.Right,
+                        DirectionalTurnStateMachine.FrontFrame);
+                    UpdateSchoolVisuals();
+                    ApplyCurrentFrame();
+                }
+            }
+
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
+        if (presentationKey == PresentationKey.Q)
+        {
+            if (decision.StartCelebration)
+            {
+                StartCelebration();
+            }
+
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
+        if (presentationKey == PresentationKey.R)
+        {
+            if (
+                decision.StopFireworks
+                && _celebration.TryStopFireworks()
+            )
+            {
+                _fireworks.StopAndClear();
+                _character.Position = new Vector2(
+                    CelebrationCenterX,
+                    _character.Position.Y);
+                _turn.Reset(
+                    TurnDirection.Left,
+                    DirectionalTurnStateMachine.FrontFrame);
+                ShowConfiguredActionMessage("R");
+                UpdateSchoolVisuals();
+                ApplyCurrentFrame();
+                GetViewport().SetInputAsHandled();
+            }
+
+            return;
+        }
+
         if (selectedSchoolNumber is not null)
         {
+            if (!decision.AllowSchoolAction)
+            {
+                GetViewport().SetInputAsHandled();
+                return;
+            }
+
             double characterProgress = CharacterProgressFromPosition();
             SchoolBackgroundLayout layout =
                 _schoolBackgroundLayouts[selectedSchoolNumber.Value - 1];
+            bool celebrationCrossHold =
+                _celebration.IsStoppedCrossHold;
             bool entryStarted = _schoolScene.TryStartEntry(
                 selectedSchoolNumber.Value,
                 layout,
@@ -377,9 +525,18 @@ public partial class TurnController : Node2D
                 echo: false,
                 dialogueEditing: false,
                 currentCharacterProgress: characterProgress,
-                existingCrossHold: _turn.IsCrossArmsHeld);
+                existingCrossHold:
+                    celebrationCrossHold
+                    || _turn.IsCrossArmsHeld);
             if (entryStarted)
             {
+                if (celebrationCrossHold)
+                {
+                    _celebration.Cancel();
+                }
+                _pendingSchoolActionMessage =
+                    _actionMessages.Get(
+                        selectedSchoolNumber.Value.ToString());
                 ApplySelectedSchoolBackground();
                 _turn.Reset(
                     TurnDirection.Left,
@@ -392,19 +549,13 @@ public partial class TurnController : Node2D
             return;
         }
 
-        if (keyEvent.PhysicalKeycode == Key.Key0)
+        if (
+            keyEvent.PhysicalKeycode == Key.X
+            && _celebration.IsStoppedCrossHold
+        )
         {
-            double characterProgress = CharacterProgressFromPosition();
-            bool exitStarted = _schoolScene.TryStartExit(
-                pressed: true,
-                echo: false,
-                dialogueEditing: false,
-                characterProgress);
-            if (exitStarted)
+            if (_celebration.TryReleaseStoppedHold())
             {
-                _turn.Reset(
-                    TurnDirection.Right,
-                    DirectionalTurnStateMachine.FrontFrame);
                 UpdateSchoolVisuals();
                 ApplyCurrentFrame();
                 GetViewport().SetInputAsHandled();
@@ -413,8 +564,28 @@ public partial class TurnController : Node2D
             return;
         }
 
+        if (_celebration.SuppressesOrdinaryInput)
+        {
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
         if (_schoolScene.SuppressesOrdinaryInput)
         {
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
+        if (keyEvent.PhysicalKeycode == Key.C)
+        {
+            bool stateChanged = _turn.TryStartClap(
+                Input.IsPhysicalKeyPressed(Key.Left),
+                Input.IsPhysicalKeyPressed(Key.Right));
+            if (stateChanged)
+            {
+                ApplyCurrentFrame();
+            }
+
             GetViewport().SetInputAsHandled();
             return;
         }
@@ -443,24 +614,6 @@ public partial class TurnController : Node2D
                 Input.IsPhysicalKeyPressed(Key.Left),
                 Input.IsPhysicalKeyPressed(Key.Right));
             if (stateChanged)
-            {
-                ApplyCurrentFrame();
-            }
-
-            return;
-        }
-
-        if (keyEvent.PhysicalKeycode == Key.C)
-        {
-            if (_schoolScene.IsFinalCrossHold)
-            {
-                return;
-            }
-
-            bool clapStarted = _turn.TryStartClap(
-                Input.IsPhysicalKeyPressed(Key.Left),
-                Input.IsPhysicalKeyPressed(Key.Right));
-            if (clapStarted)
             {
                 ApplyCurrentFrame();
             }
@@ -505,7 +658,9 @@ public partial class TurnController : Node2D
 
     private void UpdateSchoolVisuals()
     {
-        _schoolBackground.Visible = _schoolScene.IsSchoolVisible;
+        _schoolBackground.Visible =
+            !_celebration.IsActive
+            && _schoolScene.IsSchoolVisible;
         if (_schoolScene.SelectedBackgroundLayout is { } layout)
         {
             _schoolBackground.Position = new Vector2(
@@ -513,7 +668,13 @@ public partial class TurnController : Node2D
                 layout.CenterY);
         }
 
-        if (
+        if (_celebration.IsActive)
+        {
+            _character.Position = new Vector2(
+                (float)_celebration.CharacterX,
+                _character.Position.Y);
+        }
+        else if (
             _schoolScene.Phase is not (
                 SchoolScenePhase.NormalBlack
                 or SchoolScenePhase.SchoolIdle)
@@ -535,7 +696,84 @@ public partial class TurnController : Node2D
     private void UpdateDialogueSuppression()
     {
         _dialogueUi.OpeningSuppressed =
-            _schoolScene.SuppressesOrdinaryInput;
+            _schoolScene.SuppressesOrdinaryInput
+            || _celebration.SuppressesOrdinaryInput;
+    }
+
+    private void StartCelebration()
+    {
+        double currentX = _character.Position.X;
+        double characterProgress = CharacterProgressFromPosition();
+        bool existingCrossHold =
+            _celebration.IsStoppedCrossHold
+            || _schoolScene.CharacterAnimation
+                == SchoolCharacterAnimation.CrossArm
+            || _turn.IsCrossArmsHeld;
+        _schoolScene.CancelToBlack(characterProgress);
+        _schoolBackground.Visible = false;
+        _fireworks.StopAndClear();
+        _pendingSchoolActionMessage = null;
+        _dialogueUi.HideBubble();
+        _turn.Reset(
+            TurnDirection.Left,
+            DirectionalTurnStateMachine.FrontFrame);
+
+        AnimationSafeCenters centers =
+            AnimationGeometry.DefaultSafeCenters;
+        int centerArrivalSerial = _celebration.CenterArrivalSerial;
+        bool started = _celebration.TryStart(
+            currentX,
+            CelebrationCenterX,
+            centers.Right - centers.Left,
+            existingCrossHold);
+        if (!started)
+        {
+            return;
+        }
+
+        _fireworks.Start();
+        if (_celebration.CenterArrivalSerial != centerArrivalSerial)
+        {
+            ShowConfiguredActionMessage("Q");
+        }
+        UpdateSchoolVisuals();
+        ApplyCurrentFrame();
+    }
+
+    private void LoadActionMessages()
+    {
+        const string path = "res://ActionMessages.json";
+        if (!Godot.FileAccess.FileExists(path))
+        {
+            _actionMessageLoadStatus =
+                ActionMessageLoadStatus.MissingFile;
+            GD.PushError(
+                "ACTION_MESSAGES_LOAD_FAIL status=MissingFile "
+                + $"path={path}");
+            return;
+        }
+
+        ActionMessageLoadResult result =
+            ActionMessageCatalog.Load(
+                Godot.FileAccess.GetFileAsBytes(path));
+        _actionMessages = result.Catalog;
+        _actionMessageLoadStatus = result.Status;
+        if (!result.Succeeded)
+        {
+            GD.PushError(
+                $"ACTION_MESSAGES_LOAD_FAIL status={result.Status} "
+                + $"message={ToSingleLine(result.Error ?? "unknown")} "
+                + $"path={path}");
+            return;
+        }
+
+        GD.Print(
+            "ACTION_MESSAGES_LOAD_PASS keys=1,2,3,4,5,6,Q,R");
+    }
+
+    private void ShowConfiguredActionMessage(string key)
+    {
+        _dialogueUi.ShowActionText(_actionMessages.Get(key));
     }
 
     private double CharacterProgressFromPosition()
@@ -748,6 +986,42 @@ public partial class TurnController : Node2D
                 $"Loaded {frameCount} runtime frames; expected 66.");
         }
 
+        if (_actionMessageLoadStatus != ActionMessageLoadStatus.Success)
+        {
+            throw new InvalidOperationException(
+                "ActionMessages.json did not load successfully: "
+                + _actionMessageLoadStatus);
+        }
+        foreach (
+            string key in new[]
+            {
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "Q",
+                "R",
+            })
+        {
+            if (_actionMessages.Get(key) is null)
+            {
+                throw new InvalidOperationException(
+                    $"Action message {key} is missing from the release config.");
+            }
+        }
+        if (
+            _fireworks.IsActive
+            || _actionLegend.IsLegendVisible
+            || CelebrationStateMachine.ClapDurationSeconds != 30.0
+            || ActionLegendLayout.Entries.Length != 13
+        )
+        {
+            throw new InvalidOperationException(
+                "Celebration, fireworks, or legend runtime state is invalid.");
+        }
+
         string[] backgroundDimensions = new string[
             _schoolBackgroundTextures.Length];
         for (
@@ -781,12 +1055,22 @@ public partial class TurnController : Node2D
             + "school_backgrounds=6 dimensions="
             + string.Join(",", backgroundDimensions)
             + " dialogue_ui=true "
+            + "action_messages=8 legend_entries=13 "
+            + "celebration_seconds=30 fireworks_layer=true "
             + "viewport_fit=1920x1080:CanvasItems:Keep");
         GetTree().Quit();
     }
 
     private void ApplyCurrentFrame()
     {
+        if (_celebration.IsActive)
+        {
+            _character.Texture = GetCelebrationCharacterTexture(
+                _celebration.CharacterAnimation,
+                _celebration.CurrentAnimationFrame);
+            return;
+        }
+
         if (
             _schoolScene.CharacterAnimation
             != SchoolCharacterAnimation.Normal
@@ -865,6 +1149,29 @@ public partial class TurnController : Node2D
         _character.Texture = frames[_turn.CurrentFrame];
     }
 
+    private Texture2D GetCelebrationCharacterTexture(
+        CelebrationCharacterAnimation animation,
+        int frame)
+    {
+        return animation switch
+        {
+            CelebrationCharacterAnimation.Normal =>
+                _schoolLeftFrames[DirectionalTurnStateMachine.FrontFrame],
+            CelebrationCharacterAnimation.WalkLeft =>
+                _schoolLeftWalkFrames[frame],
+            CelebrationCharacterAnimation.WalkRight =>
+                _schoolRightWalkFrames[frame],
+            CelebrationCharacterAnimation.Clap =>
+                _schoolClapFrames[frame],
+            CelebrationCharacterAnimation.CrossArm =>
+                _schoolCrossArmFrames[frame],
+            CelebrationCharacterAnimation.CrossArmRelease =>
+                _schoolCrossArmReleaseFrames[frame],
+            _ => throw new InvalidOperationException(
+                $"Unsupported celebration animation: {animation}."),
+        };
+    }
+
     private Texture2D GetSchoolSceneCharacterTexture(
         SchoolCharacterAnimation animation,
         int frame)
@@ -916,11 +1223,17 @@ public partial class TurnController : Node2D
         string? capturePath = null;
         string? dialoguePreview = null;
         SchoolCaptureSelection? schoolCapture = null;
+        CelebrationSnapshot? celebrationCapture = null;
+        bool legendVisible = false;
+        bool hideBubble = false;
         int frameOptionCount = 0;
         int directionOptionCount = 0;
         int pathOptionCount = 0;
         int dialogueOptionCount = 0;
         int schoolOptionCount = 0;
+        int celebrationOptionCount = 0;
+        int legendOptionCount = 0;
+        int hideBubbleOptionCount = 0;
         bool captureModeRequested = IsCaptureModeRequested(arguments);
 
         foreach (string argument in arguments)
@@ -930,6 +1243,8 @@ public partial class TurnController : Node2D
             const string pathPrefix = "--capture-path=";
             const string dialoguePrefix = "--dialogue-preview=";
             const string schoolPrefix = "--capture-school=";
+            const string celebrationPrefix =
+                "--capture-celebration=";
 
             if (argument.StartsWith(framePrefix, StringComparison.Ordinal))
             {
@@ -990,6 +1305,42 @@ public partial class TurnController : Node2D
             }
             else if (
                 argument.StartsWith(
+                    celebrationPrefix,
+                    StringComparison.Ordinal)
+            )
+            {
+                EnsureSingleOption(
+                    ref celebrationOptionCount,
+                    "--capture-celebration");
+                celebrationCapture = ParseCelebrationCapture(
+                    argument[celebrationPrefix.Length..]);
+            }
+            else if (
+                string.Equals(
+                    argument,
+                    "--capture-legend",
+                    StringComparison.Ordinal)
+            )
+            {
+                EnsureSingleOption(
+                    ref legendOptionCount,
+                    "--capture-legend");
+                legendVisible = true;
+            }
+            else if (
+                string.Equals(
+                    argument,
+                    "--capture-hide-bubble",
+                    StringComparison.Ordinal)
+            )
+            {
+                EnsureSingleOption(
+                    ref hideBubbleOptionCount,
+                    "--capture-hide-bubble");
+                hideBubble = true;
+            }
+            else if (
+                argument.StartsWith(
                     "--capture-",
                     StringComparison.Ordinal)
             )
@@ -1013,14 +1364,16 @@ public partial class TurnController : Node2D
             return null;
         }
 
-        if (
-            capturePath is null
-            || (captureFrame is null) == (schoolCapture is null)
-        )
+        int baseSnapshotCount =
+            (captureFrame is null ? 0 : 1)
+            + (schoolCapture is null ? 0 : 1)
+            + (celebrationCapture is null ? 0 : 1);
+        if (capturePath is null || baseSnapshotCount != 1)
         {
             throw new ArgumentException(
                 "Capture mode requires --capture-path and exactly one of "
-                + "--capture-frame or --capture-school.");
+                + "--capture-frame, --capture-school, or "
+                + "--capture-celebration.");
         }
 
         if (
@@ -1044,7 +1397,10 @@ public partial class TurnController : Node2D
                     "Capture root was not resolved for capture mode."),
             capturePath,
             dialoguePreview,
-            schoolCapture);
+            schoolCapture,
+            celebrationCapture,
+            legendVisible,
+            hideBubble);
     }
 
     private void ConfigureCaptureMode(
@@ -1057,7 +1413,40 @@ public partial class TurnController : Node2D
 
         _captureRoot = captureMode.Root;
         _capturePath = captureMode.Path;
-        if (captureMode.SchoolCapture is not null)
+        if (captureMode.CelebrationCapture is not null)
+        {
+            _schoolScene.CancelToBlack(CharacterProgressFromPosition());
+            _celebration.SetDevelopmentSnapshot(
+                captureMode.CelebrationCapture.Value,
+                CelebrationCenterX);
+            _character.Position = new Vector2(
+                (float)_celebration.CharacterX,
+                _character.Position.Y);
+            if (
+                captureMode.CelebrationCapture
+                    != CelebrationSnapshot.StoppedWithMessage
+            )
+            {
+                _fireworks.Start(FireworksLayer.CaptureSeed);
+                _fireworks.AdvanceForCapture(0.72);
+                if (
+                    captureMode.CelebrationCapture
+                        != CelebrationSnapshot.WalkingToCenter
+                )
+                {
+                    ShowConfiguredActionMessage("Q");
+                }
+            }
+            else if (
+                captureMode.CelebrationCapture
+                    == CelebrationSnapshot.StoppedWithMessage
+            )
+            {
+                _fireworks.StopAndClear();
+                ShowConfiguredActionMessage("R");
+            }
+        }
+        else if (captureMode.SchoolCapture is not null)
         {
             SchoolCaptureSelection schoolCapture =
                 captureMode.SchoolCapture;
@@ -1085,6 +1474,15 @@ public partial class TurnController : Node2D
                 + (centers.Right - centers.Left)
                 * (float)_schoolScene.CharacterProgress,
                 _character.Position.Y);
+            if (
+                schoolCapture.Snapshot is
+                    SchoolSceneSnapshot.EntryEnd
+                    or SchoolSceneSnapshot.Clap
+            )
+            {
+                ShowConfiguredActionMessage(
+                    schoolCapture.SchoolNumber.ToString());
+            }
         }
         else
         {
@@ -1095,6 +1493,14 @@ public partial class TurnController : Node2D
                         "Capture frame is missing."));
         }
         ConfigureDialoguePreview(captureMode.DialoguePreview);
+        if (captureMode.HideBubble)
+        {
+            _dialogueUi.HideBubble();
+        }
+        if (captureMode.LegendVisible)
+        {
+            _actionLegend.SetLegendVisible(true);
+        }
         _captureCountdown = 3;
     }
 
@@ -1170,6 +1576,21 @@ public partial class TurnController : Node2D
                 $"Invalid school capture snapshot: {snapshotName}"),
         };
         return new SchoolCaptureSelection(schoolNumber, snapshot);
+    }
+
+    private static CelebrationSnapshot ParseCelebrationCapture(
+        string value)
+    {
+        return value switch
+        {
+            "walk" => CelebrationSnapshot.WalkingToCenter,
+            "clap" => CelebrationSnapshot.CenteredClapping,
+            "fireworks" =>
+                CelebrationSnapshot.CrossedWithFireworks,
+            "stopped" => CelebrationSnapshot.StoppedWithMessage,
+            _ => throw new ArgumentException(
+                $"Invalid celebration capture snapshot: {value}"),
+        };
     }
 
     private void ConfigureDialoguePreview(string? preview)
@@ -1256,7 +1677,10 @@ public partial class TurnController : Node2D
                 $"CAPTURE_SAVED direction={_turn.CurrentDirection} "
                 + $"frame={_turn.CurrentFrame} "
                 + $"school_id={_schoolScene.SelectedSchoolNumber?.ToString() ?? "none"} "
-                + $"school_phase={_schoolScene.Phase} path={_capturePath}");
+                + $"school_phase={_schoolScene.Phase} "
+                + $"celebration_phase={_celebration.Phase} "
+                + $"legend={_actionLegend.IsLegendVisible} "
+                + $"fireworks={_fireworks.IsActive} path={_capturePath}");
             GetTree().Quit();
         }
         catch (Exception exception)
@@ -1305,7 +1729,10 @@ public partial class TurnController : Node2D
         string Root,
         string Path,
         string? DialoguePreview,
-        SchoolCaptureSelection? SchoolCapture);
+        SchoolCaptureSelection? SchoolCapture,
+        CelebrationSnapshot? CelebrationCapture,
+        bool LegendVisible,
+        bool HideBubble);
 
     private sealed record SchoolCaptureSelection(
         int SchoolNumber,

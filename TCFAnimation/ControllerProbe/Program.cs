@@ -19,6 +19,10 @@ RunCapturePathCases();
 RunGlobalInputCases();
 RunSchoolGeometryCases();
 RunSchoolSceneCases();
+RunActionMessageCases();
+RunCelebrationCases();
+RunFireworksCases();
+RunLegendAndPresentationInputCases();
 
 Console.WriteLine(
     $"CONTROLLER_PROBE_PASS assertions={ProbeAssertions.Count} "
@@ -43,6 +47,9 @@ Console.WriteLine(
     + "school_entry_seconds=8 school_clap_seconds=10 "
     + "school_exit_seconds=8 entry_direction=right_to_left "
     + "fixed_runtime_frames=33 school_overlay_frames=33 "
+    + "action_messages=true celebration_seconds=30 "
+    + "fireworks_deterministic=true legend=true c_manual_clap=true "
+    + "l_legend=true "
     + "wave_assets=false");
 return;
 
@@ -2241,6 +2248,483 @@ static void RunDialogueCases()
         && dialogue.IsEditing
         && dialogue.BubbleText == "Hello brave world!");
     dialogue.HandleKey(DialogueKey.Escape, echo: false);
+}
+
+static void RunActionMessageCases()
+{
+    ActionMessageLoadResult valid = ActionMessageCatalog.Load(
+        Encoding.UTF8.GetBytes(
+            """
+            {
+              "1": "  Welcome   to School 1! ",
+              "2": "",
+              "3": "   ",
+              "4": null,
+              "5": 42,
+              "6": false,
+              "Q": "Celebrate!",
+              "R": "Finished.",
+              "unknown": "ignored"
+            }
+            """));
+    AssertEqual(
+        "action messages valid load status",
+        valid.Status,
+        ActionMessageLoadStatus.Success);
+    AssertEqual(
+        "action messages normalize display whitespace",
+        valid.Catalog.Get("1"),
+        "Welcome to School 1!");
+    AssertTrue(
+        "action messages ignore empty whitespace null and non-string values",
+        valid.Catalog.Get("2") is null
+        && valid.Catalog.Get("3") is null
+        && valid.Catalog.Get("4") is null
+        && valid.Catalog.Get("5") is null
+        && valid.Catalog.Get("6") is null);
+    AssertTrue(
+        "action messages preserve Q and R",
+        valid.Catalog.Get("Q") == "Celebrate!"
+        && valid.Catalog.Get("R") == "Finished.");
+    AssertTrue(
+        "action messages ignore unknown keys and missing keys",
+        valid.Catalog.Get("unknown") is null
+        && ActionMessageCatalog.Load(
+            Encoding.UTF8.GetBytes("""{"Q":"Only Q"}"""))
+            .Catalog.Get("1") is null);
+
+    string supplementary = "\U0001F680";
+    string oversized =
+        string.Concat(
+            Enumerable.Repeat(
+                supplementary,
+                DialogueLayout.MaximumInputCharacters + 1));
+    ActionMessageLoadResult bounded = ActionMessageCatalog.Load(
+        Encoding.UTF8.GetBytes(
+            $"{{\"Q\":\"{oversized}\"}}"));
+    string boundedMessage = bounded.Catalog.Get("Q")!;
+    AssertTrue(
+        "action messages truncate at 500 Unicode scalars without splitting",
+        boundedMessage.EnumerateRunes().Count()
+            == DialogueLayout.MaximumInputCharacters
+        && IsValidUtf16(boundedMessage));
+
+    ActionMessageLoadResult invalidJson = ActionMessageCatalog.Load(
+        Encoding.UTF8.GetBytes("""{"Q":"""));
+    AssertTrue(
+        "action messages report invalid JSON with empty safe catalog",
+        invalidJson.Status == ActionMessageLoadStatus.InvalidJson
+        && invalidJson.Error is not null
+        && invalidJson.Catalog.Get("Q") is null);
+    ActionMessageLoadResult invalidSchema = ActionMessageCatalog.Load(
+        Encoding.UTF8.GetBytes("""["not","an","object"]"""));
+    AssertEqual(
+        "action messages report invalid root schema",
+        invalidSchema.Status,
+        ActionMessageLoadStatus.InvalidSchema);
+    ActionMessageLoadResult invalidUtf8 = ActionMessageCatalog.Load(
+        new byte[] { 0x7B, 0x22, 0x51, 0x22, 0x3A, 0x22, 0xFF, 0x22, 0x7D });
+    AssertEqual(
+        "action messages report invalid UTF-8",
+        invalidUtf8.Status,
+        ActionMessageLoadStatus.InvalidUtf8);
+
+    DialogueModel dialogue = new();
+    AssertTrue(
+        "configured action text shows without opening editor",
+        dialogue.ShowActionText("  Action   message  ")
+        && dialogue.IsBubbleVisible
+        && !dialogue.IsEditing
+        && dialogue.BubbleText == "Action message");
+    AssertTrue(
+        "empty configured action text is ignored without replacing bubble",
+        !dialogue.ShowActionText(" \t ")
+        && dialogue.IsBubbleVisible
+        && dialogue.BubbleText == "Action message");
+    AssertTrue(
+        "explicit bubble hide preserves stored text",
+        dialogue.HideBubble()
+        && !dialogue.IsBubbleVisible
+        && dialogue.BubbleText == "Action message");
+}
+
+static void RunCelebrationCases()
+{
+    AnimationSafeCenters centers = AnimationGeometry.DefaultSafeCenters;
+    double fullSpan = centers.Right - centers.Left;
+
+    CelebrationStateMachine left = new();
+    AssertTrue(
+        "Q starts from left without teleport",
+        left.TryStart(
+            centers.Left,
+            960.0,
+            fullSpan,
+            existingCrossHold: false)
+        && left.Phase == CelebrationPhase.WalkingToCenter
+        && left.WalkDirection == TurnDirection.Right
+        && left.CharacterX == centers.Left
+        && left.IsFireworksActive
+        && left.FireworksStartSerial == 1);
+    double expectedLeftDuration =
+        (960.0 - centers.Left) / fullSpan
+        * CelebrationStateMachine.FullSpanWalkDurationSeconds;
+    AssertNear(
+        "Q left distance-scaled duration",
+        left.CurrentPhaseDurationSeconds,
+        expectedLeftDuration,
+        0.000001);
+    left.Advance(expectedLeftDuration / 2.0);
+    AssertTrue(
+        "Q left walk advances continuously",
+        left.CharacterX > centers.Left
+        && left.CharacterX < 960.0
+        && left.Phase == CelebrationPhase.WalkingToCenter);
+    left.Advance(expectedLeftDuration / 2.0);
+    AssertTrue(
+        "Q left reaches exact center and begins clap",
+        left.CharacterX == 960.0
+        && left.Phase == CelebrationPhase.Clapping
+        && left.CenterArrivalSerial == 1);
+
+    CelebrationStateMachine right = new();
+    AssertTrue(
+        "Q starts from right with left walk",
+        right.TryStart(
+            centers.Right,
+            960.0,
+            fullSpan,
+            existingCrossHold: false)
+        && right.WalkDirection == TurnDirection.Left
+        && right.CharacterX == centers.Right);
+    AssertNear(
+        "Q right distance-scaled duration",
+        right.CurrentPhaseDurationSeconds,
+        (centers.Right - 960.0) / fullSpan
+            * CelebrationStateMachine.FullSpanWalkDurationSeconds,
+        0.000001);
+
+    CelebrationStateMachine centered = new();
+    AssertTrue(
+        "Q at center continues immediately into clap",
+        centered.TryStart(960.0, 960.0, fullSpan, false)
+        && centered.Phase == CelebrationPhase.Clapping
+        && centered.CenterArrivalSerial == 1);
+    for (int step = 0;
+        step < DirectionalTurnStateMachine.ClapPlaybackStepCount;
+        step++)
+    {
+        CelebrationStateMachine frameProbe = new();
+        frameProbe.TryStart(960.0, 960.0, fullSpan, false);
+        frameProbe.Advance(
+            step / DirectionalTurnStateMachine.ClapAnimationFps);
+        AssertEqual(
+            $"celebration clap step {step} uses approved order",
+            frameProbe.CurrentAnimationFrame,
+            DirectionalTurnStateMachine.GetClapFrameForStep(step));
+    }
+    CelebrationStateMachine repeatedFrame = new();
+    repeatedFrame.TryStart(960.0, 960.0, fullSpan, false);
+    repeatedFrame.Advance(
+        DirectionalTurnStateMachine.ClapPlaybackStepCount
+        / DirectionalTurnStateMachine.ClapAnimationFps);
+    AssertEqual(
+        "celebration clap repeats approved 15-step sequence",
+        repeatedFrame.CurrentAnimationFrame,
+        DirectionalTurnStateMachine.GetClapFrameForStep(0));
+
+    CelebrationStateMachine stoppedDuringClap = new();
+    stoppedDuringClap.TryStart(960.0, 960.0, fullSpan, false);
+    AssertTrue(
+        "R stops fireworks and immediately returns to standing",
+        stoppedDuringClap.TryStopFireworks()
+        && !stoppedDuringClap.IsFireworksActive
+        && stoppedDuringClap.Phase == CelebrationPhase.Inactive
+        && stoppedDuringClap.CharacterX == 960.0
+        && stoppedDuringClap.CharacterAnimation
+            == CelebrationCharacterAnimation.Normal);
+
+    CelebrationStateMachine stoppedDuringWalk = new();
+    stoppedDuringWalk.TryStart(centers.Left, 960.0, fullSpan, false);
+    stoppedDuringWalk.Advance(0.25);
+    AssertTrue(
+        "R centers a walking Avatar before restoring standing pose",
+        stoppedDuringWalk.TryStopFireworks()
+        && stoppedDuringWalk.Phase == CelebrationPhase.Inactive
+        && stoppedDuringWalk.CharacterX == 960.0);
+
+    centered.Advance(
+        CelebrationStateMachine.ClapDurationSeconds - 0.001);
+    AssertTrue(
+        "celebration remains clapping before exact 30-second boundary",
+        centered.Phase == CelebrationPhase.Clapping
+        && centered.CurrentAnimationFrame
+            == DirectionalTurnStateMachine.GetClapFrameForStep(14));
+    centered.Advance(0.001);
+    AssertTrue(
+        "celebration crosses exactly at 30 seconds on clean front boundary",
+        centered.Phase == CelebrationPhase.Crossing
+        && centered.CharacterX == 960.0
+        && centered.CurrentAnimationFrame == 0);
+    centered.Advance(
+        DirectionalTurnStateMachine.CrossArmFrameCount
+        / DirectionalTurnStateMachine.CrossArmAnimationFps);
+    AssertTrue(
+        "fireworks remain active through completed cross hold",
+        centered.Phase == CelebrationPhase.FireworksHold
+        && centered.CurrentAnimationFrame
+            == DirectionalTurnStateMachine.CrossArmFrameCount - 1
+        && centered.FireworksStartSerial == 1);
+    AssertTrue(
+        "R stops only active fireworks",
+        centered.TryStopFireworks()
+        && centered.Phase == CelebrationPhase.Inactive
+        && centered.CharacterAnimation
+            == CelebrationCharacterAnimation.Normal
+        && !centered.TryStopFireworks());
+    AssertTrue(
+        "Q restarts immediately from the restored center standing pose",
+        centered.TryStart(960.0, 960.0, fullSpan, false)
+        && centered.Phase == CelebrationPhase.Clapping
+        && centered.IsFireworksActive
+        && centered.FireworksStartSerial == 2);
+
+    CelebrationStateMachine crossedLeft = new();
+    AssertTrue(
+        "Q from crossed left releases before walking",
+        crossedLeft.TryStart(
+            centers.Left,
+            960.0,
+            fullSpan,
+            existingCrossHold: true)
+        && crossedLeft.Phase
+            == CelebrationPhase.ReleasingForCelebration
+        && crossedLeft.CharacterX == centers.Left);
+    crossedLeft.Advance(
+        DirectionalTurnStateMachine.CrossArmReleaseFrameCount
+        / DirectionalTurnStateMachine.CrossArmReleaseAnimationFps);
+    AssertTrue(
+        "Q crossed release transitions into correctly directed walk",
+        crossedLeft.Phase == CelebrationPhase.WalkingToCenter
+        && crossedLeft.WalkDirection == TurnDirection.Right
+        && crossedLeft.CharacterX == centers.Left);
+
+    CelebrationStateMachine stoppedSnapshot = new();
+    stoppedSnapshot.SetDevelopmentSnapshot(
+        CelebrationSnapshot.StoppedWithMessage,
+        960.0);
+    AssertTrue(
+        "stopped capture uses centered inactive standing pose",
+        stoppedSnapshot.Phase == CelebrationPhase.Inactive
+        && stoppedSnapshot.CharacterX == 960.0
+        && stoppedSnapshot.CharacterAnimation
+            == CelebrationCharacterAnimation.Normal
+        && !stoppedSnapshot.TryReleaseStoppedHold());
+
+    SchoolSceneStateMachine school = new();
+    school.SetDevelopmentSnapshot(
+        3,
+        SchoolLayout(3),
+        SchoolSceneSnapshot.Clap);
+    school.CancelToBlack(0.42);
+    AssertTrue(
+        "school cancellation clears selection background and choreography",
+        school.Phase == SchoolScenePhase.NormalBlack
+        && school.SelectedSchoolNumber is null
+        && school.SelectedBackgroundLayout is null
+        && !school.IsSchoolVisible
+        && Math.Abs(school.CharacterProgress - 0.42) < 0.000001);
+
+    SchoolSceneStateMachine entryMessageTiming = new();
+    entryMessageTiming.SetDevelopmentSnapshot(
+        1,
+        SchoolLayout(1),
+        SchoolSceneSnapshot.EntryStart);
+    entryMessageTiming.Advance(
+        SchoolSceneStateMachine.EntryDurationSeconds - 0.001);
+    AssertTrue(
+        "school action message event does not fire before right endpoint",
+        !entryMessageTiming.EntryEndpointReachedOnLastAdvance);
+    entryMessageTiming.Advance(0.001);
+    AssertTrue(
+        "school action message event fires at entry completion",
+        entryMessageTiming.EntryEndpointReachedOnLastAdvance
+        && entryMessageTiming.Phase == SchoolScenePhase.Clapping
+        && entryMessageTiming.CharacterProgress == 1.0);
+    entryMessageTiming.Advance(0.001);
+    AssertTrue(
+        "school action message event is one advance only",
+        !entryMessageTiming.EntryEndpointReachedOnLastAdvance);
+}
+
+static void RunFireworksCases()
+{
+    FireworksSimulation first = new();
+    FireworksSimulation second = new();
+    first.Start(12345);
+    second.Start(12345);
+    first.Advance(2.4);
+    second.Advance(2.4);
+    FireworkBurst[] firstSnapshot = first.Snapshot().ToArray();
+    FireworkBurst[] secondSnapshot = second.Snapshot().ToArray();
+    AssertTrue(
+        "fireworks use deterministic seeded simulation",
+        firstSnapshot.SequenceEqual(secondSnapshot));
+    AssertTrue(
+        "fireworks bursts stay bounded and include the Avatar center zone",
+        firstSnapshot.Length is > 0 and <= FireworksSimulation.MaximumBurstCount
+        && firstSnapshot.All(
+            burst =>
+                burst.Center.Y is >= 115.0f and <= 505.0f
+                && burst.Center.X is >= 150.0f and <= 1770.0f
+                && burst.RayCount
+                    is >= FireworksSimulation.MinimumRayCount
+                    and <= FireworksSimulation.MaximumRayCount)
+        && firstSnapshot.Any(
+            burst => burst.Center.X is > 760.0f and < 1160.0f));
+    FireworksSimulation different = new();
+    different.Start(54321);
+    different.Advance(2.4);
+    AssertTrue(
+        "fireworks seed changes burst geometry",
+        !firstSnapshot.SequenceEqual(different.Snapshot()));
+    first.Stop();
+    AssertTrue(
+        "fireworks stop clears all bursts immediately",
+        !first.IsActive
+        && first.ActiveBurstCount == 0
+        && first.Snapshot().Count == 0);
+    AssertThrows<ArgumentOutOfRangeException>(
+        "fireworks reject invalid delta",
+        () => second.Advance(double.NaN));
+}
+
+static void RunLegendAndPresentationInputCases()
+{
+    AssertEqual(
+        "legend contains exact active entry count",
+        ActionLegendLayout.Entries.Length,
+        13);
+    AssertTrue(
+        "legend accurately lists Q R C L and fullscreen controls",
+        ActionLegendLayout.Entries.Any(line => line.StartsWith("Q "))
+        && ActionLegendLayout.Entries.Any(line => line.StartsWith("R "))
+        && ActionLegendLayout.Entries.Any(line => line.StartsWith("C "))
+        && ActionLegendLayout.Entries.Any(line => line.StartsWith("L "))
+        && ActionLegendLayout.Entries.Any(
+            line => line.StartsWith("F11 / Alt+Enter")));
+    foreach (
+        (float width, float height) in new[]
+        {
+            (1920.0f, 1080.0f),
+            (1280.0f, 720.0f),
+            (640.0f, 360.0f),
+        })
+    {
+        LegendSize size = ActionLegendLayout.Calculate(width, height);
+        AssertTrue(
+            $"legend stays inside {width}x{height} viewport",
+            size.Width > 0.0f
+            && size.Height > 0.0f
+            && size.Width
+                <= width - ActionLegendLayout.SafeMargin * 2.0f
+            && size.Height
+                <= height - ActionLegendLayout.SafeMargin * 2.0f);
+    }
+
+    PresentationInputDecision l = PresentationInputPolicy.Resolve(
+        PresentationKey.L,
+        pressed: true,
+        echo: false,
+        dialogueEditing: false,
+        CelebrationPhase.Clapping);
+    AssertTrue(
+        "L toggles legend during celebration",
+        l.ToggleLegend
+        && !l.StartCelebration
+        && !l.StopFireworks
+        && !l.AllowSchoolAction);
+    AssertEqual(
+        "L echo is ignored",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.L,
+            true,
+            echo: true,
+            dialogueEditing: false,
+            CelebrationPhase.Inactive),
+        default);
+    AssertEqual(
+        "L typed while dialogue editing remains ordinary text",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.L,
+            true,
+            echo: false,
+            dialogueEditing: true,
+            CelebrationPhase.Inactive),
+        default);
+    AssertEqual(
+        "C no longer toggles legend",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.C,
+            true,
+            echo: false,
+            dialogueEditing: false,
+            CelebrationPhase.Inactive),
+        default);
+
+    PresentationInputDecision zeroDuringCelebration =
+        PresentationInputPolicy.Resolve(
+            PresentationKey.Zero,
+            true,
+            false,
+            false,
+            CelebrationPhase.Clapping);
+    AssertTrue(
+        "0 hides bubble but cannot corrupt active celebration",
+        zeroDuringCelebration.HideBubble
+        && !zeroDuringCelebration.AllowSchoolAction);
+    AssertTrue(
+        "school keys suppressed throughout active celebration",
+        !PresentationInputPolicy.Resolve(
+            PresentationKey.School,
+            true,
+            false,
+            false,
+            CelebrationPhase.WalkingToCenter).AllowSchoolAction
+        && !PresentationInputPolicy.Resolve(
+            PresentationKey.School,
+            true,
+            false,
+            false,
+            CelebrationPhase.FireworksHold).AllowSchoolAction);
+    AssertTrue(
+        "R accepted while immediate fireworks are active",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.R,
+            true,
+            false,
+            false,
+            CelebrationPhase.Clapping).StopFireworks
+        && !PresentationInputPolicy.Resolve(
+            PresentationKey.R,
+            true,
+            false,
+            false,
+            CelebrationPhase.StoppedCrossHold).StopFireworks);
+    AssertTrue(
+        "Q ignored while active and accepted after R",
+        !PresentationInputPolicy.Resolve(
+            PresentationKey.Q,
+            true,
+            false,
+            false,
+            CelebrationPhase.Crossing).StartCelebration
+        && PresentationInputPolicy.Resolve(
+            PresentationKey.Q,
+            true,
+            false,
+            false,
+            CelebrationPhase.StoppedCrossHold).StartCelebration);
 }
 
 static bool IsValidUtf16(string text)
