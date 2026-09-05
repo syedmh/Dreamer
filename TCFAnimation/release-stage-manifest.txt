@@ -9,6 +9,7 @@ ActionLegendLayout.cs
 ActionLegendUi.cs
 ActionMessageCatalog.cs
 AnimationGeometry.cs
+AvatarPresenceStateMachine.cs
 CapturePathPolicy.cs
 CelebrationStateMachine.cs
 DialogueModel.cs
@@ -19,6 +20,7 @@ FireworksSimulation.cs
 GlobalInputPolicy.cs
 LogoRainLayer.cs
 LogoRainSimulation.cs
+NeonLogoBackground.cs
 PresentationInputPolicy.cs
 SchoolSceneStateMachine.cs
 TurnController.cs
@@ -27,6 +29,7 @@ ActionLegendLayout.cs.uid
 ActionLegendUi.cs.uid
 ActionMessageCatalog.cs.uid
 AnimationGeometry.cs.uid
+AvatarPresenceStateMachine.cs.uid
 CapturePathPolicy.cs.uid
 CelebrationStateMachine.cs.uid
 DialogueModel.cs.uid
@@ -36,6 +39,7 @@ FireworksLayer.cs.uid
 FireworksSimulation.cs.uid
 LogoRainLayer.cs.uid
 LogoRainSimulation.cs.uid
+NeonLogoBackground.cs.uid
 PresentationInputPolicy.cs.uid
 SchoolSceneStateMachine.cs.uid
 TurnController.cs.uid
@@ -79,6 +83,8 @@ Frames/Backgrounds/school4.png
 Frames/Backgrounds/school5.png
 Frames/Backgrounds/school6.png
 Frames/Effects/logo-small.png
+Frames/Effects/tcf-neon-background.png
+Frames/Effects/tcf-neon-background.png.import
 Frames/SchoolCharacter/LeftTurn/turn_0.png
 Frames/SchoolCharacter/LeftTurn/turn_1.png
 Frames/SchoolCharacter/LeftTurn/turn_2.png

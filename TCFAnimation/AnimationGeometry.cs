@@ -6,6 +6,10 @@ public readonly record struct AnimationSafeCenters(
     float Left,
     float Right);
 
+public readonly record struct AnimationOffscreenCenters(
+    float Left,
+    float Right);
+
 public static class AnimationGeometry
 {
     public const float ViewportWidth = 1920.0f;
@@ -16,6 +20,15 @@ public static class AnimationGeometry
 
     public static AnimationSafeCenters DefaultSafeCenters =>
         CalculateSafeCenters(
+            viewportLeft: 0.0f,
+            viewportWidth: ViewportWidth,
+            canvasCenterX: CanvasCenterX,
+            characterScale: CharacterScale,
+            leftVisibleX: LeftWalkVisibleX,
+            rightVisibleX: RightWalkVisibleX);
+
+    public static AnimationOffscreenCenters DefaultOffscreenCenters =>
+        CalculateOffscreenCenters(
             viewportLeft: 0.0f,
             viewportWidth: ViewportWidth,
             canvasCenterX: CanvasCenterX,
@@ -78,5 +91,31 @@ public static class AnimationGeometry
         }
 
         return new AnimationSafeCenters(left, right);
+    }
+
+    public static AnimationOffscreenCenters CalculateOffscreenCenters(
+        float viewportLeft,
+        float viewportWidth,
+        float canvasCenterX,
+        float characterScale,
+        float leftVisibleX,
+        float rightVisibleX)
+    {
+        _ = CalculateSafeCenters(
+            viewportLeft,
+            viewportWidth,
+            canvasCenterX,
+            characterScale,
+            leftVisibleX,
+            rightVisibleX);
+
+        float left =
+            viewportLeft
+            - (rightVisibleX - canvasCenterX) * characterScale;
+        float right =
+            viewportLeft
+            + viewportWidth
+            + (canvasCenterX - leftVisibleX) * characterScale;
+        return new AnimationOffscreenCenters(left, right);
     }
 }

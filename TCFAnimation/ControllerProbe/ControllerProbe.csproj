@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Include="..\AnimationGeometry.cs" Link="AnimationGeometry.cs" />
     <Compile Include="..\AnimationConfig.cs" Link="AnimationConfig.cs" />
+    <Compile Include="..\AvatarPresenceStateMachine.cs" Link="AvatarPresenceStateMachine.cs" />
     <Compile Include="..\ActionLegendLayout.cs" Link="ActionLegendLayout.cs" />
     <Compile Include="..\ActionMessageCatalog.cs" Link="ActionMessageCatalog.cs" />
     <Compile Include="..\CapturePathPolicy.cs" Link="CapturePathPolicy.cs" />

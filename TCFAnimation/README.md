@@ -4,6 +4,8 @@ Godot 4.5.1 Mono/C# directional turn, walking, dialogue, JSON-driven action
 messages, a timed celebration with procedural fireworks, a control legend,
 clap/cross-arm playback, and six scripted school platform-scene animations.
 The project targets .NET 8 and uses a 1920x1080 logical viewport.
+Normal startup is a completely blank black screen until **E** brings the
+Avatar in from the right.
 
 ## Build everything
 
@@ -44,6 +46,11 @@ prints `GODOT_RESOLUTION_FAIL` and exits 1.
 - **Left/Right Arrow**: turn from front through 45° to 90°, then walk while the
   key remains held. Releasing or reversing returns through the existing turn
   sequence; holding both arrows is neutral.
+- **D**: cancel active choreography and effects, then walk off the
+  mathematically nearest fully hidden screen edge. At the exact tie point,
+  the left edge wins.
+- **E**: cancel active choreography and effects, enter from fully offscreen
+  right, walk left, and stop in a front-standing pose at screen center.
 - **+/-**: adjust movement and walk playback together from `0.25x` to `3.0x`
   in `0.25x` steps. At `1.0x`, movement is 240 design pixels/second and both
   six-frame walks use `walkFps` (6 FPS by default). Turns use `turnFps`
@@ -56,6 +63,20 @@ prints `GODOT_RESOLUTION_FAIL` and exits 1.
 - **L**: show or hide the high-contrast action legend. Key echo is ignored,
   and the legend is hidden by default to preserve a clean presentation.
   While dialogue input is open, typed `L` remains ordinary text.
+- **N**: turn the neon TCF logo background on or off. It is off by
+  default, uses the high-quality transparent `TCFLogo2.png` artwork, appears
+  anywhere the stage would otherwise be black, and stays
+  behind fireworks, logo rain, the Avatar, dialogue, and the legend. School
+  backgrounds temporarily cover it without changing its enabled state.
+  While dialogue input is open, typed `N` remains ordinary text.
+- **O**: start or freeze the neon sign's subtle brightness pulse.
+  Animation is off by default, independently of whether **N** is showing the
+  sign. The lettering remains white and the rest of the artwork remains green;
+  **O** does not change colors. While dialogue input is open, typed `O` remains
+  ordinary text.
+- **I**: turn color cycling on or off for the logo and horizontal line. It is
+  off by default, so those elements start green. The lettering always remains
+  white. While dialogue input is open, typed `I` remains ordinary text.
 - **X**: from front idle, play `cross_00..02` at `crossArmFps`
   (8 FPS by default) and hold `cross_02`.
   Press X again to play `release_00..05` at `crossArmReleaseFps`
@@ -163,6 +184,11 @@ bubble without changing celebration state, **L** still toggles the legend,
 fullscreen controls remain global, **F** is ignored, **S** can stop the
 fireworks and restore the centered front-standing pose during any active
 celebration phase, and **R** can independently start or restart logo rain.
+**D** and **E** override active school or celebration choreography, clear
+their effects, and return to the black stage. While the Avatar is hidden or
+entering/exiting, ordinary Avatar controls cannot reveal or redirect it.
+**N** and **O** remain available during all choreography and change only the
+otherwise-black stage background and its animation.
 
 ## Action message configuration
 
@@ -195,6 +221,11 @@ falling back to a different timing.
 | `clapFps` | 8 | Manual, school, and celebration clap frame rate |
 | `crossArmFps` | 8 | Cross-arm entry frame rate |
 | `crossArmReleaseFps` | 8 | Cross-arm release frame rate |
+| `avatarEntrySeconds` | 6 | E travel time from fully offscreen right to center |
+| `avatarExitFullSpanSeconds` | 6 | D travel time for a full offscreen-left to offscreen-right span; nearer-edge exits scale by distance |
+| `neonIntensity` | 0.7 | Base brightness multiplier for the complete neon sign |
+| `neonHueCycleSeconds` | 8 | Time for one complete logo-and-line color cycle |
+| `neonPulseSeconds` | 2.5 | Time for one complete neon brightness pulse |
 | `schoolPrepositionSeconds` | 6 | Full-width pre-entry/pre-exit walk |
 | `schoolEntrySeconds` | 8 | School background entry and Avatar crossing |
 | `schoolClapSeconds` | 10 | School arrival clapping |
@@ -361,7 +392,7 @@ python -B FrameExtraction\validate_release.py
 Success ends with:
 
 ```text
-ASSET_RELEASE_CHECK_PASS frames=33 school_overlays=33 backgrounds=6 sources=12 read_only=true export_resources=76 artifact_manifest=checked_if_present
+ASSET_RELEASE_CHECK_PASS frames=33 school_overlays=33 backgrounds=6 sources=12 read_only=true export_resources=77 artifact_manifest=checked_if_present
 ```
 
 The validator does not create, modify, or delete files. It verifies immutable
@@ -421,8 +452,9 @@ It additionally covers action-message schema tolerance and failure statuses,
 cancellation, left/right/center/crossed celebration starts, non-teleporting
 distance-scaled travel, the configured celebration clap boundary, cross and
 fireworks activation, S idempotence, F restart, deterministic bounded
-fireworks simulation, deterministic configured logo rain, C/F/L/R/S/0
-arbitration, and legend entries/layout bounds.
+fireworks simulation, deterministic configured logo rain, D/E Avatar
+presence, C/D/E/F/L/N/R/S/0 arbitration, neon compositing selection, and
+legend entries/layout bounds.
 
 ## Regenerate runtime frames
 
@@ -456,7 +488,7 @@ release-readiness command.
 exactly `res://Main.tscn`, the 33 original frames, the 33 shared transparent
 counterparts, the six prepared school backgrounds, and
 `res://AnimationConfig.json`, `res://ActionMessages.json`, and the transparent
-logo effect texture (76 resources total). It
+logo effect plus neon background textures (77 resources total). It
 does not use broad include/exclude filters: both filter assignments must exist
 exactly once and be empty. Source sheets, extractors, `ControllerProbe`,
 `.ai-org`, `Build`, README files, obsolete root images, and all Waving files
@@ -514,12 +546,12 @@ if ($smoke.ExitCode -ne 0) { throw "Runtime smoke failed with exit code $($smoke
 
 The release script authenticates Godot, its companion, and the release
 template before touching `Build`. It then guarded-cleans that generated
-directory and copies exactly the 114 entries in
+directory and copies exactly the 120 entries in
 `release-stage-manifest.txt` into a GUID-owned isolated stage. After proving
 that copied seed, it creates a fixed 994-byte UTF-8-without-BOM, CRLF
 `TCFAnimation.sln` inside the stage. The generated solution references only
 `TCFAnimation.csproj`; the repository solution and `ControllerProbe` never
-cross the staging boundary. The resulting 115-file pre-import inventory is
+cross the staging boundary. The resulting 121-file pre-import inventory is
 proved before Godot import, so import-generated UID/cache state remains
 stage-local and is never copied back.
 
@@ -535,7 +567,7 @@ partial generated output. The final executable path remains exactly
 The validator reads the final embedded PCK in place without extraction. It
 checks exact payload counts, bounded entry descriptors, a 4 MiB per-metadata
 limit, a 16 MiB aggregate metadata limit, all four engine metadata entries,
-all 73 import metadata entries, both runtime JSON resources, two one-byte
+all 74 import metadata entries, both runtime JSON resources, two one-byte
 scene-script placeholders, and denied development/unrelated tokens in both
 single-byte and UTF-16LE forms.
 
@@ -544,14 +576,17 @@ The exported smoke test is read-only, rejects capture arguments, loads
 66 character textures plus all six school backgrounds, checks every source
 dimension and aspect-cover/offscreen geometry, checks the
 1920x1080 viewport and 512x864 character texture sizes, validates all eight
-action messages, the 14-entry hidden legend, the configured celebration
+action messages, the 19-entry hidden legend, the initial blank-screen state,
+the inactive 2062×763 neon background and animation, its 75% scale and
+48-pixel top margin, the configured Avatar entrance/exit
+and neon animation timing, the configured celebration
 contract, the inactive fireworks layer, and the inactive configured logo-rain
 layer with its 128×102 transparent texture, and exits successfully
 only after printing:
 
 ```text
-ANIMATION_CONFIG_LOAD_PASS school_entry=8 school_clap=10 celebration_clap=30 logo_rain_spawn=10
-RUNTIME_SMOKE_PASS character_textures=66 school_backgrounds=6 dimensions=1908x824,1536x1024,1540x1021,1540x1021,1540x1021,1540x1021 dialogue_ui=true action_messages=8 legend_entries=14 celebration_seconds=30 fireworks_layer=true logo_rain_seconds=10 logo_texture=128x102 viewport_fit=1920x1080:CanvasItems:Keep
+ANIMATION_CONFIG_LOAD_PASS avatar_entry=6 avatar_exit_full_span=6 neon_intensity=0.7 neon_hue_cycle=8 neon_pulse=2.5 school_entry=8 school_clap=10 celebration_clap=30 logo_rain_spawn=10
+RUNTIME_SMOKE_PASS character_textures=66 school_backgrounds=6 dimensions=1908x824,1536x1024,1540x1021,1540x1021,1540x1021,1540x1021 dialogue_ui=true action_messages=8 legend_entries=19 initial_blank=true neon_background=true neon_animation_default=false neon_color_cycle_default=false neon_text_color=white neon_intensity=0.7 neon_scale=0.75 neon_top=48 neon_texture=2062x763 neon_hue_cycle_seconds=8 neon_pulse_seconds=2.5 avatar_entry_seconds=6 avatar_exit_full_span_seconds=6 celebration_seconds=30 fireworks_layer=true logo_rain_seconds=10 logo_texture=128x102 viewport_fit=1920x1080:CanvasItems:Keep
 ```
 
 Deterministic developer capture snapshots use
@@ -566,7 +601,8 @@ release resources.
 Celebration snapshots use
 `--capture-celebration=walk|clap|fireworks|stopped`; fireworks use a fixed
 capture seed. Add `--capture-legend` to any base snapshot to show the legend,
-`--capture-logo-rain` to show deterministic logo rain, or
+`--capture-logo-rain` to show deterministic logo rain,
+`--capture-neon-background` to show the neon TCF background, or
 `--capture-hide-bubble` to prove 0-style bubble dismissal. Capture mode
 still requires exactly one base selector: `--capture-frame`,
 `--capture-school`, or `--capture-celebration`.

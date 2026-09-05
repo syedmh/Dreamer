@@ -45,14 +45,17 @@ public partial class TurnController : Node2D
     private readonly SchoolBackgroundLayout[] _schoolBackgroundLayouts =
         new SchoolBackgroundLayout[
             SchoolSceneStateMachine.MaximumSchoolNumber];
+    private Texture2D _neonLogoTexture = null!;
     private Texture2D _smallLogoTexture = null!;
     private DirectionalTurnStateMachine _turn = null!;
     private readonly SchoolSceneStateMachine _schoolScene = new();
     private readonly CelebrationStateMachine _celebration = new();
+    private readonly AvatarPresenceStateMachine _avatarPresence = new();
 
     private Sprite2D _schoolBackground = null!;
     private Sprite2D _character = null!;
     private DialogueUi _dialogueUi = null!;
+    private NeonLogoBackground _neonBackground = null!;
     private FireworksLayer _fireworks = null!;
     private LogoRainLayer _logoRain = null!;
     private ActionLegendUi _actionLegend = null!;
@@ -104,6 +107,19 @@ public partial class TurnController : Node2D
             _character = GetNode<Sprite2D>("Character");
             _dialogueUi = GetNode<DialogueUi>("DialogueUi");
             _schoolBackground.ZIndex = -2;
+            _character.Visible = false;
+
+            _neonLogoTexture = GD.Load<Texture2D>(
+                "res://Frames/Effects/tcf-neon-background.png")
+                ?? throw new InvalidOperationException(
+                    "Could not load the required neon background texture.");
+            _neonBackground = new NeonLogoBackground
+            {
+                Name = "NeonLogoBackground",
+            };
+            _neonBackground.Initialize(_neonLogoTexture);
+            AddChild(_neonBackground);
+            MoveChild(_neonBackground, _schoolBackground.GetIndex());
 
             _fireworks = new FireworksLayer
             {
@@ -247,6 +263,34 @@ public partial class TurnController : Node2D
 
         if (_dialogueUi.IsEditing)
         {
+            return;
+        }
+
+        if (_avatarPresence.IsTransitioning)
+        {
+            AvatarPresencePhase initialPhase = _avatarPresence.Phase;
+            _avatarPresence.Advance(delta);
+            _character.Position = new Vector2(
+                (float)_avatarPresence.CharacterX,
+                _character.Position.Y);
+            if (
+                initialPhase == AvatarPresencePhase.EnteringFromRight
+                && _avatarPresence.Phase == AvatarPresencePhase.Visible
+            )
+            {
+                _turn.Reset(
+                    TurnDirection.Left,
+                    DirectionalTurnStateMachine.FrontFrame);
+            }
+            UpdateDialogueSuppression();
+            ApplyCurrentFrame();
+            return;
+        }
+
+        if (!_avatarPresence.IsVisible)
+        {
+            UpdateDialogueSuppression();
+            ApplyCurrentFrame();
             return;
         }
 
@@ -440,8 +484,13 @@ public partial class TurnController : Node2D
             keyEvent.PhysicalKeycode switch
             {
                 Key.C => PresentationKey.C,
+                Key.D => PresentationKey.D,
+                Key.E => PresentationKey.E,
                 Key.F => PresentationKey.F,
+                Key.I => PresentationKey.I,
                 Key.L => PresentationKey.L,
+                Key.N => PresentationKey.N,
+                Key.O => PresentationKey.O,
                 Key.R => PresentationKey.R,
                 Key.S => PresentationKey.S,
                 Key.Key0 => PresentationKey.Zero,
@@ -460,6 +509,49 @@ public partial class TurnController : Node2D
         if (decision.ToggleLegend)
         {
             _actionLegend.Toggle();
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
+        if (decision.ToggleNeonBackground)
+        {
+            _neonBackground.Toggle();
+            UpdateSchoolVisuals();
+            ApplyCurrentFrame();
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
+        if (decision.ToggleNeonAnimation)
+        {
+            _neonBackground.ToggleAnimation();
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
+        if (decision.ToggleNeonColorCycle)
+        {
+            _neonBackground.ToggleColorCycle();
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
+        if (decision.EnterAvatar)
+        {
+            StartAvatarEntrance();
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
+        if (decision.ExitAvatar)
+        {
+            StartAvatarExit();
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
+        if (_avatarPresence.IsTransitioning)
+        {
             GetViewport().SetInputAsHandled();
             return;
         }
@@ -485,6 +577,18 @@ public partial class TurnController : Node2D
                 }
             }
 
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
+        bool hiddenAvatarAction =
+            presentationKey is
+                PresentationKey.C
+                or PresentationKey.F
+                or PresentationKey.School
+            || keyEvent.PhysicalKeycode == Key.X;
+        if (!_avatarPresence.IsVisible && hiddenAvatarAction)
+        {
             GetViewport().SetInputAsHandled();
             return;
         }
@@ -687,6 +791,8 @@ public partial class TurnController : Node2D
         _schoolBackground.Visible =
             !_celebration.IsActive
             && _schoolScene.IsSchoolVisible;
+        _neonBackground.SetBlackStageVisible(
+            !_schoolBackground.Visible);
         if (_schoolScene.SelectedBackgroundLayout is { } layout)
         {
             _schoolBackground.Position = new Vector2(
@@ -723,7 +829,78 @@ public partial class TurnController : Node2D
     {
         _dialogueUi.OpeningSuppressed =
             _schoolScene.SuppressesOrdinaryInput
-            || _celebration.SuppressesOrdinaryInput;
+            || _celebration.SuppressesOrdinaryInput
+            || _avatarPresence.IsTransitioning;
+    }
+
+    private void StartAvatarEntrance()
+    {
+        if (_avatarPresence.Phase == AvatarPresencePhase.EnteringFromRight)
+        {
+            return;
+        }
+
+        ResetPresentationToBlack();
+        AnimationOffscreenCenters offscreen =
+            CalculateOffscreenCenters();
+        _avatarPresence.StartEnterFromRight(
+            offscreen.Right,
+            AnimationGeometry.ViewportWidth / 2.0);
+        _character.Position = new Vector2(
+            (float)_avatarPresence.CharacterX,
+            _character.Position.Y);
+        _turn.Reset(
+            TurnDirection.Left,
+            DirectionalTurnStateMachine.FrontFrame);
+        UpdateSchoolVisuals();
+        ApplyCurrentFrame();
+    }
+
+    private void StartAvatarExit()
+    {
+        if (!_avatarPresence.IsVisible)
+        {
+            return;
+        }
+
+        double currentX = _character.Position.X;
+        ResetPresentationToBlack();
+        AnimationOffscreenCenters offscreen =
+            CalculateOffscreenCenters();
+        _avatarPresence.StartExit(
+            currentX,
+            offscreen.Left,
+            offscreen.Right);
+        _turn.Reset(
+            _avatarPresence.IsWalkingRight
+                ? TurnDirection.Right
+                : TurnDirection.Left,
+            DirectionalTurnStateMachine.FrontFrame);
+        UpdateSchoolVisuals();
+        ApplyCurrentFrame();
+    }
+
+    private void ResetPresentationToBlack()
+    {
+        _schoolScene.CancelToBlack(CharacterProgressFromPosition());
+        _celebration.Cancel();
+        _schoolBackground.Visible = false;
+        _fireworks.StopAndClear();
+        _logoRain.StopAndClear();
+        _pendingSchoolActionMessage = null;
+        _dialogueUi.HideBubble();
+    }
+
+    private AnimationOffscreenCenters CalculateOffscreenCenters()
+    {
+        Rect2 visibleRect = GetViewport().GetVisibleRect();
+        return AnimationGeometry.CalculateOffscreenCenters(
+            visibleRect.Position.X,
+            visibleRect.Size.X,
+            AnimationGeometry.CanvasCenterX,
+            MathF.Abs(_character.Scale.X),
+            AnimationGeometry.LeftWalkVisibleX,
+            AnimationGeometry.RightWalkVisibleX);
     }
 
     private void StartCelebration()
@@ -811,7 +988,7 @@ public partial class TurnController : Node2D
             Godot.FileAccess.GetFileAsBytes(path));
         AnimationConfig.Install(config);
         GD.Print(
-            $"ANIMATION_CONFIG_LOAD_PASS school_entry={config.SchoolEntrySeconds:0.###} school_clap={config.SchoolClapSeconds:0.###} celebration_clap={config.CelebrationClapSeconds:0.###} logo_rain_spawn={config.LogoRainSpawnSeconds:0.###}");
+            $"ANIMATION_CONFIG_LOAD_PASS avatar_entry={config.AvatarEntrySeconds:0.###} avatar_exit_full_span={config.AvatarExitFullSpanSeconds:0.###} neon_intensity={config.NeonIntensity:0.###} neon_hue_cycle={config.NeonHueCycleSeconds:0.###} neon_pulse={config.NeonPulseSeconds:0.###} school_entry={config.SchoolEntrySeconds:0.###} school_clap={config.SchoolClapSeconds:0.###} celebration_clap={config.CelebrationClapSeconds:0.###} logo_rain_spawn={config.LogoRainSpawnSeconds:0.###}");
     }
 
     private void ShowConfiguredActionMessage(string key)
@@ -1057,14 +1234,77 @@ public partial class TurnController : Node2D
         if (
             _fireworks.IsActive
             || _logoRain.IsActive
+            || _neonBackground.IsEnabled
+            || _neonBackground.IsAnimationEnabled
+            || _neonBackground.IsColorCycleEnabled
             || _actionLegend.IsLegendVisible
-            || ActionLegendLayout.Entries.Length != 14
+            || _avatarPresence.Phase != AvatarPresencePhase.Hidden
+            || _character.Visible
+            || ActionLegendLayout.Entries.Length != 19
+            || _neonLogoTexture.GetWidth() != 2062
+            || _neonLogoTexture.GetHeight() != 763
             || _smallLogoTexture.GetWidth() != 128
             || _smallLogoTexture.GetHeight() != 102
         )
         {
             throw new InvalidOperationException(
-                "Celebration, fireworks, logo rain, or legend runtime state is invalid.");
+                "Initial Avatar, neon background, effects, or legend state is invalid.");
+        }
+        if (
+            !_neonBackground.Toggle()
+            || !_neonBackground.IsShowing
+        )
+        {
+            throw new InvalidOperationException(
+                "Neon background did not turn on over the black stage.");
+        }
+        if (
+            !_neonBackground.ToggleAnimation()
+            || !_neonBackground.IsAnimationEnabled
+        )
+        {
+            throw new InvalidOperationException(
+                "Neon animation did not turn on.");
+        }
+        if (
+            _neonBackground.ToggleAnimation()
+            || _neonBackground.IsAnimationEnabled
+        )
+        {
+            throw new InvalidOperationException(
+                "Neon animation did not return to its default off state.");
+        }
+        if (
+            !_neonBackground.ToggleColorCycle()
+            || !_neonBackground.IsColorCycleEnabled
+        )
+        {
+            throw new InvalidOperationException(
+                "Neon color cycling did not turn on.");
+        }
+        if (
+            _neonBackground.ToggleColorCycle()
+            || _neonBackground.IsColorCycleEnabled
+        )
+        {
+            throw new InvalidOperationException(
+                "Neon color cycling did not return to its default off state.");
+        }
+        _neonBackground.SetBlackStageVisible(false);
+        if (_neonBackground.IsShowing)
+        {
+            throw new InvalidOperationException(
+                "Neon background remained visible behind a school scene.");
+        }
+        _neonBackground.SetBlackStageVisible(true);
+        if (
+            !_neonBackground.IsShowing
+            || _neonBackground.Toggle()
+            || _neonBackground.IsShowing
+        )
+        {
+            throw new InvalidOperationException(
+                "Neon background toggle did not restore the default off state.");
         }
 
         string[] backgroundDimensions = new string[
@@ -1100,7 +1340,20 @@ public partial class TurnController : Node2D
             + "school_backgrounds=6 dimensions="
             + string.Join(",", backgroundDimensions)
             + " dialogue_ui=true "
-            + "action_messages=8 legend_entries=14 "
+            + "action_messages=8 legend_entries=19 initial_blank=true "
+            + "neon_background=true neon_animation_default=false "
+            + "neon_color_cycle_default=false neon_text_color=white "
+            + FormattableString.Invariant(
+                $"neon_intensity={AnimationConfig.Current.NeonIntensity:0.###} ")
+            + "neon_scale=0.75 neon_top=48 neon_texture=2062x763 "
+            + FormattableString.Invariant(
+                $"neon_hue_cycle_seconds={AnimationConfig.Current.NeonHueCycleSeconds:0.###} ")
+            + FormattableString.Invariant(
+                $"neon_pulse_seconds={AnimationConfig.Current.NeonPulseSeconds:0.###} ")
+            + FormattableString.Invariant(
+                $"avatar_entry_seconds={AnimationConfig.Current.AvatarEntrySeconds:0.###} ")
+            + FormattableString.Invariant(
+                $"avatar_exit_full_span_seconds={AnimationConfig.Current.AvatarExitFullSpanSeconds:0.###} ")
             + FormattableString.Invariant(
                 $"celebration_seconds={CelebrationStateMachine.ClapDurationSeconds:0.###} ")
             + "fireworks_layer=true "
@@ -1113,6 +1366,28 @@ public partial class TurnController : Node2D
 
     private void ApplyCurrentFrame()
     {
+        _character.Visible =
+            _capturePath is not null
+            || _avatarPresence.IsVisible;
+        if (!_character.Visible)
+        {
+            return;
+        }
+
+        if (_avatarPresence.IsTransitioning)
+        {
+            Texture2D[] stageLeftWalkFrames = _neonBackground.IsShowing
+                ? _schoolLeftWalkFrames
+                : _leftWalkFrames;
+            Texture2D[] stageRightWalkFrames = _neonBackground.IsShowing
+                ? _schoolRightWalkFrames
+                : _rightWalkFrames;
+            _character.Texture = _avatarPresence.IsWalkingLeft
+                ? stageLeftWalkFrames[_avatarPresence.CurrentWalkFrame]
+                : stageRightWalkFrames[_avatarPresence.CurrentWalkFrame];
+            return;
+        }
+
         if (_celebration.IsActive)
         {
             _character.Texture = GetCelebrationCharacterTexture(
@@ -1136,7 +1411,8 @@ public partial class TurnController : Node2D
         bool schoolOverlay =
             PresentationInputPolicy.ShouldUseTransparentCharacter(
                 _schoolScene.UsesTransparentCharacter,
-                _logoRain.IsActive);
+                _logoRain.IsActive,
+                _neonBackground.IsShowing);
         Texture2D[] crossArmFrames = schoolOverlay
             ? _schoolCrossArmFrames
             : _crossArmFrames;
@@ -1232,7 +1508,8 @@ public partial class TurnController : Node2D
         bool schoolOverlay =
             PresentationInputPolicy.ShouldUseTransparentCharacter(
                 _schoolScene.UsesTransparentCharacter,
-                _logoRain.IsActive);
+                _logoRain.IsActive,
+                _neonBackground.IsShowing);
         return animation switch
         {
             SchoolCharacterAnimation.WalkRight =>
@@ -1283,6 +1560,7 @@ public partial class TurnController : Node2D
         bool legendVisible = false;
         bool hideBubble = false;
         bool logoRainVisible = false;
+        bool neonBackgroundVisible = false;
         int frameOptionCount = 0;
         int directionOptionCount = 0;
         int pathOptionCount = 0;
@@ -1292,6 +1570,7 @@ public partial class TurnController : Node2D
         int legendOptionCount = 0;
         int hideBubbleOptionCount = 0;
         int logoRainOptionCount = 0;
+        int neonBackgroundOptionCount = 0;
         bool captureModeRequested = IsCaptureModeRequested(arguments);
 
         foreach (string argument in arguments)
@@ -1410,6 +1689,18 @@ public partial class TurnController : Node2D
                 logoRainVisible = true;
             }
             else if (
+                string.Equals(
+                    argument,
+                    "--capture-neon-background",
+                    StringComparison.Ordinal)
+            )
+            {
+                EnsureSingleOption(
+                    ref neonBackgroundOptionCount,
+                    "--capture-neon-background");
+                neonBackgroundVisible = true;
+            }
+            else if (
                 argument.StartsWith(
                     "--capture-",
                     StringComparison.Ordinal)
@@ -1471,7 +1762,8 @@ public partial class TurnController : Node2D
             celebrationCapture,
             legendVisible,
             hideBubble,
-            logoRainVisible);
+            logoRainVisible,
+            neonBackgroundVisible);
     }
 
     private void ConfigureCaptureMode(
@@ -1484,6 +1776,7 @@ public partial class TurnController : Node2D
 
         _captureRoot = captureMode.Root;
         _capturePath = captureMode.Path;
+        _avatarPresence.SetVisible(_character.Position.X);
         if (captureMode.CelebrationCapture is not null)
         {
             _schoolScene.CancelToBlack(CharacterProgressFromPosition());
@@ -1576,6 +1869,10 @@ public partial class TurnController : Node2D
         {
             _logoRain.Start(LogoRainLayer.CaptureSeed);
             _logoRain.AdvanceForCapture(3.2);
+        }
+        if (captureMode.NeonBackgroundVisible)
+        {
+            _neonBackground.Toggle();
         }
         _captureCountdown = 3;
     }
@@ -1757,7 +2054,8 @@ public partial class TurnController : Node2D
                 + $"celebration_phase={_celebration.Phase} "
                 + $"legend={_actionLegend.IsLegendVisible} "
                 + $"fireworks={_fireworks.IsActive} "
-                + $"logo_rain={_logoRain.IsActive} path={_capturePath}");
+                + $"logo_rain={_logoRain.IsActive} "
+                + $"neon={_neonBackground.IsShowing} path={_capturePath}");
             GetTree().Quit();
         }
         catch (Exception exception)
@@ -1810,7 +2108,8 @@ public partial class TurnController : Node2D
         CelebrationSnapshot? CelebrationCapture,
         bool LegendVisible,
         bool HideBubble,
-        bool LogoRainVisible);
+        bool LogoRainVisible,
+        bool NeonBackgroundVisible);
 
     private sealed record SchoolCaptureSelection(
         int SchoolNumber,

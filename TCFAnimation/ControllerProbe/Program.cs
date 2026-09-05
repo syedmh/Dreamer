@@ -17,6 +17,7 @@ RunDialogueLayoutCases();
 RunCaptureRootCases();
 RunCapturePathCases();
 RunGlobalInputCases();
+RunAvatarPresenceCases();
 RunSchoolGeometryCases();
 RunSchoolSceneCases();
 RunActionMessageCases();
@@ -41,6 +42,7 @@ Console.WriteLine(
     + "release_6_frames=true release_source=CrossArm4 fps_cross_arm_release=8 "
     + "cross_arm_direction_lock=true dialogue_input=true "
     + "dialogue_layout=true global_input=true "
+    + "avatar_presence=true initial_blank=true d_exit=true e_enter=true "
     + "capture_root=true "
     + "school_geometry=all_6 school_choreography=all_6 "
     + "school_ids=1..6 invalid_ids=-1,0,7 "
@@ -51,7 +53,7 @@ Console.WriteLine(
     + "fixed_runtime_frames=33 school_overlay_frames=33 "
     + "action_messages=true celebration_seconds=30 "
     + "fireworks_deterministic=true logo_rain_seconds=10 "
-    + "legend=true c_manual_clap=true "
+    + "legend=true neon_background=true c_manual_clap=true "
     + "l_legend=true "
     + "wave_assets=false");
 return;
@@ -131,6 +133,136 @@ static void RunSchoolGeometryCases()
         () => SchoolSceneGeometry.BackgroundCenterX(
             validationLayout,
             -0.01));
+}
+
+static void RunAvatarPresenceCases()
+{
+    AnimationConfig.Install(AnimationConfig.Defaults);
+    AnimationOffscreenCenters offscreen =
+        AnimationGeometry.DefaultOffscreenCenters;
+    AssertNear(
+        "left offscreen center hides visible right edge",
+        offscreen.Left,
+        -226.25,
+        0.001);
+    AssertNear(
+        "right offscreen center hides visible left edge",
+        offscreen.Right,
+        2147.5,
+        0.001);
+
+    AvatarPresenceStateMachine presence = new();
+    AssertTrue(
+        "Avatar starts completely hidden",
+        presence.Phase == AvatarPresencePhase.Hidden
+        && !presence.IsVisible
+        && !presence.IsTransitioning);
+    AssertTrue(
+        "D is inert while Avatar is hidden",
+        !presence.StartExit(
+            960.0,
+            offscreen.Left,
+            offscreen.Right));
+
+    AssertTrue(
+        "E starts entry from right",
+        presence.StartEnterFromRight(offscreen.Right, 960.0)
+        && presence.IsVisible
+        && presence.IsTransitioning
+        && presence.IsWalkingLeft);
+    AssertNear(
+        "E begins fully offscreen right",
+        presence.CharacterX,
+        offscreen.Right,
+        0.001);
+    AssertTrue(
+        "repeated E preserves active entrance",
+        !presence.StartEnterFromRight(offscreen.Right, 960.0));
+    presence.Advance(
+        AnimationConfig.Current.AvatarEntrySeconds / 2.0);
+    AssertNear(
+        "E reaches midpoint at half duration",
+        presence.CharacterX,
+        (offscreen.Right + 960.0) / 2.0,
+        0.001);
+    AssertTrue(
+        "E uses left walking frames",
+        presence.IsWalkingLeft
+        && presence.CurrentWalkFrame
+            is >= 0
+            and < DirectionalTurnStateMachine.LeftWalkFrameCount);
+    presence.Advance(
+        AnimationConfig.Current.AvatarEntrySeconds / 2.0);
+    AssertTrue(
+        "E ends visible and centered",
+        presence.Phase == AvatarPresencePhase.Visible
+        && presence.IsVisible
+        && !presence.IsTransitioning);
+    AssertNear(
+        "E stops at exact screen center",
+        presence.CharacterX,
+        960.0,
+        0.001);
+
+    AssertTrue(
+        "D exits left when left edge is nearer",
+        presence.StartExit(
+            960.0,
+            offscreen.Left,
+            offscreen.Right)
+        && presence.Phase == AvatarPresencePhase.ExitingLeft
+        && presence.IsWalkingLeft);
+    presence.Advance(
+        AnimationConfig.Current.AvatarExitFullSpanSeconds);
+    AssertTrue(
+        "D hides Avatar after left exit",
+        presence.Phase == AvatarPresencePhase.Hidden
+        && !presence.IsVisible);
+    AssertNear(
+        "left exit reaches fully offscreen center",
+        presence.CharacterX,
+        offscreen.Left,
+        0.001);
+
+    presence.SetVisible(1700.0);
+    AssertTrue(
+        "D exits right when right edge is nearer",
+        presence.StartExit(
+            1700.0,
+            offscreen.Left,
+            offscreen.Right)
+        && presence.Phase == AvatarPresencePhase.ExitingRight
+        && presence.IsWalkingRight);
+    presence.Advance(
+        AnimationConfig.Current.AvatarExitFullSpanSeconds);
+    AssertTrue(
+        "D hides Avatar after right exit",
+        presence.Phase == AvatarPresencePhase.Hidden
+        && !presence.IsVisible);
+    AssertNear(
+        "right exit reaches fully offscreen center",
+        presence.CharacterX,
+        offscreen.Right,
+        0.001);
+
+    presence.SetVisible(960.625);
+    presence.StartExit(
+        960.625,
+        offscreen.Left,
+        offscreen.Right);
+    AssertEqual(
+        "exact nearest-edge tie resolves left",
+        presence.Phase,
+        AvatarPresencePhase.ExitingLeft);
+    AssertTrue(
+        "E interrupts an exit and restarts at right edge",
+        presence.StartEnterFromRight(offscreen.Right, 960.0)
+        && presence.Phase == AvatarPresencePhase.EnteringFromRight);
+    AssertNear(
+        "interrupted E restarts fully offscreen right",
+        presence.CharacterX,
+        offscreen.Right,
+        0.001);
 }
 
 static void RunSchoolSceneCases()
@@ -2669,25 +2801,35 @@ static void RunLogoRainCases()
 static void RunLegendAndPresentationInputCases()
 {
     AssertTrue(
-        "logo rain selects transparent Avatar compositing",
+        "effects select transparent Avatar compositing",
         PresentationInputPolicy.ShouldUseTransparentCharacter(
             schoolOverlay: false,
             logoRainActive: true)
         && PresentationInputPolicy.ShouldUseTransparentCharacter(
             schoolOverlay: true,
             logoRainActive: false)
+        && PresentationInputPolicy.ShouldUseTransparentCharacter(
+            schoolOverlay: false,
+            logoRainActive: false,
+            neonBackgroundVisible: true)
         && !PresentationInputPolicy.ShouldUseTransparentCharacter(
             schoolOverlay: false,
             logoRainActive: false));
     AssertEqual(
         "legend contains exact active entry count",
         ActionLegendLayout.Entries.Length,
-        14);
+        19);
     AssertTrue(
-        "legend accurately lists F S R C L and fullscreen controls",
+        "legend accurately lists D E F S R N O I C L and fullscreen controls",
+        ActionLegendLayout.Entries.Any(line => line.StartsWith("D "))
+        && ActionLegendLayout.Entries.Any(line => line.StartsWith("E "))
+        &&
         ActionLegendLayout.Entries.Any(line => line.StartsWith("F "))
         && ActionLegendLayout.Entries.Any(line => line.StartsWith("S "))
         && ActionLegendLayout.Entries.Any(line => line.StartsWith("R "))
+        && ActionLegendLayout.Entries.Any(line => line.StartsWith("N "))
+        && ActionLegendLayout.Entries.Any(line => line.StartsWith("O "))
+        && ActionLegendLayout.Entries.Any(line => line.StartsWith("I "))
         && ActionLegendLayout.Entries.Any(line => line.StartsWith("C "))
         && ActionLegendLayout.Entries.Any(line => line.StartsWith("L "))
         && ActionLegendLayout.Entries.Any(
@@ -2732,10 +2874,95 @@ static void RunLegendAndPresentationInputCases()
             dialogueEditing: false,
             CelebrationPhase.Inactive),
         default);
+    AssertTrue(
+        "O toggles neon animation during celebration",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.O,
+            true,
+            echo: false,
+            dialogueEditing: false,
+            CelebrationPhase.Clapping).ToggleNeonAnimation);
+    AssertEqual(
+        "O typed while dialogue editing remains ordinary text",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.O,
+            true,
+            echo: false,
+            dialogueEditing: true,
+            CelebrationPhase.Inactive),
+        default);
+    AssertTrue(
+        "I toggles neon color cycling during celebration",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.I,
+            true,
+            echo: false,
+            dialogueEditing: false,
+            CelebrationPhase.Clapping).ToggleNeonColorCycle);
+    AssertEqual(
+        "I typed while dialogue editing remains ordinary text",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.I,
+            true,
+            echo: false,
+            dialogueEditing: true,
+            CelebrationPhase.Inactive),
+        default);
+    AssertTrue(
+        "D requests nearest-edge Avatar exit",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.D,
+            true,
+            false,
+            false,
+            CelebrationPhase.Clapping).ExitAvatar);
+    AssertTrue(
+        "E requests right-side Avatar entry",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.E,
+            true,
+            false,
+            false,
+            CelebrationPhase.Clapping).EnterAvatar);
+    AssertEqual(
+        "D and E typed while dialogue editing remain ordinary text",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.D,
+            true,
+            false,
+            dialogueEditing: true,
+            CelebrationPhase.Inactive),
+        default);
+    AssertEqual(
+        "E typed while dialogue editing remains ordinary text",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.E,
+            true,
+            false,
+            dialogueEditing: true,
+            CelebrationPhase.Inactive),
+        default);
     AssertEqual(
         "L typed while dialogue editing remains ordinary text",
         PresentationInputPolicy.Resolve(
             PresentationKey.L,
+            true,
+            echo: false,
+            dialogueEditing: true,
+            CelebrationPhase.Inactive),
+        default);
+    AssertTrue(
+        "N toggles neon background during celebration",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.N,
+            true,
+            echo: false,
+            dialogueEditing: false,
+            CelebrationPhase.Clapping).ToggleNeonBackground);
+    AssertEqual(
+        "N typed while dialogue editing remains ordinary text",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.N,
             true,
             echo: false,
             dialogueEditing: true,
@@ -2844,6 +3071,11 @@ static void RunAnimationConfigCases()
               "clapFps": 10.0,
               "crossArmFps": 11.0,
               "crossArmReleaseFps": 12.0,
+              "avatarEntrySeconds": 6.5,
+              "avatarExitFullSpanSeconds": 7.5,
+              "neonIntensity": 0.65,
+              "neonHueCycleSeconds": 9.5,
+              "neonPulseSeconds": 2.25,
               "schoolPrepositionSeconds": 4.0,
               "schoolEntrySeconds": 5.0,
               "schoolClapSeconds": 6.0,
@@ -2875,6 +3107,11 @@ static void RunAnimationConfigCases()
         && configuredTurn.ClapFrameDurationSeconds == 1.0 / 10.0
         && configuredTurn.CrossArmFrameDurationSeconds == 1.0 / 11.0
         && configuredTurn.CrossArmReleaseFrameDurationSeconds == 1.0 / 12.0
+        && AnimationConfig.Current.AvatarEntrySeconds == 6.5
+        && AnimationConfig.Current.AvatarExitFullSpanSeconds == 7.5
+        && AnimationConfig.Current.NeonIntensity == 0.65
+        && AnimationConfig.Current.NeonHueCycleSeconds == 9.5
+        && AnimationConfig.Current.NeonPulseSeconds == 2.25
         && SchoolSceneStateMachine.CharacterPrePositionFullSpanDurationSeconds
             == 4.0
         && SchoolSceneStateMachine.EntryDurationSeconds == 5.0
@@ -2904,6 +3141,11 @@ static void RunAnimationConfigCases()
                   "clapFps": 8,
                   "crossArmFps": 8,
                   "crossArmReleaseFps": 8,
+                  "avatarEntrySeconds": 6,
+                  "avatarExitFullSpanSeconds": 6,
+                  "neonIntensity": 0.7,
+                  "neonHueCycleSeconds": 8,
+                  "neonPulseSeconds": 2.5,
                   "schoolPrepositionSeconds": 6,
                   "schoolEntrySeconds": 8,
                   "schoolClapSeconds": 10,

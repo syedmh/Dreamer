@@ -12,6 +12,11 @@ public sealed record AnimationConfig
     public double ClapFps { get; init; }
     public double CrossArmFps { get; init; }
     public double CrossArmReleaseFps { get; init; }
+    public double AvatarEntrySeconds { get; init; }
+    public double AvatarExitFullSpanSeconds { get; init; }
+    public double NeonIntensity { get; init; }
+    public double NeonHueCycleSeconds { get; init; }
+    public double NeonPulseSeconds { get; init; }
     public double SchoolPrepositionSeconds { get; init; }
     public double SchoolEntrySeconds { get; init; }
     public double SchoolClapSeconds { get; init; }
@@ -31,6 +36,11 @@ public sealed record AnimationConfig
         ClapFps = 8.0,
         CrossArmFps = 8.0,
         CrossArmReleaseFps = 8.0,
+        AvatarEntrySeconds = 6.0,
+        AvatarExitFullSpanSeconds = 6.0,
+        NeonIntensity = 0.7,
+        NeonHueCycleSeconds = 8.0,
+        NeonPulseSeconds = 2.5,
         SchoolPrepositionSeconds = 6.0,
         SchoolEntrySeconds = 8.0,
         SchoolClapSeconds = 10.0,
@@ -89,6 +99,14 @@ public sealed record AnimationConfig
                 (nameof(ClapFps), ClapFps),
                 (nameof(CrossArmFps), CrossArmFps),
                 (nameof(CrossArmReleaseFps), CrossArmReleaseFps),
+                (nameof(AvatarEntrySeconds), AvatarEntrySeconds),
+                (
+                    nameof(AvatarExitFullSpanSeconds),
+                    AvatarExitFullSpanSeconds
+                ),
+                (nameof(NeonIntensity), NeonIntensity),
+                (nameof(NeonHueCycleSeconds), NeonHueCycleSeconds),
+                (nameof(NeonPulseSeconds), NeonPulseSeconds),
                 (nameof(SchoolPrepositionSeconds), SchoolPrepositionSeconds),
                 (nameof(SchoolEntrySeconds), SchoolEntrySeconds),
                 (nameof(SchoolClapSeconds), SchoolClapSeconds),

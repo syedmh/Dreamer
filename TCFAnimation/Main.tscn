@@ -12,6 +12,7 @@ texture_filter = 1
 z_index = -1
 
 [node name="Character" type="Sprite2D" parent="."]
+visible = false
 centered = true
 
 [node name="DialogueUi" type="CanvasLayer" parent="."]

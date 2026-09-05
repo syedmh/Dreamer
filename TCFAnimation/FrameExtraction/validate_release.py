@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import re
@@ -180,7 +181,10 @@ EXPECTED_BACKGROUNDS = {
     ),
 }
 EXPECTED_BACKGROUND_PATHS = tuple(EXPECTED_BACKGROUNDS)
-EXPECTED_EFFECT_PATHS = ("Frames/Effects/logo-small.png",)
+EXPECTED_EFFECT_PATHS = (
+    "Frames/Effects/logo-small.png",
+    "Frames/Effects/tcf-neon-background.png",
+)
 EXPECTED_TEXTURE_PATHS = (
     *EXPECTED_FRAME_PATHS,
     *EXPECTED_BACKGROUND_PATHS,
@@ -1061,6 +1065,8 @@ def validate_frame_tree() -> None:
     expected_effect_entries = {
         "logo-small.png",
         "logo-small.png.import",
+        "tcf-neon-background.png",
+        "tcf-neon-background.png.import",
     }
     if effect_entries != expected_effect_entries:
         raise RuntimeError(
@@ -1074,10 +1080,10 @@ def validate_frame_tree() -> None:
     )
     if (
         set(actual_pngs) != set(EXPECTED_TEXTURE_PATHS)
-        or len(actual_pngs) != 73
+        or len(actual_pngs) != 74
     ):
         raise RuntimeError(
-            f"Runtime PNG set has {len(actual_pngs)} files; expected exact 73."
+            f"Runtime PNG set has {len(actual_pngs)} files; expected exact 74."
         )
 
 
@@ -1128,6 +1134,11 @@ def validate_animation_config() -> None:
         "clapFps",
         "crossArmFps",
         "crossArmReleaseFps",
+        "avatarEntrySeconds",
+        "avatarExitFullSpanSeconds",
+        "neonIntensity",
+        "neonHueCycleSeconds",
+        "neonPulseSeconds",
         "schoolPrepositionSeconds",
         "schoolEntrySeconds",
         "schoolClapSeconds",
@@ -1142,7 +1153,7 @@ def validate_animation_config() -> None:
     }
     if not isinstance(document, dict) or set(document) != expected_keys:
         raise RuntimeError(
-            "AnimationConfig.json must contain exactly the supported timing keys."
+            "AnimationConfig.json must contain exactly the supported keys."
         )
     for key, value in document.items():
         if (
@@ -1155,7 +1166,7 @@ def validate_animation_config() -> None:
                 f"AnimationConfig.json value {key} must be a finite "
                 "positive number."
             )
-    print("animation_config_ok=timing_keys:16 positive=true")
+    print("animation_config_ok=config_keys:21 positive=true")
 
 
 def validate_logo_effect() -> None:
@@ -1176,6 +1187,33 @@ def validate_logo_effect() -> None:
             "Small logo must contain both transparent and opaque pixels."
         )
     print("logo_effect_ok=size:128x102 transparent=true duration_seconds=10")
+
+
+def validate_neon_background() -> None:
+    path = ROOT / EXPECTED_EFFECT_PATHS[1]
+    if path.stat().st_size != 1_246_534:
+        raise RuntimeError(
+            f"{path.relative_to(ROOT)} has unexpected byte length."
+        )
+    if hashlib.sha256(path.read_bytes()).hexdigest().upper() != (
+        "F32624AE81B2C0C30D88B9673C4D7A3A2939BF75003EC5FDE32C15FDF302BE08"
+    ):
+        raise RuntimeError(
+            f"{path.relative_to(ROOT)} has unexpected content."
+        )
+    with Image.open(path) as image:
+        if (
+            image.format != "PNG"
+            or image.mode != "RGBA"
+            or image.size != (2062, 763)
+        ):
+            raise RuntimeError(
+                f"{path.relative_to(ROOT)} is {image.format} {image.mode} "
+                f"{image.size}; expected PNG RGBA (2062, 763)."
+            )
+    print(
+        "neon_background_ok=size:2062x763 true_png=true transparent=true"
+    )
 
 
 def validate_runtime_pngs() -> None:
@@ -2891,7 +2929,7 @@ def validate_pack_payload(
     print(
         f"pack_payload_ok={path.name} runtime_scene=1 runtime_scripts=2 "
         "runtime_json=2 "
-        "runtime_textures=73 import_metadata=73 engine_metadata=4 "
+        "runtime_textures=74 import_metadata=74 engine_metadata=4 "
         "denied_payloads=false source_content=false metadata_denied_tokens=0"
     )
 
@@ -2974,6 +3012,7 @@ def main() -> int:
     validate_animation_config()
     validate_action_messages()
     validate_logo_effect()
+    validate_neon_background()
     validate_runtime_pngs()
     regenerated = regenerate_in_memory()
     validate_independent_lower_anatomy(regenerated)
@@ -2988,7 +3027,7 @@ def main() -> int:
     validate_sources()
     print(
         "ASSET_RELEASE_CHECK_PASS frames=33 school_overlays=33 "
-        "backgrounds=6 sources=12 read_only=true export_resources=76 "
+        "backgrounds=6 sources=12 read_only=true export_resources=77 "
         "artifact_manifest=checked_if_present"
     )
     return 0
