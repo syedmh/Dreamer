@@ -7,9 +7,9 @@ The project targets .NET 8 and uses a 1920x1080 logical viewport.
 
 ## Build everything
 
-Run `build.bat` from any directory to build the Release solution, execute the
-controller probe, import Godot resources, export and validate the Windows
-package, and smoke-test `Build\TCFAnimation.exe`.
+Run `build.bat` from any directory to build both Debug and Release solutions,
+execute the controller probe, import Godot resources, export and validate the
+Windows package, and smoke-test `Build\TCFAnimation.exe`.
 
 ## Run
 
@@ -17,10 +17,17 @@ From any current working directory:
 
 ```bat
 C:\path\to\Dreamer\TCFAnimation\run-animation.bat
+C:\path\to\Dreamer\TCFAnimation\run-animation.bat debug
+C:\path\to\Dreamer\TCFAnimation\run-animation.bat release
 ```
 
-Both `run-animation.bat` and `export-release.ps1` resolve Godot in the same
-order: nonempty `GODOT_EXE`, the project-local bundled executable, `godot4` on
+With no parameter, `run-animation.bat` runs the exported Release executable.
+The `release` parameter does the same; run `build.bat` first if the executable
+does not exist. The `debug` parameter runs the Godot project with the Debug
+assembly.
+
+Debug launching and `export-release.ps1` resolve Godot in the same order:
+nonempty `GODOT_EXE`, the project-local bundled executable, `godot4` on
 `PATH`, then `godot` on `PATH`. An explicitly configured `GODOT_EXE` is
 authoritative and never falls back when missing or invalid. Candidate bytes
 must match the release provenance before execution; console candidates also
