@@ -5,6 +5,12 @@ messages, a timed celebration with procedural fireworks, a control legend,
 clap/cross-arm playback, and six scripted school platform-scene animations.
 The project targets .NET 8 and uses a 1920x1080 logical viewport.
 
+## Build everything
+
+Run `build.bat` from any directory to build the Release solution, execute the
+controller probe, import Godot resources, export and validate the Windows
+package, and smoke-test `Build\TCFAnimation.exe`.
+
 ## Run
 
 From any current working directory:
@@ -33,74 +39,90 @@ prints `GODOT_RESOLUTION_FAIL` and exits 1.
   sequence; holding both arrows is neutral.
 - **+/-**: adjust movement and walk playback together from `0.25x` to `3.0x`
   in `0.25x` steps. At `1.0x`, movement is 240 design pixels/second and both
-  six-frame walks play at 6 FPS. Turn timing remains fixed at 8 FPS.
-- **C**: from front idle, play the approved 15-step clap once at 8 FPS.
+  six-frame walks use `walkFps` (6 FPS by default). Turns use `turnFps`
+  (8 FPS by default).
+- **C**: from front idle, play the approved 15-step clap once at `clapFps`
+  (8 FPS by default).
   Directional input interrupts the clap, while scripted school and celebration
   choreography suppress manual clapping. While dialogue input is open, typed
   `C` remains ordinary text.
 - **L**: show or hide the high-contrast action legend. Key echo is ignored,
   and the legend is hidden by default to preserve a clean presentation.
   While dialogue input is open, typed `L` remains ordinary text.
-- **X**: from front idle, play `cross_00..02` at 8 FPS and hold `cross_02`.
-  Press X again to play `release_00..05` at 8 FPS and return to the same
+- **X**: from front idle, play `cross_00..02` at `crossArmFps`
+  (8 FPS by default) and hold `cross_02`.
+  Press X again to play `release_00..05` at `crossArmReleaseFps`
+  (8 FPS by default) and return to the same
   directional front pose. Clap and directional input are blocked throughout
   crossing, hold, and release; held arrows are not queued.
 - **Physical top-row 1 through 6**: select the matching `School1.png` through
   `School6.png`. When the school scene is inactive, first run
   `PreparingEntryLeft` on pure black. The Avatar visibly uses the approved
   left walk from its current x to the calibrated left x=`227.5`; a full-span
-  pre-position is 6.0 seconds and partial distances scale linearly. If already
-  left, preparation completes immediately. `Entering` then lasts 8.0 seconds:
+  pre-position defaults to 6.0 seconds and partial distances scale linearly.
+  If already left, preparation completes immediately. `Entering` uses
+  `schoolEntrySeconds` (8.0 seconds by default):
   the selected aspect-cover school background starts fully offscreen-right and moves
   left to center while the approved right walk moves the Avatar from
   x=`227.5` to x=`1693.75`. They complete together. The exact 15-step clap
-  then repeats at 8 FPS for exactly 10.0 seconds; the first update at or
-  beyond 10.0 seconds returns to front idle on the right. From a black crossed
+  then repeats at the configured clap FPS for the configured duration
+  (8 FPS and 10.0 seconds by default); the first update at or
+  beyond that duration returns to front idle on the right. From a black crossed
   hold, any physical top-row `1` through `6` first plays the normal six-frame
-  release at 8 FPS, selects the requested school, then performs the same left
+  configured release animation, selects the requested school, then performs the same left
   pre-position if needed before entry. The matching configured action message
-  is shown only when entry reaches the exact right endpoint and the 10-second
+  is shown only when entry reaches the exact right endpoint and the configured
   clap begins. Empty or missing messages leave the existing bubble unchanged.
 - **Physical top-row 0**: while a school is entering, clapping, or active,
   first run
   `PreparingExitRight`. The background remains at its current visible
   position while the Avatar uses the approved right walk from its current x
-  to calibrated right x=`1693.75`; a full-span pre-position is 6.0 seconds
+  to calibrated right x=`1693.75`; a full-span pre-position defaults to
+  6.0 seconds
   and partial distances scale linearly. If already right, preparation
   completes immediately. If `0` interrupted a partial entry,
   `NormalizingExitBackground` then holds the Avatar in a clean right-front
   pose and smoothly continues the background left to exact center at the same
   background speed as entry. Its duration is
-  `currentRightOffsetProgress * 8.0` seconds. `Exiting` then lasts 8.0 seconds:
+  `currentRightOffsetProgress * schoolBackgroundNormalizationSeconds`.
+  `Exiting` uses the configured school exit duration (8.0 seconds by default):
   the background moves right from center to fully offscreen-right while the
   Avatar uses the left walk from x=`1693.75` to x=`227.5`; they complete
   together. Exit ends on exact black, automatically plays `cross_00..02` at
-  8 FPS, and holds `cross_02`; **X** releases that hold. `0` always hides a
+  the configured cross-arm FPS, and holds `cross_02`; **X** releases that
+  hold. `0` always hides a
   visible bubble immediately, even when no school exit is eligible or while
   celebration choreography is active.
-- **Q**: cancel any school choreography, hide the school background, switch
+- **F**: cancel any school choreography, hide the school background, switch
   to black, start procedural fireworks immediately behind the Avatar, release
   crossed arms when necessary, and visibly walk the Avatar
   to exact center x=`960`. The walk uses the correct directional six-frame
-  sheet at 6 FPS and a distance-scaled duration based on the existing
-  6.0-second full-span speed; it never teleports. At center, the configured
-  `Q` message is shown, the approved 15-step clap repeats at 8 FPS for exactly
-  30.0 seconds (240 frame intervals, ending on its clean front boundary), and
+  sheet at the configured walk FPS and a distance-scaled duration based on
+  `celebrationWalkSeconds`; it never teleports. At center, the configured
+  `F` message is shown, the approved 15-step clap repeats using the configured
+  clap FPS and celebration duration (8 FPS and 30.0 seconds by default), and
   the Avatar automatically plays `cross_00..02`. Transparent celebration
   frames allow the deterministic colorful bursts to remain visible behind
   the Avatar throughout walking, clapping, crossing, and the final hold.
-- **R**: while celebration fireworks are active, stop, clear, and hide them
+- **S**: while celebration fireworks are active, stop, clear, and hide them
   immediately, cancel the remaining celebration choreography, move the Avatar
   to exact center, and restore its normal front-standing pose. The configured
-  `R` message is shown when non-empty. `R` otherwise does nothing. A later
-  **Q** starts the full celebration again from that centered standing pose.
+  `S` message is shown when non-empty. `S` otherwise does nothing. A later
+  **F** starts the full celebration again from that centered standing pose.
+- **R**: start or restart a configurable rain of small, transparent `Logo.png`
+  images at randomized horizontal positions, fall speeds, drift, rotation,
+  and scale. The effect renders behind the Avatar and above any school
+  background without changing the current Avatar pose or choreography. New
+  logos stop spawning after `logoRainSpawnSeconds` (10 seconds by default);
+  every logo already visible continues
+  falling naturally until it has completely left the bottom of the screen.
 - **Enter**: open dialogue input. Submit with Enter or cancel with Escape.
   Input is capped at 500 Unicode scalar values (matching Godot's code-point
   character model without splitting UTF-16 surrogate pairs), normalized on
   submission, wrapped to at most four lines, and clamped inside the logical
   viewport.
 - **P**: hide the current speech bubble while dialogue input is closed.
-- The legend lists Left/Right, +/-, 1-6, 0, Q, R, X, C, Enter, P, L,
+- The legend lists Left/Right, +/-, 1-6, 0, F, S, R, X, C, Enter, P, L,
   F11/Alt+Enter, and Escape, remains above black/school/fireworks visuals, and
   stays visible until toggled.
 - **F11** or **Alt+Enter**: toggle fullscreen. **Escape** exits fullscreen
@@ -117,7 +139,7 @@ During scripted school release, entry/exit pre-position, partial-entry
 background normalization, synchronized entry/exit, clap, and final crossing,
 arrows, **C**, **X**, **+/-**, and dialogue opening are suppressed. **L** still
 toggles the legend and fullscreen controls remain global. While dialogue is
-already open, numeric characters, `C`, `L`, `Q`, and `R` remain ordinary text input
+already open, numeric characters, `C`, `F`, `L`, `R`, and `S` remain ordinary text input
 and never trigger choreography.
 At school idle, ordinary
 walk/cross/speed/dialogue controls are enabled over the school background;
@@ -128,17 +150,17 @@ arrows remain blocked like the normal crossed hold, **L** toggles the legend,
 any `1` through `6` auto-releases, pre-positions left if needed, then enters
 the selected school.
 
-During Q release/walk/clap/cross/fireworks phases, arrows, **X**, **1-6**,
+During F release/walk/clap/cross/fireworks phases, arrows, **X**, **1-6**,
 school exit, **+/-**, and dialogue opening are suppressed. `0` still hides the
 bubble without changing celebration state, **L** still toggles the legend,
-fullscreen controls remain global, **Q** is ignored, and **R** can stop the
+fullscreen controls remain global, **F** is ignored, **S** can stop the
 fireworks and restore the centered front-standing pose during any active
-celebration phase.
+celebration phase, and **R** can independently start or restart logo rain.
 
 ## Action message configuration
 
 `ActionMessages.json` is an editable runtime resource with exact supported
-keys `"1"` through `"6"`, `"Q"`, and `"R"`. Values are normalized with the
+keys `"1"` through `"6"`, `"F"`, and `"S"`. Values are normalized with the
 same whitespace/display rules as dialogue and bounded to 500 Unicode scalar
 values without splitting surrogate pairs. At runtime, missing, null,
 non-string, empty, whitespace-only, and unknown entries are ignored safely;
@@ -147,10 +169,36 @@ root logs one visible `ACTION_MESSAGES_LOAD_FAIL` and continues with no
 configured action messages. The shipped release validator requires all eight
 editable defaults to be non-empty strings.
 
-School messages appear at right-entry completion, the Q message appears at
-center before the 30-second clap, and the R message appears only when R
+School messages appear at right-entry completion, the F message appears at
+center before the configured celebration clap, and the S message appears only when S
 actually stops active fireworks. User Enter submission still replaces action
 text, and P or 0 hides the bubble without erasing its stored text.
+
+## Animation timing configuration
+
+`AnimationConfig.json` is the single editable source for all runtime animation
+and effect timing. Every value must be a finite positive number; missing,
+unknown, nonnumeric, zero, or negative values fail startup rather than silently
+falling back to a different timing.
+
+| Key | Default | Controls |
+|---|---:|---|
+| `turnFps` | 8 | Left/right turn frame rate |
+| `walkFps` | 6 | Normal and scripted walking frame rate |
+| `clapFps` | 8 | Manual, school, and celebration clap frame rate |
+| `crossArmFps` | 8 | Cross-arm entry frame rate |
+| `crossArmReleaseFps` | 8 | Cross-arm release frame rate |
+| `schoolPrepositionSeconds` | 6 | Full-width pre-entry/pre-exit walk |
+| `schoolEntrySeconds` | 8 | School background entry and Avatar crossing |
+| `schoolClapSeconds` | 10 | School arrival clapping |
+| `schoolBackgroundNormalizationSeconds` | 8 | Full-span interrupted-entry normalization |
+| `schoolExitSeconds` | 8 | School background exit and Avatar return |
+| `celebrationWalkSeconds` | 6 | Full-width F celebration walk |
+| `celebrationClapSeconds` | 30 | F celebration clapping |
+| `fireworksSpawnIntervalSeconds` | 0.48 | Delay between firework bursts |
+| `fireworksBurstSeconds` | 1.7 | Lifetime of each firework burst |
+| `logoRainSpawnSeconds` | 10 | Time during which R creates new logos |
+| `logoRainSpawnIntervalSeconds` | 0.12 | Delay between falling logo spawns |
 
 There is intentionally **no waving action, control, runtime state, or release
 resource**. Files whose names begin with `Waving` are obsolete, unrelated
@@ -306,7 +354,7 @@ python -B FrameExtraction\validate_release.py
 Success ends with:
 
 ```text
-ASSET_RELEASE_CHECK_PASS frames=33 school_overlays=33 backgrounds=6 sources=12 read_only=true export_resources=74 artifact_manifest=checked_if_present
+ASSET_RELEASE_CHECK_PASS frames=33 school_overlays=33 backgrounds=6 sources=12 read_only=true export_resources=76 artifact_manifest=checked_if_present
 ```
 
 The validator does not create, modify, or delete files. It verifies immutable
@@ -355,18 +403,19 @@ clap/cross/release interruption and reset boundaries, and the fixed
 33-frame/no-wave contract. It also covers all six per-image aspect-cover
 geometries; all valid and invalid school IDs; identity retention and clearing;
 physical-key restrictions; synchronized
-right-to-left background entry and left-to-right exit; six-second
+right-to-left background entry and left-to-right exit; configured
 distance-scaled Avatar pre-position in both directions; repeated 15-step clap
-order and exact 10-second boundary; partial-entry interruption with held
+order and exact configured duration boundary; partial-entry interruption with held
 background, smooth same-speed normalization to center, and no teleport; final
 automatic cross/hold; auto-release/re-entry; invalid and large deltas;
 snapshot geometry; and scripted input suppression.
 It additionally covers action-message schema tolerance and failure statuses,
 500-scalar normalization, school endpoint message timing, explicit school
 cancellation, left/right/center/crossed celebration starts, non-teleporting
-distance-scaled travel, the exact 30.0-second/8 FPS clap boundary, cross and
-fireworks activation, R idempotence, Q restart, deterministic bounded
-fireworks simulation, C/L/0/Q/R arbitration, and legend entries/layout bounds.
+distance-scaled travel, the configured celebration clap boundary, cross and
+fireworks activation, S idempotence, F restart, deterministic bounded
+fireworks simulation, deterministic configured logo rain, C/F/L/R/S/0
+arbitration, and legend entries/layout bounds.
 
 ## Regenerate runtime frames
 
@@ -399,7 +448,8 @@ release-readiness command.
 `export_presets.cfg` uses Godot selected resources. Its positive list is
 exactly `res://Main.tscn`, the 33 original frames, the 33 shared transparent
 counterparts, the six prepared school backgrounds, and
-`res://ActionMessages.json` (74 resources total). It
+`res://AnimationConfig.json`, `res://ActionMessages.json`, and the transparent
+logo effect texture (76 resources total). It
 does not use broad include/exclude filters: both filter assignments must exist
 exactly once and be empty. Source sheets, extractors, `ControllerProbe`,
 `.ai-org`, `Build`, README files, obsolete root images, and all Waving files
@@ -457,12 +507,12 @@ if ($smoke.ExitCode -ne 0) { throw "Runtime smoke failed with exit code $($smoke
 
 The release script authenticates Godot, its companion, and the release
 template before touching `Build`. It then guarded-cleans that generated
-directory and copies exactly the 106 entries in
+directory and copies exactly the 114 entries in
 `release-stage-manifest.txt` into a GUID-owned isolated stage. After proving
 that copied seed, it creates a fixed 994-byte UTF-8-without-BOM, CRLF
 `TCFAnimation.sln` inside the stage. The generated solution references only
 `TCFAnimation.csproj`; the repository solution and `ControllerProbe` never
-cross the staging boundary. The resulting 107-file pre-import inventory is
+cross the staging boundary. The resulting 115-file pre-import inventory is
 proved before Godot import, so import-generated UID/cache state remains
 stage-local and is never copied back.
 
@@ -478,7 +528,7 @@ partial generated output. The final executable path remains exactly
 The validator reads the final embedded PCK in place without extraction. It
 checks exact payload counts, bounded entry descriptors, a 4 MiB per-metadata
 limit, a 16 MiB aggregate metadata limit, all four engine metadata entries,
-all 72 import metadata entries, the runtime JSON resource, two one-byte
+all 73 import metadata entries, both runtime JSON resources, two one-byte
 scene-script placeholders, and denied development/unrelated tokens in both
 single-byte and UTF-16LE forms.
 
@@ -487,12 +537,14 @@ The exported smoke test is read-only, rejects capture arguments, loads
 66 character textures plus all six school backgrounds, checks every source
 dimension and aspect-cover/offscreen geometry, checks the
 1920x1080 viewport and 512x864 character texture sizes, validates all eight
-action messages, the 13-entry hidden legend, the 30-second celebration
-contract, and the inactive fireworks layer, and exits successfully
+action messages, the 14-entry hidden legend, the configured celebration
+contract, the inactive fireworks layer, and the inactive configured logo-rain
+layer with its 128×102 transparent texture, and exits successfully
 only after printing:
 
 ```text
-RUNTIME_SMOKE_PASS character_textures=66 school_backgrounds=6 dimensions=1908x824,1536x1024,1540x1021,1540x1021,1540x1021,1540x1021 dialogue_ui=true action_messages=8 legend_entries=13 celebration_seconds=30 fireworks_layer=true viewport_fit=1920x1080:CanvasItems:Keep
+ANIMATION_CONFIG_LOAD_PASS school_entry=8 school_clap=10 celebration_clap=30 logo_rain_spawn=10
+RUNTIME_SMOKE_PASS character_textures=66 school_backgrounds=6 dimensions=1908x824,1536x1024,1540x1021,1540x1021,1540x1021,1540x1021 dialogue_ui=true action_messages=8 legend_entries=14 celebration_seconds=30 fireworks_layer=true logo_rain_seconds=10 logo_texture=128x102 viewport_fit=1920x1080:CanvasItems:Keep
 ```
 
 Deterministic developer capture snapshots use
@@ -507,6 +559,7 @@ release resources.
 Celebration snapshots use
 `--capture-celebration=walk|clap|fireworks|stopped`; fireworks use a fixed
 capture seed. Add `--capture-legend` to any base snapshot to show the legend,
-or `--capture-hide-bubble` to prove 0-style bubble dismissal. Capture mode
+`--capture-logo-rain` to show deterministic logo rain, or
+`--capture-hide-bubble` to prove 0-style bubble dismissal. Capture mode
 still requires exactly one base selector: `--capture-frame`,
 `--capture-school`, or `--capture-celebration`.

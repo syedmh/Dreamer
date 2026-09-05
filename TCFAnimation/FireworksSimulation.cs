@@ -22,8 +22,10 @@ public sealed class FireworksSimulation
     public const int MinimumRayCount = 18;
     public const int MaximumRayCount = 26;
 
-    private const float BurstDurationSeconds = 1.7f;
-    private const double SpawnIntervalSeconds = 0.48;
+    private static float BurstDurationSeconds =>
+        (float)AnimationConfig.Current.FireworksBurstSeconds;
+    private static double SpawnIntervalSeconds =>
+        AnimationConfig.Current.FireworksSpawnIntervalSeconds;
 
     private readonly List<MutableBurst> _bursts = [];
     private uint _randomState;

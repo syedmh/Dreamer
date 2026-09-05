@@ -2,7 +2,9 @@ project.godot
 Main.tscn
 TCFAnimation.csproj
 export_presets.cfg
+AnimationConfig.json
 ActionMessages.json
+AnimationConfig.cs
 ActionLegendLayout.cs
 ActionLegendUi.cs
 ActionMessageCatalog.cs
@@ -15,9 +17,12 @@ DirectionalTurnStateMachine.cs
 FireworksLayer.cs
 FireworksSimulation.cs
 GlobalInputPolicy.cs
+LogoRainLayer.cs
+LogoRainSimulation.cs
 PresentationInputPolicy.cs
 SchoolSceneStateMachine.cs
 TurnController.cs
+AnimationConfig.cs.uid
 ActionLegendLayout.cs.uid
 ActionLegendUi.cs.uid
 ActionMessageCatalog.cs.uid
@@ -29,6 +34,8 @@ DialogueUi.cs.uid
 DirectionalTurnStateMachine.cs.uid
 FireworksLayer.cs.uid
 FireworksSimulation.cs.uid
+LogoRainLayer.cs.uid
+LogoRainSimulation.cs.uid
 PresentationInputPolicy.cs.uid
 SchoolSceneStateMachine.cs.uid
 TurnController.cs.uid
@@ -71,6 +78,7 @@ Frames/Backgrounds/school3.png
 Frames/Backgrounds/school4.png
 Frames/Backgrounds/school5.png
 Frames/Backgrounds/school6.png
+Frames/Effects/logo-small.png
 Frames/SchoolCharacter/LeftTurn/turn_0.png
 Frames/SchoolCharacter/LeftTurn/turn_1.png
 Frames/SchoolCharacter/LeftTurn/turn_2.png

@@ -1,0 +1,18 @@
+{
+  "turnFps": 8.0,
+  "walkFps": 6.0,
+  "clapFps": 8.0,
+  "crossArmFps": 8.0,
+  "crossArmReleaseFps": 8.0,
+  "schoolPrepositionSeconds": 6.0,
+  "schoolEntrySeconds": 8.0,
+  "schoolClapSeconds": 10.0,
+  "schoolBackgroundNormalizationSeconds": 8.0,
+  "schoolExitSeconds": 8.0,
+  "celebrationWalkSeconds": 6.0,
+  "celebrationClapSeconds": 30.0,
+  "fireworksSpawnIntervalSeconds": 0.48,
+  "fireworksBurstSeconds": 1.7,
+  "logoRainSpawnSeconds": 10.0,
+  "logoRainSpawnIntervalSeconds": 0.12
+}

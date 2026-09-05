@@ -143,11 +143,16 @@ public sealed class SchoolSceneStateMachine
 {
     public const int MinimumSchoolNumber = 1;
     public const int MaximumSchoolNumber = 6;
-    public const double EntryDurationSeconds = 8.0;
-    public const double CharacterPrePositionFullSpanDurationSeconds = 6.0;
-    public const double BackgroundNormalizationFullSpanDurationSeconds = 8.0;
-    public const double ExitTravelDurationSeconds = 8.0;
-    public const double ClapDurationSeconds = 10.0;
+    public static double EntryDurationSeconds =>
+        AnimationConfig.Current.SchoolEntrySeconds;
+    public static double CharacterPrePositionFullSpanDurationSeconds =>
+        AnimationConfig.Current.SchoolPrepositionSeconds;
+    public static double BackgroundNormalizationFullSpanDurationSeconds =>
+        AnimationConfig.Current.SchoolBackgroundNormalizationSeconds;
+    public static double ExitTravelDurationSeconds =>
+        AnimationConfig.Current.SchoolExitSeconds;
+    public static double ClapDurationSeconds =>
+        AnimationConfig.Current.SchoolClapSeconds;
 
     private const double Epsilon = 1e-9;
 

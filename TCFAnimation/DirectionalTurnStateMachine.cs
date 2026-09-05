@@ -27,15 +27,20 @@ public sealed class DirectionalTurnStateMachine
     public const int FrontFrame = 0;
     public const int HalfTurnFrame = 1;
     public const int FullTurnFrame = 2;
-    public const double LeftWalkAnimationFps = 6.0;
+    public static double LeftWalkAnimationFps =>
+        AnimationConfig.Current.WalkFps;
     public const int LeftWalkFrameCount = 6;
-    public const double RightWalkAnimationFps = 6.0;
+    public static double RightWalkAnimationFps =>
+        AnimationConfig.Current.WalkFps;
     public const int RightWalkFrameCount = 6;
-    public const double ClapAnimationFps = 8.0;
+    public static double ClapAnimationFps =>
+        AnimationConfig.Current.ClapFps;
     public const int ClapFrameCount = 6;
-    public const double CrossArmAnimationFps = 8.0;
+    public static double CrossArmAnimationFps =>
+        AnimationConfig.Current.CrossArmFps;
     public const int CrossArmFrameCount = 3;
-    public const double CrossArmReleaseAnimationFps = 8.0;
+    public static double CrossArmReleaseAnimationFps =>
+        AnimationConfig.Current.CrossArmReleaseFps;
     public const int CrossArmReleaseFrameCount = 6;
 
     private double _elapsedSeconds;

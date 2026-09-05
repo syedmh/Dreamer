@@ -34,8 +34,10 @@ public enum CelebrationSnapshot
 
 public sealed class CelebrationStateMachine
 {
-    public const double ClapDurationSeconds = 30.0;
-    public const double FullSpanWalkDurationSeconds = 6.0;
+    public static double ClapDurationSeconds =>
+        AnimationConfig.Current.CelebrationClapSeconds;
+    public static double FullSpanWalkDurationSeconds =>
+        AnimationConfig.Current.CelebrationWalkSeconds;
 
     private const double Epsilon = 1e-9;
 

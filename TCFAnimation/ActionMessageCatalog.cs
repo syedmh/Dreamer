@@ -25,8 +25,8 @@ public sealed class ActionMessageCatalog
             "4",
             "5",
             "6",
-            "Q",
-            "R",
+            "F",
+            "S",
         };
 
     private readonly IReadOnlyDictionary<string, string> _messages;

@@ -8,7 +8,6 @@ namespace TCFAnimation;
 
 public partial class TurnController : Node2D
 {
-    public const double TurnAnimationFps = 8.0;
     public const float BaseWalkSpeedPixelsPerSecond = 240.0f;
     public const double WalkSpeedMultiplierStep = 0.25;
     public const double MinimumWalkSpeedMultiplier = 0.25;
@@ -46,8 +45,8 @@ public partial class TurnController : Node2D
     private readonly SchoolBackgroundLayout[] _schoolBackgroundLayouts =
         new SchoolBackgroundLayout[
             SchoolSceneStateMachine.MaximumSchoolNumber];
-    private readonly DirectionalTurnStateMachine _turn =
-        new(TurnAnimationFps);
+    private Texture2D _smallLogoTexture = null!;
+    private DirectionalTurnStateMachine _turn = null!;
     private readonly SchoolSceneStateMachine _schoolScene = new();
     private readonly CelebrationStateMachine _celebration = new();
 
@@ -55,6 +54,7 @@ public partial class TurnController : Node2D
     private Sprite2D _character = null!;
     private DialogueUi _dialogueUi = null!;
     private FireworksLayer _fireworks = null!;
+    private LogoRainLayer _logoRain = null!;
     private ActionLegendUi _actionLegend = null!;
     private ActionMessageCatalog _actionMessages =
         ActionMessageCatalog.Empty;
@@ -74,6 +74,10 @@ public partial class TurnController : Node2D
         bool captureModeRequested = IsCaptureModeRequested(arguments);
         try
         {
+            LoadAnimationConfig();
+            _turn = new DirectionalTurnStateMachine(
+                AnimationConfig.Current.TurnFps);
+
             if (verifyRuntime)
             {
                 ValidateRuntimeVerificationArguments(arguments);
@@ -107,6 +111,19 @@ public partial class TurnController : Node2D
             };
             AddChild(_fireworks);
             MoveChild(_fireworks, _character.GetIndex());
+
+            _smallLogoTexture = GD.Load<Texture2D>(
+                "res://Frames/Effects/logo-small.png")
+                ?? throw new InvalidOperationException(
+                    "Could not load the required small logo texture.");
+            _logoRain = new LogoRainLayer
+            {
+                Name = "LogoRainLayer",
+            };
+            _logoRain.Initialize(_smallLogoTexture);
+            _logoRain.Finished += ApplyCurrentFrame;
+            AddChild(_logoRain);
+            MoveChild(_logoRain, _character.GetIndex());
 
             _actionLegend = new ActionLegendUi
             {
@@ -240,7 +257,7 @@ public partial class TurnController : Node2D
             _celebration.Advance(delta);
             if (_celebration.CenterArrivalSerial != centerArrivalSerial)
             {
-                ShowConfiguredActionMessage("Q");
+                ShowConfiguredActionMessage("F");
             }
             if (_celebration.FireworksStartSerial != fireworksStartSerial)
             {
@@ -423,9 +440,10 @@ public partial class TurnController : Node2D
             keyEvent.PhysicalKeycode switch
             {
                 Key.C => PresentationKey.C,
+                Key.F => PresentationKey.F,
                 Key.L => PresentationKey.L,
-                Key.Q => PresentationKey.Q,
                 Key.R => PresentationKey.R,
+                Key.S => PresentationKey.S,
                 Key.Key0 => PresentationKey.Zero,
                 _ when selectedSchoolNumber is not null =>
                     PresentationKey.School,
@@ -471,7 +489,15 @@ public partial class TurnController : Node2D
             return;
         }
 
-        if (presentationKey == PresentationKey.Q)
+        if (decision.StartLogoRain)
+        {
+            _logoRain.Start();
+            ApplyCurrentFrame();
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
+        if (presentationKey == PresentationKey.F)
         {
             if (decision.StartCelebration)
             {
@@ -482,7 +508,7 @@ public partial class TurnController : Node2D
             return;
         }
 
-        if (presentationKey == PresentationKey.R)
+        if (presentationKey == PresentationKey.S)
         {
             if (
                 decision.StopFireworks
@@ -496,7 +522,7 @@ public partial class TurnController : Node2D
                 _turn.Reset(
                     TurnDirection.Left,
                     DirectionalTurnStateMachine.FrontFrame);
-                ShowConfiguredActionMessage("R");
+                ShowConfiguredActionMessage("S");
                 UpdateSchoolVisuals();
                 ApplyCurrentFrame();
                 GetViewport().SetInputAsHandled();
@@ -734,7 +760,7 @@ public partial class TurnController : Node2D
         _fireworks.Start();
         if (_celebration.CenterArrivalSerial != centerArrivalSerial)
         {
-            ShowConfiguredActionMessage("Q");
+            ShowConfiguredActionMessage("F");
         }
         UpdateSchoolVisuals();
         ApplyCurrentFrame();
@@ -768,7 +794,24 @@ public partial class TurnController : Node2D
         }
 
         GD.Print(
-            "ACTION_MESSAGES_LOAD_PASS keys=1,2,3,4,5,6,Q,R");
+            "ACTION_MESSAGES_LOAD_PASS keys=1,2,3,4,5,6,F,S");
+    }
+
+    private static void LoadAnimationConfig()
+    {
+        const string path = "res://AnimationConfig.json";
+        if (!Godot.FileAccess.FileExists(path))
+        {
+            throw new FileNotFoundException(
+                "Required animation configuration is missing.",
+                path);
+        }
+
+        AnimationConfig config = AnimationConfig.Load(
+            Godot.FileAccess.GetFileAsBytes(path));
+        AnimationConfig.Install(config);
+        GD.Print(
+            $"ANIMATION_CONFIG_LOAD_PASS school_entry={config.SchoolEntrySeconds:0.###} school_clap={config.SchoolClapSeconds:0.###} celebration_clap={config.CelebrationClapSeconds:0.###} logo_rain_spawn={config.LogoRainSpawnSeconds:0.###}");
     }
 
     private void ShowConfiguredActionMessage(string key)
@@ -1001,8 +1044,8 @@ public partial class TurnController : Node2D
                 "4",
                 "5",
                 "6",
-                "Q",
-                "R",
+                "F",
+                "S",
             })
         {
             if (_actionMessages.Get(key) is null)
@@ -1013,13 +1056,15 @@ public partial class TurnController : Node2D
         }
         if (
             _fireworks.IsActive
+            || _logoRain.IsActive
             || _actionLegend.IsLegendVisible
-            || CelebrationStateMachine.ClapDurationSeconds != 30.0
-            || ActionLegendLayout.Entries.Length != 13
+            || ActionLegendLayout.Entries.Length != 14
+            || _smallLogoTexture.GetWidth() != 128
+            || _smallLogoTexture.GetHeight() != 102
         )
         {
             throw new InvalidOperationException(
-                "Celebration, fireworks, or legend runtime state is invalid.");
+                "Celebration, fireworks, logo rain, or legend runtime state is invalid.");
         }
 
         string[] backgroundDimensions = new string[
@@ -1055,8 +1100,13 @@ public partial class TurnController : Node2D
             + "school_backgrounds=6 dimensions="
             + string.Join(",", backgroundDimensions)
             + " dialogue_ui=true "
-            + "action_messages=8 legend_entries=13 "
-            + "celebration_seconds=30 fireworks_layer=true "
+            + "action_messages=8 legend_entries=14 "
+            + FormattableString.Invariant(
+                $"celebration_seconds={CelebrationStateMachine.ClapDurationSeconds:0.###} ")
+            + "fireworks_layer=true "
+            + FormattableString.Invariant(
+                $"logo_rain_seconds={LogoRainSimulation.DurationSeconds:0.###} ")
+            + "logo_texture=128x102 "
             + "viewport_fit=1920x1080:CanvasItems:Keep");
         GetTree().Quit();
     }
@@ -1083,7 +1133,10 @@ public partial class TurnController : Node2D
             return;
         }
 
-        bool schoolOverlay = _schoolScene.UsesTransparentCharacter;
+        bool schoolOverlay =
+            PresentationInputPolicy.ShouldUseTransparentCharacter(
+                _schoolScene.UsesTransparentCharacter,
+                _logoRain.IsActive);
         Texture2D[] crossArmFrames = schoolOverlay
             ? _schoolCrossArmFrames
             : _crossArmFrames;
@@ -1176,7 +1229,10 @@ public partial class TurnController : Node2D
         SchoolCharacterAnimation animation,
         int frame)
     {
-        bool schoolOverlay = _schoolScene.UsesTransparentCharacter;
+        bool schoolOverlay =
+            PresentationInputPolicy.ShouldUseTransparentCharacter(
+                _schoolScene.UsesTransparentCharacter,
+                _logoRain.IsActive);
         return animation switch
         {
             SchoolCharacterAnimation.WalkRight =>
@@ -1226,6 +1282,7 @@ public partial class TurnController : Node2D
         CelebrationSnapshot? celebrationCapture = null;
         bool legendVisible = false;
         bool hideBubble = false;
+        bool logoRainVisible = false;
         int frameOptionCount = 0;
         int directionOptionCount = 0;
         int pathOptionCount = 0;
@@ -1234,6 +1291,7 @@ public partial class TurnController : Node2D
         int celebrationOptionCount = 0;
         int legendOptionCount = 0;
         int hideBubbleOptionCount = 0;
+        int logoRainOptionCount = 0;
         bool captureModeRequested = IsCaptureModeRequested(arguments);
 
         foreach (string argument in arguments)
@@ -1340,6 +1398,18 @@ public partial class TurnController : Node2D
                 hideBubble = true;
             }
             else if (
+                string.Equals(
+                    argument,
+                    "--capture-logo-rain",
+                    StringComparison.Ordinal)
+            )
+            {
+                EnsureSingleOption(
+                    ref logoRainOptionCount,
+                    "--capture-logo-rain");
+                logoRainVisible = true;
+            }
+            else if (
                 argument.StartsWith(
                     "--capture-",
                     StringComparison.Ordinal)
@@ -1400,7 +1470,8 @@ public partial class TurnController : Node2D
             schoolCapture,
             celebrationCapture,
             legendVisible,
-            hideBubble);
+            hideBubble,
+            logoRainVisible);
     }
 
     private void ConfigureCaptureMode(
@@ -1434,7 +1505,7 @@ public partial class TurnController : Node2D
                         != CelebrationSnapshot.WalkingToCenter
                 )
                 {
-                    ShowConfiguredActionMessage("Q");
+                    ShowConfiguredActionMessage("F");
                 }
             }
             else if (
@@ -1443,7 +1514,7 @@ public partial class TurnController : Node2D
             )
             {
                 _fireworks.StopAndClear();
-                ShowConfiguredActionMessage("R");
+                ShowConfiguredActionMessage("S");
             }
         }
         else if (captureMode.SchoolCapture is not null)
@@ -1500,6 +1571,11 @@ public partial class TurnController : Node2D
         if (captureMode.LegendVisible)
         {
             _actionLegend.SetLegendVisible(true);
+        }
+        if (captureMode.LogoRainVisible)
+        {
+            _logoRain.Start(LogoRainLayer.CaptureSeed);
+            _logoRain.AdvanceForCapture(3.2);
         }
         _captureCountdown = 3;
     }
@@ -1680,7 +1756,8 @@ public partial class TurnController : Node2D
                 + $"school_phase={_schoolScene.Phase} "
                 + $"celebration_phase={_celebration.Phase} "
                 + $"legend={_actionLegend.IsLegendVisible} "
-                + $"fireworks={_fireworks.IsActive} path={_capturePath}");
+                + $"fireworks={_fireworks.IsActive} "
+                + $"logo_rain={_logoRain.IsActive} path={_capturePath}");
             GetTree().Quit();
         }
         catch (Exception exception)
@@ -1732,7 +1809,8 @@ public partial class TurnController : Node2D
         SchoolCaptureSelection? SchoolCapture,
         CelebrationSnapshot? CelebrationCapture,
         bool LegendVisible,
-        bool HideBubble);
+        bool HideBubble,
+        bool LogoRainVisible);
 
     private sealed record SchoolCaptureSelection(
         int SchoolNumber,

@@ -4,9 +4,10 @@ public enum PresentationKey
 {
     Other,
     C,
+    F,
     L,
-    Q,
     R,
+    S,
     Zero,
     School,
 }
@@ -16,10 +17,18 @@ public readonly record struct PresentationInputDecision(
     bool HideBubble,
     bool StartCelebration,
     bool StopFireworks,
-    bool AllowSchoolAction);
+    bool AllowSchoolAction,
+    bool StartLogoRain);
 
 public static class PresentationInputPolicy
 {
+    public static bool ShouldUseTransparentCharacter(
+        bool schoolOverlay,
+        bool logoRainActive)
+    {
+        return schoolOverlay || logoRainActive;
+    }
+
     public static PresentationInputDecision Resolve(
         PresentationKey key,
         bool pressed,
@@ -40,6 +49,7 @@ public static class PresentationInputPolicy
                     false,
                     false,
                     false,
+                    false,
                     false),
             PresentationKey.Zero =>
                 new PresentationInputDecision(
@@ -47,8 +57,9 @@ public static class PresentationInputPolicy
                     true,
                     false,
                     false,
-                    celebrationPhase == CelebrationPhase.Inactive),
-            PresentationKey.Q =>
+                    celebrationPhase == CelebrationPhase.Inactive,
+                    false),
+            PresentationKey.F =>
                 new PresentationInputDecision(
                     false,
                     false,
@@ -56,8 +67,9 @@ public static class PresentationInputPolicy
                         CelebrationPhase.Inactive
                         or CelebrationPhase.StoppedCrossHold,
                     false,
+                    false,
                     false),
-            PresentationKey.R =>
+            PresentationKey.S =>
                 new PresentationInputDecision(
                     false,
                     false,
@@ -68,7 +80,16 @@ public static class PresentationInputPolicy
                         or CelebrationPhase.Clapping
                         or CelebrationPhase.Crossing
                         or CelebrationPhase.FireworksHold,
+                    false,
                     false),
+            PresentationKey.R =>
+                new PresentationInputDecision(
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    true),
             PresentationKey.School =>
                 new PresentationInputDecision(
                     false,
@@ -77,7 +98,8 @@ public static class PresentationInputPolicy
                     false,
                     celebrationPhase is
                         CelebrationPhase.Inactive
-                        or CelebrationPhase.StoppedCrossHold),
+                        or CelebrationPhase.StoppedCrossHold,
+                    false),
             _ => default,
         };
     }

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 import struct
 import sys
@@ -179,13 +180,16 @@ EXPECTED_BACKGROUNDS = {
     ),
 }
 EXPECTED_BACKGROUND_PATHS = tuple(EXPECTED_BACKGROUNDS)
+EXPECTED_EFFECT_PATHS = ("Frames/Effects/logo-small.png",)
 EXPECTED_TEXTURE_PATHS = (
     *EXPECTED_FRAME_PATHS,
     *EXPECTED_BACKGROUND_PATHS,
+    *EXPECTED_EFFECT_PATHS,
     *EXPECTED_SCHOOL_CHARACTER_PATHS,
 )
 EXPECTED_EXPORT_RESOURCES = (
     "res://Main.tscn",
+    "res://AnimationConfig.json",
     "res://ActionMessages.json",
     *(f"res://{path}" for path in EXPECTED_TEXTURE_PATHS),
 )
@@ -990,6 +994,7 @@ def validate_frame_tree() -> None:
     expected_directories = {
         *FRAME_GROUPS,
         "Backgrounds",
+        "Effects",
         "SchoolCharacter",
     }
     if actual_directories != expected_directories:
@@ -1048,16 +1053,31 @@ def validate_frame_tree() -> None:
             f"expected {sorted(expected_background_entries)}."
         )
 
+    effect_entries = {
+        path.name
+        for path in (frames_root / "Effects").iterdir()
+        if path.is_file()
+    }
+    expected_effect_entries = {
+        "logo-small.png",
+        "logo-small.png.import",
+    }
+    if effect_entries != expected_effect_entries:
+        raise RuntimeError(
+            f"Frames/Effects files are {sorted(effect_entries)}; "
+            f"expected {sorted(expected_effect_entries)}."
+        )
+
     actual_pngs = tuple(
         path.relative_to(ROOT).as_posix()
         for path in sorted(frames_root.rglob("*.png"))
     )
     if (
         set(actual_pngs) != set(EXPECTED_TEXTURE_PATHS)
-        or len(actual_pngs) != 72
+        or len(actual_pngs) != 73
     ):
         raise RuntimeError(
-            f"Runtime PNG set has {len(actual_pngs)} files; expected exact 72."
+            f"Runtime PNG set has {len(actual_pngs)} files; expected exact 73."
         )
 
 
@@ -1072,10 +1092,10 @@ def validate_action_messages() -> None:
         raise RuntimeError(
             f"ActionMessages.json is invalid: {exception}."
         ) from exception
-    expected_keys = {str(number) for number in range(1, 7)} | {"Q", "R"}
+    expected_keys = {str(number) for number in range(1, 7)} | {"F", "S"}
     if not isinstance(document, dict) or set(document) != expected_keys:
         raise RuntimeError(
-            "ActionMessages.json must contain exactly keys 1-6, Q, and R."
+            "ActionMessages.json must contain exactly keys 1-6, F, and S."
         )
     for key, value in document.items():
         if not isinstance(value, str):
@@ -1088,7 +1108,74 @@ def validate_action_messages() -> None:
                 f"ActionMessages.json value {key} must normalize to 1-500 "
                 "Unicode scalar values."
             )
-    print("action_messages_ok=keys:1,2,3,4,5,6,Q,R max_scalars=500")
+    print("action_messages_ok=keys:1,2,3,4,5,6,F,S max_scalars=500")
+
+
+def validate_animation_config() -> None:
+    path = ROOT / "AnimationConfig.json"
+    raw = path.read_bytes()
+    if raw.startswith(b"\xef\xbb\xbf"):
+        raise RuntimeError("AnimationConfig.json must not contain a UTF-8 BOM.")
+    try:
+        document = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exception:
+        raise RuntimeError(
+            f"AnimationConfig.json is invalid: {exception}."
+        ) from exception
+    expected_keys = {
+        "turnFps",
+        "walkFps",
+        "clapFps",
+        "crossArmFps",
+        "crossArmReleaseFps",
+        "schoolPrepositionSeconds",
+        "schoolEntrySeconds",
+        "schoolClapSeconds",
+        "schoolBackgroundNormalizationSeconds",
+        "schoolExitSeconds",
+        "celebrationWalkSeconds",
+        "celebrationClapSeconds",
+        "fireworksSpawnIntervalSeconds",
+        "fireworksBurstSeconds",
+        "logoRainSpawnSeconds",
+        "logoRainSpawnIntervalSeconds",
+    }
+    if not isinstance(document, dict) or set(document) != expected_keys:
+        raise RuntimeError(
+            "AnimationConfig.json must contain exactly the supported timing keys."
+        )
+    for key, value in document.items():
+        if (
+            not isinstance(value, (int, float))
+            or isinstance(value, bool)
+            or not math.isfinite(value)
+            or value <= 0
+        ):
+            raise RuntimeError(
+                f"AnimationConfig.json value {key} must be a finite "
+                "positive number."
+            )
+    print("animation_config_ok=timing_keys:16 positive=true")
+
+
+def validate_logo_effect() -> None:
+    path = ROOT / EXPECTED_EFFECT_PATHS[0]
+    with Image.open(path) as image:
+        if (
+            image.format != "PNG"
+            or image.mode != "RGBA"
+            or image.size != (128, 102)
+        ):
+            raise RuntimeError(
+                f"{path.relative_to(ROOT)} is {image.format} {image.mode} "
+                f"{image.size}; expected PNG RGBA (128, 102)."
+            )
+        alpha = np.asarray(image, dtype=np.uint8)[:, :, 3]
+    if not np.any(alpha == 0) or not np.any(alpha == 255):
+        raise RuntimeError(
+            "Small logo must contain both transparent and opaque pixels."
+        )
+    print("logo_effect_ok=size:128x102 transparent=true duration_seconds=10")
 
 
 def validate_runtime_pngs() -> None:
@@ -2739,7 +2826,7 @@ def validate_pack_payload(
         | import_metadata
         | scene_payloads
         | set(EXPECTED_SCRIPT_PAYLOADS)
-        | {"ActionMessages.json"}
+        | {"ActionMessages.json", "AnimationConfig.json"}
     )
     actual_entries = set(entries)
     denied_entries = sorted(actual_entries - expected_entries)
@@ -2803,8 +2890,8 @@ def validate_pack_payload(
     )
     print(
         f"pack_payload_ok={path.name} runtime_scene=1 runtime_scripts=2 "
-        "runtime_json=1 "
-        "runtime_textures=72 import_metadata=72 engine_metadata=4 "
+        "runtime_json=2 "
+        "runtime_textures=73 import_metadata=73 engine_metadata=4 "
         "denied_payloads=false source_content=false metadata_denied_tokens=0"
     )
 
@@ -2884,7 +2971,9 @@ def main() -> int:
     validate_extractor_segmentation_contract()
     validate_sources()
     validate_frame_tree()
+    validate_animation_config()
     validate_action_messages()
+    validate_logo_effect()
     validate_runtime_pngs()
     regenerated = regenerate_in_memory()
     validate_independent_lower_anatomy(regenerated)
@@ -2899,7 +2988,7 @@ def main() -> int:
     validate_sources()
     print(
         "ASSET_RELEASE_CHECK_PASS frames=33 school_overlays=33 "
-        "backgrounds=6 sources=12 read_only=true export_resources=74 "
+        "backgrounds=6 sources=12 read_only=true export_resources=76 "
         "artifact_manifest=checked_if_present"
     )
     return 0
