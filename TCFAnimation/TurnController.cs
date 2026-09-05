@@ -791,8 +791,6 @@ public partial class TurnController : Node2D
         _schoolBackground.Visible =
             !_celebration.IsActive
             && _schoolScene.IsSchoolVisible;
-        _neonBackground.SetBlackStageVisible(
-            !_schoolBackground.Visible);
         if (_schoolScene.SelectedBackgroundLayout is { } layout)
         {
             _schoolBackground.Position = new Vector2(
@@ -1290,13 +1288,23 @@ public partial class TurnController : Node2D
             throw new InvalidOperationException(
                 "Neon color cycling did not return to its default off state.");
         }
-        _neonBackground.SetBlackStageVisible(false);
-        if (_neonBackground.IsShowing)
+        _schoolScene.SetDevelopmentSnapshot(
+            1,
+            _schoolBackgroundLayouts[0],
+            SchoolSceneSnapshot.EntryStart);
+        ApplySelectedSchoolBackground();
+        UpdateSchoolVisuals();
+        if (
+            !_schoolBackground.Visible
+            || !_neonBackground.IsShowing
+        )
         {
             throw new InvalidOperationException(
-                "Neon background remained visible behind a school scene.");
+                "Enabled neon did not remain visible beneath a moving school background.");
         }
-        _neonBackground.SetBlackStageVisible(true);
+        _schoolScene.CancelToBlack(
+            0.5);
+        UpdateSchoolVisuals();
         if (
             !_neonBackground.IsShowing
             || _neonBackground.Toggle()

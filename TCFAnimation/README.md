@@ -67,7 +67,8 @@ prints `GODOT_RESOLUTION_FAIL` and exits 1.
   default, uses the high-quality transparent `TCFLogo2.png` artwork, appears
   anywhere the stage would otherwise be black, and stays
   behind fireworks, logo rain, the Avatar, dialogue, and the legend. School
-  backgrounds temporarily cover it without changing its enabled state.
+  backgrounds draw above it without changing its enabled state, so moving
+  school scenes reveal neon rather than black at uncovered screen edges.
   While dialogue input is open, typed `N` remains ordinary text.
 - **O**: start or freeze the neon sign's subtle brightness pulse.
   Animation is off by default, independently of whether **N** is showing the

@@ -71,7 +71,6 @@ public partial class NeonLogoBackground : Node2D
     private Rect2 _destination;
     private Vector2 _lastViewportSize;
     private double _phaseSeconds;
-    private bool _blackStageVisible = true;
 
     public bool IsEnabled { get; private set; }
 
@@ -79,7 +78,7 @@ public partial class NeonLogoBackground : Node2D
 
     public bool IsColorCycleEnabled { get; private set; }
 
-    public bool IsShowing => IsEnabled && _blackStageVisible;
+    public bool IsShowing => IsEnabled;
 
     public void Initialize(Texture2D texture)
     {
@@ -163,12 +162,6 @@ public partial class NeonLogoBackground : Node2D
         UpdateProcessing();
         QueueRedraw();
         return IsColorCycleEnabled;
-    }
-
-    public void SetBlackStageVisible(bool visible)
-    {
-        _blackStageVisible = visible;
-        UpdateVisibility();
     }
 
     public override void _Draw()
