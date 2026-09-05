@@ -29,11 +29,12 @@ internal static class Program
         var pathProvider = new LocalSettingsPathProvider(safeDemo);
         var phoneValidator = new E164PhoneNumberValidator();
         var contactValidator = new ContactRowValidator(phoneValidator);
+        var draftValidator = new ContactDraftValidator(phoneValidator);
         var setupValidator = new SetupValidator(phoneValidator);
         var settingsStore = new JsonLocalSettingsStore(pathProvider.SettingsPath);
         var settingsService = new SettingsService(
             settingsStore, new DpapiSecretProtector(), setupValidator);
-        var csvImporter = new CsvHelperContactCsvImporter(contactValidator);
+        var csvStore = new CsvHelperContactCsvStore(contactValidator);
         ITwilioTransportFactory transportFactory = safeDemo
             ? new ScriptedFakeTwilioTransportFactory(parsed.Options.Scenario!.Value)
             : new TwilioTransportFactory();
@@ -41,12 +42,14 @@ internal static class Program
         var controller = new MainController(
             form,
             new WinFormsUserDialogs(form),
-            csvImporter,
+            csvStore,
             settingsService,
             new MessageValidator(),
             new BatchSendCoordinator(transportFactory),
             TimeProvider.System,
-            safeDemo);
+            safeDemo,
+            draftValidator,
+            contactValidator);
         form.AttachController(controller);
         Application.Run(form);
     }

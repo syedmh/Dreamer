@@ -80,7 +80,7 @@ public sealed class MainControllerTests
         var view = new FakeMainView();
         var dialogs = new FakeUserDialogs { CsvPath = "contacts.csv" };
         var settings = new ReadySettingsService();
-        var importer = new StubImporter(new(CsvImportStatus.Success,
+        var importer = new StubContactCsvStore(new(CsvImportStatus.Success,
             new[] { ValidRow(1) }, null));
         var controller = Create(view, dialogs, importer, settings);
         await controller.ImportContactsAsync();
@@ -103,7 +103,7 @@ public sealed class MainControllerTests
         var view = new FakeMainView();
         var dialogs = new FakeUserDialogs { CsvPath = "good.csv" };
         var settings = new ReadySettingsService();
-        var importer = new SequenceImporter(
+        var importer = new SequenceContactCsvStore(
             new(CsvImportStatus.Success, new[] { ValidRow(1) }, null),
             new(CsvImportStatus.MalformedCsv, Array.Empty<ContactRow>(), "Malformed CSV."));
         var controller = Create(view, dialogs, importer, settings);
@@ -130,17 +130,23 @@ public sealed class MainControllerTests
                 SaveCsvPathStatus.StorageFailed,
                 "The CSV path could not be saved.")
         };
-        view.ReplaceContacts(new[]
+        var existingGridRows = new[]
         {
             new ContactGridRowViewModel(
                 4, true, true, "Existing", "+15550100104", "Valid",
                 RecipientSendState.Succeeded, "SM-OLD", null, null)
-        });
+        };
+        view.RenderDocumentState(new(
+            "remembered.csv",
+            false,
+            existingGridRows,
+            new HashSet<int> { 4 },
+            Array.Empty<int>().ToHashSet()));
         var existingRows = view.Rows;
         var controller = Create(
             view,
             dialogs,
-            new StubImporter(new(
+            new StubContactCsvStore(new(
                 CsvImportStatus.Success,
                 new[] { ValidRow(1) },
                 null)),
@@ -158,14 +164,20 @@ public sealed class MainControllerTests
     public async Task RefreshWithoutRememberedPathIsActionableAndNonDestructive()
     {
         var view = new FakeMainView();
-        view.ReplaceContacts(new[]
+        var existingGridRows = new[]
         {
             new ContactGridRowViewModel(
                 7, true, true, "Existing", "+15550100107", "Valid",
                 RecipientSendState.Succeeded, "SM-OLD", null, null)
-        });
+        };
+        view.RenderDocumentState(new(
+            "remembered.csv",
+            false,
+            existingGridRows,
+            new HashSet<int> { 7 },
+            Array.Empty<int>().ToHashSet()));
         var existingRows = view.Rows;
-        var importer = new StubImporter(new(
+        var importer = new StubContactCsvStore(new(
             CsvImportStatus.Success,
             new[] { ValidRow(1) },
             null));
@@ -184,8 +196,8 @@ public sealed class MainControllerTests
         var view = new FakeMainView();
         var dialogs = new FakeUserDialogs { CsvPath = "different.csv" };
         var settings = new ReadySettingsService { LastCsvPath = "remembered.csv" };
-        var importer = new SequenceImporter(
-            new CsvImportResult(
+        var importer = new SequenceContactCsvStore(
+            new TestLoadResult(
                 CsvImportStatus.Success,
                 new[] { ValidRow(1) },
                 null));
@@ -214,13 +226,13 @@ public sealed class MainControllerTests
         var view = new FakeMainView();
         var dialogs = new FakeUserDialogs { CsvPath = "contacts.csv" };
         var settings = new ReadySettingsService();
-        var importer = new SequenceImporter(
+        var importer = new SequenceContactCsvStore(
             new(CsvImportStatus.Success, new[] { originalSelected, originalUnselected }, null),
             new(CsvImportStatus.Success, new[] { refreshedMatch, refreshedOther }, null));
         var controller = Create(view, dialogs, importer, settings);
 
         await controller.ImportContactsAsync();
-        view.SelectedOrdinals = new[] { 1 };
+        view.CheckedRecipientOrdinals = new[] { 1 };
         await controller.RefreshContactsAsync();
 
         CollectionAssert.AreEquivalent(new[] { 10 }, view.AppliedSelection.ToArray());
@@ -246,7 +258,7 @@ public sealed class MainControllerTests
         var view = new FakeMainView();
         var dialogs = new FakeUserDialogs { CsvPath = "contacts.csv" };
         var settings = new ReadySettingsService();
-        var importer = new SequenceImporter(
+        var importer = new SequenceContactCsvStore(
             new(CsvImportStatus.Success, new[]
             {
                 ValidRow(1),
@@ -260,7 +272,7 @@ public sealed class MainControllerTests
         var controller = Create(view, dialogs, importer, settings);
         await controller.ImportContactsAsync();
         controller.SelectAllEligible();
-        view.SelectedOrdinals = new[] { 1 };
+        view.CheckedRecipientOrdinals = new[] { 1 };
         view.ApplyRecipientProgress(new(
             Guid.NewGuid(),
             1,
@@ -294,13 +306,13 @@ public sealed class MainControllerTests
         await using (var stream = new FileStream(
             oversizedPath, FileMode.Create, FileAccess.Write))
         {
-            stream.SetLength(CsvHelperContactCsvImporter.MaximumFileBytes + 1L);
+            stream.SetLength(CsvHelperContactCsvStore.MaximumFileBytes + 1L);
         }
 
         var view = new FakeMainView();
         var dialogs = new FakeUserDialogs { CsvPath = validPath };
         var phone = new E164PhoneNumberValidator();
-        var importer = new CsvHelperContactCsvImporter(new ContactRowValidator(phone));
+        var importer = new CsvHelperContactCsvStore(new ContactRowValidator(phone));
         var controller = Create(view, dialogs, importer);
         await controller.ImportContactsAsync();
         controller.SelectAllEligible();
@@ -320,7 +332,7 @@ public sealed class MainControllerTests
     {
         var view = new FakeMainView();
         var dialogs = new FakeUserDialogs { CsvPath = "contacts.csv" };
-        var importer = new StubImporter(new(CsvImportStatus.Success,
+        var importer = new StubContactCsvStore(new(CsvImportStatus.Success,
             new[]
             {
                 ValidRow(1),
@@ -341,11 +353,11 @@ public sealed class MainControllerTests
     [TestMethod]
     public async Task InvalidMessageRejectsBeforeConfirmationAndCoordinator()
     {
-        var view = new FakeMainView { MessageText = "   ", SelectedOrdinals = new[] { 1 } };
+        var view = new FakeMainView { MessageText = "   ", CheckedRecipientOrdinals = new[] { 1 } };
         var dialogs = new FakeUserDialogs { CsvPath = "contacts.csv" };
         var coordinator = new RecordingCoordinator();
         var controller = Create(view, dialogs,
-            new StubImporter(new(CsvImportStatus.Success, new[] { ValidRow(1) }, null)),
+            new StubContactCsvStore(new(CsvImportStatus.Success, new[] { ValidRow(1) }, null)),
             coordinator: coordinator);
         await controller.ImportContactsAsync();
         await controller.SendAsync(SendScope.Selected);
@@ -358,11 +370,11 @@ public sealed class MainControllerTests
     [TestMethod]
     public async Task IncompleteSetupRejectsBeforeConfirmationAndCoordinator()
     {
-        var view = new FakeMainView { MessageText = "hello", SelectedOrdinals = new[] { 1 } };
+        var view = new FakeMainView { MessageText = "hello", CheckedRecipientOrdinals = new[] { 1 } };
         var dialogs = new FakeUserDialogs { CsvPath = "contacts.csv" };
         var coordinator = new RecordingCoordinator();
         var controller = Create(view, dialogs,
-            new StubImporter(new(CsvImportStatus.Success, new[] { ValidRow(1) }, null)),
+            new StubContactCsvStore(new(CsvImportStatus.Success, new[] { ValidRow(1) }, null)),
             new IncompleteSettingsService(),
             coordinator);
         await controller.ImportContactsAsync();
@@ -380,11 +392,11 @@ public sealed class MainControllerTests
         var rows = new[] { ValidRow(1), ValidRow(2) };
         var coordinator = new RecordingCoordinator();
         var controller = Create(view, dialogs,
-            new StubImporter(new(CsvImportStatus.Success, rows, null)),
+            new StubContactCsvStore(new(CsvImportStatus.Success, rows, null)),
             coordinator: coordinator);
         await controller.ImportContactsAsync();
 
-        view.SelectedOrdinals = new[] { 1 };
+        view.CheckedRecipientOrdinals = new[] { 1 };
         await controller.SendAsync(SendScope.Selected);
         Assert.AreEqual((SendScope.Selected, 1, true), dialogs.LastConfirmation);
         Assert.AreEqual(0, coordinator.CallCount);
@@ -401,11 +413,11 @@ public sealed class MainControllerTests
         var dialogs = new FakeUserDialogs { CsvPath = "contacts.csv" };
         var coordinator = new RecordingCoordinator();
         var controller = Create(view, dialogs,
-            new StubImporter(new(CsvImportStatus.Success, new[] { ValidRow(1) }, null)),
+            new StubContactCsvStore(new(CsvImportStatus.Success, new[] { ValidRow(1) }, null)),
             coordinator: coordinator);
         await controller.ImportContactsAsync();
 
-        view.SelectedOrdinals = Array.Empty<int>();
+        view.CheckedRecipientOrdinals = Array.Empty<int>();
         await controller.SendAsync(SendScope.Selected);
 
         Assert.AreEqual(0, dialogs.SendConfirmationCount);
@@ -419,16 +431,17 @@ public sealed class MainControllerTests
         var view = new FakeMainView
         {
             MessageText = "original validated message",
-            SelectedOrdinals = new[] { 1 }
+            CheckedRecipientOrdinals = new[] { 1 }
         };
         var dialogs = new FakeUserDialogs { CsvPath = "contacts.csv" };
         var settings = new ControllableSettingsService(delayCredentials: true);
         var coordinator = new RecordingCoordinator();
         var controller = Create(view, dialogs,
-            new StubImporter(new(CsvImportStatus.Success, new[] { ValidRow(1) }, null)),
+            new StubContactCsvStore(new(CsvImportStatus.Success, new[] { ValidRow(1) }, null)),
             settings,
             coordinator);
         await controller.ImportContactsAsync();
+        view.CheckedRecipientOrdinals = new[] { 1 };
 
         var first = controller.SendAsync(SendScope.Selected);
         await settings.CredentialsStarted.Task;
@@ -456,7 +469,7 @@ public sealed class MainControllerTests
     {
         var view = new FakeMainView();
         var dialogs = new FakeUserDialogs { CsvPath = "contacts.csv" };
-        var importer = new StubImporter(new(CsvImportStatus.Success,
+        var importer = new StubContactCsvStore(new(CsvImportStatus.Success,
             new[] { ValidRow(1) }, null));
         var settings = new ControllableSettingsService(delayDescriptor: true);
         var coordinator = new RecordingCoordinator();
@@ -494,7 +507,7 @@ public sealed class MainControllerTests
         var view = new FakeMainView();
         var dialogs = new FakeUserDialogs { CsvPath = "chooser.csv" };
         var settings = new ReadySettingsService { LastCsvPath = "remembered.csv" };
-        var importer = new ControllableImporter(
+        var importer = new ControllableContactCsvStore(
             new(CsvImportStatus.Success, new[] { ValidRow(1) }, null));
         var controller = Create(view, dialogs, importer, settings);
         await controller.InitializeAsync();
@@ -518,14 +531,15 @@ public sealed class MainControllerTests
     [TestMethod]
     public async Task ActiveBatchDisablesMutationRejectsDoubleSubmitAndRestoresControls()
     {
-        var view = new FakeMainView { MessageText = "hello", SelectedOrdinals = new[] { 1, 2 } };
+        var view = new FakeMainView { MessageText = "hello", CheckedRecipientOrdinals = new[] { 1, 2 } };
         var dialogs = new FakeUserDialogs { CsvPath = "contacts.csv" };
         var coordinator = new RecordingCoordinator { Delay = true };
         var controller = Create(view, dialogs,
-            new StubImporter(new(CsvImportStatus.Success,
+            new StubContactCsvStore(new(CsvImportStatus.Success,
                 new[] { ValidRow(1), ValidRow(2) }, null)),
             coordinator: coordinator);
         await controller.ImportContactsAsync();
+        view.CheckedRecipientOrdinals = new[] { 1, 2 };
 
         var first = controller.SendAsync(SendScope.Selected);
         await coordinator.Started.Task;
@@ -549,7 +563,7 @@ public sealed class MainControllerTests
     [TestMethod]
     public async Task CancellationAndCancelCloseAwaitSettlementAndBypassOnce()
     {
-        var view = new FakeMainView { MessageText = "hello", SelectedOrdinals = new[] { 1 } };
+        var view = new FakeMainView { MessageText = "hello", CheckedRecipientOrdinals = new[] { 1 } };
         var dialogs = new FakeUserDialogs
         {
             CsvPath = "contacts.csv",
@@ -557,9 +571,10 @@ public sealed class MainControllerTests
         };
         var coordinator = new RecordingCoordinator { Delay = true };
         var controller = Create(view, dialogs,
-            new StubImporter(new(CsvImportStatus.Success, new[] { ValidRow(1) }, null)),
+            new StubContactCsvStore(new(CsvImportStatus.Success, new[] { ValidRow(1) }, null)),
             coordinator: coordinator);
         await controller.ImportContactsAsync();
+        view.CheckedRecipientOrdinals = new[] { 1 };
         var send = controller.SendAsync(SendScope.Selected);
         await coordinator.Started.Task;
         var close = controller.HandleActiveCloseRequestAsync();
@@ -572,7 +587,7 @@ public sealed class MainControllerTests
     [TestMethod]
     public async Task CloseStayLeavesBatchRunningAndRepeatedCancelClosePromptsOnlyOnce()
     {
-        var view = new FakeMainView { MessageText = "hello", SelectedOrdinals = new[] { 1 } };
+        var view = new FakeMainView { MessageText = "hello", CheckedRecipientOrdinals = new[] { 1 } };
         var dialogs = new FakeUserDialogs
         {
             CsvPath = "contacts.csv",
@@ -580,9 +595,10 @@ public sealed class MainControllerTests
         };
         var coordinator = new RecordingCoordinator { Delay = true };
         var controller = Create(view, dialogs,
-            new StubImporter(new(CsvImportStatus.Success, new[] { ValidRow(1) }, null)),
+            new StubContactCsvStore(new(CsvImportStatus.Success, new[] { ValidRow(1) }, null)),
             coordinator: coordinator);
         await controller.ImportContactsAsync();
+        view.CheckedRecipientOrdinals = new[] { 1 };
         var send = controller.SendAsync(SendScope.Selected);
         await coordinator.Started.Task;
 
@@ -632,7 +648,7 @@ public sealed class MainControllerTests
             form => new MainController(
                 form,
                 dialogs,
-                new StubImporter(new(CsvImportStatus.Success, new[] { ValidRow(1) }, null)),
+                new StubContactCsvStore(new(CsvImportStatus.Success, new[] { ValidRow(1) }, null)),
                 settings,
                 new MessageValidator(),
                 coordinator,
@@ -697,7 +713,7 @@ public sealed class MainControllerTests
             form => new MainController(
                 form,
                 new FakeUserDialogs(),
-                new StubImporter(new(CsvImportStatus.Success, Array.Empty<ContactRow>(), null)),
+                new StubContactCsvStore(new(CsvImportStatus.Success, Array.Empty<ContactRow>(), null)),
                 new ReadySettingsService(),
                 new MessageValidator(),
                 new RecordingCoordinator(),
@@ -749,7 +765,7 @@ public sealed class MainControllerTests
             form => new MainController(
                 form,
                 new FakeUserDialogs(),
-                new StubImporter(new(CsvImportStatus.Success, Array.Empty<ContactRow>(), null)),
+                new StubContactCsvStore(new(CsvImportStatus.Success, Array.Empty<ContactRow>(), null)),
                 new ReadySettingsService(),
                 new MessageValidator(),
                 new RecordingCoordinator(),
@@ -774,6 +790,10 @@ public sealed class MainControllerTests
             "saveSetupButton",
             "importButton",
             "refreshButton",
+            "addContactButton",
+            "editContactButton",
+            "deleteSelectedButton",
+            "saveCsvButton",
             "selectAllButton",
             "clearSelectionButton",
             "sendSelectedButton",
@@ -785,7 +805,7 @@ public sealed class MainControllerTests
             form => new MainController(
                 form,
                 new FakeUserDialogs(),
-                new StubImporter(new(CsvImportStatus.Success, Array.Empty<ContactRow>(), null)),
+                new StubContactCsvStore(new(CsvImportStatus.Success, Array.Empty<ContactRow>(), null)),
                 new ReadySettingsService(),
                 new MessageValidator(),
                 new RecordingCoordinator(),
@@ -845,13 +865,14 @@ public sealed class MainControllerTests
     [TestMethod]
     public async Task CorrectedFollowUpBatchCanRunWithNewBatchId()
     {
-        var view = new FakeMainView { MessageText = "first", SelectedOrdinals = new[] { 1 } };
+        var view = new FakeMainView { MessageText = "first", CheckedRecipientOrdinals = new[] { 1 } };
         var dialogs = new FakeUserDialogs { CsvPath = "contacts.csv" };
         var coordinator = new RecordingCoordinator();
         var controller = Create(view, dialogs,
-            new StubImporter(new(CsvImportStatus.Success, new[] { ValidRow(1) }, null)),
+            new StubContactCsvStore(new(CsvImportStatus.Success, new[] { ValidRow(1) }, null)),
             coordinator: coordinator);
         await controller.ImportContactsAsync();
+        view.CheckedRecipientOrdinals = new[] { 1 };
         await controller.SendAsync(SendScope.Selected);
         var firstId = coordinator.LastRequest!.BatchId;
         view.MessageText = "corrected";
@@ -861,20 +882,1155 @@ public sealed class MainControllerTests
         Assert.AreEqual("corrected", coordinator.LastRequest.Message);
     }
 
+    [TestMethod]
+    public void AddBeforeLoadAppendsUncheckedHighlightsAndMarksDirty()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new(" New person ", " +15550100100 ")
+        };
+        var controller = CreateWithStore(view, dialogs, new FakeContactCsvStore());
+
+        controller.AddContact();
+
+        Assert.AreEqual(1, view.Rows.Count);
+        Assert.AreEqual(1, view.Rows[0].ImportOrdinal);
+        Assert.AreEqual("New person", view.Rows[0].Name);
+        Assert.IsFalse(view.Rows[0].IsCheckedRecipient);
+        Assert.AreEqual(1, view.FocusedOrdinal);
+        Assert.IsTrue(view.DocumentState!.IsDirty);
+        Assert.AreEqual("Unsaved contacts", view.DocumentState.DisplayName);
+        Assert.IsTrue(view.InteractionState!.CanSaveCsv);
+    }
+
+    [TestMethod]
+    public void AddCancelLeavesUntitledDocumentUnchanged()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs { ContactResult = null };
+        var controller = CreateWithStore(view, dialogs, new FakeContactCsvStore());
+
+        controller.AddContact();
+
+        Assert.AreEqual(0, view.Rows.Count);
+        Assert.IsFalse(view.DocumentState?.IsDirty ?? false);
+    }
+
+    [TestMethod]
+    public async Task EditRequiresExactlyOneHighlightAndNameOnlyPreservesCheckAndResult()
+    {
+        var view = new FakeMainView { MessageText = "hello" };
+        var dialogs = new FakeUserDialogs { CsvPath = "contacts.csv" };
+        var store = new FakeContactCsvStore();
+        store.QueueLoad(FakeContactCsvStore.SuccessfulLoad(
+            "contacts.csv",
+            new[] { ValidRow(1), ValidRow(2) }));
+        var controller = CreateWithStore(
+            view,
+            dialogs,
+            store,
+            coordinator: new ImmediateProgressCoordinator());
+        await controller.ImportContactsAsync();
+
+        view.HighlightedContactOrdinals = new[] { 1, 2 };
+        controller.EditContact();
+        Assert.IsNull(dialogs.LastContactRequest);
+        StringAssert.Contains(view.Error!, "exactly one");
+
+        controller.SelectAllEligible();
+        await controller.SendAsync(SendScope.Selected);
+        await WaitUntilAsync(() =>
+            view.Rows.Single(row => row.ImportOrdinal == 1).ProviderMessageId == "SM-1");
+        view.HighlightedContactOrdinals = new[] { 1 };
+        dialogs.ContactResult = new("Renamed", "+15550100101");
+        controller.EditContact();
+
+        var edited = view.Rows.Single(row => row.ImportOrdinal == 1);
+        Assert.AreEqual("Renamed", edited.Name);
+        Assert.IsTrue(edited.IsCheckedRecipient);
+        Assert.AreEqual("SM-1", edited.ProviderMessageId);
+        Assert.AreEqual(1, view.FocusedOrdinal);
+    }
+
+    [TestMethod]
+    public async Task SendWithoutSynchronizationContextDrainsDelayedProgressBeforeSettlement()
+    {
+        Assert.IsNull(SynchronizationContext.Current);
+        var view = new FakeMainView
+        {
+            MessageText = "hello",
+            DelayProgressApplication = true
+        };
+        var dialogs = new FakeUserDialogs { CsvPath = "contacts.csv" };
+        var store = new FakeContactCsvStore();
+        store.QueueLoad(FakeContactCsvStore.SuccessfulLoad(
+            "contacts.csv",
+            new[] { ValidRow(1) }));
+        var controller = CreateWithStore(
+            view,
+            dialogs,
+            store,
+            coordinator: new BackgroundDelayedProgressCoordinator());
+        await controller.ImportContactsAsync();
+        controller.SelectAllEligible();
+
+        var send = controller.SendAsync(SendScope.Selected);
+        await view.ProgressApplicationStarted.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+        Assert.IsFalse(send.IsCompleted);
+        Assert.IsTrue(controller.IsBatchActive);
+        Assert.IsNull(view.Summary);
+
+        view.ReleaseProgressApplication();
+        await send;
+
+        Assert.IsFalse(controller.IsBatchActive);
+        Assert.IsNotNull(view.Summary);
+        Assert.AreEqual("SM-DELAYED", view.Rows.Single().ProviderMessageId);
+        Assert.AreEqual(1, view.MaximumConcurrentProgress);
+        CollectionAssert.AreEqual(
+            new[]
+            {
+                RecipientSendState.Pending,
+                RecipientSendState.Succeeded
+            },
+            view.Progress.Select(item => item.State).ToArray());
+    }
+
+    [TestMethod]
+    public async Task NumberEditClearsOnlyEditedCheckAndResult()
+    {
+        var view = new FakeMainView { MessageText = "hello" };
+        var dialogs = new FakeUserDialogs { CsvPath = "contacts.csv" };
+        var store = new FakeContactCsvStore();
+        store.QueueLoad(FakeContactCsvStore.SuccessfulLoad(
+            "contacts.csv",
+            new[] { ValidRow(1), ValidRow(2) }));
+        var controller = CreateWithStore(
+            view,
+            dialogs,
+            store,
+            coordinator: new ImmediateProgressCoordinator());
+        await controller.ImportContactsAsync();
+        controller.SelectAllEligible();
+        await controller.SendAsync(SendScope.Selected);
+        await WaitUntilAsync(() => view.Rows.All(row => row.ProviderMessageId is not null));
+
+        view.HighlightedContactOrdinals = new[] { 1 };
+        dialogs.ContactResult = new("Person 1", "+15550100999");
+        controller.EditContact();
+
+        var changed = view.Rows.Single(row => row.ImportOrdinal == 1);
+        var unchanged = view.Rows.Single(row => row.ImportOrdinal == 2);
+        Assert.IsFalse(changed.IsCheckedRecipient);
+        Assert.IsNull(changed.SendState);
+        Assert.IsTrue(unchanged.IsCheckedRecipient);
+        Assert.AreEqual("SM-2", unchanged.ProviderMessageId);
+    }
+
+    [TestMethod]
+    public async Task DeleteUsesHighlightsExactCountDefaultNoAndNearestSurvivor()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            CsvPath = "contacts.csv",
+            DeleteConfirmationResult = false
+        };
+        var store = new FakeContactCsvStore();
+        store.QueueLoad(FakeContactCsvStore.SuccessfulLoad(
+            "contacts.csv",
+            new[] { ValidRow(1), ValidRow(2), ValidRow(3) }));
+        var controller = CreateWithStore(view, dialogs, store);
+        await controller.ImportContactsAsync();
+        controller.SelectAllEligible();
+        view.HighlightedContactOrdinals = new[] { 1, 2 };
+
+        controller.DeleteSelectedContacts();
+        Assert.AreEqual(3, view.Rows.Count);
+        Assert.AreEqual(2, dialogs.LastDeleteCount);
+
+        dialogs.DeleteConfirmationResult = true;
+        controller.DeleteSelectedContacts();
+        CollectionAssert.AreEqual(
+            new[] { 3 },
+            view.Rows.Select(row => row.ImportOrdinal).ToArray());
+        Assert.AreEqual(3, view.FocusedOrdinal);
+        CollectionAssert.AreEquivalent(new[] { 3 }, view.AppliedSelection.ToArray());
+        Assert.IsTrue(view.DocumentState!.IsDirty);
+    }
+
+    [TestMethod]
+    public async Task DeleteAllLeavesValidDirtyHeaderOnlyDocument()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            CsvPath = "contacts.csv",
+            DeleteConfirmationResult = true
+        };
+        var store = new FakeContactCsvStore();
+        store.QueueLoad(FakeContactCsvStore.SuccessfulLoad(
+            "contacts.csv",
+            new[] { ValidRow(1), ValidRow(2) }));
+        var controller = CreateWithStore(view, dialogs, store);
+        await controller.ImportContactsAsync();
+        view.HighlightedContactOrdinals = new[] { 1, 2 };
+
+        controller.DeleteSelectedContacts();
+
+        Assert.AreEqual(0, view.Rows.Count);
+        Assert.IsTrue(view.DocumentState!.IsDirty);
+        Assert.IsTrue(view.InteractionState!.CanSaveCsv);
+    }
+
+    [TestMethod]
+    public async Task FirstSaveAsMarksCleanAndSettingsFailureWarnsWithoutRollback()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new("One", "+15550100100"),
+            CsvSavePath = "saved.csv"
+        };
+        var store = new FakeContactCsvStore();
+        var savedVersion = FakeContactCsvStore.Version(42, 'S');
+        store.QueueSave(FakeContactCsvStore.SuccessfulSave("saved.csv", savedVersion));
+        var settings = new ReadySettingsService
+        {
+            SaveCsvPathResult = new(
+                SaveCsvPathStatus.StorageFailed,
+                "settings unavailable")
+        };
+        var controller = CreateWithStore(view, dialogs, store, settings);
+        controller.AddContact();
+
+        await controller.SaveContactsAsync();
+
+        Assert.AreEqual(1, store.SaveRequests.Count);
+        Assert.IsNull(store.SaveRequests[0].ExpectedVersion);
+        Assert.IsFalse(view.DocumentState!.IsDirty);
+        Assert.AreEqual("saved.csv", view.DocumentState.DisplayName);
+        Assert.AreSame(savedVersion, view.DocumentState.Rows.Count >= 0
+            ? savedVersion
+            : null);
+        StringAssert.Contains(view.Error!, "may not be remembered");
+    }
+
+    [TestMethod]
+    public async Task SuccessfulSaveCleanupWarningIsVisibleAndDocumentRemainsClean()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new("One", "+15550100100"),
+            CsvSavePath = "saved.csv"
+        };
+        var store = new FakeContactCsvStore();
+        store.QueueSave(new ContactCsvSaveResult(
+            ContactCsvSaveStatus.Saved,
+            "saved.csv",
+            FakeContactCsvStore.Version(42, 'S'),
+            null,
+            "Contacts were saved, but a temporary CSV file may remain."));
+        var controller = CreateWithStore(view, dialogs, store);
+        controller.AddContact();
+
+        await controller.SaveContactsAsync();
+
+        Assert.IsFalse(view.DocumentState!.IsDirty);
+        StringAssert.Contains(view.Error!, "temporary CSV file");
+    }
+
+    [TestMethod]
+    public async Task SamePathSaveUsesLoadVersionAndPreservesSelectionAndResults()
+    {
+        var view = new FakeMainView { MessageText = "hello" };
+        var dialogs = new FakeUserDialogs { CsvPath = "contacts.csv" };
+        var store = new FakeContactCsvStore();
+        var loadedVersion = FakeContactCsvStore.Version(10, 'L');
+        store.QueueLoad(FakeContactCsvStore.SuccessfulLoad(
+            "contacts.csv",
+            new[] { ValidRow(1) },
+            loadedVersion));
+        store.QueueSave(FakeContactCsvStore.SuccessfulSave(
+            "contacts.csv",
+            FakeContactCsvStore.Version(20, 'S')));
+        var controller = CreateWithStore(
+            view,
+            dialogs,
+            store,
+            coordinator: new ImmediateProgressCoordinator());
+        await controller.ImportContactsAsync();
+        controller.SelectAllEligible();
+        await controller.SendAsync(SendScope.Selected);
+        await WaitUntilAsync(() => view.Rows[0].ProviderMessageId == "SM-1");
+        view.HighlightedContactOrdinals = new[] { 1 };
+        dialogs.ContactResult = new("Renamed", "+15550100101");
+        controller.EditContact();
+
+        await controller.SaveContactsAsync();
+
+        Assert.IsTrue(loadedVersion == store.SaveRequests.Single().ExpectedVersion);
+        Assert.IsFalse(view.DocumentState!.IsDirty);
+        Assert.IsTrue(view.Rows[0].IsCheckedRecipient);
+        Assert.AreEqual("SM-1", view.Rows[0].ProviderMessageId);
+        CollectionAssert.AreEquivalent(new[] { 1 }, view.HighlightedContactOrdinals.ToArray());
+    }
+
+    [TestMethod]
+    public async Task InvalidDirtyDocumentBlocksSaveAndFocusesFirstInvalid()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            CsvPath = "contacts.csv",
+            ContactResult = new("Valid", "+15550100101")
+        };
+        var store = new FakeContactCsvStore();
+        store.QueueLoad(FakeContactCsvStore.SuccessfulLoad(
+            "contacts.csv",
+            new[]
+            {
+                new ContactRow(
+                    1,
+                    string.Empty,
+                    "+15550100100",
+                    new[] { ContactErrorCode.NameRequired })
+            }));
+        var controller = CreateWithStore(view, dialogs, store);
+        await controller.ImportContactsAsync();
+        controller.AddContact();
+
+        Assert.IsFalse(view.InteractionState!.CanSaveCsv);
+        await controller.SaveContactsAsync();
+        Assert.AreEqual(0, store.SaveRequests.Count);
+        Assert.AreEqual(1, view.FocusedOrdinal);
+    }
+
+    [TestMethod]
+    public async Task FormulaPrefixImportedContactBlocksControllerSaveAndFocusesRow()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            CsvPath = "contacts.csv",
+            ContactResult = new("Valid", "+15550100101")
+        };
+        var store = new FakeContactCsvStore();
+        store.QueueLoad(FakeContactCsvStore.SuccessfulLoad(
+            "contacts.csv",
+            new[]
+            {
+                new ContactRow(
+                    1,
+                    "=HYPERLINK(\"https://example.invalid\")",
+                    "+15550100100",
+                    new[] { ContactErrorCode.FormulaPrefixNotAllowed })
+            }));
+        var controller = CreateWithStore(view, dialogs, store);
+        await controller.ImportContactsAsync();
+        controller.AddContact();
+
+        await controller.SaveContactsAsync();
+
+        Assert.IsFalse(view.InteractionState!.CanSaveCsv);
+        Assert.AreEqual(0, store.SaveRequests.Count);
+        Assert.AreEqual(1, view.FocusedOrdinal);
+        StringAssert.Contains(
+            view.Rows.Single(row => row.ImportOrdinal == 1).ValidationText,
+            "cannot begin");
+    }
+
+    [TestMethod]
+    public async Task StoreLimitFailureUsesSafeDiagnosticWithoutMislabelingValidRows()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new("One", "+15550100100"),
+            CsvSavePath = "target.csv"
+        };
+        var store = new FakeContactCsvStore();
+        store.QueueSave(new ContactCsvSaveResult(
+            ContactCsvSaveStatus.InvalidDocument,
+            null,
+            null,
+            null,
+            "CSV exceeds the 10,485,760 byte file size limit."));
+        var controller = CreateWithStore(view, dialogs, store);
+        controller.AddContact();
+        var focusedBeforeSave = view.FocusedOrdinal;
+
+        await controller.SaveContactsAsync();
+
+        Assert.IsTrue(view.DocumentState!.IsDirty);
+        Assert.AreEqual(focusedBeforeSave, view.FocusedOrdinal);
+        StringAssert.Contains(view.Error!, "byte file size limit");
+    }
+
+    [TestMethod]
+    public async Task ModifiedConflictExplicitOverwriteRetriesAgainstObservedVersion()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            CsvPath = "contacts.csv",
+            ContactResult = new("Renamed", "+15550100101"),
+            ConflictChoice = ExternalCsvConflictChoice.OverwriteThisVersion
+        };
+        var store = new FakeContactCsvStore();
+        var loaded = FakeContactCsvStore.Version(10, 'A');
+        var external = FakeContactCsvStore.Version(11, 'B');
+        store.QueueLoad(FakeContactCsvStore.SuccessfulLoad(
+            "contacts.csv",
+            new[] { ValidRow(1) },
+            loaded));
+        store.QueueSave(
+            new(
+                ContactCsvSaveStatus.ConflictModified,
+                "contacts.csv",
+                null,
+                external,
+                "changed"),
+            FakeContactCsvStore.SuccessfulSave("contacts.csv"));
+        var controller = CreateWithStore(view, dialogs, store);
+        await controller.ImportContactsAsync();
+        view.HighlightedContactOrdinals = new[] { 1 };
+        controller.EditContact();
+
+        await controller.SaveContactsAsync();
+
+        Assert.AreEqual(2, store.SaveRequests.Count);
+        Assert.IsTrue(loaded == store.SaveRequests[0].ExpectedVersion);
+        Assert.IsTrue(external == store.SaveRequests[1].ExpectedVersion);
+        Assert.IsFalse(view.DocumentState!.IsDirty);
+    }
+
+    [TestMethod]
+    public async Task ReloadExternalAfterSaveAsChainUsesCanonicalConflictFullPath()
+    {
+        const string originalPath = "original.csv";
+        const string selectedSaveAsPath = "relative-target.csv";
+        const string canonicalTargetPath = @"C:\canonical\target.csv";
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            CsvPath = originalPath,
+            ContactResult = new("Renamed", "+15550100101")
+        };
+        dialogs.ConflictChoices.Enqueue(ExternalCsvConflictChoice.SaveAs);
+        dialogs.ConflictChoices.Enqueue(ExternalCsvConflictChoice.OverwriteThisVersion);
+        dialogs.ConflictChoices.Enqueue(ExternalCsvConflictChoice.ReloadExternal);
+        dialogs.SavePaths.Enqueue(selectedSaveAsPath);
+        var store = new FakeContactCsvStore();
+        var originalVersion = FakeContactCsvStore.Version(10, 'A');
+        var targetVersionOne = FakeContactCsvStore.Version(11, 'B');
+        var targetVersionTwo = FakeContactCsvStore.Version(12, 'C');
+        store.QueueLoad(
+            FakeContactCsvStore.SuccessfulLoad(
+                originalPath,
+                new[] { ValidRow(1) },
+                originalVersion),
+            FakeContactCsvStore.SuccessfulLoad(
+                canonicalTargetPath,
+                new[] { new ContactRow(
+                    1,
+                    "External",
+                    "+15550100999",
+                    Array.Empty<ContactErrorCode>()) },
+                targetVersionTwo));
+        store.QueueSave(
+            new(
+                ContactCsvSaveStatus.ConflictModified,
+                Path.GetFullPath(originalPath),
+                null,
+                FakeContactCsvStore.Version(13, 'D'),
+                "changed"),
+            new(
+                ContactCsvSaveStatus.TargetExists,
+                canonicalTargetPath,
+                null,
+                targetVersionOne,
+                "exists"),
+            new(
+                ContactCsvSaveStatus.ConflictModified,
+                canonicalTargetPath,
+                null,
+                targetVersionTwo,
+                "changed again"));
+        var controller = CreateWithStore(view, dialogs, store);
+        await controller.ImportContactsAsync();
+        view.HighlightedContactOrdinals = new[] { 1 };
+        controller.EditContact();
+
+        await controller.SaveContactsAsync();
+
+        CollectionAssert.AreEqual(
+            new[] { originalPath, canonicalTargetPath },
+            store.LoadPaths.ToArray());
+        CollectionAssert.AreEqual(
+            new[] { originalPath, selectedSaveAsPath, selectedSaveAsPath },
+            store.SaveRequests.Select(request => request.Path).ToArray());
+        Assert.AreEqual("External", view.Rows.Single().Name);
+        Assert.AreEqual(Path.GetFileName(canonicalTargetPath), view.DocumentState!.DisplayName);
+        Assert.IsFalse(view.DocumentState.IsDirty);
+    }
+
+    [TestMethod]
+    public async Task DeletedConflictSaveAsRetriesChosenPathWithoutExpectedVersion()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            CsvPath = "contacts.csv",
+            ContactResult = new("Renamed", "+15550100101"),
+            ConflictChoice = ExternalCsvConflictChoice.SaveAs,
+            CsvSavePath = "replacement.csv"
+        };
+        var store = new FakeContactCsvStore();
+        store.QueueLoad(FakeContactCsvStore.SuccessfulLoad(
+            "contacts.csv",
+            new[] { ValidRow(1) }));
+        store.QueueSave(
+            new ContactCsvSaveResult(
+                ContactCsvSaveStatus.ConflictDeleted,
+                Path.GetFullPath("contacts.csv"),
+                null,
+                null,
+                "deleted"),
+            FakeContactCsvStore.SuccessfulSave("replacement.csv"));
+        var controller = CreateWithStore(view, dialogs, store);
+        await controller.ImportContactsAsync();
+        view.HighlightedContactOrdinals = new[] { 1 };
+        controller.EditContact();
+
+        await controller.SaveContactsAsync();
+
+        Assert.AreEqual(2, store.SaveRequests.Count);
+        Assert.AreEqual("replacement.csv", store.SaveRequests[1].Path);
+        Assert.IsNull(store.SaveRequests[1].ExpectedVersion);
+        Assert.IsFalse(view.DocumentState!.IsDirty);
+    }
+
+    [TestMethod]
+    public async Task TargetExistsOverwriteRetriesAgainstObservedVersion()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new("One", "+15550100100"),
+            CsvSavePath = "target.csv",
+            ConflictChoice = ExternalCsvConflictChoice.OverwriteThisVersion
+        };
+        var observed = FakeContactCsvStore.Version(20, 'E');
+        var store = new FakeContactCsvStore();
+        store.QueueSave(
+            new ContactCsvSaveResult(
+                ContactCsvSaveStatus.TargetExists,
+                Path.GetFullPath("target.csv"),
+                null,
+                observed,
+                "exists"),
+            FakeContactCsvStore.SuccessfulSave("target.csv"));
+        var controller = CreateWithStore(view, dialogs, store);
+        controller.AddContact();
+
+        await controller.SaveContactsAsync();
+
+        Assert.AreEqual(2, store.SaveRequests.Count);
+        Assert.IsNull(store.SaveRequests[0].ExpectedVersion);
+        Assert.IsTrue(ReferenceEquals(
+            observed,
+            store.SaveRequests[1].ExpectedVersion));
+        Assert.IsFalse(view.DocumentState!.IsDirty);
+    }
+
+    [TestMethod]
+    [DataRow(ContactCsvSaveStatus.ConflictModified)]
+    [DataRow(ContactCsvSaveStatus.ConflictDeleted)]
+    [DataRow(ContactCsvSaveStatus.TargetExists)]
+    public async Task ConflictCancelPreservesDirtyDocumentWithoutRetry(
+        ContactCsvSaveStatus status)
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            CsvPath = "contacts.csv",
+            ContactResult = new("Renamed", "+15550100101"),
+            ConflictChoice = ExternalCsvConflictChoice.Cancel
+        };
+        var store = new FakeContactCsvStore();
+        store.QueueLoad(FakeContactCsvStore.SuccessfulLoad(
+            "contacts.csv",
+            new[] { ValidRow(1) }));
+        store.QueueSave(new ContactCsvSaveResult(
+            status,
+            Path.GetFullPath("contacts.csv"),
+            null,
+            status == ContactCsvSaveStatus.ConflictDeleted
+                ? null
+                : FakeContactCsvStore.Version(21, 'F'),
+            "conflict"));
+        var controller = CreateWithStore(view, dialogs, store);
+        await controller.ImportContactsAsync();
+        view.HighlightedContactOrdinals = new[] { 1 };
+        controller.EditContact();
+
+        await controller.SaveContactsAsync();
+
+        Assert.AreEqual(1, store.SaveRequests.Count);
+        Assert.IsTrue(view.DocumentState!.IsDirty);
+    }
+
+    [TestMethod]
+    [DataRow(ContactCsvSaveStatus.AccessDenied)]
+    [DataRow(ContactCsvSaveStatus.IoFailure)]
+    [DataRow(ContactCsvSaveStatus.AtomicReplaceUnavailable)]
+    public async Task RecoverableSaveFailureCancelPreservesDirtyDocument(
+        ContactCsvSaveStatus status)
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new("One", "+15550100100"),
+            CsvSavePath = "target.csv",
+            FailureChoice = SaveFailureChoice.Cancel
+        };
+        var store = new FakeContactCsvStore();
+        store.QueueSave(new ContactCsvSaveResult(
+            status,
+            Path.GetFullPath("target.csv"),
+            null,
+            null,
+            "failed"));
+        var controller = CreateWithStore(view, dialogs, store);
+        controller.AddContact();
+
+        await controller.SaveContactsAsync();
+
+        Assert.AreEqual(1, store.SaveRequests.Count);
+        Assert.IsTrue(view.DocumentState!.IsDirty);
+        Assert.AreEqual("failed", view.Error);
+    }
+
+    [TestMethod]
+    public async Task DeletedConflictExplicitRecreateRetriesWithoutExpectedVersion()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            CsvPath = "contacts.csv",
+            ContactResult = new("Renamed", "+15550100101"),
+            ConflictChoice = ExternalCsvConflictChoice.Recreate
+        };
+        var store = new FakeContactCsvStore();
+        var loaded = FakeContactCsvStore.Version(10, 'A');
+        store.QueueLoad(FakeContactCsvStore.SuccessfulLoad(
+            "contacts.csv",
+            new[] { ValidRow(1) },
+            loaded));
+        store.QueueSave(
+            new(
+                ContactCsvSaveStatus.ConflictDeleted,
+                "contacts.csv",
+                null,
+                null,
+                "deleted"),
+            FakeContactCsvStore.SuccessfulSave("contacts.csv"));
+        var controller = CreateWithStore(view, dialogs, store);
+        await controller.ImportContactsAsync();
+        view.HighlightedContactOrdinals = new[] { 1 };
+        controller.EditContact();
+
+        await controller.SaveContactsAsync();
+
+        Assert.AreEqual(2, store.SaveRequests.Count);
+        Assert.IsTrue(loaded == store.SaveRequests[0].ExpectedVersion);
+        Assert.IsNull(store.SaveRequests[1].ExpectedVersion);
+        Assert.IsFalse(view.DocumentState!.IsDirty);
+    }
+
+    [TestMethod]
+    public async Task RepeatedConflictPromptsAgainAndCancelPreservesDirtyState()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            CsvPath = "contacts.csv",
+            ContactResult = new("Renamed", "+15550100101")
+        };
+        dialogs.ConflictChoices.Enqueue(
+            ExternalCsvConflictChoice.OverwriteThisVersion);
+        dialogs.ConflictChoices.Enqueue(ExternalCsvConflictChoice.Cancel);
+        var store = new FakeContactCsvStore();
+        var loaded = FakeContactCsvStore.Version(10, 'A');
+        var externalOne = FakeContactCsvStore.Version(11, 'B');
+        var externalTwo = FakeContactCsvStore.Version(12, 'C');
+        store.QueueLoad(FakeContactCsvStore.SuccessfulLoad(
+            "contacts.csv",
+            new[] { ValidRow(1) },
+            loaded));
+        store.QueueSave(
+            new(
+                ContactCsvSaveStatus.ConflictModified,
+                "contacts.csv",
+                null,
+                externalOne,
+                "changed"),
+            new(
+                ContactCsvSaveStatus.ConflictModified,
+                "contacts.csv",
+                null,
+                externalTwo,
+                "changed again"));
+        var controller = CreateWithStore(view, dialogs, store);
+        await controller.ImportContactsAsync();
+        view.HighlightedContactOrdinals = new[] { 1 };
+        controller.EditContact();
+
+        await controller.SaveContactsAsync();
+
+        Assert.AreEqual(2, dialogs.ConflictPrompts.Count);
+        Assert.AreEqual(2, store.SaveRequests.Count);
+        Assert.IsTrue(view.DocumentState!.IsDirty);
+    }
+
+    [TestMethod]
+    public async Task DeletedConflictRecreateAndTargetExistsChooseAnotherAreExplicit()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new("One", "+15550100100"),
+            CsvSavePath = "first.csv"
+        };
+        dialogs.ConflictChoices.Enqueue(ExternalCsvConflictChoice.ChooseAnother);
+        dialogs.SavePaths.Enqueue("first.csv");
+        dialogs.SavePaths.Enqueue("second.csv");
+        var store = new FakeContactCsvStore();
+        store.QueueSave(
+            new(
+                ContactCsvSaveStatus.TargetExists,
+                "first.csv",
+                null,
+                FakeContactCsvStore.Version(1, 'E'),
+                "exists"),
+            FakeContactCsvStore.SuccessfulSave("second.csv"));
+        var controller = CreateWithStore(view, dialogs, store);
+        controller.AddContact();
+
+        await controller.SaveContactsAsync();
+
+        CollectionAssert.AreEqual(
+            new[] { "first.csv", "second.csv" },
+            store.SaveRequests.Select(request => request.Path).ToArray());
+        Assert.IsTrue(store.SaveRequests.All(request => request.ExpectedVersion is null));
+        Assert.IsFalse(view.DocumentState!.IsDirty);
+    }
+
+    [TestMethod]
+    public async Task SaveFailureCanRecoverThroughSaveAs()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new("One", "+15550100100"),
+            CsvSavePath = "first.csv",
+            FailureChoice = SaveFailureChoice.SaveAs
+        };
+        dialogs.SavePaths.Enqueue("first.csv");
+        dialogs.SavePaths.Enqueue("second.csv");
+        var store = new FakeContactCsvStore();
+        store.QueueSave(
+            new(
+                ContactCsvSaveStatus.AtomicReplaceUnavailable,
+                "first.csv",
+                null,
+                null,
+                "unavailable"),
+            FakeContactCsvStore.SuccessfulSave("second.csv"));
+        var controller = CreateWithStore(view, dialogs, store);
+        controller.AddContact();
+
+        await controller.SaveContactsAsync();
+
+        Assert.AreEqual(2, store.SaveRequests.Count);
+        Assert.IsFalse(view.DocumentState!.IsDirty);
+    }
+
+    [TestMethod]
+    [DataRow(ContactCsvSaveStatus.AccessDenied)]
+    [DataRow(ContactCsvSaveStatus.IoFailure)]
+    [DataRow(ContactCsvSaveStatus.AtomicReplaceUnavailable)]
+    public async Task RecoverableSaveFailuresOfferSaveAs(
+        ContactCsvSaveStatus failureStatus)
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new("One", "+15550100100"),
+            FailureChoice = SaveFailureChoice.SaveAs
+        };
+        dialogs.SavePaths.Enqueue("first.csv");
+        dialogs.SavePaths.Enqueue("second.csv");
+        var store = new FakeContactCsvStore();
+        store.QueueSave(
+            new(failureStatus, "first.csv", null, null, "failed"),
+            FakeContactCsvStore.SuccessfulSave("second.csv"));
+        var controller = CreateWithStore(view, dialogs, store);
+        controller.AddContact();
+
+        await controller.SaveContactsAsync();
+
+        Assert.AreEqual(failureStatus, dialogs.FailurePrompts.Single().Status);
+        Assert.AreEqual(2, store.SaveRequests.Count);
+        Assert.IsFalse(view.DocumentState!.IsDirty);
+    }
+
+    [TestMethod]
+    public async Task CanceledFirstSaveAsPreservesDirtyDocumentAndState()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new("One", "+15550100100"),
+            CsvSavePath = null
+        };
+        var store = new FakeContactCsvStore();
+        var controller = CreateWithStore(view, dialogs, store);
+        controller.AddContact();
+        var rows = view.Rows;
+
+        await controller.SaveContactsAsync();
+
+        Assert.AreEqual(0, store.SaveRequests.Count);
+        Assert.AreSame(rows, view.Rows);
+        Assert.IsTrue(view.DocumentState!.IsDirty);
+    }
+
+    [TestMethod]
+    public async Task DirtyImportCancelAndFailedDiscardPreserveCompleteDocument()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new("Local", "+15550100100"),
+            CsvPath = "external.csv"
+        };
+        var store = new FakeContactCsvStore();
+        var controller = CreateWithStore(view, dialogs, store);
+        controller.AddContact();
+        var original = view.Rows;
+
+        dialogs.UnsavedChoice = UnsavedChangesChoice.Cancel;
+        await controller.ImportContactsAsync();
+        Assert.AreEqual(0, store.LoadPaths.Count);
+        Assert.AreSame(original, view.Rows);
+
+        dialogs.UnsavedChoice = UnsavedChangesChoice.Discard;
+        store.QueueLoad(new ContactCsvLoadResult(
+            CsvImportStatus.MalformedCsv,
+            null,
+            Array.Empty<ContactRow>(),
+            null,
+            "Malformed."));
+        await controller.ImportContactsAsync();
+        Assert.AreSame(original, view.Rows);
+        Assert.IsTrue(view.DocumentState!.IsDirty);
+    }
+
+    [TestMethod]
+    public async Task DirtyImportSaveMustSucceedBeforeReplacement()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new("Local", "+15550100100"),
+            CsvPath = "external.csv",
+            CsvSavePath = "local.csv",
+            UnsavedChoice = UnsavedChangesChoice.Save
+        };
+        var store = new FakeContactCsvStore();
+        store.QueueSave(FakeContactCsvStore.SuccessfulSave("local.csv"));
+        store.QueueLoad(FakeContactCsvStore.SuccessfulLoad(
+            "external.csv",
+            new[] { ValidRow(1) }));
+        var controller = CreateWithStore(view, dialogs, store);
+        controller.AddContact();
+
+        await controller.ImportContactsAsync();
+
+        Assert.AreEqual(1, store.SaveRequests.Count);
+        Assert.AreEqual(1, store.LoadPaths.Count);
+        Assert.AreEqual("Person 1", view.Rows.Single().Name);
+        Assert.IsFalse(view.DocumentState!.IsDirty);
+    }
+
+    [TestMethod]
+    [DataRow(UnsavedChangesChoice.Save, 1, 1, "Person 1", false)]
+    [DataRow(UnsavedChangesChoice.Discard, 0, 1, "Person 1", false)]
+    [DataRow(UnsavedChangesChoice.Cancel, 0, 0, "Local", true)]
+    public async Task DirtyImportHonorsSaveDiscardAndCancel(
+        UnsavedChangesChoice choice,
+        int expectedSaveCount,
+        int expectedLoadCount,
+        string expectedName,
+        bool expectedDirty)
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new("Local", "+15550100100"),
+            CsvPath = "external.csv",
+            CsvSavePath = "local.csv",
+            UnsavedChoice = choice
+        };
+        var store = new FakeContactCsvStore();
+        if (choice == UnsavedChangesChoice.Save)
+        {
+            store.QueueSave(FakeContactCsvStore.SuccessfulSave("local.csv"));
+        }
+
+        store.QueueLoad(FakeContactCsvStore.SuccessfulLoad(
+            "external.csv",
+            new[] { ValidRow(1) }));
+        var controller = CreateWithStore(view, dialogs, store);
+        controller.AddContact();
+
+        await controller.ImportContactsAsync();
+
+        Assert.AreEqual(PendingAction.Import, dialogs.LastUnsavedPrompt!.Value.Action);
+        Assert.AreEqual(expectedSaveCount, store.SaveRequests.Count);
+        Assert.AreEqual(expectedLoadCount, store.LoadPaths.Count);
+        Assert.AreEqual(expectedName, view.Rows.Single().Name);
+        Assert.AreEqual(expectedDirty, view.DocumentState!.IsDirty);
+    }
+
+    [TestMethod]
+    [DataRow(UnsavedChangesChoice.Save, 1, 2, false)]
+    [DataRow(UnsavedChangesChoice.Discard, 0, 2, false)]
+    [DataRow(UnsavedChangesChoice.Cancel, 0, 1, true)]
+    public async Task DirtyRefreshHonorsSaveDiscardAndCancel(
+        UnsavedChangesChoice choice,
+        int expectedSaveCount,
+        int expectedLoadCount,
+        bool expectedDirty)
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            CsvPath = "contacts.csv",
+            ContactResult = new("Local edit", "+15550100101"),
+            UnsavedChoice = choice
+        };
+        var store = new FakeContactCsvStore();
+        store.QueueLoad(
+            FakeContactCsvStore.SuccessfulLoad(
+                "contacts.csv",
+                new[] { ValidRow(1) }),
+            FakeContactCsvStore.SuccessfulLoad(
+                "contacts.csv",
+                new[]
+                {
+                    new ContactRow(
+                        1,
+                        "External refresh",
+                        "+15550100999",
+                        Array.Empty<ContactErrorCode>())
+                }));
+        if (choice == UnsavedChangesChoice.Save)
+        {
+            store.QueueSave(FakeContactCsvStore.SuccessfulSave("contacts.csv"));
+        }
+
+        var controller = CreateWithStore(view, dialogs, store);
+        await controller.ImportContactsAsync();
+        view.HighlightedContactOrdinals = new[] { 1 };
+        controller.EditContact();
+
+        await controller.RefreshContactsAsync();
+
+        Assert.AreEqual(PendingAction.Refresh, dialogs.LastUnsavedPrompt!.Value.Action);
+        Assert.AreEqual(expectedSaveCount, store.SaveRequests.Count);
+        Assert.AreEqual(expectedLoadCount, store.LoadPaths.Count);
+        Assert.AreEqual(expectedDirty, view.DocumentState!.IsDirty);
+        Assert.AreEqual(
+            choice == UnsavedChangesChoice.Cancel ? "Local edit" : "External refresh",
+            view.Rows.Single().Name);
+    }
+
+    [TestMethod]
+    [DataRow(UnsavedChangesChoice.Save, 1, 1)]
+    [DataRow(UnsavedChangesChoice.Discard, 0, 1)]
+    [DataRow(UnsavedChangesChoice.Cancel, 0, 0)]
+    public async Task DirtyNonBatchExitHonorsSaveDiscardAndCancel(
+        UnsavedChangesChoice choice,
+        int expectedSaveCount,
+        int expectedCloseCount)
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new("Local", "+15550100100"),
+            CsvSavePath = "saved.csv",
+            UnsavedChoice = choice
+        };
+        var store = new FakeContactCsvStore();
+        if (choice == UnsavedChangesChoice.Save)
+        {
+            store.QueueSave(FakeContactCsvStore.SuccessfulSave("saved.csv"));
+        }
+
+        var controller = CreateWithStore(view, dialogs, store);
+        controller.AddContact();
+
+        await controller.RequestCloseAsync();
+
+        Assert.AreEqual(PendingAction.Exit, dialogs.LastUnsavedPrompt!.Value.Action);
+        Assert.AreEqual(expectedSaveCount, store.SaveRequests.Count);
+        Assert.AreEqual(expectedCloseCount, view.CloseBypassCount);
+        Assert.AreEqual(
+            choice != UnsavedChangesChoice.Save,
+            view.DocumentState!.IsDirty);
+    }
+
+    [TestMethod]
+    public async Task DirtyRefreshAndExitAbortWhenRequestedSaveFails()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new("Local", "+15550100100"),
+            CsvSavePath = "saved.csv",
+            UnsavedChoice = UnsavedChangesChoice.Save,
+            FailureChoice = SaveFailureChoice.Cancel
+        };
+        var store = new FakeContactCsvStore();
+        store.QueueSave(
+            new ContactCsvSaveResult(
+                ContactCsvSaveStatus.IoFailure,
+                "saved.csv",
+                null,
+                null,
+                "save failed"),
+            new ContactCsvSaveResult(
+                ContactCsvSaveStatus.IoFailure,
+                "saved.csv",
+                null,
+                null,
+                "save failed"));
+        var controller = CreateWithStore(view, dialogs, store);
+        controller.AddContact();
+
+        await controller.RefreshContactsAsync();
+        await controller.RequestCloseAsync();
+
+        Assert.AreEqual(2, store.SaveRequests.Count);
+        Assert.AreEqual(0, store.LoadPaths.Count);
+        Assert.AreEqual(0, view.CloseBypassCount);
+        Assert.IsTrue(view.DocumentState!.IsDirty);
+    }
+
+    [TestMethod]
+    public async Task DelayedSaveRejectsDuplicateMutationsAndClose()
+    {
+        var view = new FakeMainView();
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new("One", "+15550100100"),
+            CsvSavePath = "saved.csv"
+        };
+        var store = new FakeContactCsvStore { DelaySave = true };
+        store.QueueSave(FakeContactCsvStore.SuccessfulSave("saved.csv"));
+        var controller = CreateWithStore(view, dialogs, store);
+        controller.AddContact();
+
+        var save = controller.SaveContactsAsync();
+        await store.SaveStarted.Task;
+        Assert.IsFalse(view.InteractionState!.CanAddContact);
+        Assert.IsFalse(view.InteractionState.CanSaveCsv);
+        controller.AddContact();
+        await controller.SaveContactsAsync();
+        await controller.RequestCloseAsync();
+        Assert.AreEqual(1, store.SaveRequests.Count);
+        Assert.AreEqual(1, view.Rows.Count);
+        Assert.AreEqual(0, view.CloseBypassCount);
+
+        store.ReleaseSave();
+        await save;
+    }
+
+    [TestMethod]
+    public async Task ActiveBatchSettlesBeforeDirtyExitGuardAndClosesOnce()
+    {
+        var view = new FakeMainView { MessageText = "hello" };
+        var dialogs = new FakeUserDialogs
+        {
+            ContactResult = new("One", "+15550100100"),
+            CloseChoice = CloseDuringBatchChoice.CancelRemainingAndClose,
+            UnsavedChoice = UnsavedChangesChoice.Discard
+        };
+        var coordinator = new RecordingCoordinator { Delay = true };
+        var controller = CreateWithStore(
+            view,
+            dialogs,
+            new FakeContactCsvStore(),
+            coordinator: coordinator);
+        controller.AddContact();
+        controller.SelectAllEligible();
+        var send = controller.SendAsync(SendScope.Selected);
+        await coordinator.Started.Task;
+
+        var close = controller.RequestCloseAsync();
+        Assert.AreEqual(0, dialogs.UnsavedConfirmationCount);
+        coordinator.Complete(canceled: true);
+        await Task.WhenAll(send, close);
+
+        Assert.AreEqual(1, dialogs.UnsavedConfirmationCount);
+        Assert.AreEqual(PendingAction.Exit, dialogs.LastUnsavedPrompt!.Value.Action);
+        Assert.AreEqual(1, view.CloseBypassCount);
+        await controller.RequestCloseAsync();
+        Assert.AreEqual(1, view.CloseBypassCount);
+    }
+
     private static MainController Create(
         FakeMainView? view = null,
         FakeUserDialogs? dialogs = null,
-        IContactCsvImporter? importer = null,
+        IContactCsvStore? importer = null,
         ISettingsService? settings = null,
         IBatchSendCoordinator? coordinator = null) =>
         new(view ?? new FakeMainView(),
             dialogs ?? new FakeUserDialogs(),
-            importer ?? new StubImporter(new(CsvImportStatus.Success, Array.Empty<ContactRow>(), null)),
+            importer ?? new StubContactCsvStore(new(CsvImportStatus.Success, Array.Empty<ContactRow>(), null)),
             settings ?? new ReadySettingsService(),
             new MessageValidator(),
             coordinator ?? new RecordingCoordinator(),
             new FakeTimeProvider(Now),
             isSafeDemo: true);
+
+    private static MainController CreateWithStore(
+        FakeMainView? view = null,
+        FakeUserDialogs? dialogs = null,
+        IContactCsvStore? store = null,
+        ISettingsService? settings = null,
+        IBatchSendCoordinator? coordinator = null)
+    {
+        var phone = new E164PhoneNumberValidator();
+        var rowValidator = new ContactRowValidator(phone);
+        return new(
+            view ?? new FakeMainView(),
+            dialogs ?? new FakeUserDialogs(),
+            store ?? new FakeContactCsvStore(),
+            settings ?? new ReadySettingsService(),
+            new MessageValidator(),
+            coordinator ?? new RecordingCoordinator(),
+            new FakeTimeProvider(Now),
+            isSafeDemo: true,
+            new ContactDraftValidator(phone),
+            rowValidator);
+    }
 
     private static ContactRow ValidRow(int ordinal) =>
         new(ordinal, $"Person {ordinal}", $"+1555010010{ordinal}", Array.Empty<ContactErrorCode>());
@@ -961,31 +2117,58 @@ public sealed class MainControllerTests
         }
     }
 
-    private sealed class StubImporter(CsvImportResult result) : IContactCsvImporter
+    private sealed record TestLoadResult(
+        CsvImportStatus Status,
+        IReadOnlyList<ContactRow> Rows,
+        string? SafeDiagnostic);
+
+    private sealed class StubContactCsvStore(TestLoadResult result) : IContactCsvStore
     {
         public int CallCount { get; private set; }
-        public Task<CsvImportResult> ImportAsync(string path, CancellationToken cancellationToken)
+        public Task<ContactCsvLoadResult> LoadAsync(
+            string path,
+            CancellationToken cancellationToken)
         {
             CallCount++;
-            return Task.FromResult(result);
+            return Task.FromResult(ToLoadResult(path, result));
         }
+
+        public Task<ContactCsvSaveResult> SaveAsync(
+            ContactCsvSaveRequest request,
+            CancellationToken cancellationToken) =>
+            Task.FromResult(new ContactCsvSaveResult(
+                ContactCsvSaveStatus.IoFailure,
+                null,
+                null,
+                null,
+                "Save is not configured."));
     }
 
-    private sealed class SequenceImporter(params CsvImportResult[] results) : IContactCsvImporter
+    private sealed class SequenceContactCsvStore(params TestLoadResult[] results) : IContactCsvStore
     {
-        private readonly Queue<CsvImportResult> _results = new(results);
+        private readonly Queue<TestLoadResult> _results = new(results);
         public List<string> Paths { get; } = [];
 
-        public Task<CsvImportResult> ImportAsync(
+        public Task<ContactCsvLoadResult> LoadAsync(
             string path,
             CancellationToken cancellationToken)
         {
             Paths.Add(path);
-            return Task.FromResult(_results.Dequeue());
+            return Task.FromResult(ToLoadResult(path, _results.Dequeue()));
         }
+
+        public Task<ContactCsvSaveResult> SaveAsync(
+            ContactCsvSaveRequest request,
+            CancellationToken cancellationToken) =>
+            Task.FromResult(new ContactCsvSaveResult(
+                ContactCsvSaveStatus.IoFailure,
+                null,
+                null,
+                null,
+                "Save is not configured."));
     }
 
-    private sealed class ControllableImporter(CsvImportResult result) : IContactCsvImporter
+    private sealed class ControllableContactCsvStore(TestLoadResult result) : IContactCsvStore
     {
         private readonly TaskCompletionSource _release =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -993,18 +2176,45 @@ public sealed class MainControllerTests
         public TaskCompletionSource Started { get; } =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        public async Task<CsvImportResult> ImportAsync(
+        public async Task<ContactCsvLoadResult> LoadAsync(
             string path,
             CancellationToken cancellationToken)
         {
             CallCount++;
             Started.TrySetResult();
             await _release.Task;
-            return result;
+            return ToLoadResult(path, result);
         }
 
         public void Release() => _release.TrySetResult();
+
+        public Task<ContactCsvSaveResult> SaveAsync(
+            ContactCsvSaveRequest request,
+            CancellationToken cancellationToken) =>
+            Task.FromResult(new ContactCsvSaveResult(
+                ContactCsvSaveStatus.IoFailure,
+                null,
+                null,
+                null,
+                "Save is not configured."));
     }
+
+    private static ContactCsvLoadResult ToLoadResult(
+        string path,
+        TestLoadResult result) =>
+        result.Status == CsvImportStatus.Success
+            ? new(
+                result.Status,
+                path,
+                result.Rows,
+                FakeContactCsvStore.Version(result.Rows.Count, '0'),
+                result.SafeDiagnostic)
+            : new(
+                result.Status,
+                null,
+                Array.Empty<ContactRow>(),
+                null,
+                result.SafeDiagnostic);
 
     private sealed class ReadySettingsService : ISettingsService
     {
@@ -1185,6 +2395,69 @@ public sealed class MainControllerTests
                     request.Recipients[0].ImportOrdinal,
                     RecipientSendState.Succeeded,
                     "SM-UI",
+                    null,
+                    null));
+            }, cancellationToken);
+
+            return new(
+                BatchStartStatus.Completed,
+                new BatchSummary(request.BatchId, 1, 1, 0, 0));
+        }
+
+    }
+
+    private sealed class ImmediateProgressCoordinator : IBatchSendCoordinator
+    {
+        public async Task<BatchRunResult> TryRunAsync(
+            SmsBatchRequest request,
+            IProgress<RecipientProgress> progress,
+            CancellationToken cancellationToken)
+        {
+            foreach (var recipient in request.Recipients)
+            {
+                progress.Report(new(
+                    request.BatchId,
+                    recipient.ImportOrdinal,
+                    RecipientSendState.Succeeded,
+                    $"SM-{recipient.ImportOrdinal}",
+                    null,
+                    null));
+            }
+
+            await Task.Delay(25, cancellationToken);
+            return new BatchRunResult(
+                BatchStartStatus.Completed,
+                new(
+                    request.BatchId,
+                    request.Recipients.Count,
+                    request.Recipients.Count,
+                    0,
+                    0));
+        }
+    }
+
+    private sealed class BackgroundDelayedProgressCoordinator : IBatchSendCoordinator
+    {
+        public async Task<BatchRunResult> TryRunAsync(
+            SmsBatchRequest request,
+            IProgress<RecipientProgress> progress,
+            CancellationToken cancellationToken)
+        {
+            await Task.Run(() =>
+            {
+                var recipient = request.Recipients.Single();
+                progress.Report(new(
+                    request.BatchId,
+                    recipient.ImportOrdinal,
+                    RecipientSendState.Pending,
+                    null,
+                    null,
+                    null));
+                progress.Report(new(
+                    request.BatchId,
+                    recipient.ImportOrdinal,
+                    RecipientSendState.Succeeded,
+                    "SM-DELAYED",
                     null,
                     null));
             }, cancellationToken);

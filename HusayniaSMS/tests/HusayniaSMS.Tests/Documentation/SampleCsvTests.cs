@@ -20,8 +20,8 @@ public sealed class SampleCsvTests
             .All(line => line.Contains("+1202555010", StringComparison.Ordinal)));
 
         var phone = new E164PhoneNumberValidator();
-        var importer = new CsvHelperContactCsvImporter(new ContactRowValidator(phone));
-        var result = await importer.ImportAsync(path, default);
+        var store = new CsvHelperContactCsvStore(new ContactRowValidator(phone));
+        var result = await store.LoadAsync(path, default);
         Assert.AreEqual(CsvImportStatus.Success, result.Status);
         Assert.AreEqual(3, result.Rows.Count);
         Assert.IsTrue(result.Rows.All(row => row.IsEligible));

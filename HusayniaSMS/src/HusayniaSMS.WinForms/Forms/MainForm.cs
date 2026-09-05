@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using HusayniaSMS.Core.Batching;
 using HusayniaSMS.Core.Messaging;
 using HusayniaSMS.Core.Settings;
@@ -16,19 +17,32 @@ public partial class MainForm : Form, IMainView
     private string _savedTokenPlaceholder = string.Empty;
     private bool _savedTokenAvailable;
     private bool _closeBypass;
+    private int _checkedRecipientUpdateDepth;
 
-    public MainForm(bool isSafeDemo)
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public MainForm()
     {
         InitializeComponent();
+    }
+
+    public MainForm(bool isSafeDemo)
+        : this()
+    {
         safeDemoBanner.Visible = isSafeDemo;
     }
 
     public string MessageText => messageTextBox.Text;
 
-    public IReadOnlyList<int> SelectedOrdinals =>
+    public IReadOnlyList<int> CheckedRecipientOrdinals =>
         contactsGrid.Rows.Cast<DataGridViewRow>()
             .Where(row => row.Tag is ContactGridRowViewModel &&
                 Convert.ToBoolean(row.Cells[selectedColumn.Index].Value))
+            .Select(row => ((ContactGridRowViewModel)row.Tag!).ImportOrdinal)
+            .ToArray();
+
+    public IReadOnlyList<int> HighlightedContactOrdinals =>
+        contactsGrid.SelectedRows.Cast<DataGridViewRow>()
+            .Where(row => row.Tag is ContactGridRowViewModel)
             .Select(row => ((ContactGridRowViewModel)row.Tag!).ImportOrdinal)
             .ToArray();
 
@@ -70,34 +84,96 @@ public partial class MainForm : Form, IMainView
         };
     }
 
-    public void ReplaceContacts(IReadOnlyList<ContactGridRowViewModel> rows)
+    private void PopulateContacts(IReadOnlyList<ContactGridRowViewModel> rows)
     {
         contactsGrid.Rows.Clear();
         foreach (var item in rows)
         {
-            var index = contactsGrid.Rows.Add(item.IsSelected, item.Name, item.Number,
-                item.ValidationText, item.SafeMessage ?? string.Empty, FormatResult(item));
+            var index = contactsGrid.Rows.Add(
+                item.IsCheckedRecipient,
+                item.Name,
+                item.Number,
+                item.CanCheckRecipient ? "Valid" : "Invalid",
+                item.CanCheckRecipient ? string.Empty : item.ValidationText,
+                FormatResult(item));
             var row = contactsGrid.Rows[index];
             row.Tag = item;
-            row.Cells[selectedColumn.Index].ReadOnly = !item.CanSelect;
-            if (!item.CanSelect)
+            row.Cells[selectedColumn.Index].ReadOnly = !item.CanCheckRecipient;
+            if (!item.CanCheckRecipient)
             {
                 row.DefaultCellStyle.BackColor = Color.MistyRose;
             }
         }
 
         contactsStatusLabel.Text =
-            $"{rows.Count} contact(s), {rows.Count(row => row.CanSelect)} valid.";
+            $"{rows.Count} contact(s), {rows.Count(row => row.CanCheckRecipient)} valid.";
     }
 
-    public void ApplySelection(IReadOnlySet<int> selectedOrdinals)
+    private void SetCheckedRecipients(
+        IReadOnlySet<int> checkedOrdinals,
+        bool notifyController)
+    {
+        _checkedRecipientUpdateDepth++;
+        contactsGrid.SuspendLayout();
+        try
+        {
+            foreach (DataGridViewRow row in contactsGrid.Rows)
+            {
+                if (row.Tag is ContactGridRowViewModel item)
+                {
+                    row.Cells[selectedColumn.Index].Value =
+                        item.CanCheckRecipient && checkedOrdinals.Contains(item.ImportOrdinal);
+                }
+            }
+        }
+        finally
+        {
+            contactsGrid.ResumeLayout(performLayout: false);
+            _checkedRecipientUpdateDepth--;
+        }
+
+        if (notifyController)
+        {
+            _controller?.CheckedRecipientsChanged();
+        }
+    }
+
+    public void RenderDocumentState(ContactDocumentViewState state)
+    {
+        PopulateContacts(state.Rows);
+        SetCheckedRecipients(state.CheckedRecipientOrdinals, notifyController: false);
+        var highlighted = state.HighlightedContactOrdinals;
+        contactsGrid.ClearSelection();
+        foreach (DataGridViewRow row in contactsGrid.Rows)
+        {
+            if (row.Tag is ContactGridRowViewModel item &&
+                highlighted.Contains(item.ImportOrdinal))
+            {
+                row.Selected = true;
+            }
+        }
+
+        Text = $"Husaynia SMS — {state.DisplayName}{(state.IsDirty ? "*" : string.Empty)}";
+        var valid = state.Rows.Count(row => row.CanCheckRecipient);
+        contactsStatusLabel.Text =
+            $"{state.DisplayName}: {state.Rows.Count} contact(s), {valid} valid, {state.Rows.Count - valid} invalid." +
+            (state.IsDirty ? " Unsaved changes." : string.Empty);
+    }
+
+    public void ApplyCheckedRecipients(IReadOnlySet<int> checkedOrdinals) =>
+        SetCheckedRecipients(checkedOrdinals, notifyController: true);
+
+    public void FocusContact(int ordinal)
     {
         foreach (DataGridViewRow row in contactsGrid.Rows)
         {
-            if (row.Tag is ContactGridRowViewModel item)
+            if (row.Tag is ContactGridRowViewModel item &&
+                item.ImportOrdinal == ordinal)
             {
-                row.Cells[selectedColumn.Index].Value =
-                    item.CanSelect && selectedOrdinals.Contains(item.ImportOrdinal);
+                contactsGrid.ClearSelection();
+                row.Selected = true;
+                contactsGrid.CurrentCell = row.Cells[1];
+                return;
             }
         }
     }
@@ -118,6 +194,10 @@ public partial class MainForm : Form, IMainView
         saveSetupButton.Enabled = state.CanSaveSetup;
         importButton.Enabled = state.CanImport;
         refreshButton.Enabled = state.CanRefresh;
+        addContactButton.Enabled = state.CanAddContact;
+        editContactButton.Enabled = state.CanEditContact;
+        deleteSelectedButton.Enabled = state.CanDeleteContacts;
+        saveCsvButton.Enabled = state.CanSaveCsv;
         selectAllButton.Enabled = state.CanChangeSelection;
         clearSelectionButton.Enabled = state.CanChangeSelection;
         selectedColumn.ReadOnly = !state.CanChangeSelection;
@@ -174,7 +254,7 @@ public partial class MainForm : Form, IMainView
         applicationStatusLabel.Text = message;
     }
 
-    public void CloseWithBypass()
+    public void CloseAfterControllerApproval()
     {
         _closeBypass = true;
         Close();
@@ -253,6 +333,45 @@ public partial class MainForm : Form, IMainView
         }
     }
 
+    private void AddContactButton_Click(object? sender, EventArgs e) =>
+        _controller?.AddContact();
+
+    private void EditContactButton_Click(object? sender, EventArgs e) =>
+        _controller?.EditContact();
+
+    private void DeleteSelectedButton_Click(object? sender, EventArgs e) =>
+        _controller?.DeleteSelectedContacts();
+
+    private async void SaveCsvButton_Click(object? sender, EventArgs e)
+    {
+        if (_controller is not null)
+        {
+            await _controller.SaveContactsAsync();
+        }
+    }
+
+    private void ContactsGrid_CurrentCellDirtyStateChanged(object? sender, EventArgs e)
+    {
+        if (contactsGrid.IsCurrentCellDirty &&
+            contactsGrid.CurrentCell?.ColumnIndex == selectedColumn.Index)
+        {
+            contactsGrid.CommitEdit(DataGridViewDataErrorContexts.Commit);
+        }
+    }
+
+    private void ContactsGrid_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
+    {
+        if (_checkedRecipientUpdateDepth == 0 &&
+            e.RowIndex >= 0 &&
+            e.ColumnIndex == selectedColumn.Index)
+        {
+            _controller?.CheckedRecipientsChanged();
+        }
+    }
+
+    private void ContactsGrid_SelectionChanged(object? sender, EventArgs e) =>
+        _controller?.GridHighlightChanged();
+
     private void SelectAllButton_Click(object? sender, EventArgs e) => _controller?.SelectAllEligible();
     private void ClearSelectionButton_Click(object? sender, EventArgs e) => _controller?.ClearSelection();
     private void MessageTextBox_TextChanged(object? sender, EventArgs e) => _controller?.MessageChanged();
@@ -277,12 +396,18 @@ public partial class MainForm : Form, IMainView
 
     private async void MainForm_FormClosing(object? sender, FormClosingEventArgs e)
     {
-        if (_closeBypass || _controller is null || !_controller.IsBatchActive)
+        if (_controller is null)
         {
             return;
         }
 
+        if (_closeBypass)
+        {
+            _closeBypass = false;
+            return;
+        }
+
         e.Cancel = true;
-        await _controller.HandleActiveCloseRequestAsync();
+        await _controller.RequestCloseAsync();
     }
 }

@@ -11,4 +11,24 @@
     <PackageReference Include="System.Security.Cryptography.ProtectedData" />
     <PackageReference Include="Twilio" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Forms\ContactDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\ContactDialog.Designer.cs">
+      <DependentUpon>ContactDialog.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="Forms\ContactDialog.resx">
+      <DependentUpon>ContactDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <Compile Update="Forms\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="Forms\MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>

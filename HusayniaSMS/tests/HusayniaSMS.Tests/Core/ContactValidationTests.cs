@@ -66,5 +66,22 @@ public sealed class ContactValidationTests
         Assert.IsTrue(rows.All(row => !row.Errors.Contains(ContactErrorCode.DuplicateNumber)));
     }
 
+    [TestMethod]
+    [DataRow("=HYPERLINK(\"https://example.invalid\")")]
+    [DataRow(" +SUM(1,1)")]
+    [DataRow("\t-1+1")]
+    [DataRow("\u0001@command")]
+    public void FormulaPrefixNamesAreRejectedAfterControlWhitespaceNormalization(string name)
+    {
+        var row = Validator().Validate(
+            [new ContactInput(1, name, "+15550100100")]).Single();
+
+        Assert.IsFalse(row.IsEligible);
+        CollectionAssert.Contains(
+            row.Errors.ToArray(),
+            ContactErrorCode.FormulaPrefixNotAllowed);
+        Assert.IsTrue("=+-@".Contains(row.Name[0], StringComparison.Ordinal));
+    }
+
     private ContactRowValidator Validator() => new(_phone);
 }

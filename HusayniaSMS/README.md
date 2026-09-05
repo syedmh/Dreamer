@@ -110,8 +110,41 @@ spaces, and tolerates a UTF-8 BOM. Additional uniquely named columns are ignored
 Use **Import CSV** to browse for a file. The chosen path is remembered only after the complete CSV
 has imported successfully and the local settings update succeeds; canceling the chooser, a CSV
 failure, or a settings-write failure leaves the previous remembered path and grid unchanged. Use
-**Refresh** to reload exactly that remembered path without opening the file chooser. If no path has
-been remembered, the app explains that a successful import is required first.
+**Refresh** to reload the current document path, or the remembered path after restart, without
+opening the file chooser. If no path is available, use Import CSV or save a new document first.
+
+## Add, edit, delete, and explicitly save contacts
+
+Contact cells remain read-only. Use the modal contact editor instead:
+
+- **Add Contact** opens a blank Name/Number dialog and is available before any CSV is loaded. The
+  new contact is appended in memory and highlighted, but it is not written to disk automatically.
+- **Edit Contact** requires exactly one highlighted grid row. A Name-only change preserves that
+  row's checked-recipient state and latest send result. Changing Number clears that row's check and
+  stale result.
+- **Delete Selected** acts on highlighted rows, not checked recipients. It supports multiple
+  highlighted rows and always asks for confirmation with the exact count; **No** is the default.
+- **Save CSV** explicitly persists the current visual order. The first save of an untitled document
+  uses **Save As**. Deleting every row and saving produces a header-only CSV.
+
+Checked boxes continue to control SMS recipient selection. Blue/highlighted rows independently
+control Edit Contact and Delete Selected. Highlighting a row never checks it for sending, and
+checking a row never selects it for editing or deletion.
+
+The editor trims surrounding whitespace and control characters from both fields, requires a Name
+and Number, applies the existing E.164 rule, and rejects a number already used by another row while
+excluding the row currently being edited. Names whose normalized first character is `=`, `+`, `-`,
+or `@` are rejected rather than silently altered, preventing saved contact names from becoming
+spreadsheet formulas. Imported invalid and duplicate rows remain visible so they can be repaired or
+deleted. The complete document is revalidated after every add, edit, or delete. **Save CSV** is
+blocked until every remaining row is valid and unique, but valid in-memory rows can still be checked
+and sent before saving.
+
+An asterisk in the window title and **Unsaved changes.** in contact status indicate a dirty
+in-memory document. Before Import, Refresh, or Exit, the app offers **Save / Discard / Cancel**.
+Save must complete before the pending action continues. Discard does not clear the current document
+until the replacement CSV loads successfully, so a canceled chooser or failed load leaves local
+changes intact. Exit first settles an active send, then applies the same dirty guard.
 
 CsvHelper handles quoted commas, escaped quotes (`""`), and quoted line breaks. Name and number
 values are trimmed. Invalid rows remain visible but cannot be selected or sent. Blank names, blank
@@ -120,6 +153,35 @@ first row is eligible and later rows are marked duplicate. A malformed/unreadabl
 replace the current grid. A header-only file successfully replaces the grid with zero contacts.
 Imports above 100,000 logical records, 10 MiB per file, 256 characters per header, or 4,096
 characters per field are rejected without partial replacement.
+
+Saved files always use strict UTF-8 without a BOM, exact `Name,Number` headers, normal CsvHelper
+quoting, and the grid's current visual order. Contact ordinals, checks, highlights, and send results
+are session-only and never enter CSV bytes. Save enforces the same 100,000-record, 10 MiB serialized
+UTF-8, and 4,096-character field limits before touching the destination.
+
+CSV saving is conflict-safe and fail-closed. The app compares the loaded file's length, UTC
+last-write time, and SHA-256 immediately before committing a sibling temporary file. The temporary
+file receives the existing destination's protected access rules, or a protected current-user-only
+access rule for a new destination, before contact bytes are written. Existing files are committed
+only with atomic replacement; new files use a non-overwriting atomic move. The exact saved version
+is computed from the flushed temporary bytes and timestamp before that final commit, so no
+cancelable fingerprint read occurs after the destination changes. The app never truncates the
+original, deletes it before moving, or silently overwrites an external change.
+
+- If the file changed externally, choose **Reload External**, **Overwrite This Version**,
+  **Save As**, or **Cancel**.
+- If it was deleted externally, choose **Recreate**, **Save As**, or **Cancel**.
+- If a Save As target appeared, choose **Overwrite This Version**, **Choose Another**, or
+  **Cancel**.
+- If access is denied, the target is read-only, an I/O failure occurs, or Atomic replacement is
+  unavailable on the filesystem/share, choose **Save As** or **Cancel**.
+
+Every overwrite is tied to the version the user explicitly chose; another external change prompts
+again. Any canceled or failed save leaves the in-memory rows, current path/version, checks,
+highlights, results, and dirty state unchanged. If the CSV save succeeds but saving its remembered
+path in settings fails, the document remains clean and usable at the new path for this session; a
+warning explains that Refresh after restart might not remember it. A temporary-file cleanup problem
+is also surfaced with a safe warning without changing an already committed save into a failure.
 
 A successful Refresh transactionally replaces the grid and clears prior send results. Checked
 recipients are preserved when the refreshed CSV still contains an eligible row with the same
@@ -141,11 +203,12 @@ preserves the current contacts, checked selections, displayed results, and remem
   or trailing whitespace, is sent unchanged.
 
 Recipients are attempted sequentially, with one request in flight and one active batch. Interactions
-that could overlap setup, import, refresh, initialization, send preflight, or an active batch are
-serialized; Import and Refresh cannot queue or overlap each other. Message editing and other
-batch-mutating controls stay disabled throughout send preflight and the active batch. Cancel and
-window processing remain available during the active batch. Repeated activation cannot queue a
-second batch. There are no automatic retries: a timeout might have reached Twilio, so a retry could
+that could overlap setup, Import, Refresh, Add/Edit/Delete dialogs, Save CSV, initialization, send
+preflight, or an active batch are serialized; duplicate mutations do not queue. Message editing and
+all contact mutation/persistence controls stay disabled throughout send preflight and the active
+batch. Cancel and window processing remain available during the active batch. The confirmed
+recipient/message/credential snapshot is immutable even if local contacts are later edited after
+settlement. There are no automatic retries: a timeout might have reached Twilio, so a retry could
 duplicate an SMS.
 
 Production mode uses the official Twilio SDK and may create billable live messages after
