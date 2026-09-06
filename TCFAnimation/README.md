@@ -218,12 +218,12 @@ falling back to a different timing.
 | Key | Default | Controls |
 |---|---:|---|
 | `turnFps` | 8 | Left/right turn frame rate |
-| `walkFps` | 6 | Normal and scripted walking frame rate |
+| `walkFps` | 8 | Normal and scripted walking frame rate |
 | `clapFps` | 8 | Manual, school, and celebration clap frame rate |
 | `crossArmFps` | 8 | Cross-arm entry frame rate |
 | `crossArmReleaseFps` | 8 | Cross-arm release frame rate |
-| `avatarEntrySeconds` | 6 | E travel time from fully offscreen right to center |
-| `avatarExitFullSpanSeconds` | 6 | D travel time for a full offscreen-left to offscreen-right span; nearer-edge exits scale by distance |
+| `avatarEntrySeconds` | 8 | E travel time from fully offscreen right to center |
+| `avatarExitFullSpanSeconds` | 8 | D travel time for a full offscreen-left to offscreen-right span; nearer-edge exits scale by distance |
 | `neonIntensity` | 0.7 | Base brightness multiplier for the complete neon sign |
 | `neonHueCycleSeconds` | 8 | Time for one complete logo-and-line color cycle |
 | `neonPulseSeconds` | 2.5 | Time for one complete neon brightness pulse |
@@ -232,7 +232,7 @@ falling back to a different timing.
 | `schoolClapSeconds` | 10 | School arrival clapping |
 | `schoolBackgroundNormalizationSeconds` | 8 | Full-span interrupted-entry normalization |
 | `schoolExitSeconds` | 8 | School background exit and Avatar return |
-| `celebrationWalkSeconds` | 6 | Full-width F celebration walk |
+| `celebrationWalkSeconds` | 8 | Full-width F celebration walk |
 | `celebrationClapSeconds` | 30 | F celebration clapping |
 | `fireworksSpawnIntervalSeconds` | 0.48 | Delay between firework bursts |
 | `fireworksBurstSeconds` | 1.7 | Lifetime of each firework burst |
@@ -586,8 +586,8 @@ layer with its 128×102 transparent texture, and exits successfully
 only after printing:
 
 ```text
-ANIMATION_CONFIG_LOAD_PASS avatar_entry=6 avatar_exit_full_span=6 neon_intensity=0.7 neon_hue_cycle=8 neon_pulse=2.5 school_entry=8 school_clap=10 celebration_clap=30 logo_rain_spawn=10
-RUNTIME_SMOKE_PASS character_textures=66 school_backgrounds=6 dimensions=1908x824,1536x1024,1540x1021,1540x1021,1540x1021,1540x1021 dialogue_ui=true action_messages=8 legend_entries=19 initial_blank=true neon_background=true neon_animation_default=false neon_color_cycle_default=false neon_text_color=white neon_intensity=0.7 neon_scale=0.75 neon_top=48 neon_texture=2062x763 neon_hue_cycle_seconds=8 neon_pulse_seconds=2.5 avatar_entry_seconds=6 avatar_exit_full_span_seconds=6 celebration_seconds=30 fireworks_layer=true logo_rain_seconds=10 logo_texture=128x102 viewport_fit=1920x1080:CanvasItems:Keep
+ANIMATION_CONFIG_LOAD_PASS avatar_entry=8 avatar_exit_full_span=8 neon_intensity=0.7 neon_hue_cycle=8 neon_pulse=2.5 school_entry=8 school_clap=10 celebration_clap=30 logo_rain_spawn=10
+RUNTIME_SMOKE_PASS character_textures=66 school_backgrounds=6 dimensions=1908x824,1536x1024,1540x1021,1540x1021,1540x1021,1540x1021 dialogue_ui=true action_messages=8 legend_entries=19 initial_blank=true neon_background=true neon_animation_default=false neon_color_cycle_default=false neon_text_color=white neon_intensity=0.7 neon_scale=0.75 neon_top=48 neon_texture=2062x763 neon_hue_cycle_seconds=8 neon_pulse_seconds=2.5 avatar_entry_seconds=8 avatar_exit_full_span_seconds=8 celebration_seconds=30 fireworks_layer=true logo_rain_seconds=10 logo_texture=128x102 viewport_fit=1920x1080:CanvasItems:Keep
 ```
 
 Deterministic developer capture snapshots use

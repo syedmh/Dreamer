@@ -34,7 +34,7 @@ Console.WriteLine(
     + "left_walk_6_frames=true right_walk_6_frames=true "
     + "left_edge_latch=true right_edge_latch=true "
     + "geometry_extrema=74,437 geometry_centers=227.5,1693.75 "
-    + "fps_turn=8 fps_left_walk=6 fps_right_walk=6 "
+    + "fps_turn=8 fps_left_walk=8 fps_right_walk=8 "
     + "adjustable_walk_speed=true "
     + "clap_6_frames=true clap_15_steps=true fps_clap=8 clap_one_shot=true "
     + "clap_interruptible=true "
@@ -447,7 +447,8 @@ static void RunSchoolSceneCases()
     AssertEqual(
         "entry uses six-frame walk cadence",
         scene.CurrentAnimationFrame,
-        0);
+        (int)(4.0 * AnimationConfig.Current.WalkFps)
+            % DirectionalTurnStateMachine.LeftWalkFrameCount);
 
     scene.Advance(4.0);
     AssertEqual(
@@ -2211,7 +2212,8 @@ static void RunValidationCases()
         turn.Advance(
             true,
             false,
-            1_000_000.0 + turn.LeftWalkFrameDurationSeconds * 1.5));
+            turn.LeftWalkFrameDurationSeconds
+                * (6_000_000.0 + 1.5)));
     AssertWalk("large left walk endpoint", turn, TurnDirection.Left, 1);
 
     turn = EnterWalk(TurnDirection.Right);
@@ -2220,7 +2222,8 @@ static void RunValidationCases()
         turn.Advance(
             false,
             true,
-            1_000_000.0 + turn.RightWalkFrameDurationSeconds * 4.5));
+            turn.RightWalkFrameDurationSeconds
+                * (6_000_000.0 + 4.5)));
     AssertWalk("large right walk endpoint", turn, TurnDirection.Right, 4);
 }
 
