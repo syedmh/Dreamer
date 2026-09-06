@@ -22,6 +22,26 @@ node server.mjs --port=8081
 
 Open the port printed by the server.
 
+### Windows command line
+
+Build a validated, runnable distribution in `dist`:
+
+```cmd
+build.bat
+```
+
+Build and launch the distribution:
+
+```cmd
+run.bat
+```
+
+Server arguments are forwarded by `run.bat`, so an alternate port can be used:
+
+```cmd
+run.bat --port=8081
+```
+
 ## Configure
 
 URL parameters:
@@ -37,10 +57,11 @@ Keyboard controls:
 - `Space` — show or hide both keyboard legends
 - `C` — show or hide the operator controls
 - `D` — start or pause the 90-second demo
-- `E` — switch between day and night
-- `T` — start or stop visible students clapping
-- `Y` — show or hide student “Thank You” messages after the goal
-- `R` — add a kite to the sky
+- `N` — switch between day and night
+- `O` — start or stop visible students clapping
+- `P` — show or hide student “Thank You” messages after the goal
+- `K` — add a kite to the sky
+- `L` — remove all kites
 - Arrow keys — adjust by 1% of goal
 - Shift + Arrow keys — adjust by 5% of goal
 - `Home` — set 0%

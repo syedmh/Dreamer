@@ -725,10 +725,17 @@ function createKiteController(root, sceneSvg, sceneDescription, sceneDescription
     return kiteCount;
   }
 
+  function clearKites() {
+    layer.replaceChildren();
+    occupiedBounds.length = 0;
+    updateKiteDescription(0);
+  }
+
   updateKiteDescription(0);
 
   return Object.freeze({
-    addKite
+    addKite,
+    clearKites
   });
 }
 
@@ -2268,6 +2275,7 @@ export function createFundraiserView(root, scene, config) {
     addFirework: fireworkController.addFirework,
     clearFireworks: fireworkController.clearFireworks,
     addKite: kiteController.addKite,
+    clearKites: kiteController.clearKites,
     setNightMode,
     setStudentsClapping,
     setThankYouVisible,

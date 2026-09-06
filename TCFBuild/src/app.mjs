@@ -183,7 +183,11 @@ function isEditingTarget(target) {
 }
 
 function isKiteKey(event) {
-  return String(event.key).toLowerCase() === "r";
+  return String(event.key).toLowerCase() === "k";
+}
+
+function isClearKitesKey(event) {
+  return String(event.key).toLowerCase() === "l";
 }
 
 function isControlsKey(event) {
@@ -205,15 +209,15 @@ function isFullscreenKey(event) {
 }
 
 function isNightKey(event) {
-  return String(event.key).toLowerCase() === "e";
+  return String(event.key).toLowerCase() === "n";
 }
 
 function isClappingKey(event) {
-  return String(event.key).toLowerCase() === "t";
+  return String(event.key).toLowerCase() === "o";
 }
 
 function isThankYouKey(event) {
-  return String(event.key).toLowerCase() === "y";
+  return String(event.key).toLowerCase() === "p";
 }
 
 function formatKiteAnnouncement(count) {
@@ -343,6 +347,14 @@ document.addEventListener("keydown", (event) => {
 }, true);
 
 document.addEventListener("keydown", (event) => {
+  if (!isClearKitesKey(event)) return;
+  if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
+  event.preventDefault();
+  view.clearKites();
+  announcer.textContent = "All kites removed.";
+}, true);
+
+document.addEventListener("keydown", (event) => {
   if (!isFireworkKey(event)) return;
   if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
   event.preventDefault();
@@ -408,6 +420,7 @@ document.addEventListener("keydown", (event) => {
   const editing = isEditingTarget(event.target);
   if (isControlsKey(event)) return;
   if (isKiteKey(event)) return;
+  if (isClearKitesKey(event)) return;
   if (
     isFireworkKey(event)
     || isContinuousFireworksKey(event)
