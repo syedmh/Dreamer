@@ -17,9 +17,21 @@ export function deriveProgress(raised, goal, overGoalRamp = 0.25) {
     : 0.25;
   const completionRatio = 1 + safeRamp;
   const completionRaised = safeGoal * completionRatio;
-  const donationRatio = safeRaised === completionRaised
-    ? completionRatio
-    : Math.min(Number.MAX_VALUE, Math.max(0, safeRaised / safeGoal));
+  const busStartRatio = 1.25;
+  const busStartRaised = safeGoal * busStartRatio;
+  const busMidpointRatio = 1.30;
+  const busMidpointRaised = safeGoal * busMidpointRatio;
+  const busCompletionRatio = 1.35;
+  const busCompletionRaised = safeGoal * busCompletionRatio;
+  const donationRatio = safeRaised === busCompletionRaised
+    ? busCompletionRatio
+    : safeRaised === busMidpointRaised
+      ? busMidpointRatio
+      : safeRaised === busStartRaised
+        ? busStartRatio
+        : safeRaised === completionRaised
+          ? completionRatio
+          : Math.min(Number.MAX_VALUE, Math.max(0, safeRaised / safeGoal));
   return {
     donationRatio,
     buildingRatio: clamp(donationRatio),
@@ -39,7 +51,14 @@ export function deriveProgress(raised, goal, overGoalRamp = 0.25) {
       donationRatio,
       1 + .68 * safeRamp,
       .32 * safeRamp
-    )
+    ),
+    busRatio: donationRatio <= busStartRatio
+      ? 0
+      : donationRatio >= busCompletionRatio
+        ? 1
+        : donationRatio === busMidpointRatio
+          ? .5
+          : (donationRatio - busStartRatio) / .10
   };
 }
 

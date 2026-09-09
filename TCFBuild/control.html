@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#075f38">
+  <title>TCF Fundraiser Control Dashboard</title>
+  <link rel="icon" href="/favicon.ico" type="image/png">
+  <link rel="stylesheet" href="/control.css">
+</head>
+<body>
+  <main class="dashboard">
+    <header class="dashboard-header">
+      <img src="/Logo.png" alt="" width="86" height="66">
+      <div>
+        <p class="eyebrow">THE CITIZENS FOUNDATION</p>
+        <h1>Fundraiser control dashboard</h1>
+        <p>Controls the separate school display live.</p>
+      </div>
+    </header>
+
+    <section class="status-card" aria-label="Connection status">
+      <span id="server-indicator" class="indicator" data-state="connecting">Dashboard connecting…</span>
+      <span id="display-indicator" class="indicator" data-state="offline">Display not connected</span>
+      <span id="operation-status" role="status" aria-live="polite">Waiting for live state.</span>
+    </section>
+
+    <form id="progress-form" class="card">
+      <h2>Fundraiser progress</h2>
+      <div class="amount-grid">
+        <label>Raised
+          <input id="raised-input" name="raised" type="number" min="0" max="9007199254740991" step="any" required>
+        </label>
+        <label>Goal
+          <input id="goal-input" name="goal" type="number" min="0.01" max="6671999447956289" step="any" required>
+        </label>
+      </div>
+      <label class="slider-label">Quick progress
+        <input id="raised-slider" type="range" min="0" max="135000" step="any">
+      </label>
+      <button class="primary" type="submit">Apply raised and goal</button>
+    </form>
+
+    <section class="card">
+      <h2>Display state</h2>
+      <div class="toggle-grid">
+        <button id="demo-toggle" class="toggle" type="button" aria-pressed="false">Start demo</button>
+        <button id="night-toggle" class="toggle" type="button" aria-pressed="false">Switch to night</button>
+        <button id="clapping-toggle" class="toggle" type="button" aria-pressed="false">Start clapping</button>
+        <button id="thank-you-toggle" class="toggle" type="button" aria-pressed="true">Hide thank-you bubbles</button>
+        <button id="continuous-toggle" class="toggle" type="button" aria-pressed="false">Start continuous fireworks</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>One-time effects</h2>
+      <div class="action-grid">
+        <button type="button" data-action="kite.add">Add kite</button>
+        <button type="button" data-action="kite.clear">Clear kites</button>
+        <button type="button" data-action="firework.launch">Launch firework</button>
+        <button type="button" data-action="firework.clear">Clear fireworks</button>
+        <button type="button" data-action="school.add">Drop next school</button>
+        <button type="button" data-action="school.remove">Remove last school</button>
+      </div>
+      <p class="note">One-time effects require an open display. Fullscreen is display-local; press <kbd>F</kbd> on the display keyboard.</p>
+    </section>
+  </main>
+  <script type="module" src="/src/control.mjs"></script>
+</body>
+</html>

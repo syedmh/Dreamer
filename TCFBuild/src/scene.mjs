@@ -43,7 +43,8 @@ const CAMPUS_GEOMETRY = deepFreeze({
     }
   },
   swings: {
-    bounds: { left: 20, right: 145, top: 490, bottom: 660 },
+    offsetY: 45,
+    bounds: { left: 20, right: 145, top: 535, bottom: 705 },
     ground: {
       cx: 82,
       cy: 646,
@@ -82,6 +83,86 @@ const CAMPUS_GEOMETRY = deepFreeze({
       { x: 86, y: 506, color: "#FFF7DF" },
       { x: 107, y: 500, color: "#D54843" }
     ]
+  },
+  distantSchools: [
+    {
+      slot: 1,
+      x: 18,
+      baseY: 571,
+      scale: .54,
+      bounds: { left: 18, right: 61.2, top: 518.08, bottom: 571 }
+    },
+    {
+      slot: 2,
+      x: 82,
+      baseY: 555,
+      scale: .5,
+      bounds: { left: 82, right: 122, top: 506, bottom: 555 }
+    },
+    {
+      slot: 3,
+      x: 325,
+      baseY: 559,
+      scale: .56,
+      bounds: { left: 325, right: 369.8, top: 504.12, bottom: 559 }
+    },
+    {
+      slot: 4,
+      x: 390,
+      baseY: 578,
+      scale: .52,
+      bounds: { left: 390, right: 431.6, top: 527.04, bottom: 578 }
+    }
+  ],
+  trees: [
+    { x: 230, y: 520, scale: 1.1, trunkHeight: 76 },
+    { x: 1420, y: 590, scale: 1, trunkHeight: 98 },
+    { x: 1330, y: 640, scale: .65, trunkHeight: 98 }
+  ],
+  bus: {
+    bounds: { left: 165, right: 530, top: 630, bottom: 775 },
+    artworkOffset: { x: 0, y: -60 },
+    startOffset: { x: -600, y: 25 },
+    startBounds: { left: -435, right: -70, top: 655, bottom: 800 },
+    routeDistance: Math.hypot(600, 25),
+    wheels: [
+      { cx: 235, cy: 805, r: 30 },
+      { cx: 475, cy: 805, r: 30 }
+    ],
+    body: {
+      x: 169,
+      y: 732,
+      width: 339,
+      height: 73,
+      strokeWidth: 4
+    },
+    cabin: {
+      path: "M185 730 V722 Q185 716 191 716 H225 L250 702 Q259 698 270 698 H465 Q478 698 478 712 V732 H185 Z",
+      bounds: { left: 183, right: 480, top: 696, bottom: 732 }
+    },
+    hood: {
+      path: "M476 751 H509 Q520 751 523 760 L529 782 V805 H476 Z",
+      bounds: { left: 476, right: 530, top: 750, bottom: 807 }
+    },
+    windows: [
+      { x: 194, y: 720, width: 27, height: 25 },
+      { x: 226, y: 716, width: 27, height: 29 },
+      { x: 258, y: 710, width: 27, height: 35 },
+      { x: 290, y: 710, width: 27, height: 35 },
+      { x: 322, y: 710, width: 27, height: 35 },
+      { x: 354, y: 710, width: 27, height: 35 },
+      { x: 386, y: 710, width: 27, height: 35 }
+    ],
+    windshield: {
+      path: "M445 710 H465 Q473 710 473 719 V745 H445 Z"
+    },
+    door: { x: 421, y: 712, width: 30, height: 83 },
+    rails: [
+      { x: 174, y: 758, width: 334, height: 4 },
+      { x: 174, y: 782, width: 334, height: 4 }
+    ],
+    studs: [262, 290, 318, 346, 374, 402, 430, 458],
+    stopSign: { cx: 443, cy: 752, r: 10 }
   }
 });
 
@@ -341,10 +422,10 @@ export function createTeacherLayout() {
     {
       id: "teacher-0",
       index: 0,
-      x: 500,
-      y: 704,
+      x: 550,
+      y: 698,
       scale: 1.08,
-      transform: "translate(500 704) scale(1.08)",
+      transform: "translate(550 698) scale(1.08)",
       bounds: { left: -16, right: 16, top: -68, bottom: 0 },
       clothing: "#0A713E",
       accent: "#F0A533",

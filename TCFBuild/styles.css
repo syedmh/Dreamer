@@ -183,7 +183,7 @@ body { display: grid; place-items: center; }
   z-index: 5;
   left: 2.2%;
   right: auto;
-  bottom: 1.8%;
+  bottom: 1.5%;
   margin: 0;
   color: rgb(255 247 223 / .9);
   font-size: clamp(9px, .75cqw, 26px);
@@ -199,34 +199,6 @@ kbd {
   font: inherit;
   font-weight: 900;
 }
-
-.operator-panel {
-  position: absolute;
-  z-index: 10;
-  left: 2.2%;
-  right: auto;
-  bottom: 5.5%;
-  width: clamp(280px, 20cqw, 340px);
-  min-width: 0;
-  padding: 18px;
-  border: 1px solid rgb(255 255 255 / .7);
-  border-radius: 18px;
-  color: var(--cream);
-  background: rgb(23 53 42 / .95);
-  box-shadow: 0 18px 55px rgb(0 0 0 / .35);
-  backdrop-filter: blur(12px);
-}
-
-.operator-panel form { display: grid; gap: 11px; }
-.operator-panel label { display: grid; grid-template-columns: 70px 1fr; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; }
-.operator-panel .slider-label { grid-template-columns: 1fr; }
-.operator-panel input { min-width: 0; width: 100%; accent-color: #1cc06e; }
-.operator-panel input[type="number"] { padding: 7px 9px; border: 1px solid rgb(255 255 255 / .22); border-radius: 7px; color: var(--cream); background: rgb(255 255 255 / .08); font: inherit; }
-
-.control-heading { display: flex; justify-content: space-between; align-items: center; }
-#close-controls { width: 30px; height: 30px; border: 0; border-radius: 50%; color: var(--cream); background: rgb(255 255 255 / .1); font-size: 22px; cursor: pointer; }
-.apply-button { padding: 9px 14px; border: 0; border-radius: 9px; color: white; background: var(--green); font-weight: 850; cursor: pointer; }
-.shortcuts { margin: 0; color: rgb(255 247 223 / .7); font-size: 10px; line-height: 1.35; }
 
 .cloud {
   animation: cloud-drift var(--cloud-duration, 42s) linear infinite;
@@ -276,6 +248,82 @@ kbd {
 
 #school-scene.is-night .cloud {
   filter: brightness(.72) saturate(.7);
+}
+
+.school-blueprint {
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity 600ms ease;
+}
+
+.school-blueprint-fill {
+  fill: rgb(255 247 223 / .12);
+}
+
+.distant-school-slot[data-state="inactive"] {
+  display: none;
+}
+
+.distant-school-drop-motion {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+.distant-school-drop-motion.is-dropping {
+  animation: distant-school-drop 1450ms cubic-bezier(.2, .78, .28, 1) both;
+}
+
+@keyframes distant-school-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(var(--school-drop-y, -690px)) rotate(-7deg) scale(.92);
+  }
+  68% {
+    opacity: 1;
+    transform: translateY(12px) rotate(2.5deg) scale(1.02);
+  }
+  84% {
+    transform: translateY(-6px) rotate(-1.2deg) scale(.99);
+  }
+  94% {
+    transform: translateY(2px) rotate(.4deg) scale(1.005);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+  stroke: none;
+}
+
+.school-blueprint-top {
+  fill: rgb(255 255 255 / .09);
+  stroke: rgb(255 247 223 / .34);
+  stroke-width: 1;
+}
+
+.school-blueprint-lines {
+  fill: none;
+  stroke: rgb(7 113 62 / .48);
+  stroke-width: 1.5;
+  stroke-dasharray: 7 6;
+  vector-effect: non-scaling-stroke;
+}
+
+#fundraiser[data-goal-achieved="true"] .school-blueprint {
+  opacity: 0;
+}
+
+#school-scene.is-night .school-blueprint-fill {
+  fill: rgb(139 224 250 / .12);
+}
+
+#school-scene.is-night .school-blueprint-top {
+  fill: rgb(139 224 250 / .08);
+  stroke: rgb(139 224 250 / .3);
+}
+
+#school-scene.is-night .school-blueprint-lines {
+  stroke: rgb(139 224 250 / .48);
 }
 
 .student-arm {
@@ -514,6 +562,12 @@ kbd {
 
 #fundraiser[data-motion="reduce"] .cloud {
   animation: none !important;
+  transform: none !important;
+}
+
+#fundraiser[data-motion="reduce"] .distant-school-drop-motion {
+  animation: none !important;
+  opacity: 1;
   transform: none !important;
 }
 

@@ -26,6 +26,8 @@ mkdir "%DIST_DIR%\tests" || exit /b 1
 
 copy /y "%PROJECT_DIR%index.html" "%DIST_DIR%\index.html" >nul || exit /b 1
 copy /y "%PROJECT_DIR%styles.css" "%DIST_DIR%\styles.css" >nul || exit /b 1
+copy /y "%PROJECT_DIR%control.html" "%DIST_DIR%\control.html" >nul || exit /b 1
+copy /y "%PROJECT_DIR%control.css" "%DIST_DIR%\control.css" >nul || exit /b 1
 copy /y "%PROJECT_DIR%Logo.png" "%DIST_DIR%\Logo.png" >nul || exit /b 1
 copy /y "%PROJECT_DIR%server.mjs" "%DIST_DIR%\server.mjs" >nul || exit /b 1
 copy /y "%PROJECT_DIR%README.md" "%DIST_DIR%\README.md" >nul || exit /b 1

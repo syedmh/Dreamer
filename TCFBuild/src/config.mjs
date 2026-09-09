@@ -6,12 +6,13 @@ export const DEFAULT_CONFIG = Object.freeze({
   maxStudents: 36,
   overGoalRamp: 0.25,
   animationTimeConstantMs: 420,
-  demoDurationMs: 90000
+  demoDurationMs: 97200
 });
 
 export const MIN_GOAL = 0.01;
 export const MAX_RAISED = Number.MAX_SAFE_INTEGER;
-export const MAX_GOAL = MAX_RAISED / 1.25;
+export const MAX_PROGRESS_RATIO = 1.35;
+export const MAX_GOAL = MAX_RAISED / MAX_PROGRESS_RATIO;
 
 export function clampAmount(value) {
   if (!Number.isFinite(value)) return 0;
@@ -19,7 +20,7 @@ export function clampAmount(value) {
 }
 
 export function deriveSliderMaximum(goal) {
-  return clampAmount(goal * 1.25);
+  return clampAmount(goal * MAX_PROGRESS_RATIO);
 }
 
 export function deriveSliderValue(raised, goal) {
@@ -45,6 +46,7 @@ function deriveExactIntegerPercentAmount(goal, percent) {
 }
 
 export function addRaisedAmount(raised, goal, stepFraction) {
+  const maximum = deriveSliderMaximum(goal);
   const currentRatio = raised / goal;
   const currentPercent = Math.round(currentRatio * 100);
   const stepPercent = stepFraction * 100;
@@ -58,10 +60,10 @@ export function addRaisedAmount(raised, goal, stepFraction) {
   ) {
     const nextPercent = currentPercent + stepPercent;
     const exactNext = deriveExactIntegerPercentAmount(goal, nextPercent);
-    if (exactNext !== null) return clampAmount(exactNext);
-    return clampAmount(goal * (nextPercent / 100));
+    if (exactNext !== null) return Math.min(maximum, clampAmount(exactNext));
+    return Math.min(maximum, clampAmount(goal * (nextPercent / 100)));
   }
-  return clampAmount((currentRatio + stepFraction) * goal);
+  return Math.min(maximum, clampAmount((currentRatio + stepFraction) * goal));
 }
 
 export function deriveDemoRaised(goal, progress) {
@@ -111,6 +113,13 @@ export function validateOperatorAmounts(raisedValue, goalValue) {
       message: "Enter a valid raised amount within the allowed range."
     });
   }
+  if (raised > deriveSliderMaximum(goal)) {
+    return Object.freeze({
+      valid: false,
+      field: "raised",
+      message: "Enter a raised amount no greater than 135% of the goal."
+    });
+  }
 
   return Object.freeze({ valid: true, raised, goal });
 }
@@ -131,7 +140,10 @@ export function parseConfig(search = "", overrides = {}) {
   const params = new URLSearchParams(search);
   const base = { ...DEFAULT_CONFIG, ...overrides };
   const goal = finiteNumber(params.get("goal"), base.goal, MIN_GOAL, MAX_GOAL);
-  const raised = finiteNumber(params.get("raised"), base.raised, 0, MAX_RAISED);
+  const raised = Math.min(
+    deriveSliderMaximum(goal),
+    finiteNumber(params.get("raised"), base.raised, 0, MAX_RAISED)
+  );
   const requestedMotion = (params.get("motion") || "auto").toLowerCase();
   const motion = ["auto", "reduce", "full"].includes(requestedMotion)
     ? requestedMotion

@@ -148,6 +148,7 @@ const FIREWORK_PALETTES = Object.freeze([
 const FIREWORK_FULL_DURATION_MS = 1450;
 const FIREWORK_REDUCED_DURATION_MS = 680;
 const FIREWORK_MAX_ACTIVE = 14;
+const DISTANT_SCHOOL_DROP_START_Y = 145;
 const THANK_YOU_MESSAGES = Object.freeze([
   Object.freeze({ text: "Thank You", language: "en", direction: "ltr" }),
   Object.freeze({ text: "شکریہ", language: "ur", direction: "rtl" }),
@@ -166,6 +167,14 @@ function svg(name, attributes = {}, parent) {
 
 function randomBetween(min, max) {
   return min + Math.random() * (max - min);
+}
+
+function wholeDisplayPercentage(value) {
+  const nearestInteger = Math.round(value);
+  const normalized = Math.abs(value - nearestInteger) < 1e-9
+    ? nearestInteger
+    : value;
+  return Math.floor(normalized);
 }
 
 function randomItem(items) {
@@ -345,7 +354,178 @@ function addDefinitions(root) {
   }, flagClip);
 }
 
-function addLandscape(root) {
+function createDistantSchoolController(root, dataRoot, slots) {
+  const layer = svg("g", {
+    class: "distant-schools",
+    "aria-hidden": "true",
+    focusable: "false"
+  }, root);
+  const schools = new Map();
+  let droppedCount = 0;
+
+  for (const slot of slots) {
+    const position = svg("g", {
+      class: "distant-school-slot",
+      "data-school-slot": slot.slot,
+      "data-state": "inactive",
+      "data-dropped": "false",
+      "data-drop-run": 0,
+      transform: `translate(${slot.x} ${slot.baseY}) scale(${slot.scale})`,
+      "aria-hidden": "true",
+      focusable: "false"
+    }, layer);
+    const motion = svg("g", {
+      class: "distant-school-drop-motion"
+    }, position);
+    motion.style.setProperty(
+      "--school-drop-y",
+      `${((DISTANT_SCHOOL_DROP_START_Y - slot.bounds.top) / slot.scale).toFixed(2)}px`
+    );
+
+    svg("ellipse", {
+      cx: 40,
+      cy: 2,
+      rx: 44,
+      ry: 7,
+      fill: "#17352A",
+      opacity: .16
+    }, motion);
+    svg("rect", {
+      x: 0,
+      y: -58,
+      width: 80,
+      height: 58,
+      rx: 2,
+      fill: "#F5D2A2",
+      stroke: "#8F432C",
+      "stroke-width": 3
+    }, motion);
+    svg("path", {
+      d: "M-3 -58 H83 V-68 H74 V-63 H63 V-68 H52 V-63 H41 V-68 H30 V-63 H19 V-68 H8 V-63 H-3 Z",
+      fill: "#C96E43",
+      stroke: "#8F432C",
+      "stroke-width": 2,
+      "stroke-linejoin": "round"
+    }, motion);
+    svg("rect", {
+      x: 33,
+      y: -27,
+      width: 14,
+      height: 27,
+      rx: 1,
+      fill: "#087541",
+      stroke: "#17352A",
+      "stroke-width": 2
+    }, motion);
+    for (const x of [10, 57]) {
+      svg("rect", {
+        x,
+        y: -45,
+        width: 13,
+        height: 13,
+        rx: 1,
+        fill: "#8BE0FA",
+        stroke: "#17352A",
+        "stroke-width": 2
+      }, motion);
+      svg("line", {
+        x1: x + 6.5,
+        y1: -44,
+        x2: x + 6.5,
+        y2: -33,
+        stroke: "#FFF7DF",
+        "stroke-width": 1.5
+      }, motion);
+    }
+
+    svg("line", {
+      x1: 8,
+      y1: -92,
+      x2: 8,
+      y2: -58,
+      stroke: "#17352A",
+      "stroke-width": 2
+    }, motion);
+    svg("rect", {
+      x: 10,
+      y: -90,
+      width: 6,
+      height: 18,
+      fill: "#FFF7DF"
+    }, motion);
+    svg("rect", {
+      x: 16,
+      y: -90,
+      width: 22,
+      height: 18,
+      fill: "#078447"
+    }, motion);
+    svg("path", {
+      d: "M29 -85 A5 5 0 1 0 29 -77 A4 4 0 1 1 29 -85 Z",
+      fill: "#FFF7DF"
+    }, motion);
+    svg("path", {
+      d: "M31 -84 L32 -81.8 L34.4 -81.6 L32.6 -80 L33.2 -77.7 L31 -79 L28.8 -77.7 L29.4 -80 L27.6 -81.6 L30 -81.8 Z",
+      fill: "#FFF7DF",
+      transform: "scale(.55) translate(26 -67)"
+    }, motion);
+
+    schools.set(slot.slot, { position, motion });
+  }
+
+  function dropDistantSchool(slotNumber, { reducedMotion = false } = {}) {
+    const school = schools.get(Number(slotNumber));
+    if (!school) return droppedCount;
+    const wasDropped = school.position.dataset.dropped === "true";
+    if (!wasDropped) droppedCount += 1;
+
+    school.position.dataset.state = "dropped";
+    school.position.dataset.dropped = "true";
+    school.position.dataset.dropRun = String(
+      Number(school.position.dataset.dropRun || 0) + 1
+    );
+    school.position.dataset.reducedMotion = String(Boolean(reducedMotion));
+    school.motion.setAttribute("class", "distant-school-drop-motion");
+    if (!reducedMotion) {
+      school.motion.getBoundingClientRect?.();
+      school.motion.setAttribute(
+        "class",
+        "distant-school-drop-motion is-dropping"
+      );
+    }
+
+    dataRoot.dataset.distantSchools = String(droppedCount);
+    return droppedCount;
+  }
+
+  function removeLastDistantSchool() {
+    if (droppedCount === 0) return droppedCount;
+    const school = schools.get(droppedCount);
+    school.position.dataset.state = "inactive";
+    school.position.dataset.dropped = "false";
+    school.position.dataset.reducedMotion = "false";
+    school.motion.setAttribute("class", "distant-school-drop-motion");
+    droppedCount -= 1;
+    dataRoot.dataset.distantSchools = String(droppedCount);
+    layer.dataset.distantSchools = String(droppedCount);
+    return droppedCount;
+  }
+
+  dataRoot.dataset.distantSchools = "0";
+  layer.dataset.distantSchools = "0";
+
+  return Object.freeze({
+    addDistantSchool(options) {
+      if (droppedCount >= slots.length) return droppedCount;
+      const count = dropDistantSchool(droppedCount + 1, options);
+      layer.dataset.distantSchools = String(count);
+      return count;
+    },
+    removeLastDistantSchool
+  });
+}
+
+function addLandscape(root, trees, distantSchools, dataRoot) {
   const landscape = svg("g", { class: "landscape" }, root);
   svg("rect", {
     width: 1600,
@@ -461,21 +641,22 @@ function addLandscape(root) {
     fill: "url(#grass-gradient)"
   }, landscape);
 
-  const trees = [
-    [230, 590, 1.1],
-    [360, 625, .75],
-    [1420, 590, 1],
-    [1330, 640, .65]
-  ];
-  for (const [x, y, scale] of trees) {
+  const distantSchoolController = createDistantSchoolController(
+    landscape,
+    dataRoot,
+    distantSchools
+  );
+
+  for (const { x, y, scale, trunkHeight } of trees) {
     const tree = svg("g", {
+      class: "tree",
       transform: `translate(${x} ${y}) scale(${scale})`
     }, landscape);
     svg("rect", {
       x: -10,
       y: 12,
       width: 20,
-      height: 98,
+      height: trunkHeight,
       rx: 8,
       fill: "#8F5A38"
     }, tree);
@@ -492,6 +673,8 @@ function addLandscape(root) {
     height: 470,
     fill: "#07142F"
   }, landscape);
+
+  return distantSchoolController;
 }
 
 function createKiteBounds({
@@ -1108,7 +1291,11 @@ function addPathAndShadow(root) {
 }
 
 function addSwings(root, swings) {
-  const layer = svg("g", { class: "campus-back swings" }, root);
+  const layer = svg("g", {
+    class: "campus-back swings",
+    transform: `translate(0 ${swings.offsetY})`,
+    "data-offset-y": swings.offsetY
+  }, root);
   const ground = svg("g", { class: "swing-ground", opacity: 0 }, layer);
   svg("ellipse", {
     ...swings.ground,
@@ -1246,9 +1433,330 @@ function addSwings(root, swings) {
   }
 
   return {
+    layer,
     baseNodes: [ground, frame, ropes, seats],
     enhancementNodes: [safetyPads, climbingSide, decorations]
   };
+}
+
+function addSchoolBus(root, bus) {
+  const group = svg("g", {
+    class: "school-bus",
+    role: "img",
+    "aria-label": "Long yellow conventional US school bus facing right",
+    opacity: 0,
+    transform: `translate(${bus.startOffset.x} ${bus.startOffset.y})`
+  }, root);
+  const yellow = "#F7C948";
+  const yellowDark = "#C88A14";
+  const outline = "#4A3718";
+  const glass = "#315F67";
+  const metal = "#8D9998";
+
+  svg("rect", {
+    class: "bus-body",
+    x: bus.body.x,
+    y: bus.body.y,
+    width: bus.body.width,
+    height: bus.body.height,
+    rx: 5,
+    fill: yellow,
+    stroke: outline,
+    "stroke-width": bus.body.strokeWidth
+  }, group);
+  svg("path", {
+    class: "bus-cabin",
+    d: bus.cabin.path,
+    fill: yellow,
+    stroke: outline,
+    "stroke-width": 4,
+    "stroke-linejoin": "round"
+  }, group);
+  for (const x of bus.studs) {
+    svg("rect", {
+      class: "bus-roof-stud",
+      x,
+      y: 690,
+      width: 20,
+      height: 9,
+      rx: 3,
+      fill: yellowDark
+    }, group);
+  }
+
+  svg("rect", {
+    x: 250,
+    y: 701,
+    width: 170,
+    height: 14,
+    rx: 3,
+    fill: outline
+  }, group);
+  const header = svg("text", {
+    x: 335,
+    y: 712,
+    "text-anchor": "middle",
+    fill: "#FFF3B0",
+    "font-family": "Arial, sans-serif",
+    "font-size": 10,
+    "font-weight": 900,
+    "letter-spacing": 1.8
+  }, group);
+  header.textContent = "SCHOOL BUS";
+
+  for (const window of bus.windows) {
+    svg("rect", {
+      class: "bus-window",
+      ...window,
+      rx: 3,
+      fill: glass,
+      stroke: outline,
+      "stroke-width": 2
+    }, group);
+  }
+
+  svg("path", {
+    class: "bus-windshield",
+    d: bus.windshield.path,
+    fill: glass,
+    stroke: outline,
+    "stroke-width": 2,
+    "stroke-linejoin": "round"
+  }, group);
+
+  const door = svg("g", { class: "bus-door" }, group);
+  svg("rect", {
+    ...bus.door,
+    rx: 2,
+    fill: yellowDark,
+    stroke: outline,
+    "stroke-width": 2
+  }, door);
+  svg("rect", {
+    class: "bus-door-pane",
+    x: bus.door.x + 3,
+    y: bus.door.y + 4,
+    width: 10,
+    height: 39,
+    rx: 2,
+    fill: glass,
+    stroke: outline,
+    "stroke-width": 1
+  }, door);
+  svg("rect", {
+    class: "bus-door-pane",
+    x: bus.door.x + 17,
+    y: bus.door.y + 4,
+    width: 10,
+    height: 39,
+    rx: 2,
+    fill: glass,
+    stroke: outline,
+    "stroke-width": 1
+  }, door);
+  svg("line", {
+    x1: bus.door.x + 15,
+    y1: bus.door.y + 2,
+    x2: bus.door.x + 15,
+    y2: bus.door.y + bus.door.height - 2,
+    stroke: outline,
+    "stroke-width": 2
+  }, door);
+  svg("line", {
+    x1: bus.door.x + 4,
+    y1: bus.door.y + 48,
+    x2: bus.door.x + 26,
+    y2: bus.door.y + 48,
+    stroke: outline,
+    "stroke-width": 2
+  }, door);
+
+  svg("path", {
+    class: "bus-hood",
+    d: bus.hood.path,
+    fill: yellow,
+    stroke: outline,
+    "stroke-width": 2,
+    "stroke-linejoin": "round"
+  }, group);
+  svg("rect", {
+    class: "bus-grille",
+    x: 512,
+    y: 762,
+    width: 13,
+    height: 25,
+    rx: 2,
+    fill: metal,
+    stroke: outline,
+    "stroke-width": 2
+  }, group);
+  for (const x of [515, 519, 523]) {
+    svg("line", {
+      x1: x,
+      y1: 765,
+      x2: x,
+      y2: 784,
+      stroke: "#47504F",
+      "stroke-width": 1.5
+    }, group);
+  }
+
+  for (const rail of bus.rails) {
+    svg("rect", {
+      class: "bus-rub-rail",
+      ...rail,
+      rx: 2,
+      fill: outline
+    }, group);
+  }
+
+  for (const marker of [
+    { cx: 191, cy: 721, fill: "#D94A3D" },
+    { cx: 258, cy: 704, fill: "#F4A62A" },
+    { cx: 321, cy: 704, fill: "#F4A62A" },
+    { cx: 384, cy: 704, fill: "#F4A62A" },
+    { cx: 447, cy: 704, fill: "#F4A62A" },
+    { cx: 473, cy: 721, fill: "#D94A3D" }
+  ]) {
+    svg("circle", {
+      class: "bus-marker-light",
+      ...marker,
+      r: 3,
+      stroke: outline,
+      "stroke-width": 1
+    }, group);
+  }
+
+  svg("circle", {
+    cx: 520,
+    cy: 754,
+    r: 5,
+    fill: "#FFF4B8",
+    stroke: outline,
+    "stroke-width": 1.5
+  }, group);
+  svg("circle", {
+    cx: 177,
+    cy: 750,
+    r: 4,
+    fill: "#D94A3D",
+    stroke: outline,
+    "stroke-width": 1
+  }, group);
+
+  const sideLabel = svg("text", {
+    x: 337,
+    y: 777,
+    "text-anchor": "middle",
+    fill: outline,
+    "font-family": "Arial, sans-serif",
+    "font-size": 12,
+    "font-weight": 900,
+    "letter-spacing": 1.4
+  }, group);
+  sideLabel.textContent = "SCHOOL BUS";
+
+  const stopSign = svg("g", { class: "bus-stop-sign" }, group);
+  svg("line", {
+    x1: 430,
+    y1: 758,
+    x2: bus.stopSign.cx - 6,
+    y2: bus.stopSign.cy,
+    stroke: outline,
+    "stroke-width": 4,
+    "stroke-linecap": "round"
+  }, stopSign);
+  const stopPoints = Array.from({ length: 8 }, (_, index) => {
+    const angle = Math.PI / 8 + index * Math.PI / 4;
+    return [
+      bus.stopSign.cx + Math.cos(angle) * bus.stopSign.r,
+      bus.stopSign.cy + Math.sin(angle) * bus.stopSign.r
+    ].map((value) => value.toFixed(2)).join(",");
+  }).join(" ");
+  svg("polygon", {
+    points: stopPoints,
+    fill: "#D54843",
+    stroke: "#FFF7DF",
+    "stroke-width": 1.5
+  }, stopSign);
+  const stopLabel = svg("text", {
+    x: bus.stopSign.cx,
+    y: bus.stopSign.cy + 2.5,
+    "text-anchor": "middle",
+    fill: "#FFF7DF",
+    "font-family": "Arial, sans-serif",
+    "font-size": 5.5,
+    "font-weight": 900
+  }, stopSign);
+  stopLabel.textContent = "STOP";
+
+  for (const wheel of bus.wheels) {
+    svg("circle", {
+      class: "bus-wheel",
+      cx: wheel.cx,
+      cy: wheel.cy,
+      r: wheel.r - .5,
+      fill: "#202323",
+      stroke: "#111",
+      "stroke-width": 1
+    }, group);
+    svg("circle", {
+      cx: wheel.cx,
+      cy: wheel.cy,
+      r: 22,
+      fill: "#3D4545",
+      stroke: "#111",
+      "stroke-width": 2
+    }, group);
+    svg("circle", {
+      cx: wheel.cx,
+      cy: wheel.cy,
+      r: 13,
+      fill: "#B7C0BF",
+      stroke: "#5C6665",
+      "stroke-width": 2
+    }, group);
+    svg("circle", {
+      cx: wheel.cx,
+      cy: wheel.cy,
+      r: 5,
+      fill: "#687271"
+    }, group);
+    for (let index = 0; index < 6; index += 1) {
+      const angle = index * Math.PI / 3;
+      svg("circle", {
+        cx: wheel.cx + Math.cos(angle) * 8,
+        cy: wheel.cy + Math.sin(angle) * 8,
+        r: 1.6,
+        fill: "#596261"
+      }, group);
+    }
+  }
+  svg("rect", {
+    x: 165,
+    y: 799,
+    width: 18,
+    height: 8,
+    rx: 2,
+    fill: metal
+  }, group);
+  svg("rect", {
+    x: 512,
+    y: 799,
+    width: 18,
+    height: 8,
+    rx: 2,
+    fill: metal
+  }, group);
+
+  for (const child of group.children) {
+    child.setAttribute(
+      "transform",
+      `translate(${bus.artworkOffset.x} ${bus.artworkOffset.y})`
+    );
+  }
+
+  return group;
 }
 
 function addWindowRecess(parent, x, y) {
@@ -1386,6 +1894,34 @@ function createBrickNode(block, parent) {
     fill: "#F1A17C",
     stroke: "#9E4C31",
     "stroke-width": .7
+  }, group);
+  return group;
+}
+
+function addSchoolBlueprint(root, blocks) {
+  const group = svg("g", {
+    class: "school-blueprint",
+    "aria-hidden": "true"
+  }, root);
+  const frontFaces = blocks.map((block) => (
+    `M${block.x} ${block.y}h${block.width}v${block.height}h-${block.width}Z`
+  )).join(" ");
+  const topFaces = blocks.map((block) => (
+    `M${block.x} ${block.y}h${block.width}l${block.depth}-${block.depth}`
+    + `h-${block.width}Z`
+  )).join(" ");
+
+  svg("path", {
+    class: "school-blueprint-fill",
+    d: frontFaces
+  }, group);
+  svg("path", {
+    class: "school-blueprint-top",
+    d: topFaces
+  }, group);
+  svg("path", {
+    class: "school-blueprint-lines",
+    d: frontFaces
   }, group);
   return group;
 }
@@ -1954,6 +2490,7 @@ function addCelebration(root) {
     }, group);
     piece.style.animationDelay = `${(index % 9) * 45}ms`;
   }
+
   return group;
 }
 
@@ -1962,7 +2499,12 @@ export function createFundraiserView(root, scene, config) {
   const sceneDescription = sceneSvg.querySelector("#scene-description");
   const sceneDescriptionText = sceneDescription?.textContent ?? "";
   addDefinitions(sceneSvg);
-  addLandscape(sceneSvg);
+  const distantSchoolController = addLandscape(
+    sceneSvg,
+    scene.campus.trees,
+    scene.campus.distantSchools,
+    root
+  );
   const kiteController = createKiteController(
     root,
     sceneSvg,
@@ -1971,10 +2513,12 @@ export function createFundraiserView(root, scene, config) {
   );
   const fireworkController = createFireworkController(sceneSvg);
   const {
+    layer: swingsLayer,
     baseNodes: swingNodes,
     enhancementNodes: playgroundNodes
   } = addSwings(sceneSvg, scene.campus.swings);
   addPathAndShadow(sceneSvg);
+  addSchoolBlueprint(sceneSvg, scene.blocks);
   const finishNodes = addApertureRecesses(sceneSvg);
 
   const school = svg("g", {
@@ -1996,6 +2540,7 @@ export function createFundraiserView(root, scene, config) {
     (student) => createStudentNode(student, studentLayer)
   );
   const displayedStudentReveals = scene.students.map(() => 0);
+  const busNode = addSchoolBus(sceneSvg, scene.campus.bus);
   const celebration = addCelebration(sceneSvg);
 
   const raisedDisplay = root.querySelector("#raised-display");
@@ -2015,6 +2560,7 @@ export function createFundraiserView(root, scene, config) {
     swingRatio = 0,
     teacherRatio = 0,
     playgroundRatio = 0,
+    busRatio = 0,
     deltaMs = null,
     reducedMotion = false,
     celebrationActive = false
@@ -2068,6 +2614,11 @@ export function createFundraiserView(root, scene, config) {
         )
       );
     }
+    swingsLayer.setAttribute(
+      "transform",
+      `translate(0 ${scene.campus.swings.offsetY})`
+    );
+    swingsLayer.dataset.currentOffsetY = String(scene.campus.swings.offsetY);
     for (let index = 0; index < playgroundNodes.length; index += 1) {
       playgroundNodes[index].setAttribute(
         "opacity",
@@ -2183,10 +2734,28 @@ export function createFundraiserView(root, scene, config) {
       );
     }
 
-    const percentage = Math.min(Number.MAX_VALUE, donationRatio * 100);
-    const wholePercentage = Math.floor(
-      percentage + Number.EPSILON * Math.max(1, Math.abs(percentage))
+    const busEased = 1 - (1 - busRatio) ** 3;
+    const busOffsetX = reducedMotion
+      ? 0
+      : (1 - busEased) * scene.campus.bus.startOffset.x;
+    const busOffsetY = reducedMotion
+      ? 0
+      : (1 - busEased) * scene.campus.bus.startOffset.y;
+    busNode.setAttribute(
+      "opacity",
+      fixedPreservingEndpoints(busRatio, 4, [0, 1])
     );
+    busNode.setAttribute(
+      "transform",
+      reducedMotion || busRatio === 1
+        ? "translate(0 0)"
+        : busRatio === 0
+          ? `translate(${scene.campus.bus.startOffset.x} ${scene.campus.bus.startOffset.y})`
+          : `translate(${busOffsetX.toFixed(2)} ${busOffsetY.toFixed(2)})`
+    );
+
+    const percentage = Math.min(Number.MAX_VALUE, donationRatio * 100);
+    const wholePercentage = wholeDisplayPercentage(percentage);
     raisedDisplay.textContent = money.format(raised);
     goalDisplay.textContent = `Goal ${money.format(goal)}`;
     if (donationRatio < 1) {
@@ -2199,6 +2768,8 @@ export function createFundraiserView(root, scene, config) {
       percentDisplay.textContent = `${wholePercentage}% — teachers joining!`;
     } else if (donationRatio < 1.25) {
       percentDisplay.textContent = `${wholePercentage}% — playground finishing!`;
+    } else if (donationRatio < 1.35) {
+      percentDisplay.textContent = `${wholePercentage}% — school bus arriving!`;
     } else {
       percentDisplay.textContent = `${wholePercentage}% — campus ready!`;
     }
@@ -2248,6 +2819,11 @@ export function createFundraiserView(root, scene, config) {
       3,
       [0, 100]
     );
+    root.dataset.busPercent = fixedPreservingEndpoints(
+      busRatio * 100,
+      3,
+      [0, 100]
+    );
     return studentRoutesPending
       ? PENDING_RENDER_RESULT
       : SETTLED_RENDER_RESULT;
@@ -2276,6 +2852,8 @@ export function createFundraiserView(root, scene, config) {
     clearFireworks: fireworkController.clearFireworks,
     addKite: kiteController.addKite,
     clearKites: kiteController.clearKites,
+    addDistantSchool: distantSchoolController.addDistantSchool,
+    removeLastDistantSchool: distantSchoolController.removeLastDistantSchool,
     setNightMode,
     setStudentsClapping,
     setThankYouVisible,

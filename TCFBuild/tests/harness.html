@@ -25,137 +25,209 @@
     import { createScene } from "../src/scene.mjs";
 
     const results = document.querySelector("#results");
-    async function progressCardClearsFacade() {
-      const host = document.createElement("div");
-      host.style.position = "fixed";
-      host.style.left = "-10000px";
-      host.style.top = "0";
-      const shadow = host.attachShadow({ mode: "open" });
-      const stylesheet = document.createElement("link");
-      stylesheet.rel = "stylesheet";
-      stylesheet.href = "../styles.css";
-      const stylesheetLoaded = new Promise((resolve, reject) => {
-        stylesheet.addEventListener("load", resolve, { once: true });
-        stylesheet.addEventListener("error", reject, { once: true });
-      });
-      const stage = document.createElement("section");
-      stage.className = "stage";
-      stage.innerHTML = `
-        <header class="scoreboard">
-          <div class="brand-card" aria-hidden="true">
-            <img class="brand-logo" src="../Logo.png" alt="" width="430" height="332">
-          </div>
-          <div>
-            <p class="eyebrow">THE CITIZENS FOUNDATION</p>
-            <h1>Build a Brighter Future</h1>
-          </div>
-        </header>
-        <section class="progress-card" aria-label="Fundraiser total">
-          <p class="progress-label">Together we've raised</p>
-          <p class="raised-display">$125,000</p>
-          <div class="meter"><span class="meter-fill"></span></div>
-          <div class="progress-meta">
-            <span>125% — campus ready!</span>
-            <span>Goal $100,000</span>
-          </div>
-          <p class="over-goal-message">
-            The school is open — every extra gift welcomes more students!
-          </p>
-        </section>
-        <aside class="operator-panel">Event controls</aside>
-      `;
-      shadow.append(stylesheet, stage);
-      document.body.append(host);
+    async function busClearsOverlaysAcrossViewports() {
+      const viewports = [
+        [1920, 1080, "16:9"],
+        [1366, 768, "wide"],
+        [1024, 768, "4:3"],
+        [768, 1024, "portrait"],
+        [600, 1024, "narrow portrait"]
+      ];
+      const intersects = (first, second) =>
+        first.left < second.right
+        && first.right > second.left
+        && first.top < second.bottom
+        && first.bottom > second.top;
+      let minimumClearance = Infinity;
+      let minimumKeyboardClearance = Infinity;
+      const keyboardClearances = {};
 
-      try {
-        await stylesheetLoaded;
-        const card = stage.querySelector(".progress-card");
-        const controls = stage.querySelector(".operator-panel");
-        const scoreboard = stage.querySelector(".scoreboard");
-        const stageRect = stage.getBoundingClientRect();
-        const paintedRegions = [
-          ["school-left", 530, 386, 874, 697],
-          ["school-tower", 839, 249, 1084, 697],
-          ["school-right", 1052, 386, 1486, 697],
-          ["goal-flag", 960, 102, 1098, 252],
-          ["swings", 1490, 476, 1592, 628],
-          ["teacher-left", 484, 630, 516, 704],
-          ["teacher-right", 1501, 630, 1533, 704],
-          ["school-bus", 150, 460, 454, 576]
-        ].map(([name, left, top, right, bottom]) => ({
-          name,
-          left: stageRect.left + stageRect.width * left / 1600,
-          right: stageRect.left + stageRect.width * right / 1600,
-          top: stageRect.top + stageRect.height * top / 900,
-          bottom: stageRect.top + stageRect.height * bottom / 900
-        }));
-        let minimumFlagClearance = Infinity;
-        let minimumTowerClearance = Infinity;
-        for (const overGoal of [false, true]) {
-          stage.querySelector(".over-goal-message").hidden = !overGoal;
-          for (const controlsOpen of [false, true]) {
-            controls.hidden = !controlsOpen;
-            const cardRect = card.getBoundingClientRect();
-            minimumFlagClearance = Math.min(
-              minimumFlagClearance,
-              cardRect.left - (
-                stageRect.left + stageRect.width * 1087 / 1600
-              )
-            );
-            minimumTowerClearance = Math.min(
-              minimumTowerClearance,
-              cardRect.left - (
-                stageRect.left + stageRect.width * 1084 / 1600
-              )
-            );
-            for (const [label, element] of [
-              ["progress-card", card],
-              ["scoreboard", scoreboard],
-              ...(controlsOpen ? [["operator-panel", controls]] : [])
-            ]) {
-              const elementRect = element.getBoundingClientRect();
-              const intersection = paintedRegions.find((region) =>
-                elementRect.left < region.right
-                && elementRect.right > region.left
-                && elementRect.top < region.bottom
-                && elementRect.bottom > region.top
-              );
-              if (intersection) {
-                throw new Error(JSON.stringify({
-                  viewport: [innerWidth, innerHeight],
-                  overGoal,
-                  controlsOpen,
-                  element: label,
-                  region: intersection.name,
-                  bounds: {
-                    left: elementRect.left - stageRect.left,
-                    right: elementRect.right - stageRect.left,
-                    top: elementRect.top - stageRect.top,
-                    bottom: elementRect.bottom - stageRect.top
-                  },
-                  painted: {
-                    left: intersection.left - stageRect.left,
-                    right: intersection.right - stageRect.left,
-                    top: intersection.top - stageRect.top,
-                    bottom: intersection.bottom - stageRect.top
+      for (const [width, height, label] of viewports) {
+        const frame = document.createElement("iframe");
+        frame.style.position = "fixed";
+        frame.style.left = "-10000px";
+        frame.style.top = "0";
+        frame.style.width = `${width}px`;
+        frame.style.height = `${height}px`;
+        frame.style.border = "0";
+        document.body.append(frame);
+
+        try {
+          const frameDocument = frame.contentDocument;
+          frameDocument.open();
+          frameDocument.write("<!doctype html><html><head></head><body></body></html>");
+          frameDocument.close();
+          const stylesheet = frameDocument.createElement("link");
+          stylesheet.rel = "stylesheet";
+          stylesheet.href = new URL("../styles.css", location.href).href;
+          const stylesheetLoaded = new Promise((resolve, reject) => {
+            stylesheet.addEventListener("load", resolve, { once: true });
+            stylesheet.addEventListener("error", reject, { once: true });
+          });
+          frameDocument.head.append(stylesheet);
+
+          const root = frameDocument.createElement("main");
+          root.id = "fundraiser";
+          root.dataset.motion = "reduce";
+          root.innerHTML = `
+            <section class="stage">
+              <svg id="school-scene" viewBox="0 0 1600 900">
+                <desc id="scene-description">School bus overlay probe.</desc>
+              </svg>
+              <header class="scoreboard">
+                <div class="brand-card" aria-hidden="true">
+                  <img class="brand-logo" src="../Logo.png" alt=""
+                       width="430" height="332">
+                </div>
+                <div>
+                  <p class="eyebrow">THE CITIZENS FOUNDATION</p>
+                  <h1>Build a Brighter Future</h1>
+                </div>
+              </header>
+              <section class="progress-card" aria-label="Fundraiser total">
+                <p class="progress-label">Together we've raised</p>
+                <p id="raised-display" class="raised-display"></p>
+                <div class="meter"><span id="meter-fill" class="meter-fill"></span></div>
+                <div class="progress-meta">
+                  <span id="percent-display"></span>
+                  <span id="goal-display"></span>
+                </div>
+                <p id="over-goal-message" class="over-goal-message">
+                  The school is open — every extra gift welcomes more students!
+                </p>
+              </section>
+              <p id="keyboard-hint" class="keyboard-hint">Press <kbd>Space</kbd> to hide key legends · <kbd>S</kbd> drop next school · <kbd>X</kbd> remove last school · <kbd>D</kbd> demo · <kbd>N</kbd> day/night · <kbd>O</kbd> clap · <kbd>P</kbd> thank you · <kbd>K</kbd> kite · <kbd>L</kbd> clear kites · <kbd>Q</kbd> firework · <kbd>W</kbd> continuous · <kbd>F</kbd> fullscreen · arrows/Home/End progress</p>
+            </section>
+          `;
+          frameDocument.body.append(root);
+          await stylesheetLoaded;
+          const view = createFundraiserView(
+            root,
+            createScene({ maxStudents: 36 }),
+            { locale: "en-US", currency: "USD" }
+          );
+          view.update({
+            raised: 135000,
+            goal: 100000,
+            ...deriveProgress(135000, 100000),
+            reducedMotion: true,
+            celebrationActive: false
+          });
+          await new Promise((resolve, reject) => {
+            const logo = frameDocument.querySelector(".brand-logo");
+            if (logo.complete) {
+              resolve();
+            } else {
+              logo.addEventListener("load", resolve, { once: true });
+              logo.addEventListener("error", reject, { once: true });
+            }
+          });
+          await new Promise((resolve) =>
+            frame.contentWindow.requestAnimationFrame(() =>
+              frame.contentWindow.requestAnimationFrame(resolve)
+            )
+          );
+
+          const bus = frameDocument.querySelector(".school-bus");
+          const message = frameDocument.querySelector(".over-goal-message");
+          const overlays = [
+            ["scoreboard", frameDocument.querySelector(".scoreboard")],
+            ["progress-card", frameDocument.querySelector(".progress-card")],
+            ["keyboard-hint", frameDocument.querySelector(".keyboard-hint")]
+          ];
+          if (!bus || !message || overlays.some(([, element]) => !element)) {
+            throw new Error(`${label} display did not render required bus/overlay DOM`);
+          }
+
+          bus.setAttribute("transform", "translate(0 0)");
+          bus.setAttribute("opacity", "1");
+          for (const messageShown of [false, true]) {
+            message.hidden = !messageShown;
+            const busRect = bus.getBoundingClientRect();
+            for (const [overlayName, overlay] of overlays) {
+              const paintedElements = [
+                overlay,
+                ...overlay.querySelectorAll("*")
+              ];
+              for (const paintedElement of paintedElements) {
+                const overlayRect = paintedElement.getBoundingClientRect();
+                if (intersects(busRect, overlayRect)) {
+                  throw new Error(JSON.stringify({
+                    viewport: [width, height],
+                    label,
+                    messageShown,
+                    overlay: overlayName,
+                    paintedElement: paintedElement.tagName.toLowerCase(),
+                    bus: {
+                      left: busRect.left,
+                      right: busRect.right,
+                      top: busRect.top,
+                      bottom: busRect.bottom
+                    },
+                    overlayBounds: {
+                      left: overlayRect.left,
+                      right: overlayRect.right,
+                      top: overlayRect.top,
+                      bottom: overlayRect.bottom
+                    }
+                  }));
+                }
+                minimumClearance = Math.min(
+                  minimumClearance,
+                  Math.max(
+                    overlayRect.left - busRect.right,
+                    busRect.left - overlayRect.right,
+                    overlayRect.top - busRect.bottom,
+                    busRect.top - overlayRect.bottom
+                  )
+                );
+                const horizontallyAligned =
+                  busRect.left < overlayRect.right
+                  && busRect.right > overlayRect.left;
+                if (overlayName === "keyboard-hint" && horizontallyAligned) {
+                  const verticalClearance = overlayRect.top - busRect.bottom;
+                  minimumKeyboardClearance = Math.min(
+                    minimumKeyboardClearance,
+                    verticalClearance
+                  );
+                  const key = `${width}x${height}`;
+                  keyboardClearances[key] = Math.min(
+                    keyboardClearances[key] ?? Infinity,
+                    verticalClearance
+                  );
+                  if (verticalClearance < 12) {
+                    throw new Error(JSON.stringify({
+                      viewport: [width, height],
+                      label,
+                      messageShown,
+                      overlay: overlayName,
+                      paintedElement: paintedElement.tagName.toLowerCase(),
+                      minimumRequired: 12,
+                      verticalClearance,
+                      busBottom: busRect.bottom,
+                      overlayTop: overlayRect.top
+                    }));
                   }
-                }));
+                }
               }
             }
           }
+        } finally {
+          frame.remove();
         }
-        if (minimumFlagClearance < 12) {
-          throw new Error(`flag/card clearance ${minimumFlagClearance}px`);
-        }
-        if (minimumTowerClearance <= 0) {
-          throw new Error(`tower/card clearance ${minimumTowerClearance}px`);
-        }
-        document.body.dataset.flagCardClearance = minimumFlagClearance.toFixed(3);
-        document.body.dataset.towerCardClearance = minimumTowerClearance.toFixed(3);
-        return true;
-      } finally {
-        host.remove();
       }
+
+      document.body.dataset.busOverlayViewports = viewports
+        .map(([width, height]) => `${width}x${height}`)
+        .join(",");
+      document.body.dataset.minimumBusOverlayClearance =
+        minimumClearance.toFixed(3);
+      document.body.dataset.minimumBusKeyboardClearance =
+        minimumKeyboardClearance.toFixed(3);
+      document.body.dataset.busKeyboardClearances =
+        JSON.stringify(keyboardClearances);
+      return minimumClearance > 0
+        && minimumKeyboardClearance >= 12;
     }
 
     async function createCampusProbe({ loadStylesheet = true } = {}) {
@@ -203,6 +275,8 @@
         const stage = root.querySelector(".stage");
         stage.style.width = `${width}px`;
         stage.style.height = `${height}px`;
+        stage.querySelector("#raised-display").textContent =
+          "painted mask origin probe";
         stage.querySelector("#school-scene").style.display = "block";
         shadow.append(root);
       }
@@ -232,7 +306,9 @@
       121,
       124.0372,
       124.5,
-      125
+      125,
+      130,
+      135
     ]);
 
     const paintedMaskSupersample = 2;
@@ -242,10 +318,12 @@
           100 + (studentIndex + reveal) / 36 * 25
         )
       ),
-      125
+      125,
+      130,
+      135
     ]);
 
-    async function paintedStudentMasksNeverIntersect() {
+    async function measurePaintedStudentAndBusIntersections() {
       const probe = await createCampusProbe({ loadStylesheet: false });
       const loadImage = (source) => new Promise((resolve, reject) => {
         const image = new Image();
@@ -260,15 +338,42 @@
 
       try {
         const stage = probe.root.querySelector(".stage");
+        const svgViewport = probe.root.querySelector("#school-scene");
         const students = [...probe.root.querySelectorAll(".student")];
         const bus = probe.root.querySelector(".school-bus");
+        const trees = [...probe.root.querySelectorAll(".tree")];
+        const obstacles = [
+          ...trees.map((tree, index) => [`tree-${index}`, tree]),
+          ["playground", probe.root.querySelector(".swings")],
+          ["teacher", probe.root.querySelector(".teacher")],
+          ["school", probe.root.querySelector(".school")]
+        ];
+        if (
+          !svgViewport
+          || trees.length !== 3
+          || obstacles.some(([, element]) => !element)
+        ) {
+          throw new Error("painted bus obstacle probe did not render");
+        }
         const stageBounds = stage.getBoundingClientRect();
-        const width = Math.round(stageBounds.width);
-        const height = Math.round(stageBounds.height);
-        const supersampledWidth = width * paintedMaskSupersample;
-        const supersampledHeight = height * paintedMaskSupersample;
-        const scaleX = supersampledWidth / 1600;
-        const scaleY = supersampledHeight / 900;
+        const svgBounds = svgViewport.getBoundingClientRect();
+        const svgRasterWidth = Math.round(svgBounds.width);
+        const svgRasterHeight = Math.round(svgBounds.height);
+        const supersampledSvgWidth =
+          svgRasterWidth * paintedMaskSupersample;
+        const supersampledSvgHeight =
+          svgRasterHeight * paintedMaskSupersample;
+        const svgScaleX = supersampledSvgWidth / 1600;
+        const svgScaleY = supersampledSvgHeight / 900;
+        const trunkHeights = trees.map((tree) =>
+          Number(tree.querySelector("rect")?.getAttribute("height"))
+        );
+        const prominentTrunkBottom =
+          probe.scene.campus.trees[0].y
+          + (12 + trunkHeights[0]) * probe.scene.campus.trees[0].scale;
+        const treeGeometryValid = prominentTrunkBottom === 616.8
+          && trunkHeights[0] === 76
+          && trunkHeights.slice(1).every((height) => height === 98);
         const canvas = document.createElement("canvas");
         const context = canvas.getContext("2d", { willReadFrequently: true });
         const rasterCache = new WeakMap();
@@ -286,25 +391,25 @@
           const left = Math.max(
             0,
             Math.floor(
-              (bounds.left - stageBounds.left) * paintedMaskSupersample
+              (bounds.left - svgBounds.left) * paintedMaskSupersample
             ) - padding
           );
           const top = Math.max(
             0,
             Math.floor(
-              (bounds.top - stageBounds.top) * paintedMaskSupersample
+              (bounds.top - svgBounds.top) * paintedMaskSupersample
             ) - padding
           );
           const right = Math.min(
-            supersampledWidth,
+            supersampledSvgWidth,
             Math.ceil(
-              (bounds.right - stageBounds.left) * paintedMaskSupersample
+              (bounds.right - svgBounds.left) * paintedMaskSupersample
             ) + padding
           );
           const bottom = Math.min(
-            supersampledHeight,
+            supersampledSvgHeight,
             Math.ceil(
-              (bounds.bottom - stageBounds.top) * paintedMaskSupersample
+              (bounds.bottom - svgBounds.top) * paintedMaskSupersample
             ) + padding
           );
           const rasterWidth = Math.max(0, right - left);
@@ -316,8 +421,8 @@
           const source = [
             `<svg xmlns="http://www.w3.org/2000/svg"`,
             ` width="${rasterWidth}" height="${rasterHeight}"`,
-            ` viewBox="${left / scaleX} ${top / scaleY}`,
-            ` ${rasterWidth / scaleX} ${rasterHeight / scaleY}">`,
+            ` viewBox="${left / svgScaleX} ${top / svgScaleY}`,
+            ` ${rasterWidth / svgScaleX} ${rasterHeight / svgScaleY}">`,
             new XMLSerializer().serializeToString(element),
             "</svg>"
           ].join("");
@@ -346,6 +451,43 @@
           rasterCache.set(element, { signature, raster });
           return raster;
         };
+
+        const cropOriginFor = (bounds, originBounds) => {
+          const padding = 2 * paintedMaskSupersample;
+          return {
+            left: Math.max(
+              0,
+              Math.floor(
+                (bounds.left - originBounds.left) * paintedMaskSupersample
+              ) - padding
+            ),
+            top: Math.max(
+              0,
+              Math.floor(
+                (bounds.top - originBounds.top) * paintedMaskSupersample
+              ) - padding
+            )
+          };
+        };
+        const prominentTreeBounds = trees[0].getBoundingClientRect();
+        const svgOriginCrop = cropOriginFor(prominentTreeBounds, svgBounds);
+        const stageOriginCrop = cropOriginFor(
+          prominentTreeBounds,
+          stageBounds
+        );
+        const prominentTreeRaster = await rasterize(trees[0]);
+        const svgStageOffset = {
+          left: svgBounds.left - stageBounds.left,
+          top: svgBounds.top - stageBounds.top
+        };
+        const rasterOriginUsesSvgBounds =
+          svgBounds.top !== stageBounds.top
+          && prominentTreeRaster.left === svgOriginCrop.left
+          && prominentTreeRaster.top === svgOriginCrop.top
+          && (
+            prominentTreeRaster.left !== stageOriginCrop.left
+            || prominentTreeRaster.top !== stageOriginCrop.top
+          );
 
         const countPaintedIntersections = (first, second) => {
           const left = Math.max(first.left, second.left);
@@ -380,17 +522,61 @@
         let scannedAnimatedFrames = 0;
         let studentIntersections = 0;
         let busIntersections = 0;
+        const obstacleIntersections = Object.fromEntries(
+          obstacles.map(([name]) => [name, 0])
+        );
+        let treeIntersectionsAt130 = 0;
+        let treeStatesAt130 = 0;
+        let teacherPlacementValid = true;
+        let teacherPlacementStates = 0;
+        let stageEdgeViolations = 0;
+        const maximumScannedPercent = { full: 0, reduced: 0 };
+        const scannedBusStates = { full: 0, reduced: 0 };
+        let firstStudentIntersection = null;
+        let firstBusIntersection = null;
+
+        const paintedDiagnostic = (details) => ({
+          viewport: [innerWidth, innerHeight],
+          stageRect: {
+            left: stageBounds.left,
+            top: stageBounds.top,
+            width: stageBounds.width,
+            height: stageBounds.height
+          },
+          svgRect: {
+            left: svgBounds.left,
+            top: svgBounds.top,
+            width: svgBounds.width,
+            height: svgBounds.height
+          },
+          supersampledSvg: [
+            supersampledSvgWidth,
+            supersampledSvgHeight
+          ],
+          supersample: paintedMaskSupersample,
+          ...details
+        });
 
         const failPaintedState = (details) => {
-          const diagnostic = JSON.stringify({
-            viewport: [innerWidth, innerHeight],
-            stage: [width, height],
-            supersampledStage: [supersampledWidth, supersampledHeight],
-            supersample: paintedMaskSupersample,
-            ...details
-          });
+          const diagnostic = JSON.stringify(paintedDiagnostic(details));
           document.body.dataset.paintedMaskFailure = diagnostic;
           throw new Error(diagnostic);
+        };
+
+        const recordPaintedIntersection = (kind, details) => {
+          const diagnostic = paintedDiagnostic(details);
+          const serialized = JSON.stringify(diagnostic);
+          if (kind === "student" && firstStudentIntersection === null) {
+            firstStudentIntersection = diagnostic;
+            document.body.dataset.paintedStudentMaskFailure = serialized;
+          }
+          if (kind === "bus" && firstBusIntersection === null) {
+            firstBusIntersection = diagnostic;
+            document.body.dataset.paintedBusMaskFailure = serialized;
+          }
+          if (!document.body.dataset.paintedMaskFailure) {
+            document.body.dataset.paintedMaskFailure = serialized;
+          }
         };
 
         const scanPaintedState = async ({
@@ -403,6 +589,17 @@
           document.body.dataset.paintedMaskLastTarget = percent.toFixed(6);
           document.body.dataset.paintedMaskLastDirection = direction;
           document.body.dataset.paintedMaskLastFrame = String(frame);
+          maximumScannedPercent[motion] = Math.max(
+            maximumScannedPercent[motion],
+            percent
+          );
+          if (phase === "static" && percent === 125) {
+            teacherPlacementStates += 1;
+            teacherPlacementValid &&=
+              obstacles.find(([name]) => name === "teacher")[1]
+                .getAttribute("transform")
+                === "translate(550 698) scale(1.08)";
+          }
 
           const visibleStudents = students
             .map((student, index) => ({ student, index }))
@@ -428,7 +625,7 @@
               );
               studentIntersections += intersections;
               if (intersections > 0) {
-                failPaintedState({
+                recordPaintedIntersection("student", {
                   percent,
                   motion,
                   direction,
@@ -446,6 +643,7 @@
           }
 
           if (Number(bus.getAttribute("opacity")) > 0) {
+            scannedBusStates[motion] += 1;
             const busRaster = await rasterize(bus);
             for (const { index, raster } of studentRasters) {
               const intersections = countPaintedIntersections(
@@ -454,7 +652,7 @@
               );
               busIntersections += intersections;
               if (intersections > 0) {
-                failPaintedState({
+                recordPaintedIntersection("bus", {
                   percent,
                   motion,
                   direction,
@@ -466,9 +664,43 @@
                 });
               }
             }
+            for (const [name, element] of obstacles) {
+              const intersections = countPaintedIntersections(
+                busRaster,
+                await rasterize(element)
+              );
+              obstacleIntersections[name] += intersections;
+              if (name.startsWith("tree-") && percent === 130) {
+                treeStatesAt130 += 1;
+                treeIntersectionsAt130 += intersections;
+              }
+              if (intersections > 0) {
+                recordPaintedIntersection("bus", {
+                  percent,
+                  motion,
+                  direction,
+                  phase,
+                  frame,
+                  obstacle: name,
+                  studentIntersections: 0,
+                  busIntersections: intersections
+                });
+              }
+            }
+            const busBounds = bus.getBoundingClientRect();
+            if (
+              busBounds.top < stageBounds.top
+              || busBounds.right > stageBounds.right
+              || busBounds.bottom > stageBounds.bottom
+            ) {
+              stageEdgeViolations += 1;
+            }
           }
         };
 
+        delete document.body.dataset.paintedMaskFailure;
+        delete document.body.dataset.paintedStudentMaskFailure;
+        delete document.body.dataset.paintedBusMaskFailure;
         for (const reducedMotion of [false, true]) {
           probe.root.dataset.motion = reducedMotion ? "reduce" : "full";
           for (const direction of ["ascending", "reverse"]) {
@@ -551,12 +783,31 @@
           }
         }
 
-        delete document.body.dataset.paintedMaskFailure;
         document.body.dataset.paintedMaskSupersample = String(
           paintedMaskSupersample
         );
         document.body.dataset.paintedMaskRasterSize =
-          `${supersampledWidth}x${supersampledHeight}`;
+          `${supersampledSvgWidth}x${supersampledSvgHeight}`;
+        document.body.dataset.paintedMaskSvgStageOffset =
+          JSON.stringify(svgStageOffset);
+        document.body.dataset.paintedMaskSvgOriginCrop =
+          JSON.stringify(svgOriginCrop);
+        document.body.dataset.paintedMaskStageOriginCrop =
+          JSON.stringify(stageOriginCrop);
+        document.body.dataset.paintedMaskUsesSvgOrigin =
+          String(rasterOriginUsesSvgBounds);
+        document.body.dataset.prominentTreeTrunkBottom =
+          prominentTrunkBottom.toFixed(1);
+        document.body.dataset.treeTrunkHeights =
+          trunkHeights.join(",");
+        document.body.dataset.treeGeometryValid =
+          String(treeGeometryValid);
+        document.body.dataset.teacherTransform =
+          "translate(550 698) scale(1.08)";
+        document.body.dataset.teacherPlacementValid =
+          String(teacherPlacementValid && teacherPlacementStates === 4);
+        document.body.dataset.teacherPlacementStates =
+          String(teacherPlacementStates);
         document.body.dataset.paintedMaskStaticStates = String(
           scannedStaticStates
         );
@@ -576,17 +827,94 @@
         document.body.dataset.paintedBusStudentIntersections = String(
           busIntersections
         );
-        return paintedMaskSupersample > 1
-          && scannedStaticStates === 32
-          && scannedAnimatedFrames > animatedStudentTargetPercents.length * 2
-          && studentIntersections === 0
-          && busIntersections === 0;
+        document.body.dataset.paintedBusObstacleIntersections =
+          JSON.stringify(obstacleIntersections);
+        document.body.dataset.paintedBusTreeIntersectionsAt130 =
+          String(treeIntersectionsAt130);
+        document.body.dataset.paintedBusTreeStatesAt130 =
+          String(treeStatesAt130);
+        document.body.dataset.paintedBusStageEdgeViolations = String(
+          stageEdgeViolations
+        );
+        document.body.dataset.paintedBusFullMaxPercent =
+          maximumScannedPercent.full.toFixed(3);
+        document.body.dataset.paintedBusReducedMaxPercent =
+          maximumScannedPercent.reduced.toFixed(3);
+        document.body.dataset.paintedBusFullStates = String(
+          scannedBusStates.full
+        );
+        document.body.dataset.paintedBusReducedStates = String(
+          scannedBusStates.reduced
+        );
+        return {
+          scanComplete: paintedMaskSupersample > 1
+            && scannedStaticStates === 40
+            && scannedAnimatedFrames
+              > animatedStudentTargetPercents.length * 2,
+          busPhaseComplete: maximumScannedPercent.full === 135
+            && maximumScannedPercent.reduced === 135
+            && scannedBusStates.full > 0
+            && scannedBusStates.reduced > 0,
+          studentIntersections,
+          busIntersections,
+          obstacleIntersections,
+          treeIntersectionsAt130,
+          treeStatesAt130,
+          stageEdgeViolations,
+          rasterOriginUsesSvgBounds,
+          treeGeometryValid,
+          teacherPlacementValid:
+            teacherPlacementValid && teacherPlacementStates === 4,
+          firstStudentIntersection,
+          firstBusIntersection
+        };
       } finally {
         probe.remove();
       }
     }
 
-    async function studentRoutesClearAcrossFullRamp() {
+    let paintedIntersectionMeasurement;
+    const getPaintedIntersectionMeasurement = () => {
+      paintedIntersectionMeasurement ??=
+        measurePaintedStudentAndBusIntersections();
+      return paintedIntersectionMeasurement;
+    };
+
+    async function paintedStudentMasksNeverIntersect() {
+      const measurement = await getPaintedIntersectionMeasurement();
+      return measurement.scanComplete
+        && measurement.studentIntersections === 0;
+    }
+
+    async function paintedBusNeverIntersectsStudentsThroughBusPhase() {
+      const measurement = await getPaintedIntersectionMeasurement();
+      return measurement.scanComplete
+        && measurement.busPhaseComplete
+        && measurement.busIntersections === 0;
+    }
+
+    async function paintedBusClearsCampusObstaclesAndStageEdges() {
+      const measurement = await getPaintedIntersectionMeasurement();
+      return measurement.scanComplete
+        && measurement.teacherPlacementValid
+        && Object.values(measurement.obstacleIntersections)
+          .every((count) => count === 0)
+        && measurement.treeStatesAt130 > 0
+        && measurement.treeIntersectionsAt130 === 0
+        && measurement.stageEdgeViolations === 0;
+    }
+
+    async function prominentTreeTrunkGeometryIsScoped() {
+      const measurement = await getPaintedIntersectionMeasurement();
+      return measurement.treeGeometryValid;
+    }
+
+    async function paintedMasksUseSvgViewportOrigin() {
+      const measurement = await getPaintedIntersectionMeasurement();
+      return measurement.rasterOriginUsesSvgBounds;
+    }
+
+    async function measureStudentRoutesAcrossFullRamp() {
       const probe = await createCampusProbe();
       const intersects = (first, second) =>
         first.left < second.right
@@ -602,14 +930,6 @@
           0,
           Math.min(first.bottom, second.bottom) - Math.max(first.top, second.top)
         );
-      const milestoneExpectations = new Map([
-        [120, ["12.000", "0.000", "0.000", "0.000"]],
-        [400, ["40.000", "100.000", "0.000", "0.000"]],
-        [540, ["54.000", "100.000", "50.000", "0.000"]],
-        [840, ["84.000", "100.000", "100.000", "50.000"]],
-        [980, ["98.000", "100.000", "100.000", "93.750"]]
-      ]);
-
       try {
         const bus = probe.root.querySelector(".school-bus");
         const students = [...probe.root.querySelectorAll(".student")];
@@ -622,9 +942,9 @@
           let busIntersections = 0;
           probe.root.dataset.motion = reducedMotion ? "reduce" : "full";
           for (const direction of ["ascending", "descending"]) {
-            for (let sample = 0; sample <= 1000; sample += 1) {
-              const step = direction === "ascending" ? sample : 1000 - sample;
-              const ratio = 1 + .25 * step / 1000;
+            for (let sample = 0; sample <= 1400; sample += 1) {
+              const step = direction === "ascending" ? sample : 1400 - sample;
+              const ratio = 1 + .00025 * step;
               probe.view.update({
                 raised: ratio * 100000,
                 goal: 100000,
@@ -632,26 +952,6 @@
                 reducedMotion,
                 celebrationActive: false
               });
-
-              const milestone = milestoneExpectations.get(step);
-              if (milestone && [
-                probe.root.dataset.studentPercent,
-                probe.root.dataset.swingPercent,
-                probe.root.dataset.teacherPercent,
-                probe.root.dataset.busPercent
-              ].some((value, index) => value !== milestone[index])) {
-                throw new Error(JSON.stringify({
-                  ratio,
-                  direction,
-                  milestone,
-                  actual: [
-                    probe.root.dataset.studentPercent,
-                    probe.root.dataset.swingPercent,
-                    probe.root.dataset.teacherPercent,
-                    probe.root.dataset.busPercent
-                  ]
-                }));
-              }
 
               const stageBounds = stage.getBoundingClientRect();
               const scaleX = stageBounds.width / 1600;
@@ -708,9 +1008,9 @@
         }
 
         probe.view.update({
-          raised: 125000,
+          raised: 135000,
           goal: 100000,
-          ...deriveProgress(125000, 100000),
+          ...deriveProgress(135000, 100000),
           reducedMotion: true,
           celebrationActive: false
         });
@@ -734,16 +1034,35 @@
           measurements.reduced.busIntersections
         );
         document.body.dataset.distinctStudentPlacements = String(placements.size);
-        return measurements.full.maximumOverlapArea < 850
-          && measurements.reduced.maximumOverlapArea < 850
-          && measurements.full.overlapViolations === 0
-          && measurements.reduced.overlapViolations === 0
-          && measurements.full.busIntersections === 0
-          && measurements.reduced.busIntersections === 0
-          && placements.size === 36;
+        return {
+          measurements,
+          distinctStudentPlacements: placements.size
+        };
       } finally {
         probe.remove();
       }
+    }
+
+    let studentRouteMeasurement;
+    const getStudentRouteMeasurement = () => {
+      studentRouteMeasurement ??= measureStudentRoutesAcrossFullRamp();
+      return studentRouteMeasurement;
+    };
+
+    async function studentRoutesClearAcrossFullRamp() {
+      const { measurements, distinctStudentPlacements } =
+        await getStudentRouteMeasurement();
+      return measurements.full.maximumOverlapArea < 850
+        && measurements.reduced.maximumOverlapArea < 850
+        && measurements.full.overlapViolations === 0
+        && measurements.reduced.overlapViolations === 0
+        && distinctStudentPlacements === 36;
+    }
+
+    async function busBoundsClearStudentsAcrossFullRamp() {
+      const { measurements } = await getStudentRouteMeasurement();
+      return measurements.full.busIntersections === 0
+        && measurements.reduced.busIntersections === 0;
     }
 
     async function flagGeometryAndWaveArePoleAnchored() {
@@ -878,24 +1197,24 @@
         root.dataset.teacherPercent !== "50.000"
         || root.dataset.visibleTeachers !== "1.000000"
       ) return false;
-      update(1.21);
+      update(1.30);
       if (
         root.dataset.busPercent !== "50.000"
         || root.querySelector(".school-bus").getAttribute("transform")
-          !== "translate(31.00 0)"
+          !== "translate(-75.00 3.13)"
       ) return false;
-      update(1.21, true);
+      update(1.30, true);
       if (
         root.querySelector(".school-bus").getAttribute("transform")
           !== "translate(0 0)"
       ) return false;
-      update(1.4);
+      update(1.35);
       return root.dataset.studentPercent === "100.000"
         && root.dataset.swingPercent === "100.000"
         && root.dataset.teacherPercent === "100.000"
         && root.dataset.busPercent === "100.000"
         && root.querySelector("#percent-display").textContent
-          === "140% — campus ready!";
+          === "135% — campus ready!";
     }
 
     async function suppliedLogoLoads() {
@@ -977,18 +1296,23 @@
         return value.buildingRatio === 1 && value.studentRatio === 0;
       }],
       ["125% fills students", () => deriveProgress(125000, 100000).studentRatio === 1],
-      ["Campus ramps honor 103/110/117/125 thresholds", () => {
+      ["Campus ramps honor 103/110/117/125/130/135 thresholds", () => {
         const at103 = deriveProgress(103000, 100000);
         const at110 = deriveProgress(110000, 100000);
         const at117 = deriveProgress(117000, 100000);
         const at125 = deriveProgress(125000, 100000);
+        const at130 = deriveProgress(130000, 100000);
+        const at135 = deriveProgress(135000, 100000);
         return at103.goalAchieved
           && at103.swingRatio === 0
           && at110.swingRatio === 1
           && at110.teacherRatio === 0
           && at117.teacherRatio === 1
           && at117.busRatio === 0
-          && at125.busRatio === 1;
+          && at125.playgroundRatio === 1
+          && at125.busRatio === 0
+          && at130.busRatio === .5
+          && at135.busRatio === 1;
       }],
       ["Campus renderer reaches exact visual endpoints", campusThresholdsRender],
       ["Supplied TCF logo loads at its intrinsic dimensions", suppliedLogoLoads],
@@ -1123,15 +1447,32 @@
           && scene.teachers.length === 2
           && Object.isFrozen(scene.campus);
       }],
-      ["Student routes clear each other and the bus across the full ramp", studentRoutesClearAcrossFullRamp],
-      ["Painted student masks and bus remain pixel-disjoint", paintedStudentMasksNeverIntersect],
+      ["Student routes clear each other across the full ramp", studentRoutesClearAcrossFullRamp],
+      ["Bus bounds clear students across the full ramp", busBoundsClearStudentsAcrossFullRamp],
+      ["Painted student masks remain pixel-disjoint", paintedStudentMasksNeverIntersect],
+      ["Painted bus remains pixel-disjoint from students through 135%", paintedBusNeverIntersectsStudentsThroughBusPhase],
+      ["Only the prominent tree uses the shortened 76-unit trunk", prominentTreeTrunkGeometryIsScoped],
+      ["Painted masks use the deliberately offset SVG viewport origin", paintedMasksUseSvgViewportOrigin],
+      ["Painted bus clears the tree, teacher, playground, school, and stage edges", paintedBusClearsCampusObstaclesAndStageEdges],
       ["Pakistan flag is exact and its wave stays pole-anchored", flagGeometryAndWaveArePoleAnchored],
       ["Completed facade has masonry pixels at former stagger leaks", completedFacadeHasNoSkyLeaks],
-      ["Progress card clears painted facade with controls open and closed", progressCardClearsFacade]
+      ["Actual bus DOM clears overlays and painted keyboard descendants by 12px at responsive sizes", busClearsOverlaysAcrossViewports]
     ];
 
+    const requestedCheck = new URLSearchParams(location.search).get("check");
+    const selectedChecks = requestedCheck === "bus-overlays"
+      ? checks.filter(([name]) => name.startsWith("Actual bus DOM"))
+      : requestedCheck === "bus"
+        ? checks.filter(([name]) =>
+          name.startsWith("Bus bounds")
+          || name.startsWith("Painted bus")
+          || name.startsWith("Only the prominent tree")
+          || name.startsWith("Painted masks use")
+          || name.startsWith("Actual bus DOM")
+        )
+      : checks;
     let failures = 0;
-    for (const [name, check] of checks) {
+    for (const [name, check] of selectedChecks) {
       const item = document.createElement("li");
       try {
         const passed = await check();

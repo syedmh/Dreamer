@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#078447">
   <title>Build a Brighter Future — TCF Fundraiser</title>
-  <link rel="icon" href="/Logo.png" type="image/png">
+  <link rel="icon" href="/favicon.ico" type="image/png">
   <link rel="apple-touch-icon" href="/Logo.png">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -20,13 +20,15 @@
         data-swing-percent="0"
         data-teacher-percent="0"
         data-visible-teachers="0"
-        data-playground-percent="0">
+        data-playground-percent="0"
+        data-bus-percent="0"
+        data-distant-schools="0">
     <section class="stage" aria-labelledby="event-title">
       <svg id="school-scene" viewBox="0 0 1600 900" role="img"
            aria-labelledby="scene-title scene-description"
            preserveAspectRatio="xMidYMid meet">
         <title id="scene-title">Fundraiser progress building a school</title>
-        <desc id="scene-description">A sunny landscape where a red-brick TCF School Seattle is constructed block by block. At the goal, a Pakistan flag is raised; above the goal, students and teachers arrive while a hillside swing set grows into a finished playground.</desc>
+        <desc id="scene-description">A sunny landscape with a transparent outline of the completed TCF School Seattle while the red-brick school is constructed block by block. At the goal, a Pakistan flag is raised; above the goal, students and teachers arrive while a hillside swing set grows into a finished playground, then a long conventional yellow school bus facing right arrives in the lower-left and the campus is ready at 135%.</desc>
       </svg>
 
       <header class="scoreboard">
@@ -54,27 +56,7 @@
         </p>
       </section>
 
-      <p id="keyboard-hint" class="keyboard-hint">Press <kbd>Space</kbd> to hide key legends · <kbd>C</kbd> controls · <kbd>D</kbd> demo · <kbd>N</kbd> day/night · <kbd>O</kbd> clap · <kbd>P</kbd> thank you · <kbd>K</kbd> kite · <kbd>L</kbd> clear kites · <kbd>Q</kbd> firework · <kbd>W</kbd> continuous · <kbd>F</kbd> fullscreen</p>
-
-      <aside id="operator-panel" class="operator-panel" hidden aria-label="Operator controls">
-        <form id="operator-form">
-          <div class="control-heading">
-            <strong>Event controls</strong>
-            <button id="close-controls" type="button" aria-label="Close controls">×</button>
-          </div>
-          <label>Raised
-            <input id="raised-input" name="raised" type="number" min="0" max="9007199254740991" step="any" required>
-          </label>
-          <label>Goal
-            <input id="goal-input" name="goal" type="number" min="0.01" max="7205759403792793" step="any" required>
-          </label>
-          <label class="slider-label">Quick progress
-            <input id="raised-slider" type="range" min="0" max="125000" step="any">
-          </label>
-          <button class="apply-button" type="submit">Apply</button>
-          <p id="operator-shortcuts" class="shortcuts">Space show/hide key legends · C controls · D demo · N day/night · O students clap · P thank-you messages · K add kite · L clear kites · Q firework · W continuous fireworks · F fullscreen · ←/→ 1% · Shift 5% · Home 0 · End 100%</p>
-        </form>
-      </aside>
+      <p id="keyboard-hint" class="keyboard-hint">Press <kbd>Space</kbd> to hide key legends · <kbd>S</kbd> drop next school · <kbd>X</kbd> remove last school · <kbd>D</kbd> demo · <kbd>N</kbd> day/night · <kbd>O</kbd> clap · <kbd>P</kbd> thank you · <kbd>K</kbd> kite · <kbd>L</kbd> clear kites · <kbd>Q</kbd> firework · <kbd>W</kbd> continuous · <kbd>F</kbd> fullscreen · arrows/Home/End progress</p>
 
       <div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     </section>

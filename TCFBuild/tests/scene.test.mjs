@@ -324,7 +324,7 @@ test("teacher and campus geometry are deterministic, exact, and deeply frozen", 
     teachers.map(({ transform, bounds }) => ({ transform, bounds })),
     [
       {
-        transform: "translate(500 704) scale(1.08)",
+        transform: "translate(550 698) scale(1.08)",
         bounds: { left: -16, right: 16, top: -68, bottom: 0 }
       },
       {
@@ -333,19 +333,87 @@ test("teacher and campus geometry are deterministic, exact, and deeply frozen", 
       }
     ]
   );
+  assert.deepEqual(
+    {
+      x: teachers[0].x,
+      y: teachers[0].y,
+      scale: teachers[0].scale,
+      bounds: teachers[0].bounds
+    },
+    {
+      x: 550,
+      y: 698,
+      scale: 1.08,
+      bounds: { left: -16, right: 16, top: -68, bottom: 0 }
+    }
+  );
+  assert.ok(Object.isFrozen(teachers[0]));
+  assert.ok(Object.isFrozen(teachers[0].bounds));
 
   const scene = createScene();
+  assert.equal(scene.campus.swings.offsetY, 45);
   assert.deepEqual(scene.campus.swings.bounds, {
-    left: 1494,
-    right: 1588,
-    top: 476,
-    bottom: 624
+    left: 20,
+    right: 145,
+    top: 535,
+    bottom: 705
   });
+  assert.deepEqual(scene.campus.distantSchools, [
+    {
+      slot: 1,
+      x: 18,
+      baseY: 571,
+      scale: .54,
+      bounds: { left: 18, right: 61.2, top: 518.08, bottom: 571 }
+    },
+    {
+      slot: 2,
+      x: 82,
+      baseY: 555,
+      scale: .5,
+      bounds: { left: 82, right: 122, top: 506, bottom: 555 }
+    },
+    {
+      slot: 3,
+      x: 325,
+      baseY: 559,
+      scale: .56,
+      bounds: { left: 325, right: 369.8, top: 504.12, bottom: 559 }
+    },
+    {
+      slot: 4,
+      x: 390,
+      baseY: 578,
+      scale: .52,
+      bounds: { left: 390, right: 431.6, top: 527.04, bottom: 578 }
+    }
+  ]);
+  assert.equal(new Set(
+    scene.campus.distantSchools.map(({ slot }) => slot)
+  ).size, 4);
+  assert.ok(scene.campus.distantSchools.every(({ bounds }) =>
+    bounds.right < 540
+    && bounds.bottom < scene.campus.bus.bounds.top
+  ));
+  for (let index = 1; index < scene.campus.distantSchools.length; index += 1) {
+    assert.ok(
+      scene.campus.distantSchools[index - 1].bounds.right
+        < scene.campus.distantSchools[index].bounds.left
+    );
+  }
+  assert.ok(scene.campus.distantSchools[1].bounds.right < 154.1);
+  assert.ok(scene.campus.distantSchools[2].bounds.left > 309.2);
   assert.deepEqual(scene.campus.bus.bounds, {
-    left: 150,
-    right: 454,
-    top: 460,
-    bottom: 576
+    left: 165,
+    right: 530,
+    top: 630,
+    bottom: 775
+  });
+  assert.deepEqual(scene.campus.bus.startBounds, {
+    left: -435,
+    right: -70,
+    top: 655,
+    bottom: 800
   });
   assert.deepEqual(scene.campus.flag.pole, {
     x: 960,
@@ -375,18 +443,62 @@ test("teacher and campus geometry are deterministic, exact, and deeply frozen", 
     .25
   );
   assert.deepEqual(scene.campus.bus.wheels, [
-    { cx: 218, cy: 556, r: 20 },
-    { cx: 390, cy: 556, r: 20 }
+    { cx: 235, cy: 805, r: 30 },
+    { cx: 475, cy: 805, r: 30 }
   ]);
-  assert.equal(scene.campus.bus.startOffsetX, -360);
-  assert.equal(scene.campus.bus.startOffsetY, 34);
+  assert.deepEqual(scene.campus.bus.startOffset, { x: -600, y: 25 });
+  assert.deepEqual(scene.campus.bus.body, {
+    x: 169,
+    y: 732,
+    width: 339,
+    height: 73,
+    strokeWidth: 4
+  });
+  assert.deepEqual(scene.campus.bus.cabin.bounds, {
+    left: 183,
+    right: 480,
+    top: 696,
+    bottom: 732
+  });
+  assert.equal(scene.campus.bus.windows.length, 7);
+  assert.equal(scene.campus.bus.studs.length, 8);
+  assert.equal(scene.campus.bus.rails.length, 2);
+  assert.deepEqual(scene.campus.bus.door, {
+    x: 421,
+    y: 712,
+    width: 30,
+    height: 83
+  });
+  assert.deepEqual(scene.campus.bus.hood.bounds, {
+    left: 476,
+    right: 530,
+    top: 750,
+    bottom: 807
+  });
   assert.equal(
     scene.campus.bus.routeDistance,
-    Math.hypot(
-      scene.campus.bus.startOffsetX,
-      scene.campus.bus.startOffsetY
-    )
+    Math.hypot(600, 25)
   );
+  assert.equal(scene.campus.bus.bounds.right - scene.campus.bus.bounds.left, 365);
+  assert.equal(scene.campus.bus.bounds.bottom - scene.campus.bus.bounds.top, 145);
+  assert.ok(scene.campus.bus.startBounds.right < 0);
+  assert.equal(scene.campus.bus.bounds.left - scene.campus.swings.bounds.right, 20);
+  assert.equal(scene.campus.bus.startBounds.top - scene.campus.swings.bounds.bottom, -50);
+  assert.equal(scene.campus.bus.wheels[1].cx - scene.campus.bus.wheels[0].cx, 240);
+  assert.equal(
+    scene.campus.bus.wheels[0].cy
+      + scene.campus.bus.wheels[0].r
+      + scene.campus.bus.artworkOffset.y,
+    775
+  );
+  assert.equal(scene.campus.bus.bounds.left, 165);
+  assert.equal(900 - scene.campus.bus.bounds.bottom, 125);
+  assert.deepEqual(scene.campus.bus.artworkOffset, { x: 0, y: -60 });
+  assert.deepEqual(scene.campus.trees, [
+    { x: 230, y: 520, scale: 1.1, trunkHeight: 76 },
+    { x: 1420, y: 590, scale: 1, trunkHeight: 98 },
+    { x: 1330, y: 640, scale: .65, trunkHeight: 98 }
+  ]);
 
   const assertDeeplyFrozen = (value) => {
     if (!value || typeof value !== "object") return;

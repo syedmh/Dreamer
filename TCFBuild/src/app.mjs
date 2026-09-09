@@ -2,10 +2,7 @@ import {
   addRaisedAmount,
   clampAmount,
   deriveDemoRaised,
-  deriveOperatorControlValues,
-  deriveRaisedFromSliderValue,
-  parseConfig,
-  validateOperatorAmounts
+  parseConfig
 } from "./config.mjs";
 import { createCurrencyFormatter } from "./currency.mjs";
 import { deriveProgress, exponentialStep } from "./model.mjs";
@@ -16,81 +13,43 @@ const config = parseConfig(window.location.search);
 const root = document.querySelector("#fundraiser");
 const scene = createScene(config);
 const view = createFundraiserView(root, scene, config);
-
-const operatorPanel = document.querySelector("#operator-panel");
-const operatorForm = document.querySelector("#operator-form");
-const closeControls = document.querySelector("#close-controls");
-const raisedInput = document.querySelector("#raised-input");
-const goalInput = document.querySelector("#goal-input");
-const raisedSlider = document.querySelector("#raised-slider");
 const announcer = document.querySelector("#announcer");
 const keyboardHint = document.querySelector("#keyboard-hint");
-const operatorShortcuts = document.querySelector("#operator-shortcuts");
 const money = createCurrencyFormatter(config.locale, config.currency);
 
-let goal = config.goal;
-let targetRaised = config.raised;
+let state = {
+  raised: config.raised,
+  goal: config.goal,
+  demoActive: false,
+  nightMode: false,
+  studentsClapping: false,
+  thankYouVisible: true,
+  continuousFireworks: false
+};
+let goal = state.goal;
+let targetRaised = state.raised;
 let displayedRaised = targetRaised;
-let demoActive = config.demo;
+let demoActive = state.demoActive;
 let demoStartedAt = performance.now();
+let lastDemoPublishAt = 0;
+let demoPublishPending = false;
 let lastFrameAt = performance.now();
 let celebrationUntil = 0;
 let previousDisplayedRatio = displayedRaised / goal;
 let framePending = false;
-let focusRestoreTimeoutId = 0;
 let continuousFireworksEnabled = false;
 let continuousFireworksTimeoutId = 0;
 let fireworksCleanupComplete = false;
-let nightMode = false;
-let studentsClapping = false;
-let thankYouVisible = true;
+let nextActionSequence = 0;
+const executedActionIds = new Set();
+const MAX_EXECUTED_ACTION_IDS = 256;
 
 const mediaReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
 const reducedMotion = () => config.motion === "reduce"
   || (config.motion === "auto" && mediaReduced.matches);
-const focusRestoreDurationMs = 1400;
 
-function synchronizeMotionState() {
-  root.dataset.motion = reducedMotion() ? "reduce" : "full";
-}
-
-function clearFocusRestoreState() {
-  if (focusRestoreTimeoutId) {
-    clearTimeout(focusRestoreTimeoutId);
-    focusRestoreTimeoutId = 0;
-  }
-  delete root.dataset.focusRestore;
-}
-
-function showFocusRestoreState() {
-  clearFocusRestoreState();
-  root.dataset.focusRestore = "pointer-close";
-  focusRestoreTimeoutId = setTimeout(() => {
-    delete root.dataset.focusRestore;
-    focusRestoreTimeoutId = 0;
-  }, focusRestoreDurationMs);
-}
-
-function synchronizeSliderText() {
-  const sliderAmount = deriveRaisedFromSliderValue(raisedSlider.value, goal);
-  const sliderPercent = goal > 0 ? (sliderAmount / goal) * 100 : 0;
-  raisedSlider.setAttribute(
-    "aria-valuetext",
-    `${money.format(sliderAmount)} raised (${sliderPercent.toFixed(1)}% of goal)`
-  );
-}
-
-function synchronizeControls() {
-  const values = deriveOperatorControlValues(targetRaised, goal);
-  raisedInput.value = String(money.round(Number(values.raised)));
-  goalInput.value = String(money.round(Number(values.goal)));
-  raisedSlider.max = String(money.round(Number(values.sliderMax)));
-  raisedSlider.value = String(money.round(Number(values.sliderValue)));
-  synchronizeSliderText();
-}
-
-function announce() {
-  announcer.textContent = `${money.format(targetRaised)} raised toward a goal of ${money.format(goal)}.`;
+function announce(message) {
+  announcer.textContent = message;
 }
 
 function scheduleFrame() {
@@ -102,133 +61,8 @@ function scheduleFrame() {
   });
 }
 
-function handleMotionPreferenceChange() {
-  synchronizeMotionState();
-  if (reducedMotion()) celebrationUntil = 0;
-  if (continuousFireworksEnabled) {
-    cancelContinuousFireworksTimeout();
-    scheduleContinuousFireworks();
-  }
-  scheduleFrame();
-}
-
-if (config.motion === "auto") {
-  if (typeof mediaReduced.addEventListener === "function") {
-    mediaReduced.addEventListener("change", handleMotionPreferenceChange);
-  } else {
-    mediaReduced.addListener?.(handleMotionPreferenceChange);
-  }
-}
-
-function commitRaised(nextRaised, { speak = true } = {}) {
-  targetRaised = clampAmount(nextRaised);
-  demoActive = false;
-  synchronizeControls();
-  if (speak) announce();
-  scheduleFrame();
-}
-
-function setControlsVisible(visible, { restoreFocusVisible = false } = {}) {
-  const wasVisible = !operatorPanel.hidden;
-  operatorPanel.hidden = !visible;
-  if (visible) {
-    clearFocusRestoreState();
-    raisedInput.focus();
-  } else if (wasVisible) {
-    root.focus();
-    if (restoreFocusVisible) {
-      showFocusRestoreState();
-    } else {
-      clearFocusRestoreState();
-    }
-  }
-}
-
-raisedSlider.addEventListener("input", () => {
-  raisedInput.value = String(money.round(
-    deriveRaisedFromSliderValue(raisedSlider.value, goal)
-  ));
-  synchronizeSliderText();
-});
-
-operatorForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const submission = validateOperatorAmounts(raisedInput.value, goalInput.value);
-  if (!submission.valid) {
-    announcer.textContent = submission.message;
-    (submission.field === "raised" ? raisedInput : goalInput).focus();
-    return;
-  }
-
-  goal = submission.goal;
-  commitRaised(submission.raised);
-});
-
-closeControls.addEventListener("click", (event) => {
-  setControlsVisible(false, {
-    restoreFocusVisible: event?.detail > 0
-  });
-});
-
-root.addEventListener("blur", clearFocusRestoreState);
-
-function isEditingTarget(target) {
-  const tagName = String(target?.tagName || "").toLowerCase();
-  return ["input", "button", "select", "textarea"].includes(tagName)
-    || target?.isContentEditable
-    || Boolean(target?.closest?.(
-      '[contenteditable]:not([contenteditable="false"]), [role="textbox"]'
-    ))
-    || document.designMode === "on";
-}
-
-function isKiteKey(event) {
-  return String(event.key).toLowerCase() === "k";
-}
-
-function isClearKitesKey(event) {
-  return String(event.key).toLowerCase() === "l";
-}
-
-function isControlsKey(event) {
-  return event.key === " "
-    || event.key === "Spacebar"
-    || event.code === "Space";
-}
-
-function isFireworkKey(event) {
-  return String(event.key).toLowerCase() === "q";
-}
-
-function isContinuousFireworksKey(event) {
-  return String(event.key).toLowerCase() === "w";
-}
-
-function isFullscreenKey(event) {
-  return String(event.key).toLowerCase() === "f";
-}
-
-function isNightKey(event) {
-  return String(event.key).toLowerCase() === "n";
-}
-
-function isClappingKey(event) {
-  return String(event.key).toLowerCase() === "o";
-}
-
-function isThankYouKey(event) {
-  return String(event.key).toLowerCase() === "p";
-}
-
-function formatKiteAnnouncement(count) {
-  return `Kite added. ${count} ${count === 1 ? "kite" : "kites"} in the sky.`;
-}
-
-function toggleFullscreen() {
-  const fullscreenAction = !document.fullscreenElement
-    ? root.requestFullscreen?.()
-    : document.exitFullscreen?.();
-  fullscreenAction?.catch?.(() => {});
+function synchronizeMotionState() {
+  root.dataset.motion = reducedMotion() ? "reduce" : "full";
 }
 
 function randomContinuousDelay() {
@@ -238,9 +72,9 @@ function randomContinuousDelay() {
   return Math.round(minimum + Math.random() * (maximum - minimum));
 }
 
-function setContinuousFireworksState(state) {
+function setContinuousFireworksState(stateName) {
   root.dataset.continuousFireworks = String(continuousFireworksEnabled);
-  root.dataset.fireworksScheduler = state;
+  root.dataset.fireworksScheduler = stateName;
   root.dataset.fireworksReducedMotion = String(reducedMotion());
 }
 
@@ -272,7 +106,6 @@ function scheduleContinuousFireworks() {
       scheduleContinuousFireworks();
       return;
     }
-
     setContinuousFireworksState("launching");
     const launchCount = reducedMotion() || Math.random() >= .28 ? 1 : 2;
     for (let index = 0; index < launchCount; index += 1) {
@@ -285,28 +118,183 @@ function scheduleContinuousFireworks() {
   }, delay);
 }
 
-function startContinuousFireworks() {
-  if (continuousFireworksEnabled) return false;
-  continuousFireworksEnabled = true;
-  scheduleContinuousFireworks();
-  return true;
+function synchronizeContinuousFireworks(enabled) {
+  if (enabled === continuousFireworksEnabled) return;
+  continuousFireworksEnabled = enabled;
+  if (enabled) {
+    scheduleContinuousFireworks();
+  } else {
+    cancelContinuousFireworksTimeout();
+    setContinuousFireworksState("stopped");
+  }
 }
 
-function stopContinuousFireworks() {
-  const wasEnabled = continuousFireworksEnabled;
-  continuousFireworksEnabled = false;
-  cancelContinuousFireworksTimeout();
-  setContinuousFireworksState("stopped");
-  return wasEnabled;
+function applyState(nextState, { resetDemoClock = true } = {}) {
+  const demoStarting = !demoActive && nextState.demoActive;
+  state = { ...state, ...nextState };
+  goal = state.goal;
+  targetRaised = clampAmount(state.raised);
+  demoActive = state.demoActive;
+  view.setNightMode(state.nightMode);
+  view.setStudentsClapping(state.studentsClapping);
+  view.setThankYouVisible(state.thankYouVisible);
+  synchronizeContinuousFireworks(state.continuousFireworks);
+  if (demoStarting && resetDemoClock) {
+    demoStartedAt = performance.now();
+    lastDemoPublishAt = 0;
+  }
+  scheduleFrame();
 }
 
-function toggleContinuousFireworks() {
-  if (continuousFireworksEnabled) {
-    stopContinuousFireworks();
+async function requestJson(url, options) {
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers
+    }
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(body.error || `Request failed with status ${response.status}.`);
+  }
+  return body;
+}
+
+async function mutateState(patch, successMessage) {
+  applyState(patch);
+  try {
+    const authoritativeState = await requestJson("/api/state", {
+      method: "PATCH",
+      body: JSON.stringify(patch)
+    });
+    applyState(authoritativeState, { resetDemoClock: false });
+    if (successMessage) announce(successMessage);
+    return true;
+  } catch {
+    announce("Display updated locally; dashboard synchronization is temporarily unavailable.");
     return false;
   }
-  startContinuousFireworks();
-  return true;
+}
+
+function rememberActionId(actionId) {
+  if (!actionId) return;
+  executedActionIds.add(actionId);
+  if (executedActionIds.size <= MAX_EXECUTED_ACTION_IDS) return;
+  executedActionIds.delete(executedActionIds.values().next().value);
+}
+
+function createActionId() {
+  nextActionSequence += 1;
+  return `${Date.now().toString(36)}-${nextActionSequence.toString(36)}`;
+}
+
+function executeAction(action, { announceResult = true } = {}) {
+  const { type, id = "" } = typeof action === "string"
+    ? { type: action }
+    : action;
+  if (id && executedActionIds.has(id)) return "";
+
+  let message = "";
+  switch (type) {
+    case "kite.add": {
+      const count = view.addKite();
+      message = `Kite added. ${count} ${count === 1 ? "kite" : "kites"} in the sky.`;
+      break;
+    }
+    case "kite.clear":
+      view.clearKites();
+      message = "All kites removed.";
+      break;
+    case "firework.launch":
+      view.addFirework({ reducedMotion: reducedMotion(), source: "manual" });
+      message = "Firework launched.";
+      break;
+    case "firework.clear":
+      view.clearFireworks();
+      message = "All fireworks cleared.";
+      break;
+    case "school.add": {
+      const previousCount = Number(root.dataset.distantSchools || 0);
+      const count = view.addDistantSchool({ reducedMotion: reducedMotion() });
+      message = count === previousCount
+        ? "All four distant schools are already present."
+        : `Distant school ${count} added.`;
+      break;
+    }
+    case "school.remove": {
+      const previousCount = Number(root.dataset.distantSchools || 0);
+      const count = view.removeLastDistantSchool();
+      message = count === previousCount
+        ? "There are no distant schools to remove."
+        : `Distant school ${previousCount} removed.`;
+      break;
+    }
+    default:
+      return "";
+  }
+  rememberActionId(id);
+  if (announceResult) announce(message);
+  return message;
+}
+
+async function requestAction(type) {
+  const action = { type, id: createActionId() };
+  const message = executeAction(action);
+  try {
+    await requestJson("/api/actions", {
+      method: "POST",
+      body: JSON.stringify(action)
+    });
+  } catch {
+    if (message) {
+      announce(`${message} Control synchronization is temporarily unavailable.`);
+    }
+  }
+}
+
+function connectEvents() {
+  if (typeof EventSource !== "function") {
+    root.dataset.connection = "unavailable";
+    announce("Live control connection is unavailable; keyboard controls remain active.");
+    return;
+  }
+  const events = new EventSource("/events");
+  events.addEventListener("open", () => {
+    root.dataset.connection = "connected";
+  });
+  events.addEventListener("snapshot", (event) => {
+    const snapshot = JSON.parse(event.data);
+    applyState(snapshot.state);
+  });
+  events.addEventListener("state", (event) => {
+    applyState(JSON.parse(event.data));
+  });
+  events.addEventListener("action", (event) => {
+    executeAction(JSON.parse(event.data));
+  });
+  events.addEventListener("error", () => {
+    root.dataset.connection = "reconnecting";
+    announce("Live control connection lost. Reconnecting automatically; keyboard controls remain active.");
+  });
+}
+
+function handleMotionPreferenceChange() {
+  synchronizeMotionState();
+  if (reducedMotion()) celebrationUntil = 0;
+  if (continuousFireworksEnabled) {
+    cancelContinuousFireworksTimeout();
+    scheduleContinuousFireworks();
+  }
+  scheduleFrame();
+}
+
+if (config.motion === "auto") {
+  if (typeof mediaReduced.addEventListener === "function") {
+    mediaReduced.addEventListener("change", handleMotionPreferenceChange);
+  } else {
+    mediaReduced.addListener?.(handleMotionPreferenceChange);
+  }
 }
 
 function handleVisibilityChange() {
@@ -322,150 +310,153 @@ function handleVisibilityChange() {
 function cleanupFireworks() {
   if (fireworksCleanupComplete) return;
   fireworksCleanupComplete = true;
-  stopContinuousFireworks();
+  continuousFireworksEnabled = false;
+  cancelContinuousFireworksTimeout();
   view.clearFireworks();
 }
 
-document.addEventListener("keydown", (event) => {
-  if (!isControlsKey(event)) return;
-  if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
-  event.preventDefault();
-  const hidden = !keyboardHint.hidden;
-  keyboardHint.hidden = hidden;
-  operatorShortcuts.hidden = hidden;
-  announcer.textContent = hidden
-    ? "Keyboard legends hidden."
-    : "Keyboard legends shown.";
-}, true);
+function isEditingTarget(target) {
+  const tagName = String(target?.tagName || "").toLowerCase();
+  return ["input", "button", "select", "textarea"].includes(tagName)
+    || target?.isContentEditable
+    || Boolean(target?.closest?.(
+      '[contenteditable]:not([contenteditable="false"]), [role="textbox"]'
+    ))
+    || document.designMode === "on";
+}
+
+function isPlainKey(event, key) {
+  return String(event.key).toLowerCase() === key
+    && !event.ctrlKey
+    && !event.metaKey
+    && !event.altKey
+    && !event.repeat;
+}
+
+function isSpace(event) {
+  return event.key === " " || event.key === "Spacebar" || event.code === "Space";
+}
+
+function toggleFullscreen() {
+  const fullscreenAction = !document.fullscreenElement
+    ? root.requestFullscreen?.()
+    : document.exitFullscreen?.();
+  fullscreenAction?.catch?.(() => {});
+}
 
 document.addEventListener("keydown", (event) => {
-  if (!isKiteKey(event)) return;
   if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
-  event.preventDefault();
-  const kiteCount = view.addKite();
-  announcer.textContent = formatKiteAnnouncement(kiteCount);
-}, true);
+  if (isEditingTarget(event.target)) return;
 
-document.addEventListener("keydown", (event) => {
-  if (!isClearKitesKey(event)) return;
-  if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
-  event.preventDefault();
-  view.clearKites();
-  announcer.textContent = "All kites removed.";
-}, true);
+  if (isSpace(event)) {
+    event.preventDefault();
+    keyboardHint.hidden = !keyboardHint.hidden;
+    announce(keyboardHint.hidden ? "Keyboard legends hidden." : "Keyboard legends shown.");
+    return;
+  }
 
-document.addEventListener("keydown", (event) => {
-  if (!isFireworkKey(event)) return;
-  if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
-  event.preventDefault();
-  view.addFirework({
-    reducedMotion: reducedMotion(),
-    source: "manual"
-  });
-  announcer.textContent = "Firework launched.";
-}, true);
-
-document.addEventListener("keydown", (event) => {
-  if (!isContinuousFireworksKey(event)) return;
-  if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
-  event.preventDefault();
-  const enabled = toggleContinuousFireworks();
-  announcer.textContent = enabled
-    ? "Continuous fireworks started."
-    : "Continuous fireworks stopped.";
-}, true);
-
-document.addEventListener("keydown", (event) => {
-  if (!isFullscreenKey(event)) return;
-  if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
-  event.preventDefault();
-  toggleFullscreen();
-}, true);
-
-document.addEventListener("keydown", (event) => {
-  if (!isNightKey(event)) return;
-  if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
-  event.preventDefault();
-  nightMode = !nightMode;
-  view.setNightMode(nightMode);
-  announcer.textContent = nightMode
-    ? "Night mode enabled."
-    : "Day mode enabled.";
-}, true);
-
-document.addEventListener("keydown", (event) => {
-  if (!isClappingKey(event)) return;
-  if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
-  event.preventDefault();
-  studentsClapping = !studentsClapping;
-  view.setStudentsClapping(studentsClapping);
-  announcer.textContent = studentsClapping
-    ? "Students started clapping."
-    : "Students stopped clapping.";
-}, true);
-
-document.addEventListener("keydown", (event) => {
-  if (!isThankYouKey(event)) return;
-  if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
-  event.preventDefault();
-  thankYouVisible = !thankYouVisible;
-  view.setThankYouVisible(thankYouVisible);
-  announcer.textContent = thankYouVisible
-    ? "Student thank-you messages enabled."
-    : "Student thank-you messages hidden.";
-}, true);
-
-document.addEventListener("keydown", (event) => {
-  if (event.ctrlKey || event.metaKey || event.altKey) return;
-  const editing = isEditingTarget(event.target);
-  if (isControlsKey(event)) return;
-  if (isKiteKey(event)) return;
-  if (isClearKitesKey(event)) return;
-  if (
-    isFireworkKey(event)
-    || isContinuousFireworksKey(event)
-    || isFullscreenKey(event)
-    || isNightKey(event)
-    || isClappingKey(event)
-    || isThankYouKey(event)
-  ) return;
-  if (editing && !["Escape", "Enter", "c", "C"].includes(event.key)) return;
   const stepFraction = event.shiftKey ? .05 : .01;
-
   switch (event.key.toLowerCase()) {
-    case "c":
+    case "s":
       event.preventDefault();
-      setControlsVisible(operatorPanel.hidden);
+      requestAction("school.add");
+      break;
+    case "x":
+      event.preventDefault();
+      requestAction("school.remove");
       break;
     case "d":
       event.preventDefault();
-      demoActive = !demoActive;
-      demoStartedAt = performance.now();
-      announcer.textContent = demoActive
-        ? "Fundraiser demonstration started."
-        : "Fundraiser demonstration paused.";
-      scheduleFrame();
+      mutateState(
+        { demoActive: !state.demoActive },
+        state.demoActive
+          ? "Fundraiser demonstration paused."
+          : "Fundraiser demonstration started."
+      );
+      break;
+    case "n":
+      event.preventDefault();
+      mutateState(
+        { nightMode: !state.nightMode },
+        state.nightMode ? "Day mode enabled." : "Night mode enabled."
+      );
+      break;
+    case "o":
+      event.preventDefault();
+      mutateState(
+        { studentsClapping: !state.studentsClapping },
+        state.studentsClapping ? "Students stopped clapping." : "Students started clapping."
+      );
+      break;
+    case "p":
+      event.preventDefault();
+      mutateState(
+        { thankYouVisible: !state.thankYouVisible },
+        state.thankYouVisible
+          ? "Student thank-you messages hidden."
+          : "Student thank-you messages enabled."
+      );
+      break;
+    case "w":
+      event.preventDefault();
+      mutateState(
+        { continuousFireworks: !state.continuousFireworks },
+        state.continuousFireworks
+          ? "Continuous fireworks stopped."
+          : "Continuous fireworks started."
+      );
+      break;
+    case "k":
+      event.preventDefault();
+      requestAction("kite.add");
+      break;
+    case "l":
+      event.preventDefault();
+      requestAction("kite.clear");
+      break;
+    case "q":
+      event.preventDefault();
+      requestAction("firework.launch");
+      break;
+    case "f":
+      event.preventDefault();
+      toggleFullscreen();
       break;
     case "arrowright":
     case "arrowup":
       event.preventDefault();
-      commitRaised(addRaisedAmount(targetRaised, goal, stepFraction));
+      {
+        const raised = addRaisedAmount(targetRaised, goal, stepFraction);
+        mutateState({
+          raised,
+          demoActive: false
+        }, `${money.format(raised)} raised toward a goal of ${money.format(goal)}.`);
+      }
       break;
     case "arrowleft":
     case "arrowdown":
       event.preventDefault();
-      commitRaised(addRaisedAmount(targetRaised, goal, -stepFraction));
+      {
+        const raised = addRaisedAmount(targetRaised, goal, -stepFraction);
+        mutateState({
+          raised,
+          demoActive: false
+        }, `${money.format(raised)} raised toward a goal of ${money.format(goal)}.`);
+      }
       break;
     case "home":
       event.preventDefault();
-      commitRaised(0);
+      mutateState({
+        raised: 0,
+        demoActive: false
+      }, `${money.format(0)} raised toward a goal of ${money.format(goal)}.`);
       break;
     case "end":
       event.preventDefault();
-      commitRaised(goal);
-      break;
-    case "escape":
-      setControlsVisible(false);
+      mutateState({
+        raised: goal,
+        demoActive: false
+      }, `${money.format(goal)} raised toward a goal of ${money.format(goal)}.`);
       break;
   }
 });
@@ -473,6 +464,22 @@ document.addEventListener("keydown", (event) => {
 document.addEventListener("visibilitychange", handleVisibilityChange);
 window.addEventListener("pagehide", cleanupFireworks, { once: true });
 window.addEventListener("unload", cleanupFireworks, { once: true });
+
+async function publishDemoProgress(now) {
+  if (demoPublishPending || now - lastDemoPublishAt < 250) return;
+  demoPublishPending = true;
+  lastDemoPublishAt = now;
+  try {
+    await requestJson("/api/state", {
+      method: "PATCH",
+      body: JSON.stringify({ raised: targetRaised })
+    });
+  } catch {
+    root.dataset.connection = "reconnecting";
+  } finally {
+    demoPublishPending = false;
+  }
+}
 
 function frame(now) {
   const delta = Math.min(50, Math.max(0, now - lastFrameAt));
@@ -486,7 +493,8 @@ function frame(now) {
       goal,
       demoCompleted ? 1 : elapsed / config.demoDurationMs
     );
-    synchronizeControls();
+    state.raised = targetRaised;
+    publishDemoProgress(now);
   }
 
   displayedRaised = demoCompleted || reducedMotion()
@@ -510,6 +518,7 @@ function frame(now) {
   });
   if (demoActive && demoCompleted && !renderResult.needsFrame) {
     demoStartedAt = now;
+    lastDemoPublishAt = 0;
   }
   if (
     demoActive
@@ -521,11 +530,10 @@ function frame(now) {
   }
 }
 
-setControlsVisible(config.controls);
-synchronizeControls();
 synchronizeMotionState();
-view.setNightMode(nightMode);
-view.setStudentsClapping(studentsClapping);
-view.setThankYouVisible(thankYouVisible);
+view.setNightMode(state.nightMode);
+view.setStudentsClapping(state.studentsClapping);
+view.setThankYouVisible(state.thankYouVisible);
 setContinuousFireworksState("stopped");
+connectEvents();
 scheduleFrame();
