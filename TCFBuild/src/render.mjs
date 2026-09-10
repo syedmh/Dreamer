@@ -2440,6 +2440,9 @@ function createStudentNode(student, parent) {
   const group = svg("g", {
     class: "student",
     "data-index": student.index,
+    "data-figure": student.figureLabel.toLowerCase(),
+    role: "img",
+    "aria-label": `${student.figureLabel} student ${student.index + 1}`,
     opacity: 0
   }, parent);
   svg("ellipse", {
@@ -2451,59 +2454,22 @@ function createStudentNode(student, parent) {
     fill: "#17352A",
     opacity: .16
   }, group);
-  svg("line", {
-    x1: -6,
-    y1: 26,
-    x2: -9,
-    y2: 42,
-    stroke: "#17352A",
-    "stroke-width": 6,
-    "stroke-linecap": "round"
+  const figureMotion = svg("g", {
+    class: "student-figure-motion",
+    "aria-hidden": "true"
   }, group);
-  svg("line", {
-    x1: 6,
-    y1: 26,
-    x2: 9,
-    y2: 42,
-    stroke: "#17352A",
-    "stroke-width": 6,
-    "stroke-linecap": "round"
-  }, group);
-  svg("rect", {
-    x: -13,
-    y: -4,
-    width: 26,
-    height: 34,
-    rx: 8,
-    fill: student.shirt
-  }, group);
-  svg("line", {
-    class: "student-arm student-arm--left",
-    x1: -11,
-    y1: 2,
-    x2: -22,
-    y2: 18,
-    stroke: student.skin,
-    "stroke-width": 6,
-    "stroke-linecap": "round"
-  }, group);
-  svg("line", {
-    class: "student-arm student-arm--right",
-    x1: 11,
-    y1: 2,
-    x2: 22,
-    y2: 16,
-    stroke: student.skin,
-    "stroke-width": 6,
-    "stroke-linecap": "round"
-  }, group);
-  svg("circle", { cx: 0, cy: -18, r: 14, fill: student.skin }, group);
-  svg("path", {
-    d: "M-13 -22 Q0 -37 13 -22 L11 -13 Q0 -22 -11 -13Z",
-    fill: "#17352A"
-  }, group);
+  svg("image", {
+    class: "student-figure",
+    href: student.figureAsset,
+    x: -18,
+    y: -67,
+    width: 36,
+    height: 108,
+    preserveAspectRatio: "xMidYMid meet",
+    draggable: "false"
+  }, figureMotion);
 
-  const messageY = -62 - (student.index % 2) * 10;
+  const messageY = -92 - (student.index % 2) * 10;
   const messageContent = randomItem(THANK_YOU_MESSAGES);
   const message = svg("g", {
     class: "student-thank-you",

@@ -292,11 +292,14 @@ export function createSchoolBlocks() {
   return Object.freeze(blocks.map((block, index) => Object.freeze({ ...block, index })));
 }
 
-const SHIRT_COLORS = ["#078447", "#F0A533", "#D54843", "#3987C9", "#8B5BB4", "#E76F99"];
+const STUDENT_FIGURES = Object.freeze([
+  Object.freeze({ asset: "/Boy.png", label: "Boy" }),
+  Object.freeze({ asset: "/Girl.png", label: "Girl" })
+]);
 const STUDENT_BOUNDS = Object.freeze({
-  left: -25,
-  right: 25,
-  top: -37,
+  left: -18,
+  right: 18,
+  top: -67,
   bottom: 49
 });
 
@@ -399,6 +402,7 @@ export function createStudentLayout(maxStudents = 24) {
       targetY,
       targetRow
     });
+    const figure = STUDENT_FIGURES[index % STUDENT_FIGURES.length];
     return Object.freeze({
       id: `student-${index}`,
       index,
@@ -410,8 +414,8 @@ export function createStudentLayout(maxStudents = 24) {
       scale: 0.82 + (targetY - 700) / 470,
       bounds: STUDENT_BOUNDS,
       route,
-      shirt: SHIRT_COLORS[index % SHIRT_COLORS.length],
-      skin: ["#7B4A2E", "#A96540", "#C98963", "#E1B18C"][index % 4]
+      figureAsset: figure.asset,
+      figureLabel: figure.label
     });
   });
   return Object.freeze(students);

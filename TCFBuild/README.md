@@ -4,6 +4,8 @@ A dependency-free, event-ready 16:9 visualization that constructs an original re
 
 A transparent blueprint of the completed school remains visible behind the construction until the fundraising goal is reached, illustrating what incoming donations will complete.
 
+The two student rows alternate the local `Boy.png` and `Girl.png` artwork. These production assets are served only on the display surface and are copied into `dist` by `build.bat`.
+
 The four `Building*.jpg` files are local-only visual references. The webpage does not load, embed, copy, display, or redistribute them.
 
 ## Run
@@ -101,8 +103,8 @@ The older browser-unit harness contains coverage for the original embedded opera
 - `control.html`, `control.css`, `src/control.mjs` — separate operator dashboard
 - `src/config.mjs` — amount limits, defaults, and display URL parsing
 - `src/model.mjs` — progress, reveal, and animation math
-- `src/scene.mjs` — deterministic school and student geometry
-- `src/render.mjs` — original SVG scene construction and rendering
+- `src/scene.mjs` — deterministic school geometry, student routes, and alternating artwork selection
+- `src/render.mjs` — SVG scene construction, including PNG-backed SVG student image elements
 - `server.mjs` — two Node built-in HTTP listeners, shared in-memory state, strict JSON APIs, and SSE
 
 No packages, frameworks, CDNs, network services, CORS, or downloaded assets are used.

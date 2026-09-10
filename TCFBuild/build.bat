@@ -29,6 +29,8 @@ copy /y "%PROJECT_DIR%styles.css" "%DIST_DIR%\styles.css" >nul || exit /b 1
 copy /y "%PROJECT_DIR%control.html" "%DIST_DIR%\control.html" >nul || exit /b 1
 copy /y "%PROJECT_DIR%control.css" "%DIST_DIR%\control.css" >nul || exit /b 1
 copy /y "%PROJECT_DIR%Logo.png" "%DIST_DIR%\Logo.png" >nul || exit /b 1
+copy /y "%PROJECT_DIR%Boy.png" "%DIST_DIR%\Boy.png" >nul || exit /b 1
+copy /y "%PROJECT_DIR%Girl.png" "%DIST_DIR%\Girl.png" >nul || exit /b 1
 copy /y "%PROJECT_DIR%server.mjs" "%DIST_DIR%\server.mjs" >nul || exit /b 1
 copy /y "%PROJECT_DIR%README.md" "%DIST_DIR%\README.md" >nul || exit /b 1
 copy /y "%PROJECT_DIR%src\*.mjs" "%DIST_DIR%\src\" >nul || exit /b 1

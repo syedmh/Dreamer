@@ -154,6 +154,13 @@ test("serves isolated display and control surfaces with security headers", async
     assert.equal((await fetch(`${controlBase}/control.css`)).status, 200);
     assert.equal((await fetch(`${displayBase}/favicon.ico`)).headers.get("content-type"), "image/png");
     assert.equal((await fetch(`${controlBase}/favicon.ico`)).headers.get("content-type"), "image/png");
+    for (const asset of ["Boy.png", "Girl.png"]) {
+      const displayAsset = await fetch(`${displayBase}/${asset}`);
+      assert.equal(displayAsset.status, 200);
+      assert.equal(displayAsset.headers.get("content-type"), "image/png");
+      assert.ok(Number(displayAsset.headers.get("content-length")) > 1_000_000);
+      assert.equal((await fetch(`${controlBase}/${asset}`)).status, 404);
+    }
 
     const harness = await fetch(`${displayBase}/tests/harness.html`);
     assert.equal(harness.status, 200);

@@ -742,6 +742,33 @@ test("finished facade uses frozen drawing order, geometry, and progressive finis
       && shadow.attributes.get("ry") === "2.5"
       && shadow.attributes.get("opacity") === "0.16"
     ));
+    const studentFigures = nodes.filter(
+      (node) => classes(node) === "student-figure"
+    );
+    assert.equal(studentFigures.length, 24);
+    assert.deepEqual(
+      studentFigures.map((figure) => figure.attributes.get("href")),
+      Array.from({ length: 24 }, (_, index) =>
+        index % 2 === 0 ? "/Boy.png" : "/Girl.png"
+      )
+    );
+    assert.ok(studentFigures.every((figure) =>
+      figure.tagName === "image"
+      && figure.attributes.get("x") === "-18"
+      && figure.attributes.get("y") === "-67"
+      && figure.attributes.get("width") === "36"
+      && figure.attributes.get("height") === "108"
+      && figure.attributes.get("preserveAspectRatio") === "xMidYMid meet"
+    ));
+    assert.equal(nodes.filter(
+      (node) => classes(node).includes("student-arm")
+    ).length, 0);
+    const studentNodes = nodes.filter((node) => classes(node) === "student");
+    assert.ok(studentNodes.every((student, index) =>
+      student.attributes.get("role") === "img"
+      && student.attributes.get("aria-label")
+        === `${index % 2 === 0 ? "Boy" : "Girl"} student ${index + 1}`
+    ));
     assert.ok(nodes.some((node) => node.attributes.get("d")
       === "M760 900 C815 790 875 720 918 688 L1008 688 C1055 724 1125 795 1180 900 Z"));
     assert.ok(nodes.some((node) =>

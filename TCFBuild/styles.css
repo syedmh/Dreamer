@@ -360,43 +360,28 @@ kbd {
   stroke: rgb(139 224 250 / .48);
 }
 
-.student-arm {
+.student-figure-motion {
   transform-box: view-box;
-  animation-duration: .54s;
+  transform-origin: 0 10px;
+  animation-name: student-clap;
+  animation-duration: .42s;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
   animation-direction: alternate;
   animation-play-state: paused;
 }
 
-.student-arm--left {
-  transform-origin: -11px 2px;
+.student-figure {
+  pointer-events: none;
 }
 
-.student-arm--right {
-  transform-origin: 11px 2px;
-}
-
-.students.is-clapping .student-arm {
+.students.is-clapping .student-figure-motion {
   animation-play-state: running;
 }
 
-.students.is-clapping .student-arm--left {
-  animation-name: student-clap-left;
-}
-
-.students.is-clapping .student-arm--right {
-  animation-name: student-clap-right;
-}
-
-@keyframes student-clap-left {
-  from { transform: rotate(-78deg); }
-  to { transform: rotate(-98deg); }
-}
-
-@keyframes student-clap-right {
-  from { transform: rotate(78deg); }
-  to { transform: rotate(98deg); }
+@keyframes student-clap {
+  from { transform: rotate(-2deg) scaleX(.97); }
+  to { transform: rotate(2deg) scaleX(1); }
 }
 
 .student-thank-you {
@@ -672,16 +657,9 @@ kbd {
   transform: none;
 }
 
-#fundraiser[data-motion="reduce"] .students.is-clapping .student-arm {
+#fundraiser[data-motion="reduce"] .students.is-clapping .student-figure-motion {
   animation: none !important;
-}
-
-#fundraiser[data-motion="reduce"] .students.is-clapping .student-arm--left {
-  transform: rotate(-90deg);
-}
-
-#fundraiser[data-motion="reduce"] .students.is-clapping .student-arm--right {
-  transform: rotate(90deg);
+  transform: none;
 }
 
 #fundraiser[data-motion="reduce"][data-goal-achieved="true"]

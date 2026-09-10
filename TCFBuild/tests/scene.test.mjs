@@ -155,6 +155,24 @@ test("student layout is deterministic and capped at two rows", () => {
   assert.ok(students.every((student) => student.targetY >= 700 && student.targetY <= 850));
   assert.ok(students.some((student) => student.side < 0));
   assert.ok(students.some((student) => student.side > 0));
+  assert.deepEqual(
+    students.map((student) => student.figureAsset),
+    Array.from({ length: 24 }, (_, index) =>
+      index % 2 === 0 ? "/Boy.png" : "/Girl.png"
+    )
+  );
+  assert.deepEqual(
+    students.map((student) => student.figureLabel),
+    Array.from({ length: 24 }, (_, index) =>
+      index % 2 === 0 ? "Boy" : "Girl"
+    )
+  );
+  assert.ok(students.every((student) =>
+    student.bounds.left === -18
+    && student.bounds.right === 18
+    && student.bounds.top === -67
+    && student.bounds.bottom === 49
+  ));
 
   const targetBounds = (student) => ({
     left: student.targetX + student.bounds.left * student.scale,

@@ -24,7 +24,7 @@ const MIME_TYPES = new Map([
 
 const SECURITY_HEADERS = Object.freeze({
   "Cache-Control": "no-store",
-  "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-wEnFBTdC52xp5ZXsJ1rJs1f0VQn+/TIA7CTOFdO33xg='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
+  "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-5T7sWeLQQ4jOrxFZHC2c5KDWDLW/9fl6mf5bWn5D1IM='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
   "Cross-Origin-Resource-Policy": "same-origin",
   "Referrer-Policy": "no-referrer",
   "X-Content-Type-Options": "nosniff",
@@ -64,6 +64,8 @@ const SHARED_PATHS = new Set([
 ]);
 const DISPLAY_PATHS = new Set([
   ...SHARED_PATHS,
+  "/Boy.png",
+  "/Girl.png",
   "/index.html",
   "/styles.css",
   "/src/app.mjs",
