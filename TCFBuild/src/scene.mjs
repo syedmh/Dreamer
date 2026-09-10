@@ -43,8 +43,9 @@ const CAMPUS_GEOMETRY = deepFreeze({
     }
   },
   swings: {
-    offsetY: 45,
-    bounds: { left: 20, right: 145, top: 535, bottom: 705 },
+    offsetX: -15,
+    offsetY: 95,
+    bounds: { left: 5, right: 130, top: 585, bottom: 755 },
     ground: {
       cx: 82,
       cy: 646,
@@ -120,10 +121,10 @@ const CAMPUS_GEOMETRY = deepFreeze({
     { x: 1330, y: 640, scale: .65, trunkHeight: 98 }
   ],
   bus: {
-    bounds: { left: 165, right: 530, top: 630, bottom: 775 },
-    artworkOffset: { x: 0, y: -60 },
+    bounds: { left: 150, right: 515, top: 675, bottom: 820 },
+    artworkOffset: { x: -15, y: -15 },
     startOffset: { x: -600, y: 25 },
-    startBounds: { left: -435, right: -70, top: 655, bottom: 800 },
+    startBounds: { left: -450, right: -85, top: 700, bottom: 845 },
     routeDistance: Math.hypot(600, 25),
     wheels: [
       { cx: 235, cy: 805, r: 30 },
@@ -137,8 +138,8 @@ const CAMPUS_GEOMETRY = deepFreeze({
       strokeWidth: 4
     },
     cabin: {
-      path: "M185 730 V722 Q185 716 191 716 H225 L250 702 Q259 698 270 698 H465 Q478 698 478 712 V732 H185 Z",
-      bounds: { left: 183, right: 480, top: 696, bottom: 732 }
+      path: "M185 730 V712 Q185 702 195 702 H465 Q478 702 478 715 V732 H185 Z",
+      bounds: { left: 183, right: 480, top: 700, bottom: 732 }
     },
     hood: {
       path: "M476 751 H509 Q520 751 523 760 L529 782 V805 H476 Z",
@@ -161,7 +162,6 @@ const CAMPUS_GEOMETRY = deepFreeze({
       { x: 174, y: 758, width: 334, height: 4 },
       { x: 174, y: 782, width: 334, height: 4 }
     ],
-    studs: [262, 290, 318, 346, 374, 402, 430, 458],
     stopSign: { cx: 443, cy: 752, r: 10 }
   }
 });
@@ -382,8 +382,8 @@ export function deriveStudentRoutePosition(
   };
 }
 
-export function createStudentLayout(maxStudents = 36) {
-  const count = Math.min(36, Math.max(0, Math.trunc(maxStudents)));
+export function createStudentLayout(maxStudents = 24) {
+  const count = Math.min(24, Math.max(0, Math.trunc(maxStudents)));
   const students = Array.from({ length: count }, (_, index) => {
     const side = index % 2 === 0 ? -1 : 1;
     const lane = Math.floor(index / 2);
@@ -418,37 +418,12 @@ export function createStudentLayout(maxStudents = 36) {
 }
 
 export function createTeacherLayout() {
-  return deepFreeze([
-    {
-      id: "teacher-0",
-      index: 0,
-      x: 550,
-      y: 698,
-      scale: 1.08,
-      transform: "translate(550 698) scale(1.08)",
-      bounds: { left: -16, right: 16, top: -68, bottom: 0 },
-      clothing: "#0A713E",
-      accent: "#F0A533",
-      skin: "#A96540"
-    },
-    {
-      id: "teacher-1",
-      index: 1,
-      x: 1517,
-      y: 704,
-      scale: 1.08,
-      transform: "translate(1517 704) scale(1.08)",
-      bounds: { left: -16, right: 16, top: -68, bottom: 0 },
-      clothing: "#8B5BB4",
-      accent: "#078447",
-      skin: "#C98963"
-    }
-  ]);
+  return deepFreeze([]);
 }
 
 export function createScene(config = {}) {
   const blocks = createSchoolBlocks();
-  const students = createStudentLayout(config.maxStudents ?? 36);
+  const students = createStudentLayout(config.maxStudents ?? 24);
   const teachers = createTeacherLayout();
   return deepFreeze({
     blocks,

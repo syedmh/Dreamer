@@ -3,7 +3,7 @@ export const DEFAULT_CONFIG = Object.freeze({
   raised: 0,
   currency: "USD",
   locale: "en-US",
-  maxStudents: 36,
+  maxStudents: 24,
   overGoalRamp: 0.25,
   animationTimeConstantMs: 420,
   demoDurationMs: 97200

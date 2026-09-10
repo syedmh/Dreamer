@@ -322,11 +322,15 @@ test("distant schools begin below the logo and fall slowly enough to notice", as
   const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
   assert.match(
     css,
-    /\.distant-school-drop-motion\.is-dropping\s*\{\s*animation:\s*distant-school-drop 1450ms/
+    /\.distant-school-drop-motion\.is-dropping\s*\{\s*animation:\s*distant-school-drop 3500ms/
   );
   assert.match(
     css,
     /transform:\s*translateY\(var\(--school-drop-y, -690px\)\) rotate\(-7deg\) scale\(\.92\);/
+  );
+  assert.match(
+    css,
+    /\.tcf-firework-burst\s*\{[^}]*animation:\s*tcf-firework-show var\(--tcf-firework-duration, 5s\)/s
   );
 });
 
@@ -491,8 +495,8 @@ test("progress labels preserve exact integers, floor fractions, and distinguish 
       [1.029, "102% — students arriving!"],
       [1.03, "103% — playground growing!"],
       [1.099, "109% — playground growing!"],
-      [1.10, "110% — teachers joining!"],
-      [1.169, "116% — teachers joining!"],
+      [1.10, "110% — campus growing!"],
+      [1.169, "116% — campus growing!"],
       [1.17, "117% — playground finishing!"],
       [1.249, "124% — playground finishing!"],
       [1.25, "125% — school bus arriving!"],
@@ -559,7 +563,7 @@ test("renderer preserves adjacent and extreme non-endpoint rendering states", ()
 
   try {
     const goal = 7205759403792793;
-    const scene = createScene({ maxStudents: 36 });
+    const scene = createScene({ maxStudents: 24 });
     const view = createFundraiserView(root, scene, {
       locale: "en-US",
       currency: "USD"
@@ -687,15 +691,15 @@ test("finished facade uses frozen drawing order, geometry, and progressive finis
   const classes = (node) => node.attributes.get("class") ?? "";
 
   try {
-    const scene = createScene({ maxStudents: 36 });
+    const scene = createScene({ maxStudents: 24 });
     const view = createFundraiserView(root, scene, {
       locale: "en-US",
       currency: "USD"
     });
     const sceneSvg = elements.get("#school-scene");
     assert.equal(view.blockCount, 308);
-    assert.equal(view.studentCount, 36);
-    assert.equal(view.teacherCount, 2);
+    assert.equal(view.studentCount, 24);
+    assert.equal(view.teacherCount, 0);
     assert.deepEqual(
       sceneSvg.children
         .map(classes)
@@ -715,7 +719,6 @@ test("finished facade uses frozen drawing order, geometry, and progressive finis
         "architectural-finish finish-final facade-final",
         "architectural-finish finish-final steps-and-shrubs",
         "goal-flag",
-        "campus-people teachers",
         "students",
         "school-bus",
         "celebration-burst"
@@ -730,7 +733,7 @@ test("finished facade uses frozen drawing order, geometry, and progressive finis
     const studentGroundShadows = nodes.filter(
       (node) => classes(node) === "student-ground-shadow"
     );
-    assert.equal(studentGroundShadows.length, 36);
+    assert.equal(studentGroundShadows.length, 24);
     assert.ok(studentGroundShadows.every((shadow) =>
       shadow.tagName === "ellipse"
       && shadow.attributes.get("cx") === "0"
@@ -774,8 +777,9 @@ test("finished facade uses frozen drawing order, geometry, and progressive finis
     assert.ok(nodes.some((node) =>
       node.attributes.get("transform") === "translate(966 119)"
     ));
-    assert.equal(nodes.filter((node) => classes(node) === "teacher").length, 2);
-    assert.ok(nodes.some((node) => node.textContent === "SCHOOL BUS"));
+    assert.equal(nodes.filter((node) => classes(node) === "teacher").length, 0);
+    assert.ok(nodes.some((node) => node.textContent === "TCF School Bus"));
+    assert.equal(nodes.some((node) => node.textContent === "SCHOOL BUS"), false);
     for (const [x, y, width, height] of [
       [907, 653, 112, 11],
       [889, 664, 148, 12],
@@ -897,8 +901,9 @@ test("renderer adds four distant schools in order and removes them last-in-first
       && school.attributes.get("focusable") === "false"
     ));
     assert.equal(root.dataset.distantSchools, "0");
-    assert.equal(swings.attributes.get("transform"), "translate(0 45)");
-    assert.equal(swings.attributes.get("data-offset-y"), "45");
+    assert.equal(swings.attributes.get("transform"), "translate(-15 95)");
+    assert.equal(swings.attributes.get("data-offset-x"), "-15");
+    assert.equal(swings.attributes.get("data-offset-y"), "95");
 
     view.update({
       raised: 125001,
@@ -907,7 +912,8 @@ test("renderer adds four distant schools in order and removes them last-in-first
       reducedMotion: false,
       celebrationActive: false
     });
-    assert.ok(Number(swings.dataset.currentOffsetY) > 44.9);
+    assert.equal(swings.dataset.currentOffsetX, "-15");
+    assert.equal(swings.dataset.currentOffsetY, "95");
     view.update({
       raised: 130000,
       goal: 100000,
@@ -915,8 +921,8 @@ test("renderer adds four distant schools in order and removes them last-in-first
       reducedMotion: false,
       celebrationActive: false
     });
-    assert.equal(swings.attributes.get("transform"), "translate(0 45)");
-    assert.equal(swings.dataset.currentOffsetY, "45");
+    assert.equal(swings.attributes.get("transform"), "translate(-15 95)");
+    assert.equal(swings.dataset.currentOffsetY, "95");
     view.update({
       raised: 130000,
       goal: 100000,
@@ -924,8 +930,8 @@ test("renderer adds four distant schools in order and removes them last-in-first
       reducedMotion: true,
       celebrationActive: false
     });
-    assert.equal(swings.attributes.get("transform"), "translate(0 45)");
-    assert.equal(swings.dataset.currentOffsetY, "45");
+    assert.equal(swings.attributes.get("transform"), "translate(-15 95)");
+    assert.equal(swings.dataset.currentOffsetY, "95");
     view.update({
       raised: 135000,
       goal: 100000,
@@ -933,8 +939,8 @@ test("renderer adds four distant schools in order and removes them last-in-first
       reducedMotion: true,
       celebrationActive: false
     });
-    assert.equal(swings.attributes.get("transform"), "translate(0 45)");
-    assert.equal(swings.dataset.currentOffsetY, "45");
+    assert.equal(swings.attributes.get("transform"), "translate(-15 95)");
+    assert.equal(swings.dataset.currentOffsetY, "95");
 
     assert.equal(view.addDistantSchool({ reducedMotion: false }), 1);
     const school1 = schools[0];
@@ -1005,6 +1011,23 @@ test("display S adds up to four schools and X removes the last school", async ()
       assert.ok(schools.every(
         (school) => school.dataset.dropped === "true"
       ));
+      const tcfFireworks = createdElements.filter(
+        (element) => (element.attributes.get("class") ?? "")
+          .split(/\s+/)
+          .includes("tcf-firework")
+      );
+      assert.equal(tcfFireworks.length, 4);
+      assert.ok(tcfFireworks.every(
+        (firework) => firework.attributes.get("data-duration-ms") === "5000"
+          && firework.attributes.get("data-firework-source") === "school"
+          && firework.attributes.get("data-firework-shape") === "tcf"
+          && firework.attributes.get("data-firework-region") === "left-sky"
+          && firework.attributes.get("transform") === "translate(565 210)"
+      ));
+      assert.ok(tcfFireworks.every(
+        (firework) => firework.querySelectorAll("text")
+          .every((text) => text.textContent === "TCF")
+      ));
       assert.match(
         elements.get("#announcer").textContent,
         /^All four distant schools are already present\./
@@ -1027,6 +1050,11 @@ test("display S adds up to four schools and X removes the last school", async ()
       await new Promise((resolve) => setImmediate(resolve));
       assert.equal(root.dataset.distantSchools, "4");
       assert.equal(schools[3].dataset.dropRun, "2");
+      assert.equal(createdElements.filter(
+        (element) => (element.attributes.get("class") ?? "")
+          .split(/\s+/)
+          .includes("tcf-firework")
+      ).length, 5);
 
       keydown({
         key: "x",
@@ -1097,9 +1125,19 @@ test("display-originated actions apply immediately and ignore their later SSE ec
       assert.match(postedAction.id, /^[a-z0-9-]+$/);
       assert.equal(school.dataset.dropRun, "1");
       assert.equal(root.dataset.distantSchools, "1");
+      assert.equal(createdElements.filter(
+        (element) => (element.attributes.get("class") ?? "")
+          .split(/\s+/)
+          .includes("tcf-firework")
+      ).length, 1);
 
       eventSource.emit("action", JSON.stringify(postedAction));
       assert.equal(school.dataset.dropRun, "1");
+      assert.equal(createdElements.filter(
+        (element) => (element.attributes.get("class") ?? "")
+          .split(/\s+/)
+          .includes("tcf-firework")
+      ).length, 1);
 
       rejectAction(new Error("response lost"));
       await new Promise((resolve) => setImmediate(resolve));
@@ -1138,7 +1176,7 @@ test("campus additions reveal at frozen thresholds with bounded one-shot motion"
   const classes = (node) => node.attributes.get("class") ?? "";
 
   try {
-    const scene = createScene({ maxStudents: 36 });
+    const scene = createScene({ maxStudents: 24 });
     const view = createFundraiserView(
       root,
       scene,
@@ -1153,7 +1191,7 @@ test("campus additions reveal at frozen thresholds with bounded one-shot motion"
     const bus = nodes.find((node) => classes(node) === "school-bus");
     assert.ok(flag);
     assert.ok(swingParts.every(Boolean));
-    assert.equal(teachers.length, 2);
+    assert.equal(teachers.length, 0);
     assert.equal(trees.length, 3);
     assert.deepEqual(
       trees.map((tree) => tree.attributes.get("transform")),
@@ -1201,19 +1239,11 @@ test("campus additions reveal at frozen thresholds with bounded one-shot motion"
       swingParts.map((node) => Number(node.attributes.get("opacity"))),
       [1, 1, 1, 1]
     );
-    assert.equal(Number(teachers[0].attributes.get("opacity")), 0);
-
     update(1.135);
-    assert.ok(
-      Math.abs(Number(teachers[0].attributes.get("opacity")) - 1) < 1e-12
-    );
-    assert.equal(Number(teachers[1].attributes.get("opacity")), 0);
-    assert.equal(root.dataset.visibleTeachers, "1.000000");
+    assert.equal(root.dataset.visibleTeachers, "0.000000");
     assert.equal(root.dataset.teacherPercent, "50.000");
 
     update(1.25);
-    assert.equal(teachers[0].attributes.get("transform"), "translate(550 698) scale(1.08)");
-    assert.equal(teachers[1].attributes.get("transform"), "translate(1517 704) scale(1.08)");
     assert.equal(Number(bus.attributes.get("opacity")), 0);
     assert.equal(bus.attributes.get("transform"), "translate(-600 25)");
     assert.equal(root.dataset.busPercent, "0.000");
@@ -1234,7 +1264,7 @@ test("campus additions reveal at frozen thresholds with bounded one-shot motion"
 
     assert.equal(
       bus.attributes.get("aria-label"),
-      "Long yellow conventional US school bus facing right"
+      "Yellow TCF School Bus facing right"
     );
     assert.equal(bus.attributes.get("role"), "img");
     assert.equal(nodes.filter((node) => classes(node) === "school-bus").length, 1);
@@ -1248,7 +1278,8 @@ test("campus additions reveal at frozen thresholds with bounded one-shot motion"
     assert.equal(bus.querySelectorAll(".bus-stop-sign").length, 1);
     assert.ok(bus.querySelectorAll(".bus-marker-light").length >= 6);
     assert.equal(bus.querySelectorAll(".bus-rub-rail").length, 2);
-    assert.equal(bus.querySelectorAll(".bus-roof-stud").length, 8);
+    assert.equal(bus.querySelectorAll(".bus-roof-stud").length, 0);
+    assert.equal(bus.querySelectorAll(".bus-idle-motion").length, 1);
     assert.equal(bus.querySelectorAll(".bus-wheel").length, 2);
     for (const wheelNode of bus.querySelectorAll(".bus-wheel")) {
       const centerY = Number(wheelNode.attributes.get("cy"));
@@ -1270,7 +1301,9 @@ test("campus additions reveal at frozen thresholds with bounded one-shot motion"
     assert.match(css, /\.flag-cloth\s*\{[^}]*transform-origin:\s*left center;/s);
     assert.doesNotMatch(css, /@keyframes flag-wave\s*\{[^}]*scaleY\(/s);
     assert.match(css, /#fundraiser\[data-motion="reduce"\] \.flag-cloth\s*\{[^}]*animation:\s*none !important;/s);
-    assert.doesNotMatch(css, /swing-seat[^}]*animation:/s);
+    assert.match(css, /\.school-bus\.is-idling \.bus-idle-motion\s*\{[^}]*animation:\s*bus-idle-roll/s);
+    assert.match(css, /\.swing-moving-part\s*\{[^}]*animation:\s*playground-swing/s);
+    assert.match(css, /#fundraiser\[data-motion="reduce"\] \.bus-idle-motion,[\s\S]*\.swing-moving-part\s*\{[^}]*animation:\s*none !important;/s);
   } finally {
     if (originalDocument) {
       Object.defineProperty(globalThis, "document", originalDocument);
@@ -1323,7 +1356,7 @@ test("staged student routes stay below overlap limits and clear the moving bus",
     );
 
   try {
-    const scene = createScene({ maxStudents: 36 });
+    const scene = createScene({ maxStudents: 24 });
     const view = createFundraiserView(
       root,
       scene,
@@ -1502,7 +1535,7 @@ test("student route display progress bounds painted-frame movement and settles e
     Math.hypot(after.x - before.x, after.y - before.y);
 
   try {
-    const scene = createScene({ maxStudents: 36 });
+    const scene = createScene({ maxStudents: 24 });
     const view = createFundraiserView(
       root,
       scene,
@@ -1547,7 +1580,7 @@ test("student route display progress bounds painted-frame movement and settles e
       `maximum 16ms movement: ${maximumNormalMovement}`
     );
     assert.equal(root.dataset.studentPercent, "100.000");
-    assert.equal(root.dataset.visibleStudents, "36.000000");
+    assert.equal(root.dataset.visibleStudents, "24.000000");
     for (let index = 0; index < students.length; index += 1) {
       const position = parsePosition(students[index]);
       assert.ok(Math.abs(position.x - scene.students[index].targetX) <= .011);
@@ -1582,7 +1615,7 @@ test("student route display progress bounds painted-frame movement and settles e
 
     result = render(1.25, 16, true);
     assert.equal(result.needsFrame, false);
-    assert.equal(root.dataset.visibleStudents, "36.000000");
+    assert.equal(root.dataset.visibleStudents, "24.000000");
     for (let index = 0; index < students.length; index += 1) {
       const position = parsePosition(students[index]);
       assert.equal(position.x, scene.students[index].targetX);
@@ -1632,7 +1665,7 @@ test("direct and initial full-motion targets settle to collision-free bus placem
           ["#school-scene", new FakeElement("svg")]
         ]);
         root.querySelector = (selector) => elements.get(selector);
-        const scene = createScene({ maxStudents: 36 });
+        const scene = createScene({ maxStudents: 24 });
         const view = createFundraiserView(
           root,
           scene,
@@ -1731,7 +1764,7 @@ test("direct and initial full-motion targets settle to collision-free bus placem
 
         if (!initialTarget) settle(1, "direct baseline");
         assert.ok(settle(1.35, initialTarget ? "initial 135%" : "direct 100-135") > 1);
-        assert.equal(root.dataset.visibleStudents, "36.000000");
+        assert.equal(root.dataset.visibleStudents, "24.000000");
         assert.equal(root.dataset.busPercent, "100.000");
         assert.equal(busNode.attributes.get("transform"), "translate(0 0)");
         for (let index = 0; index < studentNodes.length; index += 1) {
@@ -1828,7 +1861,7 @@ test("integrated student route jumps remain collision-safe forward and reverse",
     );
 
   try {
-    const scene = createScene({ maxStudents: 36 });
+    const scene = createScene({ maxStudents: 24 });
     const view = createFundraiserView(
       root,
       scene,
@@ -2377,12 +2410,12 @@ test("full-motion initial student target keeps the single scheduler alive until 
       const students = createdElements.filter(
         (element) => element.attributes.get("class") === "student"
       );
-      assert.equal(students.length, 36);
+      assert.equal(students.length, 24);
       assert.equal(animationFrames.length, 1);
 
       animationFrames.shift()(startedAt);
       assert.equal(root.dataset.studentPercent, "100.000");
-      assert.ok(Number(root.dataset.visibleStudents) < 36);
+      assert.ok(Number(root.dataset.visibleStudents) < 24);
       assert.equal(animationFrames.length, 1);
 
       let frameCount = 1;
@@ -2395,7 +2428,7 @@ test("full-motion initial student target keeps the single scheduler alive until 
 
       assert.ok(frameCount > 1);
       assert.equal(animationFrames.length, 0);
-      assert.equal(root.dataset.visibleStudents, "36.000000");
+      assert.equal(root.dataset.visibleStudents, "24.000000");
       await Promise.resolve();
       assert.equal(animationFrames.length, 0);
     }
@@ -2656,7 +2689,7 @@ test("production demo targets 125% at 90 seconds and completes the bus at 97.2 s
       assert.equal(root.dataset.busPercent, "100.000");
 
       const now = startedAt + 97200;
-      assert.equal(root.dataset.visibleStudents, "36.000000");
+      assert.equal(root.dataset.visibleStudents, "24.000000");
       const bus = createdElements.find(
         (element) => element.attributes.get("class") === "school-bus"
       );

@@ -1,6 +1,6 @@
 # TCF Fundraiser Progress Experience
 
-A dependency-free, event-ready 16:9 visualization that constructs an original red-brick school as fundraising advances from 0% to 100%. From 100% to 125%, students and teachers arrive while a hillside swing set grows into a finished playground. From 125% to 135%, a long conventional yellow school bus facing right arrives in the lower-left, completing the campus at 135%.
+A dependency-free, event-ready 16:9 visualization that constructs an original red-brick school as fundraising advances from 0% to 100%. From 100% to 125%, two rows of students arrive while a hillside swing set grows into a finished playground. From 125% to 135%, a long conventional yellow school bus facing right arrives in the lower-left, completing the campus at 135%.
 
 A transparent blueprint of the completed school remains visible behind the construction until the fundraising goal is reached, illustrating what incoming donations will complete.
 
@@ -71,7 +71,7 @@ Raised amounts are capped at 135% of the current goal across URL configuration, 
 
 The shared `PATCH /api/state` endpoint validates the merged raised/goal pair atomically. Values above 135% receive HTTP 400 with `{"error":"raised must be no more than 135% of goal."}` and do not change shared state or emit an SSE state update. This intentionally narrows the former accepted range while preserving the existing state and event schemas.
 
-The bus is rendered as one dependency-free SVG group. Its final scene bounds are `x=165..530`, `y=630..775`; full motion starts fully offscreen-left at offset `(-600,+25)` and follows cubic ease-out, while reduced motion keeps the bus at `translate(0 0)` and reveals it using linear opacity only. The reveal remains exact at 0% bus visibility at 125% fundraising, 50% at 130%, and 100% at 135%.
+The bus is rendered as one dependency-free SVG group. Its final scene bounds are `x=150..515`, `y=675..820`; full motion starts fully offscreen-left at offset `(-600,+25)` and follows cubic ease-out, while reduced motion keeps the bus at `translate(0 0)` and reveals it using linear opacity only. Once parked, the flat-roofed bus labeled “TCF School Bus” gently rolls forward and backward. The lower-left playground swing seats move independently; both idle animations stop when reduced motion is requested. The reveal remains exact at 0% bus visibility at 125% fundraising, 50% at 130%, and 100% at 135%.
 
 Continuous mode distributes classic radial, ring, star, chrysanthemum, and willow bursts across safe left, center, upper, and right sky regions. It pauses while the page is hidden, resumes when visible, limits active effects, and automatically slows to single bursts when reduced motion is requested.
 

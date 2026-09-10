@@ -270,7 +270,7 @@ kbd {
 }
 
 .distant-school-drop-motion.is-dropping {
-  animation: distant-school-drop 1450ms cubic-bezier(.2, .78, .28, 1) both;
+  animation: distant-school-drop 3500ms cubic-bezier(.2, .78, .28, 1) both;
 }
 
 @keyframes distant-school-drop {
@@ -307,6 +307,40 @@ kbd {
   stroke-width: 1.5;
   stroke-dasharray: 7 6;
   vector-effect: non-scaling-stroke;
+}
+
+.bus-idle-motion {
+  transform-box: view-box;
+  transform-origin: center bottom;
+  transform: translate(-15px, -15px);
+}
+
+.school-bus.is-idling .bus-idle-motion {
+  animation: bus-idle-roll 3.8s ease-in-out infinite alternate;
+}
+
+@keyframes bus-idle-roll {
+  from { transform: translate(-15px, -15px); }
+  to { transform: translate(-9px, -14px); }
+}
+
+.swing-moving-part {
+  transform-box: view-box;
+  animation: playground-swing 2.4s ease-in-out infinite alternate;
+}
+
+.swing-moving-part--1 {
+  transform-origin: 75px 508.1px;
+}
+
+.swing-moving-part--2 {
+  transform-origin: 101px 501.4px;
+  animation-direction: alternate-reverse;
+}
+
+@keyframes playground-swing {
+  from { transform: rotate(-4deg); }
+  to { transform: rotate(4deg); }
 }
 
 #fundraiser[data-goal-achieved="true"] .school-blueprint {
@@ -459,6 +493,60 @@ kbd {
   animation-duration: calc(var(--firework-duration, 1.45s) * .75);
 }
 
+.tcf-firework {
+  mix-blend-mode: normal;
+}
+
+.tcf-firework-burst {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: tcf-firework-show var(--tcf-firework-duration, 5s) ease-out both;
+  filter: drop-shadow(0 0 12px rgb(255 214 10 / .9));
+}
+
+.tcf-firework-ray {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: tcf-firework-ray var(--tcf-firework-duration, 5s) ease-out both;
+}
+
+.tcf-firework-spark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: tcf-firework-spark var(--tcf-firework-duration, 5s) ease-out both;
+}
+
+.tcf-firework-text {
+  animation: tcf-firework-text var(--tcf-firework-duration, 5s) ease-out both;
+}
+
+@keyframes tcf-firework-show {
+  0% { opacity: 0; transform: scale(.35); }
+  10% { opacity: 1; transform: scale(1.08); }
+  18%, 82% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.08); }
+}
+
+@keyframes tcf-firework-ray {
+  0% { opacity: 0; stroke-dashoffset: 1; }
+  12% { opacity: 1; stroke-dashoffset: 0; }
+  82% { opacity: .9; stroke-dashoffset: 0; }
+  100% { opacity: 0; stroke-dashoffset: 0; }
+}
+
+@keyframes tcf-firework-spark {
+  0% { opacity: 0; transform: scale(.2); }
+  12% { opacity: 1; transform: scale(1.25); }
+  82% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(.6); }
+}
+
+@keyframes tcf-firework-text {
+  0% { opacity: 0; }
+  10%, 84% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 @keyframes firework-burst {
   0% { opacity: 0; transform: scale(.18); }
   12% { opacity: 1; }
@@ -571,6 +659,19 @@ kbd {
   transform: none !important;
 }
 
+#fundraiser[data-motion="reduce"] .bus-idle-motion,
+#fundraiser[data-motion="reduce"] .swing-moving-part {
+  animation: none !important;
+}
+
+#fundraiser[data-motion="reduce"] .bus-idle-motion {
+  transform: translate(-15px, -15px);
+}
+
+#fundraiser[data-motion="reduce"] .swing-moving-part {
+  transform: none;
+}
+
 #fundraiser[data-motion="reduce"] .students.is-clapping .student-arm {
   animation: none !important;
 }
@@ -602,6 +703,15 @@ kbd {
 #fundraiser[data-motion="reduce"] .sky-firework .firework-trail,
 #fundraiser[data-motion="reduce"] .sky-firework .firework-spark {
   animation: none !important;
+}
+
+#fundraiser[data-motion="reduce"] .tcf-firework-burst,
+#fundraiser[data-motion="reduce"] .tcf-firework-ray,
+#fundraiser[data-motion="reduce"] .tcf-firework-spark,
+#fundraiser[data-motion="reduce"] .tcf-firework-text {
+  animation: none !important;
+  opacity: 1;
+  transform: none;
 }
 
 @keyframes firework-reduced-fade {

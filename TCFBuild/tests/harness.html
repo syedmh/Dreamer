@@ -103,7 +103,7 @@
           await stylesheetLoaded;
           const view = createFundraiserView(
             root,
-            createScene({ maxStudents: 36 }),
+            createScene({ maxStudents: 24 }),
             { locale: "en-US", currency: "USD" }
           );
           view.update({
@@ -282,7 +282,7 @@
       }
       document.body.append(host);
       if (loadStylesheet) await stylesheetLoaded;
-      const scene = createScene({ maxStudents: 36 });
+      const scene = createScene({ maxStudents: 24 });
       const view = createFundraiserView(
         root,
         scene,
@@ -1166,7 +1166,7 @@
       `;
       const view = createFundraiserView(
         root,
-        createScene({ maxStudents: 36 }),
+        createScene({ maxStudents: 24 }),
         { locale: "en-US", currency: "USD" }
       );
       const update = (ratio, reducedMotion = false) => view.update({
@@ -1441,7 +1441,7 @@
           && meter.style.getPropertyValue("--meter-width") === "";
       }],
       ["Scene remains within limits", () => {
-        const scene = createScene({ maxStudents: 36 });
+        const scene = createScene({ maxStudents: 24 });
         return scene.blocks.length === 308
           && scene.students.length === 36
           && scene.teachers.length === 2

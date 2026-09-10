@@ -147,6 +147,7 @@ const FIREWORK_PALETTES = Object.freeze([
 ]);
 const FIREWORK_FULL_DURATION_MS = 1450;
 const FIREWORK_REDUCED_DURATION_MS = 680;
+const TCF_FIREWORK_DURATION_MS = 5000;
 const FIREWORK_MAX_ACTIVE = 14;
 const DISTANT_SCHOOL_DROP_START_Y = 145;
 const THANK_YOU_MESSAGES = Object.freeze([
@@ -1204,6 +1205,92 @@ function appendFirework(
   return group;
 }
 
+function appendTcfFirework(layer, fireworkIndex, reducedMotion, onRemove) {
+  const group = svg("g", {
+    class: "sky-firework tcf-firework",
+    "data-firework-index": fireworkIndex,
+    "data-firework-shape": "tcf",
+    "data-firework-region": "left-sky",
+    "data-firework-zone": "left",
+    "data-firework-source": "school",
+    "data-reduced-motion": reducedMotion,
+    "data-duration-ms": TCF_FIREWORK_DURATION_MS,
+    "data-state": "active",
+    "aria-hidden": "true",
+    focusable: "false",
+    transform: "translate(565 210)"
+  }, layer);
+  group.style.setProperty(
+    "--tcf-firework-duration",
+    `${TCF_FIREWORK_DURATION_MS}ms`
+  );
+
+  const burst = svg("g", { class: "tcf-firework-burst" }, group);
+  for (let index = 0; index < 24; index += 1) {
+    const angle = index * 15;
+    const radians = angle * Math.PI / 180;
+    const inner = index % 2 === 0 ? 116 : 128;
+    const outer = index % 2 === 0 ? 158 : 146;
+    const color = index % 3 === 0
+      ? "#FFFFFF"
+      : index % 3 === 1
+        ? "#39FF88"
+        : "#FFD60A";
+    svg("line", {
+      class: "tcf-firework-ray",
+      x1: (Math.cos(radians) * inner).toFixed(2),
+      y1: (Math.sin(radians) * inner).toFixed(2),
+      x2: (Math.cos(radians) * outer).toFixed(2),
+      y2: (Math.sin(radians) * outer).toFixed(2),
+      stroke: color,
+      "stroke-width": index % 2 === 0 ? 5 : 3,
+      "stroke-linecap": "round"
+    }, burst);
+    svg("circle", {
+      class: "tcf-firework-spark",
+      cx: (Math.cos(radians) * outer).toFixed(2),
+      cy: (Math.sin(radians) * outer).toFixed(2),
+      r: index % 2 === 0 ? 5 : 3.5,
+      fill: color
+    }, burst);
+  }
+
+  for (const [className, stroke, strokeWidth, opacity] of [
+    ["tcf-firework-text tcf-firework-text--glow", "#FFD60A", 18, .45],
+    ["tcf-firework-text", "#078447", 8, 1]
+  ]) {
+    const text = svg("text", {
+      class: className,
+      x: 0,
+      y: 35,
+      "text-anchor": "middle",
+      fill: "#FFFFFF",
+      stroke,
+      "stroke-width": strokeWidth,
+      "paint-order": "stroke fill",
+      opacity,
+      "font-family": "Arial, sans-serif",
+      "font-size": 132,
+      "font-weight": 900,
+      "letter-spacing": 10
+    }, burst);
+    text.textContent = "TCF";
+  }
+
+  const removalTimer = setTimeout(() => {
+    group.dataset.state = "finished";
+    group.remove();
+    onRemove(group);
+  }, TCF_FIREWORK_DURATION_MS);
+  group.removeFirework = () => {
+    clearTimeout(removalTimer);
+    group.dataset.state = "cancelled";
+    group.remove();
+    onRemove(group);
+  };
+  return group;
+}
+
 function createFireworkController(sceneSvg) {
   const layer = svg("g", {
     class: "firework-layer",
@@ -1261,6 +1348,23 @@ function createFireworkController(sceneSvg) {
     return group;
   }
 
+  function addTcfFirework({ reducedMotion = false } = {}) {
+    while (activeFireworks.length >= FIREWORK_MAX_ACTIVE) {
+      activeFireworks[0].removeFirework();
+    }
+    fireworkCount += 1;
+    layer.dataset.fireworkCount = String(fireworkCount);
+    const group = appendTcfFirework(
+      layer,
+      fireworkCount,
+      reducedMotion,
+      removeFromActive
+    );
+    activeFireworks.push(group);
+    updateActiveCount();
+    return group;
+  }
+
   function clearFireworks() {
     for (const group of [...activeFireworks]) group.removeFirework();
   }
@@ -1269,6 +1373,7 @@ function createFireworkController(sceneSvg) {
 
   return Object.freeze({
     addFirework,
+    addTcfFirework,
     clearFireworks
   });
 }
@@ -1293,7 +1398,8 @@ function addPathAndShadow(root) {
 function addSwings(root, swings) {
   const layer = svg("g", {
     class: "campus-back swings",
-    transform: `translate(0 ${swings.offsetY})`,
+    transform: `translate(${swings.offsetX} ${swings.offsetY})`,
+    "data-offset-x": swings.offsetX,
     "data-offset-y": swings.offsetY
   }, root);
   const ground = svg("g", { class: "swing-ground", opacity: 0 }, layer);
@@ -1328,9 +1434,11 @@ function addSwings(root, swings) {
   }
 
   const ropes = svg("g", { class: "swing-chains", opacity: 0 }, layer);
-  for (const seat of swings.seats) {
+  for (let seatIndex = 0; seatIndex < swings.seats.length; seatIndex += 1) {
+    const seat = swings.seats[seatIndex];
     for (const ropeX of [seat.centerX - 5, seat.centerX + 5]) {
       svg("line", {
+        class: `swing-moving-part swing-moving-part--${seatIndex + 1}`,
         x1: ropeX,
         y1: seat.topY,
         x2: ropeX,
@@ -1339,6 +1447,7 @@ function addSwings(root, swings) {
         "stroke-width": 3
       }, ropes);
       svg("line", {
+        class: `swing-moving-part swing-moving-part--${seatIndex + 1}`,
         x1: ropeX,
         y1: seat.topY,
         x2: ropeX,
@@ -1351,8 +1460,10 @@ function addSwings(root, swings) {
   }
 
   const seats = svg("g", { class: "swing-seats", opacity: 0 }, layer);
-  for (const seat of swings.seats) {
+  for (let seatIndex = 0; seatIndex < swings.seats.length; seatIndex += 1) {
+    const seat = swings.seats[seatIndex];
     svg("rect", {
+      class: `swing-moving-part swing-moving-part--${seatIndex + 1}`,
       x: seat.centerX - 9,
       y: seat.y - 4,
       width: 18,
@@ -1443,10 +1554,14 @@ function addSchoolBus(root, bus) {
   const group = svg("g", {
     class: "school-bus",
     role: "img",
-    "aria-label": "Long yellow conventional US school bus facing right",
+    "aria-label": "Yellow TCF School Bus facing right",
     opacity: 0,
     transform: `translate(${bus.startOffset.x} ${bus.startOffset.y})`
   }, root);
+  const artwork = svg("g", {
+    class: "bus-idle-motion",
+    transform: `translate(${bus.artworkOffset.x} ${bus.artworkOffset.y})`
+  }, group);
   const yellow = "#F7C948";
   const yellowDark = "#C88A14";
   const outline = "#4A3718";
@@ -1463,7 +1578,7 @@ function addSchoolBus(root, bus) {
     fill: yellow,
     stroke: outline,
     "stroke-width": bus.body.strokeWidth
-  }, group);
+  }, artwork);
   svg("path", {
     class: "bus-cabin",
     d: bus.cabin.path,
@@ -1471,38 +1586,7 @@ function addSchoolBus(root, bus) {
     stroke: outline,
     "stroke-width": 4,
     "stroke-linejoin": "round"
-  }, group);
-  for (const x of bus.studs) {
-    svg("rect", {
-      class: "bus-roof-stud",
-      x,
-      y: 690,
-      width: 20,
-      height: 9,
-      rx: 3,
-      fill: yellowDark
-    }, group);
-  }
-
-  svg("rect", {
-    x: 250,
-    y: 701,
-    width: 170,
-    height: 14,
-    rx: 3,
-    fill: outline
-  }, group);
-  const header = svg("text", {
-    x: 335,
-    y: 712,
-    "text-anchor": "middle",
-    fill: "#FFF3B0",
-    "font-family": "Arial, sans-serif",
-    "font-size": 10,
-    "font-weight": 900,
-    "letter-spacing": 1.8
-  }, group);
-  header.textContent = "SCHOOL BUS";
+  }, artwork);
 
   for (const window of bus.windows) {
     svg("rect", {
@@ -1512,7 +1596,7 @@ function addSchoolBus(root, bus) {
       fill: glass,
       stroke: outline,
       "stroke-width": 2
-    }, group);
+    }, artwork);
   }
 
   svg("path", {
@@ -1522,9 +1606,9 @@ function addSchoolBus(root, bus) {
     stroke: outline,
     "stroke-width": 2,
     "stroke-linejoin": "round"
-  }, group);
+  }, artwork);
 
-  const door = svg("g", { class: "bus-door" }, group);
+  const door = svg("g", { class: "bus-door" }, artwork);
   svg("rect", {
     ...bus.door,
     rx: 2,
@@ -1578,7 +1662,7 @@ function addSchoolBus(root, bus) {
     stroke: outline,
     "stroke-width": 2,
     "stroke-linejoin": "round"
-  }, group);
+  }, artwork);
   svg("rect", {
     class: "bus-grille",
     x: 512,
@@ -1589,7 +1673,7 @@ function addSchoolBus(root, bus) {
     fill: metal,
     stroke: outline,
     "stroke-width": 2
-  }, group);
+  }, artwork);
   for (const x of [515, 519, 523]) {
     svg("line", {
       x1: x,
@@ -1598,7 +1682,7 @@ function addSchoolBus(root, bus) {
       y2: 784,
       stroke: "#47504F",
       "stroke-width": 1.5
-    }, group);
+    }, artwork);
   }
 
   for (const rail of bus.rails) {
@@ -1607,7 +1691,7 @@ function addSchoolBus(root, bus) {
       ...rail,
       rx: 2,
       fill: outline
-    }, group);
+    }, artwork);
   }
 
   for (const marker of [
@@ -1624,7 +1708,7 @@ function addSchoolBus(root, bus) {
       r: 3,
       stroke: outline,
       "stroke-width": 1
-    }, group);
+    }, artwork);
   }
 
   svg("circle", {
@@ -1634,7 +1718,7 @@ function addSchoolBus(root, bus) {
     fill: "#FFF4B8",
     stroke: outline,
     "stroke-width": 1.5
-  }, group);
+  }, artwork);
   svg("circle", {
     cx: 177,
     cy: 750,
@@ -1642,7 +1726,7 @@ function addSchoolBus(root, bus) {
     fill: "#D94A3D",
     stroke: outline,
     "stroke-width": 1
-  }, group);
+  }, artwork);
 
   const sideLabel = svg("text", {
     x: 337,
@@ -1650,13 +1734,13 @@ function addSchoolBus(root, bus) {
     "text-anchor": "middle",
     fill: outline,
     "font-family": "Arial, sans-serif",
-    "font-size": 12,
+    "font-size": 11,
     "font-weight": 900,
-    "letter-spacing": 1.4
-  }, group);
-  sideLabel.textContent = "SCHOOL BUS";
+    "letter-spacing": .8
+  }, artwork);
+  sideLabel.textContent = "TCF School Bus";
 
-  const stopSign = svg("g", { class: "bus-stop-sign" }, group);
+  const stopSign = svg("g", { class: "bus-stop-sign" }, artwork);
   svg("line", {
     x1: 430,
     y1: 758,
@@ -1699,7 +1783,7 @@ function addSchoolBus(root, bus) {
       fill: "#202323",
       stroke: "#111",
       "stroke-width": 1
-    }, group);
+    }, artwork);
     svg("circle", {
       cx: wheel.cx,
       cy: wheel.cy,
@@ -1707,7 +1791,7 @@ function addSchoolBus(root, bus) {
       fill: "#3D4545",
       stroke: "#111",
       "stroke-width": 2
-    }, group);
+    }, artwork);
     svg("circle", {
       cx: wheel.cx,
       cy: wheel.cy,
@@ -1715,13 +1799,13 @@ function addSchoolBus(root, bus) {
       fill: "#B7C0BF",
       stroke: "#5C6665",
       "stroke-width": 2
-    }, group);
+    }, artwork);
     svg("circle", {
       cx: wheel.cx,
       cy: wheel.cy,
       r: 5,
       fill: "#687271"
-    }, group);
+    }, artwork);
     for (let index = 0; index < 6; index += 1) {
       const angle = index * Math.PI / 3;
       svg("circle", {
@@ -1729,7 +1813,7 @@ function addSchoolBus(root, bus) {
         cy: wheel.cy + Math.sin(angle) * 8,
         r: 1.6,
         fill: "#596261"
-      }, group);
+      }, artwork);
     }
   }
   svg("rect", {
@@ -1739,7 +1823,7 @@ function addSchoolBus(root, bus) {
     height: 8,
     rx: 2,
     fill: metal
-  }, group);
+  }, artwork);
   svg("rect", {
     x: 512,
     y: 799,
@@ -1747,14 +1831,7 @@ function addSchoolBus(root, bus) {
     height: 8,
     rx: 2,
     fill: metal
-  }, group);
-
-  for (const child of group.children) {
-    child.setAttribute(
-      "transform",
-      `translate(${bus.artworkOffset.x} ${bus.artworkOffset.y})`
-    );
-  }
+  }, artwork);
 
   return group;
 }
@@ -2531,10 +2608,7 @@ export function createFundraiserView(root, scene, config) {
   finishNodes.push(...addStepsAndShrubs(sceneSvg));
 
   const goalFlag = addPakistanFlag(sceneSvg, scene.campus.flag);
-  const teacherLayer = svg("g", { class: "campus-people teachers" }, sceneSvg);
-  const teacherNodes = scene.teachers.map(
-    (teacher) => createTeacherNode(teacher, teacherLayer)
-  );
+  const teacherNodes = [];
   const studentLayer = svg("g", { class: "students" }, sceneSvg);
   const studentNodes = scene.students.map(
     (student) => createStudentNode(student, studentLayer)
@@ -2616,8 +2690,9 @@ export function createFundraiserView(root, scene, config) {
     }
     swingsLayer.setAttribute(
       "transform",
-      `translate(0 ${scene.campus.swings.offsetY})`
+      `translate(${scene.campus.swings.offsetX} ${scene.campus.swings.offsetY})`
     );
+    swingsLayer.dataset.currentOffsetX = String(scene.campus.swings.offsetX);
     swingsLayer.dataset.currentOffsetY = String(scene.campus.swings.offsetY);
     for (let index = 0; index < playgroundNodes.length; index += 1) {
       playgroundNodes[index].setAttribute(
@@ -2753,6 +2828,7 @@ export function createFundraiserView(root, scene, config) {
           ? `translate(${scene.campus.bus.startOffset.x} ${scene.campus.bus.startOffset.y})`
           : `translate(${busOffsetX.toFixed(2)} ${busOffsetY.toFixed(2)})`
     );
+    busNode.classList.toggle("is-idling", busRatio >= .99 && !reducedMotion);
 
     const percentage = Math.min(Number.MAX_VALUE, donationRatio * 100);
     const wholePercentage = wholeDisplayPercentage(percentage);
@@ -2765,7 +2841,7 @@ export function createFundraiserView(root, scene, config) {
     } else if (donationRatio < 1.10) {
       percentDisplay.textContent = `${wholePercentage}% — playground growing!`;
     } else if (donationRatio < 1.17) {
-      percentDisplay.textContent = `${wholePercentage}% — teachers joining!`;
+      percentDisplay.textContent = `${wholePercentage}% — campus growing!`;
     } else if (donationRatio < 1.25) {
       percentDisplay.textContent = `${wholePercentage}% — playground finishing!`;
     } else if (donationRatio < 1.35) {
@@ -2849,6 +2925,7 @@ export function createFundraiserView(root, scene, config) {
 
   return Object.freeze({
     addFirework: fireworkController.addFirework,
+    addTcfFirework: fireworkController.addTcfFirework,
     clearFireworks: fireworkController.clearFireworks,
     addKite: kiteController.addKite,
     clearKites: kiteController.clearKites,

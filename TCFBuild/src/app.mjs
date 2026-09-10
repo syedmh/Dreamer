@@ -217,6 +217,9 @@ function executeAction(action, { announceResult = true } = {}) {
     case "school.add": {
       const previousCount = Number(root.dataset.distantSchools || 0);
       const count = view.addDistantSchool({ reducedMotion: reducedMotion() });
+      if (count > previousCount) {
+        view.addTcfFirework({ reducedMotion: reducedMotion() });
+      }
       message = count === previousCount
         ? "All four distant schools are already present."
         : `Distant school ${count} added.`;

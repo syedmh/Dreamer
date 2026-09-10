@@ -140,17 +140,17 @@ test("parapets are flat, full-width wing and tower caps in frozen order", () => 
   assert.ok(roof.filter((block) => block.row === 3).every((block) => block.y === 257));
 });
 
-test("student layout is deterministic and capped at 36", () => {
-  assert.deepEqual(createStudentLayout(36), createStudentLayout(36));
-  assert.equal(createStudentLayout(100).length, 36);
+test("student layout is deterministic and capped at two rows", () => {
+  assert.deepEqual(createStudentLayout(24), createStudentLayout(24));
+  assert.equal(createStudentLayout(100).length, 24);
   assert.equal(createStudentLayout(-4).length, 0);
-  const students = createStudentLayout(36);
-  assert.equal(new Set(students.map((student) => student.id)).size, 36);
+  const students = createStudentLayout(24);
+  assert.equal(new Set(students.map((student) => student.id)).size, 24);
   assert.equal(new Set(students.map((student) => [
     student.targetX,
     student.targetY,
     student.scale
-  ].join("/"))).size, 36);
+  ].join("/"))).size, 24);
   assert.ok(students.every((student) => student.targetX >= 600 && student.targetX <= 1350));
   assert.ok(students.every((student) => student.targetY >= 700 && student.targetY <= 850));
   assert.ok(students.some((student) => student.side < 0));
@@ -190,7 +190,7 @@ test("student layout is deterministic and capped at 36", () => {
 });
 
 test("student routes are frozen staged lanes with exact snap endpoints", () => {
-  const students = createStudentLayout(36);
+  const students = createStudentLayout(24);
   for (const student of students) {
     const targetRow = Math.floor(student.index / 12);
     const expectedLaneY = targetRow === 0
@@ -255,28 +255,8 @@ test("student routes are frozen staged lanes with exact snap endpoints", () => {
   );
 });
 
-test("third-row outer lane clears settled painted students at the former contact ratios", () => {
-  const students = createStudentLayout(36);
-  const settled = students[26];
-  const moving = students[28];
-  const settledPaintBottom =
-    settled.targetY + settled.bounds.bottom * settled.scale;
-
-  for (const percent of [119.917, 119.926, 119.935]) {
-    const studentRatio = (percent - 100) / 25;
-    const reveal = revealAt(studentRatio, students.length, moving.index);
-    const position = deriveStudentRoutePosition(moving, reveal);
-    const movingPaintTop =
-      position.y + moving.bounds.top * moving.scale;
-    assert.ok(
-      movingPaintTop - settledPaintBottom >= 16,
-      `${percent}% painted clearance: ${movingPaintTop - settledPaintBottom}`
-    );
-  }
-});
-
 test("full-motion student routes are continuous, bounded, and reverse deterministic", () => {
-  const students = createStudentLayout(36);
+  const students = createStudentLayout(24);
   for (const student of students) {
     const forward = [];
     let maximumStep = 0;
@@ -317,46 +297,20 @@ test("full-motion student routes are continuous, bounded, and reverse determinis
   }
 });
 
-test("teacher and campus geometry are deterministic, exact, and deeply frozen", () => {
+test("teachers are omitted and campus geometry is deeply frozen", () => {
   const teachers = createTeacherLayout();
   assert.deepEqual(teachers, createTeacherLayout());
-  assert.deepEqual(
-    teachers.map(({ transform, bounds }) => ({ transform, bounds })),
-    [
-      {
-        transform: "translate(550 698) scale(1.08)",
-        bounds: { left: -16, right: 16, top: -68, bottom: 0 }
-      },
-      {
-        transform: "translate(1517 704) scale(1.08)",
-        bounds: { left: -16, right: 16, top: -68, bottom: 0 }
-      }
-    ]
-  );
-  assert.deepEqual(
-    {
-      x: teachers[0].x,
-      y: teachers[0].y,
-      scale: teachers[0].scale,
-      bounds: teachers[0].bounds
-    },
-    {
-      x: 550,
-      y: 698,
-      scale: 1.08,
-      bounds: { left: -16, right: 16, top: -68, bottom: 0 }
-    }
-  );
-  assert.ok(Object.isFrozen(teachers[0]));
-  assert.ok(Object.isFrozen(teachers[0].bounds));
+  assert.deepEqual(teachers, []);
+  assert.ok(Object.isFrozen(teachers));
 
   const scene = createScene();
-  assert.equal(scene.campus.swings.offsetY, 45);
+  assert.equal(scene.campus.swings.offsetX, -15);
+  assert.equal(scene.campus.swings.offsetY, 95);
   assert.deepEqual(scene.campus.swings.bounds, {
-    left: 20,
-    right: 145,
-    top: 535,
-    bottom: 705
+    left: 5,
+    right: 130,
+    top: 585,
+    bottom: 755
   });
   assert.deepEqual(scene.campus.distantSchools, [
     {
@@ -404,16 +358,16 @@ test("teacher and campus geometry are deterministic, exact, and deeply frozen", 
   assert.ok(scene.campus.distantSchools[1].bounds.right < 154.1);
   assert.ok(scene.campus.distantSchools[2].bounds.left > 309.2);
   assert.deepEqual(scene.campus.bus.bounds, {
-    left: 165,
-    right: 530,
-    top: 630,
-    bottom: 775
+    left: 150,
+    right: 515,
+    top: 675,
+    bottom: 820
   });
   assert.deepEqual(scene.campus.bus.startBounds, {
-    left: -435,
-    right: -70,
-    top: 655,
-    bottom: 800
+    left: -450,
+    right: -85,
+    top: 700,
+    bottom: 845
   });
   assert.deepEqual(scene.campus.flag.pole, {
     x: 960,
@@ -457,11 +411,11 @@ test("teacher and campus geometry are deterministic, exact, and deeply frozen", 
   assert.deepEqual(scene.campus.bus.cabin.bounds, {
     left: 183,
     right: 480,
-    top: 696,
+    top: 700,
     bottom: 732
   });
   assert.equal(scene.campus.bus.windows.length, 7);
-  assert.equal(scene.campus.bus.studs.length, 8);
+  assert.equal("studs" in scene.campus.bus, false);
   assert.equal(scene.campus.bus.rails.length, 2);
   assert.deepEqual(scene.campus.bus.door, {
     x: 421,
@@ -483,17 +437,17 @@ test("teacher and campus geometry are deterministic, exact, and deeply frozen", 
   assert.equal(scene.campus.bus.bounds.bottom - scene.campus.bus.bounds.top, 145);
   assert.ok(scene.campus.bus.startBounds.right < 0);
   assert.equal(scene.campus.bus.bounds.left - scene.campus.swings.bounds.right, 20);
-  assert.equal(scene.campus.bus.startBounds.top - scene.campus.swings.bounds.bottom, -50);
+  assert.equal(scene.campus.bus.startBounds.top - scene.campus.swings.bounds.bottom, -55);
   assert.equal(scene.campus.bus.wheels[1].cx - scene.campus.bus.wheels[0].cx, 240);
   assert.equal(
     scene.campus.bus.wheels[0].cy
       + scene.campus.bus.wheels[0].r
       + scene.campus.bus.artworkOffset.y,
-    775
+    820
   );
-  assert.equal(scene.campus.bus.bounds.left, 165);
-  assert.equal(900 - scene.campus.bus.bounds.bottom, 125);
-  assert.deepEqual(scene.campus.bus.artworkOffset, { x: 0, y: -60 });
+  assert.equal(scene.campus.bus.bounds.left, 150);
+  assert.equal(900 - scene.campus.bus.bounds.bottom, 80);
+  assert.deepEqual(scene.campus.bus.artworkOffset, { x: -15, y: -15 });
   assert.deepEqual(scene.campus.trees, [
     { x: 230, y: 520, scale: 1.1, trunkHeight: 76 },
     { x: 1420, y: 590, scale: 1, trunkHeight: 98 },
@@ -513,7 +467,7 @@ test("scene combines frozen limits without mutable shared state", () => {
   const scene = createScene({ maxStudents: 20 });
   assert.equal(scene.blocks.length, 308);
   assert.equal(scene.students.length, 20);
-  assert.equal(scene.teachers.length, 2);
+  assert.equal(scene.teachers.length, 0);
   assert.ok(Object.isFrozen(scene));
   assert.ok(Object.isFrozen(scene.blocks));
   assert.ok(Object.isFrozen(scene.students));
