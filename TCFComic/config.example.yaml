@@ -1,0 +1,41 @@
+version: 1
+
+paths:
+  source: "C:\\Images\\Incoming"
+  destination: "C:\\Images\\Transformed"
+  quarantine: "C:\\Images\\Transformed\\.tcfcomic\\quarantine"
+
+provider:
+  name: openai
+  model: gpt-image-2
+  prompt: >-
+    Transform this picture into a Studio Ghibli-inspired hand-painted
+    Japanese animation aesthetic while retaining the recognizable subject
+    and major composition.
+  request_timeout_seconds: 120
+
+watch:
+  poll_interval_seconds: 1.0
+  stable_seconds: 3.0
+  recursive: false
+
+retry:
+  max_attempts: 3
+  initial_delay_seconds: 1
+  max_delay_seconds: 8
+
+shutdown:
+  timeout_seconds: 15
+
+limits:
+  max_input_bytes: 52428800
+  max_output_bytes: 52428800
+  max_width: 7680
+  max_height: 7680
+  max_pixels: 40000000
+
+logging:
+  level: INFO
+  rotate_bytes: 10485760
+  backup_count: 5
+

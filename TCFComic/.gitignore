@@ -1,0 +1,7 @@
+*.egg-info/
+
+# Local credentials-free configuration and operator image folders.
+/config.azure.yaml
+/config.azure.interactive.yaml
+/incoming/
+/output/

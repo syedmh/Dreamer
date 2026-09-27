@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools==84.0.0", "wheel==0.48.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tcfcomic"
+version = "0.1.0"
+description = "Offline-testable Windows folder watcher for provider-backed image transformations."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+dependencies = [
+  "azure-identity==1.25.3",
+  "openai==2.54.0",
+  "Pillow==12.3.0",
+  "PyYAML==6.0.3",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest==9.1.1",
+]
+dev = [
+  "pytest==9.1.1",
+  "pip-audit==2.10.1",
+]
+
+[project.scripts]
+tcfcomic = "tcfcomic.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+markers = [
+  "performance: slower capacity and timing checks",
+]
