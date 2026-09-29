@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#078447">
-  <title>Build a Brighter Future — TCF Fundraiser</title>
+  <title>Diye Se Diya Jalao — TCF Fundraiser</title>
   <link rel="icon" href="/favicon.ico" type="image/png">
   <link rel="apple-touch-icon" href="/Logo.png">
   <link rel="stylesheet" href="styles.css">
@@ -36,12 +36,19 @@
           <img class="brand-logo" src="/Logo.png" alt="" width="430" height="332" draggable="false">
         </div>
         <div>
-          <p class="eyebrow">THE CITIZENS FOUNDATION</p>
-          <h1 id="event-title">Build a Brighter Future</h1>
+          <p class="eyebrow">THE CITIZENS FOUNDATION - SEATTLE CHAPTER</p>
+          <h1 id="event-title" aria-label="Diye Se Diya Jalao">
+            Diye Se
+            <span class="slogan-flame" aria-hidden="true">
+              <span class="slogan-hand">🫴</span>
+              <span class="slogan-fire">🔥</span>
+            </span>
+            Diya Jalao
+          </h1>
         </div>
       </header>
 
-      <section class="progress-card" aria-label="Fundraiser total">
+      <section class="progress-card" aria-label="Fundraiser total" hidden>
         <p class="progress-label">Together we've raised</p>
         <p id="raised-display" class="raised-display">$0</p>
         <div class="meter" aria-hidden="true">
@@ -56,7 +63,21 @@
         </p>
       </section>
 
-      <p id="keyboard-hint" class="keyboard-hint">Press <kbd>Space</kbd> to hide key legends · <kbd>S</kbd> drop next school · <kbd>X</kbd> remove last school · <kbd>D</kbd> demo · <kbd>N</kbd> day/night · <kbd>O</kbd> clap · <kbd>P</kbd> thank you · <kbd>K</kbd> kite · <kbd>L</kbd> clear kites · <kbd>Q</kbd> firework · <kbd>W</kbd> continuous · <kbd>F</kbd> fullscreen · arrows/Home/End progress</p>
+      <section id="build-summary-card" class="progress-card build-card" aria-label="Together We Build summary">
+        <p class="progress-label">Together We Build</p>
+        <div class="build-metrics">
+          <div class="build-metric">
+            <span id="seattle-schools-display" class="build-value">0</span>
+            <span class="build-caption">Seattle Schools</span>
+          </div>
+          <div class="build-metric">
+            <span id="operation-cost-display" class="build-value">$0</span>
+            <span class="build-caption">Operation Cost</span>
+          </div>
+        </div>
+      </section>
+
+      <p id="keyboard-hint" class="keyboard-hint" hidden>Press <kbd>Space</kbd> to hide key legends · <kbd>Y</kbd> show/hide build summary · <kbd>S</kbd> drop next school · <kbd>X</kbd> remove last school · <kbd>D</kbd> demo · <kbd>N</kbd> day/night · <kbd>O</kbd> clap · <kbd>P</kbd> thank you · <kbd>K</kbd> kite · <kbd>L</kbd> clear kites · <kbd>Q</kbd> firework · <kbd>W</kbd> continuous · <kbd>F</kbd> fullscreen · arrows/Home/End progress</p>
 
       <div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     </section>

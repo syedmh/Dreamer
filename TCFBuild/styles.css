@@ -67,7 +67,8 @@ body { display: grid; place-items: center; }
 
 .scoreboard {
   position: absolute;
-  top: 4.4%;
+  top: auto;
+  bottom: 4.8%;
   left: 4.2%;
   z-index: 5;
   display: flex;
@@ -84,6 +85,29 @@ body { display: grid; place-items: center; }
   letter-spacing: -.045em;
 }
 
+.slogan-flame {
+  position: relative;
+  display: inline-block;
+  width: 1.25em;
+  height: .9em;
+  margin-left: .08em;
+  font-size: .72em;
+  vertical-align: -.08em;
+}
+
+.slogan-hand {
+  position: absolute;
+  right: 0;
+  bottom: -.08em;
+}
+
+.slogan-fire {
+  position: absolute;
+  top: -.72em;
+  left: .45em;
+  font-size: .7em;
+}
+
 .eyebrow {
   margin: 0 0 .35em;
   color: var(--green);
@@ -95,10 +119,11 @@ body { display: grid; place-items: center; }
 .brand-card {
   display: grid;
   place-items: center;
-  width: clamp(74px, 7.2cqw, 138px);
+  width: clamp(43px, 4.2cqw, 80px);
   aspect-ratio: 430 / 332;
-  padding: 5%;
-  border-radius: clamp(10px, .8cqw, 18px);
+  padding: 0;
+  overflow: hidden;
+  border-radius: clamp(5px, .4cqw, 9px);
   background: white;
   box-shadow: 0 6px 20px rgb(23 53 42 / .18);
 }
@@ -113,16 +138,30 @@ body { display: grid; place-items: center; }
 .progress-card {
   position: absolute;
   z-index: 5;
-  top: 4.1%;
-  right: 1.5%;
-  width: 29cqw;
-  min-width: 300px;
-  padding: clamp(15px, 1.7cqw, 60px);
+  top: 7.1%;
+  right: 5.5%;
+  width: 24.5cqw;
+  min-width: 270px;
+  padding: clamp(10px, .75cqw, 28px);
   border: 1px solid rgb(255 255 255 / .72);
   border-radius: clamp(18px, 1.6cqw, 60px);
   background: rgb(255 247 223 / .91);
   box-shadow: 0 16px 45px rgb(23 53 42 / .2);
   backdrop-filter: blur(10px);
+}
+
+.build-card {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 1100ms ease,
+    transform 1100ms ease;
+}
+
+.build-card.is-hidden {
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(24px);
 }
 
 .progress-label {
@@ -134,6 +173,10 @@ body { display: grid; place-items: center; }
   text-transform: uppercase;
 }
 
+.scoreboard .eyebrow {
+  color: #fff;
+}
+
 .raised-display {
   margin: .08em 0 .16em;
   color: var(--charcoal);
@@ -141,6 +184,41 @@ body { display: grid; place-items: center; }
   font-weight: 950;
   line-height: 1;
   letter-spacing: -.055em;
+}
+
+.build-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(12px, 1.2cqw, 36px);
+  margin-top: clamp(12px, 1cqw, 30px);
+}
+
+.build-metric {
+  display: grid;
+  align-content: center;
+  min-width: 0;
+  padding: clamp(10px, .9cqw, 28px);
+  border-radius: clamp(12px, 1cqw, 30px);
+  background: rgb(255 255 255 / .58);
+  text-align: center;
+}
+
+.build-value {
+  overflow-wrap: anywhere;
+  color: var(--charcoal);
+  font-size: clamp(20px, 1.6cqw, 58px);
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: -.045em;
+}
+
+.build-caption {
+  margin-top: .55em;
+  color: var(--green);
+  font-size: clamp(9px, .72cqw, 25px);
+  font-weight: 850;
+  letter-spacing: .03em;
+  text-transform: uppercase;
 }
 
 .meter {
@@ -246,6 +324,20 @@ kbd {
   opacity: 0;
 }
 
+.sun-tcf {
+  opacity: 0;
+  animation: sun-tcf-cycle 45s linear 45s infinite;
+}
+
+@keyframes sun-tcf-cycle {
+  0%, 11% {
+    opacity: 1;
+  }
+  13%, 100% {
+    opacity: 0;
+  }
+}
+
 #school-scene.is-night .cloud {
   filter: brightness(.72) saturate(.7);
 }
@@ -270,29 +362,83 @@ kbd {
 }
 
 .distant-school-drop-motion.is-dropping {
-  animation: distant-school-drop 3500ms cubic-bezier(.2, .78, .28, 1) both;
+  animation: distant-school-drop 6500ms cubic-bezier(.2, .78, .28, 1) both;
+}
+
+.distant-school-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.distant-school-drop-motion.is-dropping .distant-school-eye {
+  animation: distant-school-eye-blink 6500ms linear both;
+}
+
+@keyframes distant-school-eye-blink {
+  0%, 16%, 20%, 24%, 29%, 100% {
+    transform: scaleY(1);
+  }
+  18%, 27% {
+    transform: scaleY(.08);
+  }
 }
 
 @keyframes distant-school-drop {
   0% {
     opacity: 0;
-    transform: translateY(var(--school-drop-y, -690px)) rotate(-7deg) scale(.92);
+    transform:
+      translate(var(--school-drop-x, 0), calc(var(--school-drop-y, 0) - 180px))
+      rotate(-4deg)
+      scale(10);
   }
-  68% {
+  12% {
     opacity: 1;
-    transform: translateY(12px) rotate(2.5deg) scale(1.02);
+    transform:
+      translate(var(--school-drop-x, 0), var(--school-drop-y, 0))
+      rotate(-2deg)
+      scale(9.5);
   }
-  84% {
+  18% {
+    opacity: 1;
+    transform:
+      translate(var(--school-drop-x, 0), calc(var(--school-drop-y, 0) + 10px))
+      rotate(1deg)
+      scale(9.55);
+  }
+  26% {
+    opacity: 1;
+    transform:
+      translate(var(--school-drop-x, 0), calc(var(--school-drop-y, 0) - 24px))
+      rotate(-1deg)
+      scale(9.7);
+  }
+  34% {
+    opacity: 1;
+    transform:
+      translate(var(--school-drop-x, 0), var(--school-drop-y, 0))
+      rotate(0)
+      scale(9.5);
+  }
+  52% {
+    opacity: 1;
+    transform:
+      translate(var(--school-drop-x, 0), var(--school-drop-y, 0))
+      rotate(1deg)
+      scale(9.5);
+  }
+  86% {
+    transform: translateY(14px) rotate(2.5deg) scale(1.06);
+  }
+  93% {
     transform: translateY(-6px) rotate(-1.2deg) scale(.99);
   }
-  94% {
+  97% {
     transform: translateY(2px) rotate(.4deg) scale(1.005);
   }
   100% {
     opacity: 1;
     transform: none;
   }
-  stroke: none;
 }
 
 .school-blueprint-top {
@@ -642,6 +788,10 @@ kbd {
   animation: none !important;
   opacity: 1;
   transform: none !important;
+}
+
+#fundraiser[data-motion="reduce"] .build-card {
+  transition: none;
 }
 
 #fundraiser[data-motion="reduce"] .bus-idle-motion,

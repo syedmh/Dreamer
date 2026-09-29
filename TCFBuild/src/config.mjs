@@ -6,17 +6,23 @@ export const DEFAULT_CONFIG = Object.freeze({
   maxStudents: 24,
   overGoalRamp: 0.25,
   animationTimeConstantMs: 420,
-  demoDurationMs: 97200
+  demoDurationMs: 144000
 });
 
 export const MIN_GOAL = 0.01;
 export const MAX_RAISED = Number.MAX_SAFE_INTEGER;
-export const MAX_PROGRESS_RATIO = 1.35;
+export const MAX_PROGRESS_RATIO = 2;
 export const MAX_GOAL = MAX_RAISED / MAX_PROGRESS_RATIO;
+const ALLOWED_RAISED_STEP_FRACTIONS = new Set([-.05, -.01, .01, .05]);
 
 export function clampAmount(value) {
+  if (value === Number.POSITIVE_INFINITY) return MAX_RAISED;
   if (!Number.isFinite(value)) return 0;
   return Math.min(MAX_RAISED, Math.max(0, value));
+}
+
+export function isAllowedRaisedStep(value) {
+  return ALLOWED_RAISED_STEP_FRACTIONS.has(value);
 }
 
 export function deriveSliderMaximum(goal) {
@@ -117,7 +123,7 @@ export function validateOperatorAmounts(raisedValue, goalValue) {
     return Object.freeze({
       valid: false,
       field: "raised",
-      message: "Enter a raised amount no greater than 135% of the goal."
+      message: "Enter a raised amount no greater than 200% of the goal."
     });
   }
 
@@ -139,20 +145,37 @@ function flag(value, fallback = false) {
 export function parseConfig(search = "", overrides = {}) {
   const params = new URLSearchParams(search);
   const base = { ...DEFAULT_CONFIG, ...overrides };
-  const goal = finiteNumber(params.get("goal"), base.goal, MIN_GOAL, MAX_GOAL);
+  const requestedGoal = params.get("goal");
+  const requestedRaised = params.get("raised");
+  const hasExplicitGoal = requestedGoal !== null
+    && requestedGoal.trim() !== ""
+    && Number.isFinite(Number(requestedGoal))
+    && Number(requestedGoal) >= MIN_GOAL
+    && Number(requestedGoal) <= MAX_GOAL;
+  const goal = finiteNumber(requestedGoal, base.goal, MIN_GOAL, MAX_GOAL);
+  const hasExplicitRaised = requestedRaised !== null
+    && requestedRaised.trim() !== ""
+    && Number.isFinite(Number(requestedRaised))
+    && Number(requestedRaised) >= 0
+    && Number(requestedRaised) <= MAX_RAISED;
   const raised = Math.min(
     deriveSliderMaximum(goal),
-    finiteNumber(params.get("raised"), base.raised, 0, MAX_RAISED)
+    finiteNumber(requestedRaised, base.raised, 0, MAX_RAISED)
   );
   const requestedMotion = (params.get("motion") || "auto").toLowerCase();
   const motion = ["auto", "reduce", "full"].includes(requestedMotion)
     ? requestedMotion
     : "auto";
+  const authoritativeInitialState = Object.freeze({
+    ...(hasExplicitGoal ? { goal } : {}),
+    ...(hasExplicitRaised ? { raised } : {})
+  });
 
   return Object.freeze({
     ...base,
     goal,
     raised,
+    authoritativeInitialState,
     controls: flag(params.get("controls")),
     demo: flag(params.get("demo")),
     motion

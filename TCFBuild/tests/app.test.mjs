@@ -51,7 +51,14 @@ class FakeElement {
   }
 
   append(...children) {
-    for (const child of children) child.parentElement = this;
+    for (const child of children) {
+      if (child.parentElement && child.parentElement !== this) {
+        child.parentElement.children = child.parentElement.children.filter(
+          (candidate) => candidate !== child
+        );
+      }
+      child.parentElement = this;
+    }
     this.children.push(...children);
   }
 
@@ -133,6 +140,7 @@ async function withAppHarness({
     ["#raised-slider", new FakeInputElement()]
   ]);
   elements.get("#operator-panel").hidden = true;
+  elements.get("#keyboard-hint").hidden = true;
 
   const root = new FakeElement();
   const rootElements = new Map([
@@ -196,7 +204,65 @@ async function withAppHarness({
     timers.delete(timerId);
   });
   if (eventSourceClass) setGlobal("EventSource", eventSourceClass);
-  if (fetchImplementation) setGlobal("fetch", fetchImplementation);
+  const params = new URLSearchParams(locationSearch);
+  let serverState = {
+    revision: 0,
+    raised: Number(params.get("raised") ?? 0),
+    goal: Number(params.get("goal") ?? 100000),
+    seattleSchools: 0,
+    operationCost: 0,
+    demoActive: false,
+    nightMode: false,
+    studentsClapping: false,
+    thankYouVisible: true,
+    continuousFireworks: false,
+    buildSummaryVisible: true,
+    keyboardLegendVisible: false,
+    keypressEnabled: true,
+    distantSchools: []
+  };
+  const defaultFetch = async (url, options = {}) => {
+    const body = options.body ? JSON.parse(options.body) : null;
+    if (url === "/api/commands") {
+      if (body.type === "raised.step") {
+        serverState.raised = Math.min(
+          serverState.goal * 2,
+          Math.max(0, serverState.raised + serverState.goal * body.fraction)
+        );
+        serverState.demoActive = false;
+      } else if (body.type === "raised.setRatio") {
+        serverState.raised = serverState.goal * body.ratio;
+        serverState.demoActive = false;
+      } else if (body.type === "state.toggle") {
+        serverState[body.field] = !serverState[body.field];
+      }
+      serverState.revision += 1;
+    } else if (url === "/api/actions") {
+      if (body.type === "school.add" && serverState.distantSchools.length < 7) {
+        const slot = serverState.distantSchools.length + 1;
+        serverState.distantSchools = [...serverState.distantSchools, {
+          slot,
+          phase: "pending",
+          generation: 1,
+          startedAt: Date.now(),
+          completesAt: Date.now() + 6500
+        }];
+        serverState.revision += 1;
+      } else if (body.type === "school.remove" && serverState.distantSchools.length) {
+        serverState.distantSchools = serverState.distantSchools.slice(0, -1);
+        serverState.revision += 1;
+      }
+    }
+    return {
+      ok: true,
+      async json() {
+        return url === "/api/actions"
+          ? { accepted: true, action: body, state: { ...serverState } }
+          : { ...serverState };
+      }
+    };
+  };
+  setGlobal("fetch", fetchImplementation ?? defaultFetch);
   setGlobal("window", {
     addEventListener() {},
     location: { search: locationSearch },
@@ -318,15 +384,15 @@ test("pointer-close focus layer is contained, above stage content, and pointer-t
   );
 });
 
-test("distant schools begin below the logo and fall slowly enough to notice", async () => {
+test("distant schools appear large at center before settling on the hill", async () => {
   const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
   assert.match(
     css,
-    /\.distant-school-drop-motion\.is-dropping\s*\{\s*animation:\s*distant-school-drop 3500ms/
+    /\.distant-school-drop-motion\.is-dropping\s*\{\s*animation:\s*distant-school-drop 6500ms/
   );
   assert.match(
     css,
-    /transform:\s*translateY\(var\(--school-drop-y, -690px\)\) rotate\(-7deg\) scale\(\.92\);/
+    /translate\(var\(--school-drop-x, 0\), var\(--school-drop-y, 0\)\)[\s\S]*scale\(9\.5\);/
   );
   assert.match(
     css,
@@ -334,7 +400,7 @@ test("distant schools begin below the logo and fall slowly enough to notice", as
   );
 });
 
-test("display keyboard legend toggles locally without an embedded operator panel", async () => {
+test("display keyboard legend waits for authoritative command responses", async () => {
   await withAppHarness(
     { locationSearch: "?goal=100000&raised=51000" },
     async ({
@@ -344,24 +410,267 @@ test("display keyboard legend toggles locally without an embedded operator panel
     }) => {
       const keydown = documentListeners.get("keydown");
       const hint = elements.get("#keyboard-hint");
-      assert.equal(hint.hidden, false);
-      keydown({
-        key: " ",
-        code: "Space",
-        target: root,
-        preventDefault() {}
-      });
       assert.equal(hint.hidden, true);
-      assert.equal(elements.get("#announcer").textContent, "Keyboard legends hidden.");
       keydown({
         key: " ",
         code: "Space",
         target: root,
         preventDefault() {}
       });
+
+      test("display derives preview SSE role from the client query", async () => {
+        let eventUrl;
+        class FakeEventSource {
+          constructor(url) {
+            eventUrl = url;
+          }
+          addEventListener() {}
+        }
+        await withAppHarness(
+          {
+            eventSourceClass: FakeEventSource,
+            locationSearch: "?client=preview&motion=reduce"
+          },
+          async () => {
+            assert.equal(eventUrl, "/events?role=preview");
+          }
+        );
+      });
+      await new Promise((resolve) => setImmediate(resolve));
       assert.equal(hint.hidden, false);
       assert.equal(elements.get("#announcer").textContent, "Keyboard legends shown.");
+      keydown({
+        key: " ",
+        code: "Space",
+        target: root,
+        preventDefault() {}
+      });
+      await new Promise((resolve) => setImmediate(resolve));
+      assert.equal(hint.hidden, true);
+      assert.equal(elements.get("#announcer").textContent, "Keyboard legends hidden.");
       assert.equal(root.querySelector("#operator-panel"), undefined);
+    }
+  );
+});
+
+test("authoritative keypress disable blocks display shortcuts until re-enabled", async () => {
+  let events;
+  const requests = [];
+  class FakeEventSource {
+    constructor() {
+      this.listeners = new Map();
+      events = this;
+    }
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+    emit(type, value) {
+      this.listeners.get(type)?.({ data: JSON.stringify(value) });
+    }
+  }
+
+  await withAppHarness(
+    {
+      eventSourceClass: FakeEventSource,
+      fetchImplementation: async (url, options) => {
+        requests.push({ url, body: options?.body && JSON.parse(options.body) });
+        return {
+          ok: true,
+          async json() {
+            return {
+              revision: 2,
+              raised: 52000,
+              goal: 100000,
+              keypressEnabled: true,
+              distantSchools: []
+            };
+          }
+        };
+      },
+      locationSearch: "?goal=100000&raised=51000"
+    },
+    async ({ documentListeners, root }) => {
+      const keydown = documentListeners.get("keydown");
+      events.emit("state", {
+        revision: 1,
+        raised: 51000,
+        goal: 100000,
+        keypressEnabled: false,
+        distantSchools: []
+      });
+
+      let prevented = false;
+      keydown({
+        key: "ArrowRight",
+        target: root,
+        preventDefault() {
+          prevented = true;
+        }
+      });
+      keydown({
+        key: "s",
+        target: root,
+        preventDefault() {
+          prevented = true;
+        }
+      });
+      await new Promise((resolve) => setImmediate(resolve));
+      assert.equal(prevented, false);
+      assert.deepEqual(requests, []);
+
+      events.emit("state", {
+        revision: 2,
+        raised: 51000,
+        goal: 100000,
+        keypressEnabled: true,
+        distantSchools: []
+      });
+      keydown({
+        key: "ArrowRight",
+        target: root,
+        preventDefault() {
+          prevented = true;
+        }
+      });
+      await new Promise((resolve) => setImmediate(resolve));
+      assert.equal(prevented, true);
+      assert.deepEqual(requests, [{
+        url: "/api/commands",
+        body: { type: "raised.step", fraction: .01 }
+      }]);
+    }
+  );
+});
+
+test("explicit fundraiser URL state initializes once after the first snapshot without optimism", async () => {
+  let events;
+  let resolvePatch;
+  const requests = [];
+  class FakeEventSource {
+    constructor(url) {
+      this.url = url;
+      this.listeners = new Map();
+      events = this;
+    }
+
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+
+    emit(type, value) {
+      this.listeners.get(type)?.({ data: JSON.stringify(value) });
+    }
+  }
+
+  await withAppHarness(
+    {
+      eventSourceClass: FakeEventSource,
+      fetchImplementation(url, options) {
+        requests.push({ url, body: JSON.parse(options.body) });
+        return new Promise((resolve) => {
+          resolvePatch = resolve;
+        });
+      },
+      locationSearch: "?raised=60000&motion=reduce"
+    },
+    async ({ animationFrames, rootElements, startedAt }) => {
+      while (animationFrames.length > 0) animationFrames.shift()(startedAt);
+      assert.equal(rootElements.get("#raised-display").textContent, "$0");
+      assert.equal(rootElements.get("#goal-display").textContent, "Goal $100,000");
+      assert.deepEqual(requests, []);
+
+      events.emit("snapshot", {
+        state: {
+          revision: 5,
+          raised: 10000,
+          goal: 120000,
+          distantSchools: []
+        }
+      });
+      assert.deepEqual(requests, [{
+        url: "/api/state",
+        body: { raised: 60000 }
+      }]);
+
+      events.emit("state", {
+        revision: 7,
+        raised: 70000,
+        goal: 140000,
+        distantSchools: []
+      });
+      resolvePatch({
+        ok: true,
+        async json() {
+          return {
+            revision: 6,
+            raised: 60000,
+            goal: 120000,
+            distantSchools: []
+          };
+        }
+      });
+      await new Promise((resolve) => setImmediate(resolve));
+      while (animationFrames.length > 0) {
+        animationFrames.shift()(startedAt + 1);
+      }
+      assert.equal(rootElements.get("#raised-display").textContent, "$70,000");
+      assert.equal(rootElements.get("#goal-display").textContent, "Goal $140,000");
+
+      events.emit("snapshot", {
+        state: {
+          revision: 8,
+          raised: 71000,
+          goal: 140000,
+          distantSchools: []
+        }
+      });
+      await new Promise((resolve) => setImmediate(resolve));
+      assert.equal(requests.length, 1);
+      assert.equal(events.url, "/events?role=presentation");
+    }
+  );
+});
+
+test("preview without explicit fundraiser parameters never initializes server state", async () => {
+  let events;
+  const requests = [];
+  class FakeEventSource {
+    constructor(url) {
+      this.url = url;
+      this.listeners = new Map();
+      events = this;
+    }
+
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+
+    emit(type, value) {
+      this.listeners.get(type)?.({ data: JSON.stringify(value) });
+    }
+  }
+
+  await withAppHarness(
+    {
+      eventSourceClass: FakeEventSource,
+      fetchImplementation(url, options) {
+        requests.push({ url, options });
+        throw new Error("unexpected fetch");
+      },
+      locationSearch: "?client=preview&motion=reduce"
+    },
+    async () => {
+      events.emit("snapshot", {
+        state: {
+          revision: 1,
+          raised: 0,
+          goal: 100000,
+          distantSchools: []
+        }
+      });
+      await new Promise((resolve) => setImmediate(resolve));
+      assert.deepEqual(requests, []);
+      assert.equal(events.url, "/events?role=preview");
     }
   );
 });
@@ -635,7 +944,7 @@ test("renderer preserves adjacent and extreme non-endpoint rendering states", ()
     const finalStudentTransformDistinct = lastStudent.attributes.get("transform")
       !== completedStudentTransform;
     const busGoal = 100000;
-    const completionRaised = deriveSliderMaximum(busGoal);
+    const completionRaised = busGoal * 1.35;
     update(view, completionRaised, busGoal);
     assert.equal(Number(bus.attributes.get("opacity")), 1);
     update(view, completionRaised - .01, busGoal);
@@ -708,6 +1017,16 @@ test("finished facade uses frozen drawing order, geometry, and progressive finis
         "landscape",
         "kite-layer",
         "firework-layer",
+        "campus-layer",
+        "distant-schools"
+      ]
+    );
+    const campusLayer = sceneSvg.children.find(
+      (node) => classes(node) === "campus-layer"
+    );
+    assert.deepEqual(
+      campusLayer.children.map(classes).filter(Boolean),
+      [
         "campus-back swings",
         "path-and-shadow",
         "school-blueprint",
@@ -770,7 +1089,7 @@ test("finished facade uses frozen drawing order, geometry, and progressive finis
         === `${index % 2 === 0 ? "Boy" : "Girl"} student ${index + 1}`
     ));
     assert.ok(nodes.some((node) => node.attributes.get("d")
-      === "M760 900 C815 790 875 720 918 688 L1008 688 C1055 724 1125 795 1180 900 Z"));
+      === "M650 1100 C750 900 840 740 918 688 L1008 688 C1090 744 1190 910 1290 1100 Z"));
     assert.ok(nodes.some((node) =>
       node.tagName === "ellipse"
       && node.attributes.get("cx") === "1003"
@@ -877,7 +1196,7 @@ test("finished facade uses frozen drawing order, geometry, and progressive finis
   }
 });
 
-test("renderer adds four distant schools in order and removes them last-in-first-out", () => {
+test("renderer adds seven distant schools in order and removes them last-in-first-out", () => {
   const originalDocument = Object.getOwnPropertyDescriptor(globalThis, "document");
   const root = new FakeElement("main");
   const elements = new Map([
@@ -917,10 +1236,10 @@ test("renderer adds four distant schools in order and removes them last-in-first
       (node) => node.attributes.get("class") === "campus-back swings"
     );
 
-    assert.equal(schools.length, 4);
+    assert.equal(schools.length, 7);
     assert.deepEqual(
       schools.map((school) => Number(school.attributes.get("data-school-slot"))),
-      [1, 2, 3, 4]
+      [1, 2, 3, 4, 5, 6, 7]
     );
     assert.ok(schools.every((school) =>
       school.attributes.get("data-state") === "inactive"
@@ -981,22 +1300,31 @@ test("renderer adds four distant schools in order and removes them last-in-first
       school1Motion.attributes.get("class"),
       "distant-school-drop-motion is-dropping"
     );
-    assert.equal(school1Motion.style.getPropertyValue("--school-drop-y"), "-690.89px");
+    assert.equal(school1Motion.style.getPropertyValue("--school-drop-x"), "1408.15px");
+    assert.equal(school1Motion.style.getPropertyValue("--school-drop-y"), "736.89px");
 
     assert.equal(view.addDistantSchool({ reducedMotion: true }), 2);
     assert.equal(view.addDistantSchool({ reducedMotion: false }), 3);
     assert.equal(view.addDistantSchool({ reducedMotion: false }), 4);
-    assert.equal(view.addDistantSchool({ reducedMotion: false }), 4);
-    assert.equal(root.dataset.distantSchools, "4");
+    assert.equal(view.addDistantSchool({ reducedMotion: false }), 5);
+    assert.equal(view.addDistantSchool({ reducedMotion: false }), 6);
+    assert.equal(view.addDistantSchool({ reducedMotion: false }), 7);
+    assert.equal(view.addDistantSchool({ reducedMotion: false }), 7);
+    assert.equal(root.dataset.distantSchools, "7");
     assert.ok(schools.every((school) => school.dataset.dropped === "true"));
 
-    const school4 = schools[3];
-    assert.equal(view.removeLastDistantSchool(), 3);
-    assert.equal(root.dataset.distantSchools, "3");
-    assert.equal(school4.dataset.state, "inactive");
-    assert.equal(school4.dataset.dropped, "false");
-    assert.equal(view.addDistantSchool({ reducedMotion: false }), 4);
-    assert.equal(school4.dataset.dropRun, "2");
+    const school7 = schools.find(
+      (school) => school.attributes.get("data-school-slot") === "7"
+    );
+    assert.equal(view.removeLastDistantSchool(), 6);
+    assert.equal(root.dataset.distantSchools, "6");
+    assert.equal(school7.dataset.state, "inactive");
+    assert.equal(school7.dataset.dropped, "false");
+    assert.equal(view.addDistantSchool({ reducedMotion: false }), 7);
+    assert.equal(school7.dataset.dropRun, "2");
+    assert.equal(view.removeLastDistantSchool(), 6);
+    assert.equal(view.removeLastDistantSchool(), 5);
+    assert.equal(view.removeLastDistantSchool(), 4);
     assert.equal(view.removeLastDistantSchool(), 3);
     assert.equal(view.removeLastDistantSchool(), 2);
     assert.equal(view.removeLastDistantSchool(), 1);
@@ -1011,107 +1339,107 @@ test("renderer adds four distant schools in order and removes them last-in-first
   }
 });
 
-test("display S adds up to four schools and X removes the last school", async () => {
+test("display school keys wait for authoritative state reconciliation", async () => {
+  let events;
+  const requests = [];
+  class FakeEventSource {
+    constructor(url) {
+      this.url = url;
+      this.listeners = new Map();
+      events = this;
+    }
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+    emit(type, value) {
+      this.listeners.get(type)?.({ data: JSON.stringify(value) });
+    }
+  }
   await withAppHarness(
-    { locationSearch: "?goal=100000&raised=51000" },
+    {
+      eventSourceClass: FakeEventSource,
+      fetchImplementation: async (url, options) => {
+        requests.push({ url, body: options?.body && JSON.parse(options.body) });
+        return {
+          ok: true,
+          async json() {
+            return { accepted: true };
+          }
+        };
+      },
+      locationSearch: "?goal=100000&raised=51000"
+    },
     async ({ documentListeners, elements, root, createdElements }) => {
       const keydown = documentListeners.get("keydown");
       const schools = createdElements.filter(
         (element) => element.attributes.has("data-school-slot")
       );
-      assert.equal(schools.length, 4);
+      assert.equal(schools.length, 7);
 
-      for (let index = 0; index < 5; index += 1) {
-        let prevented = false;
-        keydown({
-          key: "s",
-          target: root,
-          preventDefault() {
-            prevented = true;
-          }
-        });
-        await new Promise((resolve) => setImmediate(resolve));
-        assert.equal(prevented, true);
-      }
+      keydown({ key: "s", target: root, preventDefault() {} });
+      await new Promise((resolve) => setImmediate(resolve));
+      assert.equal(requests[0].url, "/api/actions");
+      assert.equal(requests[0].body.type, "school.add");
+      assert.equal(root.dataset.distantSchools, "0");
 
-      assert.equal(root.dataset.distantSchools, "4");
-      assert.ok(schools.every(
-        (school) => school.dataset.dropped === "true"
-      ));
-      const tcfFireworks = createdElements.filter(
-        (element) => (element.attributes.get("class") ?? "")
-          .split(/\s+/)
-          .includes("tcf-firework")
+      const pending = {
+        slot: 1,
+        phase: "pending",
+        generation: 1,
+        startedAt: Date.now() - 2000,
+        completesAt: Date.now() + 4500
+      };
+      events.emit("state", {
+        raised: 51000,
+        goal: 100000,
+        distantSchools: [pending]
+      });
+      assert.equal(root.dataset.distantSchools, "1");
+      assert.equal(schools[0].dataset.generation, "1");
+      assert.equal(
+        schools[0].children[0].attributes.get("class"),
+        "distant-school-drop-motion is-dropping"
       );
-      assert.equal(tcfFireworks.length, 4);
-      assert.ok(tcfFireworks.every(
-        (firework) => firework.attributes.get("data-duration-ms") === "5000"
-          && firework.attributes.get("data-firework-source") === "school"
-          && firework.attributes.get("data-firework-shape") === "tcf"
-          && firework.attributes.get("data-firework-region") === "left-sky"
-          && firework.attributes.get("transform") === "translate(565 210)"
-      ));
-      assert.ok(tcfFireworks.every(
-        (firework) => firework.querySelectorAll("text")
-          .every((text) => text.textContent === "TCF")
-      ));
       assert.match(
-        elements.get("#announcer").textContent,
-        /^All four distant schools are already present\./
+        schools[0].children[0].style.getPropertyValue("animation-delay"),
+        /^-2\d{3}ms$/
       );
 
-      keydown({
-        key: "x",
-        target: root,
-        preventDefault() {}
+      events.emit("state", {
+        raised: 51000,
+        goal: 100000,
+        distantSchools: [{ ...pending, phase: "completed" }]
       });
-      await new Promise((resolve) => setImmediate(resolve));
-      assert.equal(root.dataset.distantSchools, "3");
-      assert.equal(schools[3].dataset.dropped, "false");
+      assert.equal(
+        schools[0].children[0].attributes.get("class"),
+        "distant-school-drop-motion"
+      );
+      events.emit("state", {
+        raised: 51000,
+        goal: 100000,
+        distantSchools: []
+      });
+      assert.equal(root.dataset.distantSchools, "0");
 
-      keydown({
-        key: "s",
-        target: root,
-        preventDefault() {}
+      const readded = { ...pending, generation: 2 };
+      events.emit("state", {
+        raised: 51000,
+        goal: 100000,
+        distantSchools: [readded]
       });
-      await new Promise((resolve) => setImmediate(resolve));
-      assert.equal(root.dataset.distantSchools, "4");
-      assert.equal(schools[3].dataset.dropRun, "2");
-      assert.equal(createdElements.filter(
-        (element) => (element.attributes.get("class") ?? "")
-          .split(/\s+/)
-          .includes("tcf-firework")
-      ).length, 5);
-
-      keydown({
-        key: "x",
-        target: root,
-        repeat: true,
-        preventDefault() {}
-      });
-      await new Promise((resolve) => setImmediate(resolve));
-      assert.equal(root.dataset.distantSchools, "4");
-
-      let numberPrevented = false;
-      keydown({
-        key: "1",
-        target: root,
-        preventDefault() {
-          numberPrevented = true;
-        }
-      });
-      await new Promise((resolve) => setImmediate(resolve));
-      assert.equal(numberPrevented, false);
-      assert.equal(root.dataset.distantSchools, "4");
-      assert.equal(schools[0].dataset.dropRun, "1");
+      assert.equal(schools[0].dataset.generation, "2");
+      assert.equal(schools[0].dataset.dropRun, "2");
+      assert.equal(events.url, "/events?role=presentation");
+      assert.equal(elements.get("#announcer").textContent, "");
     }
   );
 });
 
-test("display-originated actions apply immediately and ignore their later SSE echo", async () => {
+test("display-originated actions are not optimistic and accepted echoes are deduplicated", async () => {
   let eventSource;
   let rejectAction;
   let postedAction;
+  const requests = [];
 
   class FakeEventSource {
     constructor() {
@@ -1131,15 +1459,36 @@ test("display-originated actions apply immediately and ignore their later SSE ec
   await withAppHarness(
     {
       eventSourceClass: FakeEventSource,
-      fetchImplementation(_url, options) {
+      fetchImplementation(url, options) {
+        requests.push({ url, options });
+        if (url === "/api/state") {
+          return Promise.resolve({
+            ok: true,
+            async json() {
+              return {
+                revision: 3,
+                raised: 64000,
+                goal: 120000,
+                distantSchools: []
+              };
+            }
+          });
+        }
         postedAction = JSON.parse(options.body);
         return new Promise((_resolve, reject) => {
           rejectAction = reject;
         });
       },
-      locationSearch: "?goal=100000&raised=51000"
+      locationSearch: "?goal=100000&raised=51000&motion=reduce"
     },
-    async ({ createdElements, documentListeners, root }) => {
+    async ({
+      animationFrames,
+      createdElements,
+      documentListeners,
+      root,
+      rootElements,
+      startedAt
+    }) => {
       const school = createdElements.find(
         (element) => element.attributes.get("data-school-slot") === "1"
       );
@@ -1150,8 +1499,15 @@ test("display-originated actions apply immediately and ignore their later SSE ec
       });
       assert.equal(postedAction.type, "school.add");
       assert.match(postedAction.id, /^[a-z0-9-]+$/);
-      assert.equal(school.dataset.dropRun, "1");
-      assert.equal(root.dataset.distantSchools, "1");
+      assert.equal(school.dataset.dropRun, undefined);
+      assert.equal(root.dataset.distantSchools, "0");
+      assert.equal(createdElements.filter(
+        (element) => (element.attributes.get("class") ?? "")
+          .split(/\s+/)
+          .includes("tcf-firework")
+      ).length, 0);
+
+      eventSource.emit("action", JSON.stringify(postedAction));
       assert.equal(createdElements.filter(
         (element) => (element.attributes.get("class") ?? "")
           .split(/\s+/)
@@ -1159,7 +1515,6 @@ test("display-originated actions apply immediately and ignore their later SSE ec
       ).length, 1);
 
       eventSource.emit("action", JSON.stringify(postedAction));
-      assert.equal(school.dataset.dropRun, "1");
       assert.equal(createdElements.filter(
         (element) => (element.attributes.get("class") ?? "")
           .split(/\s+/)
@@ -1168,8 +1523,143 @@ test("display-originated actions apply immediately and ignore their later SSE ec
 
       rejectAction(new Error("response lost"));
       await new Promise((resolve) => setImmediate(resolve));
-      assert.equal(school.dataset.dropRun, "1");
-      assert.equal(root.dataset.distantSchools, "1");
+      assert.deepEqual(requests.map(({ url }) => url), [
+        "/api/actions",
+        "/api/state"
+      ]);
+      while (animationFrames.length > 0) {
+        animationFrames.shift()(startedAt);
+      }
+      assert.equal(rootElements.get("#raised-display").textContent, "$64,000");
+      assert.equal(rootElements.get("#goal-display").textContent, "Goal $120,000");
+      assert.equal(school.dataset.dropRun, undefined);
+      assert.equal(root.dataset.distantSchools, "0");
+    }
+  );
+});
+
+test("rejected school boundary actions refetch authority without success or firework", async () => {
+  const requests = [];
+  await withAppHarness(
+    {
+      fetchImplementation: async (url, options) => {
+        requests.push({ url, options });
+        if (url === "/api/actions") {
+          return {
+            ok: false,
+            status: 409,
+            async json() {
+              return {
+                error: "Cannot add another distant school: the seven-school maximum is already active."
+              };
+            }
+          };
+        }
+        return {
+          ok: true,
+          async json() {
+            return {
+              revision: 8,
+              raised: 51000,
+              goal: 100000,
+              distantSchools: Array.from({ length: 7 }, (_, index) => ({
+                slot: index + 1,
+                phase: "completed",
+                generation: 1,
+                startedAt: 0,
+                completesAt: 6500
+              }))
+            };
+          }
+        };
+      },
+      locationSearch: "?goal=100000&raised=51000&motion=reduce"
+    },
+    async ({ createdElements, documentListeners, elements, root }) => {
+      documentListeners.get("keydown")({
+        key: "s",
+        target: root,
+        preventDefault() {}
+      });
+      await new Promise((resolve) => setImmediate(resolve));
+
+      assert.deepEqual(requests.map(({ url }) => url), [
+        "/api/actions",
+        "/api/state"
+      ]);
+      assert.equal(root.dataset.distantSchools, "7");
+      assert.equal(createdElements.filter(
+        (element) => (element.attributes.get("class") ?? "")
+          .split(/\s+/)
+          .includes("tcf-firework")
+      ).length, 0);
+      assert.equal(
+        elements.get("#announcer").textContent,
+        "Cannot add another distant school: the seven-school maximum is already active."
+      );
+    }
+  );
+});
+
+test("display ignores mutation responses older than the latest authoritative revision", async () => {
+  const pending = [];
+  await withAppHarness(
+    {
+      fetchImplementation(url) {
+        assert.equal(url, "/api/commands");
+        return new Promise((resolve) => pending.push({ resolve }));
+      },
+      locationSearch: "?goal=100&raised=0&motion=reduce"
+    },
+    async ({
+      animationFrames,
+      documentListeners,
+      root,
+      rootElements,
+      startedAt
+    }) => {
+      const keydown = documentListeners.get("keydown");
+      keydown({ key: "ArrowRight", target: root, preventDefault() {} });
+      keydown({ key: "ArrowRight", target: root, preventDefault() {} });
+      assert.equal(pending.length, 2);
+
+      pending[1].resolve({
+        ok: true,
+        async json() {
+          return { revision: 2, raised: 2, goal: 100 };
+        }
+      });
+      await new Promise((resolve) => setImmediate(resolve));
+      while (animationFrames.length > 0) {
+        animationFrames.shift()(startedAt);
+      }
+      assert.equal(rootElements.get("#raised-display").textContent, "$2");
+
+      pending[0].resolve({
+        ok: true,
+        async json() {
+          return { revision: 1, raised: 1, goal: 100 };
+        }
+      });
+      await new Promise((resolve) => setImmediate(resolve));
+      while (animationFrames.length > 0) {
+        animationFrames.shift()(startedAt);
+      }
+      assert.equal(rootElements.get("#raised-display").textContent, "$2");
+
+      keydown({ key: "ArrowRight", target: root, preventDefault() {} });
+      assert.equal(pending.length, 3);
+      pending[2].resolve({
+        ok: true,
+        async json() {
+          return { revision: 2, raised: 3, goal: 100 };
+        }
+      });
+      await new Promise((resolve) => setImmediate(resolve));
+      while (animationFrames.length > 0) {
+        animationFrames.shift()(startedAt);
+      }
+      assert.equal(rootElements.get("#raised-display").textContent, "$3");
     }
   );
 });
@@ -1223,9 +1713,9 @@ test("campus additions reveal at frozen thresholds with bounded one-shot motion"
     assert.deepEqual(
       trees.map((tree) => tree.attributes.get("transform")),
       [
-        "translate(230 520) scale(1.1)",
-        "translate(1420 590) scale(1)",
-        "translate(1330 640) scale(0.65)"
+        "translate(230 370) scale(1.1)",
+        "translate(1420 440) scale(1)",
+        "translate(1330 490) scale(0.65)"
       ]
     );
     assert.ok(bus);
@@ -2068,7 +2558,7 @@ test("aperture recesses reveal with their wall phases forward, reverse, and redu
     );
     const sceneSvg = elements.get("#school-scene");
     const classes = (node) => node.attributes.get("class") ?? "";
-    const apertureLayer = sceneSvg.children.find(
+    const apertureLayer = sceneSvg.querySelectorAll("g").find(
       (node) => classes(node).includes("aperture-recesses")
     );
     assert.ok(apertureLayer);
@@ -2300,8 +2790,8 @@ test("display and dashboard keep their current separate layout contracts", async
 
   const progress = css.match(/^\.progress-card\s*\{([^}]*)\}/m)?.[1];
   assert.ok(progress);
-  assert.match(progress, /right:\s*1\.5%;/);
-  assert.match(progress, /top:\s*4\.1%;/);
+  assert.match(progress, /right:\s*5\.5%;/);
+  assert.match(progress, /top:\s*7\.1%;/);
   assert.doesNotMatch(css, /\.operator-panel/);
 
   for (const [viewportWidth, viewportHeight] of [
@@ -2309,25 +2799,13 @@ test("display and dashboard keep their current separate layout contracts", async
     [1024, 768]
   ]) {
     const stageWidth = Math.min(viewportWidth, viewportHeight * 16 / 9);
-    const progressWidth = Math.max(
-      viewportWidth / viewportHeight <= 4 / 3 ? 260 : 300,
-      stageWidth * .29
-    );
-    const progressLeft = stageWidth - stageWidth * .015 - progressWidth;
-    const flagRight = stageWidth * 1087 / 1600;
-    const towerRight = stageWidth * 1084 / 1600;
-    assert.ok(
-      progressLeft - flagRight >= 12,
-      `${viewportWidth}x${viewportHeight} flag/card clearance`
-    );
-    assert.ok(
-      progressLeft > towerRight,
-      `${viewportWidth}x${viewportHeight} progress card must clear the tower`
-    );
+    const progressWidth = Math.max(270, stageWidth * .245);
+    const progressLeft = stageWidth - stageWidth * .055 - progressWidth;
+    assert.ok(progressLeft > 0, `${viewportWidth}x${viewportHeight} card stays on stage`);
   }
 });
 
-test("default-motion keyboard progress smooths, filters shortcuts, and caps at 135%", async () => {
+test("default-motion keyboard progress smooths after authoritative commands and caps at 200%", async () => {
   await withAppHarness(
     { locationSearch: "?goal=100000&raised=51000" },
     async ({
@@ -2376,6 +2854,7 @@ test("default-motion keyboard progress smooths, filters shortcuts, and caps at 1
         0
       );
       press("ArrowRight");
+      await new Promise((resolve) => setImmediate(resolve));
       assert.equal(animationFrames.length, 1);
 
       let smoothingFrames = 0;
@@ -2410,7 +2889,7 @@ test("default-motion keyboard progress smooths, filters shortcuts, and caps at 1
   );
 
   await withAppHarness(
-    { locationSearch: "?goal=100000&raised=135000&motion=reduce" },
+    { locationSearch: "?goal=100000&raised=200000&motion=reduce" },
     async ({ animationFrames, documentListeners, root, rootElements, startedAt }) => {
       animationFrames.shift()(startedAt);
       documentListeners.get("keydown")({
@@ -2418,16 +2897,36 @@ test("default-motion keyboard progress smooths, filters shortcuts, and caps at 1
         target: root,
         preventDefault() {}
       });
+      await new Promise((resolve) => setImmediate(resolve));
       animationFrames.shift()(startedAt + 16);
-      assert.equal(rootElements.get("#raised-display").textContent, "$135,000");
+      assert.equal(rootElements.get("#raised-display").textContent, "$200,000");
       assert.equal(root.dataset.busPercent, "100.000");
     }
   );
 });
 
-test("full-motion initial student target keeps the single scheduler alive until routes settle", async () => {
+test("first authoritative full-motion student target keeps one scheduler until routes settle", async () => {
+  let events;
+  class FakeEventSource {
+    constructor() {
+      this.listeners = new Map();
+      events = this;
+    }
+
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+
+    emit(type, value) {
+      this.listeners.get(type)?.({ data: JSON.stringify(value) });
+    }
+  }
+
   await withAppHarness(
-    { locationSearch: "?goal=100000&raised=125000&motion=full" },
+    {
+      eventSourceClass: FakeEventSource,
+      locationSearch: "?motion=full"
+    },
     async ({
       animationFrames,
       createdElements,
@@ -2441,12 +2940,32 @@ test("full-motion initial student target keeps the single scheduler alive until 
       assert.equal(animationFrames.length, 1);
 
       animationFrames.shift()(startedAt);
+      assert.equal(root.dataset.studentPercent, "0.000");
+      events.emit("snapshot", {
+        state: {
+          revision: 1,
+          raised: 125000,
+          goal: 100000,
+          distantSchools: []
+        }
+      });
+      assert.equal(animationFrames.length, 1);
+      animationFrames.shift()(startedAt + 16);
+      let frameCount = 2;
+      let now = startedAt + 16;
+      while (
+        animationFrames.length > 0
+        && root.dataset.studentPercent !== "100.000"
+        && frameCount < 2000
+      ) {
+        now += 16;
+        animationFrames.shift()(now);
+        frameCount += 1;
+      }
       assert.equal(root.dataset.studentPercent, "100.000");
       assert.ok(Number(root.dataset.visibleStudents) < 24);
       assert.equal(animationFrames.length, 1);
 
-      let frameCount = 1;
-      let now = startedAt;
       while (animationFrames.length > 0 && frameCount < 2000) {
         now += 16;
         animationFrames.shift()(now);
@@ -2525,6 +3044,7 @@ test("dynamic reduced motion stops an active celebration after its transition fr
         target: root,
         preventDefault() {}
       });
+      await new Promise((resolve) => setImmediate(resolve));
       assert.equal(animationFrames.length, 1);
 
       let now = startedAt;
@@ -2619,6 +3139,7 @@ test("explicit reduced motion settles each update without queued frames or later
         target: root,
         preventDefault() {}
       });
+      await new Promise((resolve) => setImmediate(resolve));
       assert.equal(animationFrames.length, 1);
 
       animationFrames.shift()(startedAt + 16);
@@ -2662,6 +3183,7 @@ test("explicit reduced motion goal crossing settles in one frame without queued 
         target: root,
         preventDefault() {}
       });
+      await new Promise((resolve) => setImmediate(resolve));
       assert.equal(animationFrames.length, 1);
 
       animationFrames.shift()(startedAt + 16);
@@ -2681,9 +3203,41 @@ test("explicit reduced motion goal crossing settles in one frame without queued 
   );
 });
 
-test("production demo targets 125% at 90 seconds and completes the bus at 97.2 seconds", async () => {
+test("production demo renders only server-authoritative 144-second milestones", async () => {
+  let events;
+  const requests = [];
+  class FakeEventSource {
+    constructor(url) {
+      this.url = url;
+      this.listeners = new Map();
+      events = this;
+    }
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+    emit(type, value) {
+      this.listeners.get(type)?.({ data: JSON.stringify(value) });
+    }
+  }
   await withAppHarness(
-    { locationSearch: "?goal=100000&raised=0&motion=reduce" },
+    {
+      eventSourceClass: FakeEventSource,
+      fetchImplementation: async (url, options) => {
+        requests.push({ url, body: options?.body && JSON.parse(options.body) });
+        return {
+          ok: true,
+          async json() {
+            return {
+              raised: 0,
+              goal: 100000,
+              demoActive: true,
+              distantSchools: []
+            };
+          }
+        };
+      },
+      locationSearch: "?goal=100000&raised=0&motion=reduce"
+    },
     async ({
       animationFrames,
       createdElements,
@@ -2704,13 +3258,32 @@ test("production demo targets 125% at 90 seconds and completes the bus at 97.2 s
         target: root,
         preventDefault() {}
       });
+      await new Promise((resolve) => setImmediate(resolve));
+      assert.deepEqual(requests, [{
+        url: "/api/commands",
+        body: { type: "state.toggle", field: "demoActive" }
+      }]);
+      assert.equal(animationFrames.length, 1);
+      runNextFrame(startedAt + 1);
 
+      events.emit("state", {
+        raised: 125000,
+        goal: 100000,
+        demoActive: true,
+        distantSchools: []
+      });
       runNextFrame(startedAt + 90000);
       assert.equal(rootElements.get("#raised-display").textContent, "$125,000");
       assert.equal(root.dataset.studentPercent, "100.000");
       assert.equal(root.dataset.playgroundPercent, "100.000");
       assert.equal(root.dataset.busPercent, "0.000");
 
+      events.emit("state", {
+        raised: 135000,
+        goal: 100000,
+        demoActive: true,
+        distantSchools: []
+      });
       runNextFrame(startedAt + 97200);
       assert.equal(rootElements.get("#raised-display").textContent, "$135,000");
       assert.equal(root.dataset.busPercent, "100.000");
@@ -2723,10 +3296,22 @@ test("production demo targets 125% at 90 seconds and completes the bus at 97.2 s
       assert.equal(bus.attributes.get("transform"), "translate(0 0)");
       assert.equal(Number(bus.attributes.get("opacity")), 1);
 
-      runNextFrame(now + 50);
-      assert.equal(rootElements.get("#raised-display").textContent, "$69");
-      assert.ok(Number(root.dataset.studentPercent) < 1);
-      assert.equal(root.dataset.busPercent, "0.000");
+      events.emit("state", {
+        raised: 200000,
+        goal: 100000,
+        demoActive: true,
+        distantSchools: []
+      });
+      runNextFrame(startedAt + 144000);
+      assert.equal(rootElements.get("#raised-display").textContent, "$200,000");
+      assert.equal(root.dataset.busPercent, "100.000");
+      assert.equal(events.url, "/events?role=presentation");
+      assert.equal(
+        requests.some((request) =>
+          request.url === "/api/state" && request.body?.raised !== undefined
+        ),
+        false
+      );
     }
   );
 });

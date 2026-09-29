@@ -20,6 +20,7 @@ import {
   MAX_RAISED,
   MIN_GOAL,
   parseConfig,
+  clampAmount,
   validateOperatorAmounts
 } from "../src/config.mjs";
 
@@ -42,10 +43,10 @@ test("default configuration is the frozen event configuration", () => {
     maxStudents: 24,
     overGoalRamp: 0.25,
     animationTimeConstantMs: 420,
-    demoDurationMs: 97200
+    demoDurationMs: 144000
   });
-  assert.equal(MAX_PROGRESS_RATIO, 1.35);
-  assert.equal(MAX_GOAL, 6671999447956289);
+  assert.equal(MAX_PROGRESS_RATIO, 2);
+  assert.equal(MAX_GOAL, 4503599627370495.5);
 });
 
 test("URL configuration accepts valid event parameters and rejects invalid values", () => {
@@ -55,8 +56,28 @@ test("URL configuration accepts valid event parameters and rejects invalid value
   assert.equal(config.controls, true);
   assert.equal(config.demo, true);
   assert.equal(config.motion, "reduce");
+  assert.deepEqual(config.authoritativeInitialState, {
+    goal: 200000,
+    raised: 125000
+  });
   assert.equal(parseConfig("?goal=0&raised=-1").goal, DEFAULT_CONFIG.goal);
   assert.equal(parseConfig("?goal=0&raised=-1").raised, DEFAULT_CONFIG.raised);
+  assert.deepEqual(
+    parseConfig("?goal=0&raised=-1").authoritativeInitialState,
+    {}
+  );
+  assert.deepEqual(
+    parseConfig("?client=preview&motion=reduce").authoritativeInitialState,
+    {}
+  );
+  assert.deepEqual(
+    parseConfig("?goal=&raised=").authoritativeInitialState,
+    {}
+  );
+  assert.deepEqual(
+    parseConfig("?raised=210000").authoritativeInitialState,
+    { raised: 200000 }
+  );
 
   const arbitrary = parseConfig("?goal=12345&raised=123.75");
   assert.equal(arbitrary.goal, 12345);
@@ -70,27 +91,29 @@ test("URL configuration accepts valid event parameters and rejects invalid value
   assert.equal(parseConfig(`?goal=${MAX_GOAL}`).goal, MAX_GOAL);
   assert.equal(parseConfig(`?goal=${MIN_GOAL / 2}`).goal, DEFAULT_CONFIG.goal);
   assert.equal(parseConfig(`?goal=${MAX_GOAL + 1}`).goal, DEFAULT_CONFIG.goal);
-  assert.equal(parseConfig(`?raised=${MAX_RAISED}`).raised, 135000);
+  assert.equal(parseConfig(`?raised=${MAX_RAISED}`).raised, 200000);
   assert.equal(
     parseConfig(`?goal=${MAX_GOAL}&raised=${MAX_RAISED}`).raised,
     MAX_RAISED
   );
   assert.equal(parseConfig(`?raised=${MAX_RAISED * 2}`).raised, DEFAULT_CONFIG.raised);
-  assert.equal(parseConfig("?goal=100000&raised=140000").raised, 135000);
+  assert.equal(parseConfig("?goal=100000&raised=210000").raised, 200000);
+  assert.equal(clampAmount(Number.POSITIVE_INFINITY), MAX_RAISED);
+  assert.equal(clampAmount(Number.MAX_VALUE), MAX_RAISED);
 });
 
 test("operator controls preserve accepted values and normalize slider values", () => {
   const fractional = deriveOperatorControlValues(123.75, 12345);
   assert.equal(fractional.raised, "123.75");
   assert.equal(fractional.goal, "12345");
-  assert.equal(fractional.sliderMax, "16665.75");
+  assert.equal(fractional.sliderMax, "24690");
   assert.equal(fractional.sliderValue, "123.75");
 
   assert.deepEqual(deriveOperatorControlValues(20000.5, 12345), {
     raised: "20000.5",
     goal: "12345",
-    sliderMax: "16665.75",
-    sliderValue: "16665.75"
+    sliderMax: "24690",
+    sliderValue: "20000.5"
   });
 
   const upperBound = deriveOperatorControlValues(MAX_RAISED, MAX_GOAL);
@@ -101,7 +124,7 @@ test("operator controls preserve accepted values and normalize slider values", (
 
   const lowerBound = deriveOperatorControlValues(MIN_GOAL, MIN_GOAL);
   assert.equal(lowerBound.goal, String(MIN_GOAL));
-  assert.equal(lowerBound.sliderMax, "0.013500000000000002");
+  assert.equal(lowerBound.sliderMax, "0.02");
   assert.equal(lowerBound.sliderValue, "0.01");
 
   const keyboardNoise = deriveOperatorControlValues(56000.00000000001, 100000);
@@ -157,10 +180,10 @@ test("operator submissions require valid raised and goal values atomically", () 
       goal: MAX_GOAL
     }
   );
-  assert.deepEqual(validateOperatorAmounts("135001", "100000"), {
+  assert.deepEqual(validateOperatorAmounts("200001", "100000"), {
     valid: false,
     field: "raised",
-    message: "Enter a raised amount no greater than 135% of the goal."
+    message: "Enter a raised amount no greater than 200% of the goal."
   });
 
   for (const [raised, goal, field] of [
@@ -216,7 +239,7 @@ test("accepted goal bounds complete the slider, demo, and keyboard journey", () 
     assert.equal(deriveProgress(demoEndpoint, goal).busRatio, 1);
 
     let keyboardRaised = 0;
-    for (let step = 0; step < 135; step += 1) {
+    for (let step = 0; step < 200; step += 1) {
       const nextRaised = addRaisedAmount(keyboardRaised, goal, 0.01);
       assert.ok(nextRaised > keyboardRaised);
       keyboardRaised = nextRaised;
@@ -226,7 +249,7 @@ test("accepted goal bounds complete the slider, demo, and keyboard journey", () 
     assert.equal(deriveProgress(keyboardRaised, goal).busRatio, 1);
 
     let shiftedKeyboardRaised = 0;
-    for (let step = 0; step < 27; step += 1) {
+    for (let step = 0; step < 40; step += 1) {
       shiftedKeyboardRaised = addRaisedAmount(shiftedKeyboardRaised, goal, 0.05);
     }
     assert.equal(shiftedKeyboardRaised, endpoint);
@@ -293,7 +316,7 @@ test("keyboard percentages preserve exact grid steps without generic endpoint sn
 
   assert.equal(addRaisedAmount(125000, 100000, 0.01), 126000);
   assert.equal(addRaisedAmount(122000, 100000, 0.05), 127000);
-  assert.equal(addRaisedAmount(135000, 100000, 0.01), 135000);
+  assert.equal(addRaisedAmount(200000, 100000, 0.01), 200000);
 });
 
 test("deriveProgress preserves campus timing and adds the 125..135% bus phase", () => {

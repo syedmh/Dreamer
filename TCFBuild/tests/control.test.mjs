@@ -62,7 +62,11 @@ class FakeEventSource {
   }
 }
 
-async function withControlHarness(run, { fetchImplementation } = {}) {
+async function withControlHarness(run, {
+  fetchImplementation,
+  includeDisplayPreview = false,
+  windowHref = "http://127.0.0.1:8081/control.html"
+} = {}) {
   const originalGlobals = new Map();
   const setGlobal = (name, value) => {
     originalGlobals.set(name, Object.getOwnPropertyDescriptor(globalThis, name));
@@ -79,6 +83,15 @@ async function withControlHarness(run, { fetchImplementation } = {}) {
   const raisedSlider = new FakeElement();
   const submitButton = new FakeElement();
   form.append(raisedInput, goalInput, raisedSlider, submitButton);
+  const buildSummaryForm = new FakeElement();
+  const seattleSchoolsInput = new FakeElement();
+  const operationCostInput = new FakeElement();
+  const buildSummarySubmitButton = new FakeElement();
+  buildSummaryForm.append(
+    seattleSchoolsInput,
+    operationCostInput,
+    buildSummarySubmitButton
+  );
   const addSchoolButton = new FakeElement();
   addSchoolButton.dataset.action = "school.add";
   addSchoolButton.textContent = "Drop next school";
@@ -89,6 +102,9 @@ async function withControlHarness(run, { fetchImplementation } = {}) {
 
   const elements = new Map([
     ["#progress-form", form],
+    ["#build-summary-form", buildSummaryForm],
+    ["#seattle-schools-input", seattleSchoolsInput],
+    ["#operation-cost-input", operationCostInput],
     ["#raised-input", raisedInput],
     ["#goal-input", goalInput],
     ["#raised-slider", raisedSlider],
@@ -101,6 +117,9 @@ async function withControlHarness(run, { fetchImplementation } = {}) {
     ["#thank-you-toggle", new FakeElement()],
     ["#continuous-toggle", new FakeElement()]
   ]);
+  if (includeDisplayPreview) {
+    elements.set("#display-preview", new FakeElement());
+  }
   const document = {
     querySelector(selector) {
       return elements.get(selector);
@@ -116,6 +135,9 @@ async function withControlHarness(run, { fetchImplementation } = {}) {
   setGlobal("fetch", fetchImplementation ?? (async () => {
     throw new Error("Unexpected fetch");
   }));
+  if (includeDisplayPreview) {
+    setGlobal("window", { location: { href: windowHref } });
+  }
 
   try {
     const controlUrl = new URL("../src/control.mjs", import.meta.url);
@@ -128,7 +150,10 @@ async function withControlHarness(run, { fetchImplementation } = {}) {
       goalInput,
       raisedInput,
       raisedSlider,
-      actionButtons
+      actionButtons,
+      buildSummaryForm,
+      operationCostInput,
+      seattleSchoolsInput
     });
   } finally {
     for (const [name, descriptor] of originalGlobals) {
@@ -154,6 +179,7 @@ function sendState(events, state) {
 
 test("focus alone does not block authoritative progress updates", async () => {
   await withControlHarness(async ({ events, raisedInput, goalInput }) => {
+    assert.equal(events.url, "/events?role=control");
     sendState(events, { raised: 50, goal: 100 });
     await raisedInput.dispatch("focus");
     sendState(events, { raised: 75, goal: 150 });
@@ -161,6 +187,164 @@ test("focus alone does not block authoritative progress updates", async () => {
     assert.equal(raisedInput.value, "75");
     assert.equal(goalInput.value, "150");
   });
+});
+
+test("failed commands refetch and reconcile authoritative dashboard state", async () => {
+  const requests = [];
+  await withControlHarness(
+    async ({ events, elements, raisedInput, goalInput }) => {
+      sendState(events, {
+        revision: 1,
+        raised: 50,
+        goal: 100,
+        demoActive: false
+      });
+      await elements.get("#demo-toggle").dispatch("click");
+      await new Promise((resolve) => setImmediate(resolve));
+
+      assert.deepEqual(requests.map(({ url }) => url), [
+        "/api/commands",
+        "/api/state"
+      ]);
+      assert.deepEqual(JSON.parse(requests[0].options.body), {
+        type: "state.toggle",
+        field: "demoActive"
+      });
+      assert.equal(raisedInput.value, "75");
+      assert.equal(goalInput.value, "150");
+      assert.equal(
+        elements.get("#demo-toggle").getAttribute("aria-pressed"),
+        "false"
+      );
+      assert.equal(
+        elements.get("#operation-status").textContent,
+        "command rejected"
+      );
+    },
+    {
+      fetchImplementation: async (url, options) => {
+        requests.push({ url, options });
+        if (url === "/api/commands") {
+          return {
+            ok: false,
+            status: 409,
+            async json() {
+              return { error: "command rejected" };
+            }
+          };
+        }
+        return {
+          ok: true,
+          async json() {
+            return {
+              revision: 2,
+              raised: 75,
+              goal: 150,
+              demoActive: false,
+              nightMode: false,
+              studentsClapping: false,
+              thankYouVisible: true,
+              continuousFireworks: false
+            };
+          }
+        };
+      }
+    }
+  );
+});
+
+test("dashboard ignores mutation responses older than the latest authoritative revision", async () => {
+  const pending = [];
+  await withControlHarness(
+    async ({ events, elements }) => {
+      sendState(events, {
+        revision: 0,
+        raised: 50,
+        goal: 100,
+        nightMode: false
+      });
+
+      await elements.get("#night-toggle").dispatch("click");
+      await elements.get("#night-toggle").dispatch("click");
+      assert.equal(pending.length, 2);
+
+      pending[1].resolve({
+        ok: true,
+        async json() {
+          return {
+            revision: 2,
+            raised: 50,
+            goal: 100,
+            nightMode: false
+          };
+        }
+      });
+      await new Promise((resolve) => setImmediate(resolve));
+      assert.equal(
+        elements.get("#night-toggle").getAttribute("aria-pressed"),
+        "false"
+      );
+
+      pending[0].resolve({
+        ok: true,
+        async json() {
+          return {
+            revision: 1,
+            raised: 50,
+            goal: 100,
+            nightMode: true
+          };
+        }
+      });
+      await new Promise((resolve) => setImmediate(resolve));
+      assert.equal(
+        elements.get("#night-toggle").getAttribute("aria-pressed"),
+        "false"
+      );
+
+      sendState(events, {
+        revision: 2,
+        raised: 50,
+        goal: 100,
+        nightMode: true
+      });
+      assert.equal(
+        elements.get("#night-toggle").getAttribute("aria-pressed"),
+        "true"
+      );
+    },
+    {
+      fetchImplementation(url) {
+        assert.equal(url, "/api/commands");
+        return new Promise((resolve) => pending.push({ resolve }));
+      }
+    }
+  );
+});
+
+test("dashboard preview uses the configured display port and exact preview query", async () => {
+  await withControlHarness(
+    async ({ elements }) => {
+      await new Promise((resolve) => setImmediate(resolve));
+      assert.equal(
+        elements.get("#display-preview").src,
+        "http://127.0.0.1:9123/?client=preview"
+      );
+    },
+    {
+      includeDisplayPreview: true,
+      windowHref: "http://127.0.0.1:8123/control.html?ignored=true#fragment",
+      fetchImplementation: async (url) => {
+        assert.equal(url, "/api/runtime");
+        return {
+          ok: true,
+          async json() {
+            return { displayPort: 9123 };
+          }
+        };
+      }
+    }
+  );
 });
 
 test("dirty progress drafts survive SSE and reconcile on leaving the form", async () => {
@@ -182,12 +366,326 @@ test("dirty progress drafts survive SSE and reconcile on leaving the form", asyn
     await form.dispatch("focusout", { relatedTarget: null });
     assert.equal(raisedInput.value, "60");
     assert.equal(goalInput.value, "120");
-    assert.equal(raisedSlider.max, "162");
+    assert.equal(raisedSlider.max, "240");
     assert.equal(raisedSlider.value, "60");
   });
 });
 
-test("valid goal drafts update the 135% slider range without invalid NaN state", async () => {
+test("stale progress submit responses reconcile controls to newer SSE authority", async () => {
+  let resolveSubmit;
+  await withControlHarness(
+    async ({ events, form, raisedInput, goalInput }) => {
+      sendState(events, { revision: 1, raised: 50, goal: 100 });
+      raisedInput.value = "80";
+      goalInput.value = "160";
+      await raisedInput.dispatch("input");
+
+      const submit = form.dispatch("submit");
+      sendState(events, { revision: 3, raised: 90, goal: 180 });
+      resolveSubmit({
+        ok: true,
+        async json() {
+          return { revision: 2, raised: 80, goal: 160 };
+        }
+      });
+      await submit;
+
+      assert.equal(raisedInput.value, "90");
+      assert.equal(goalInput.value, "180");
+    },
+    {
+      fetchImplementation(url) {
+        assert.equal(url, "/api/state");
+        return new Promise((resolve) => {
+          resolveSubmit = resolve;
+        });
+      }
+    }
+  );
+});
+
+test("failed progress submits refetch and reconcile controls to authority", async () => {
+  const requests = [];
+  await withControlHarness(
+    async ({ events, form, raisedInput, goalInput }) => {
+      sendState(events, { revision: 1, raised: 50, goal: 100 });
+      raisedInput.value = "80";
+      goalInput.value = "160";
+      await raisedInput.dispatch("input");
+      await form.dispatch("submit");
+
+      assert.deepEqual(requests, ["/api/state", "/api/state"]);
+      assert.equal(raisedInput.value, "70");
+      assert.equal(goalInput.value, "140");
+    },
+    {
+      fetchImplementation: async (url) => {
+        requests.push(url);
+        if (requests.length === 1) {
+          return {
+            ok: false,
+            status: 409,
+            async json() {
+              return { error: "progress rejected" };
+            }
+          };
+        }
+        return {
+          ok: true,
+          async json() {
+            return { revision: 2, raised: 70, goal: 140 };
+          }
+        };
+      }
+    }
+  );
+});
+
+test("failed progress submit and refetch reconcile held newer SSE authority", async () => {
+  let resolveSubmit;
+  const requests = [];
+  await withControlHarness(
+    async ({
+      events,
+      elements,
+      form,
+      raisedInput,
+      goalInput,
+      operationCostInput,
+      seattleSchoolsInput
+    }) => {
+      sendState(events, {
+        revision: 1,
+        raised: 50,
+        goal: 100,
+        seattleSchools: 47,
+        operationCost: 1000
+      });
+      raisedInput.value = "80";
+      goalInput.value = "160";
+      await raisedInput.dispatch("input");
+      seattleSchoolsInput.value = "48";
+      operationCostInput.value = "1200";
+      await seattleSchoolsInput.dispatch("input");
+
+      const submit = form.dispatch("submit");
+      sendState(events, {
+        revision: 3,
+        raised: 90,
+        goal: 180,
+        seattleSchools: 50,
+        operationCost: 1500
+      });
+      resolveSubmit({
+        ok: false,
+        status: 409,
+        async json() {
+          return { error: "progress rejected" };
+        }
+      });
+      await submit;
+
+      assert.deepEqual(requests, ["/api/state", "/api/state"]);
+      assert.equal(raisedInput.value, "90");
+      assert.equal(goalInput.value, "180");
+      assert.equal(seattleSchoolsInput.value, "48");
+      assert.equal(operationCostInput.value, "1200");
+      assert.equal(
+        elements.get("#operation-status").textContent,
+        "progress rejected"
+      );
+      assert.equal(elements.get("#operation-status").dataset.error, "true");
+    },
+    {
+      fetchImplementation(url) {
+        requests.push(url);
+        if (requests.length === 1) {
+          return new Promise((resolve) => {
+            resolveSubmit = resolve;
+          });
+        }
+        throw new Error("recovery offline");
+      }
+    }
+  );
+});
+
+test("stale build summary submit responses reconcile controls to newer SSE authority", async () => {
+  let resolveSubmit;
+  await withControlHarness(
+    async ({
+      events,
+      buildSummaryForm,
+      operationCostInput,
+      seattleSchoolsInput
+    }) => {
+      sendState(events, {
+        revision: 1,
+        raised: 50,
+        goal: 100,
+        seattleSchools: 47,
+        operationCost: 1000
+      });
+      seattleSchoolsInput.value = "48";
+      operationCostInput.value = "1200";
+      await seattleSchoolsInput.dispatch("input");
+
+      const submit = buildSummaryForm.dispatch("submit");
+      sendState(events, {
+        revision: 3,
+        raised: 50,
+        goal: 100,
+        seattleSchools: 50,
+        operationCost: 1500
+      });
+      resolveSubmit({
+        ok: true,
+        async json() {
+          return {
+            revision: 2,
+            seattleSchools: 48,
+            operationCost: 1200
+          };
+        }
+      });
+      await submit;
+
+      assert.equal(seattleSchoolsInput.value, "50");
+      assert.equal(operationCostInput.value, "1500");
+    },
+    {
+      fetchImplementation(url) {
+        assert.equal(url, "/api/state");
+        return new Promise((resolve) => {
+          resolveSubmit = resolve;
+        });
+      }
+    }
+  );
+});
+
+test("failed build summary submits refetch and reconcile controls to authority", async () => {
+  const requests = [];
+  await withControlHarness(
+    async ({
+      events,
+      buildSummaryForm,
+      operationCostInput,
+      seattleSchoolsInput
+    }) => {
+      sendState(events, {
+        revision: 1,
+        raised: 50,
+        goal: 100,
+        seattleSchools: 47,
+        operationCost: 1000
+      });
+      seattleSchoolsInput.value = "48";
+      operationCostInput.value = "1200";
+      await operationCostInput.dispatch("input");
+      await buildSummaryForm.dispatch("submit");
+
+      assert.deepEqual(requests, ["/api/state", "/api/state"]);
+      assert.equal(seattleSchoolsInput.value, "51");
+      assert.equal(operationCostInput.value, "1750");
+    },
+    {
+      fetchImplementation: async (url) => {
+        requests.push(url);
+        if (requests.length === 1) {
+          return {
+            ok: false,
+            status: 409,
+            async json() {
+              return { error: "summary rejected" };
+            }
+          };
+        }
+        return {
+          ok: true,
+          async json() {
+            return {
+              revision: 2,
+              seattleSchools: 51,
+              operationCost: 1750
+            };
+          }
+        };
+      }
+    }
+  );
+});
+
+test("failed build summary submit and refetch reconcile held newer SSE authority", async () => {
+  let resolveSubmit;
+  const requests = [];
+  await withControlHarness(
+    async ({
+      events,
+      elements,
+      buildSummaryForm,
+      raisedInput,
+      goalInput,
+      operationCostInput,
+      seattleSchoolsInput
+    }) => {
+      sendState(events, {
+        revision: 1,
+        raised: 50,
+        goal: 100,
+        seattleSchools: 47,
+        operationCost: 1000
+      });
+      raisedInput.value = "80";
+      goalInput.value = "160";
+      await raisedInput.dispatch("input");
+      seattleSchoolsInput.value = "48";
+      operationCostInput.value = "1200";
+      await operationCostInput.dispatch("input");
+
+      const submit = buildSummaryForm.dispatch("submit");
+      sendState(events, {
+        revision: 3,
+        raised: 90,
+        goal: 180,
+        seattleSchools: 50,
+        operationCost: 1500
+      });
+      resolveSubmit({
+        ok: false,
+        status: 409,
+        async json() {
+          return { error: "summary rejected" };
+        }
+      });
+      await submit;
+
+      assert.deepEqual(requests, ["/api/state", "/api/state"]);
+      assert.equal(seattleSchoolsInput.value, "50");
+      assert.equal(operationCostInput.value, "1500");
+      assert.equal(raisedInput.value, "80");
+      assert.equal(goalInput.value, "160");
+      assert.equal(
+        elements.get("#operation-status").textContent,
+        "summary rejected"
+      );
+      assert.equal(elements.get("#operation-status").dataset.error, "true");
+    },
+    {
+      fetchImplementation(url) {
+        requests.push(url);
+        if (requests.length === 1) {
+          return new Promise((resolve) => {
+            resolveSubmit = resolve;
+          });
+        }
+        throw new Error("recovery offline");
+      }
+    }
+  );
+});
+
+test("valid goal drafts update the 200% slider range without invalid NaN state", async () => {
   await withControlHarness(async ({
     events,
     goalInput,
@@ -197,7 +695,7 @@ test("valid goal drafts update the 135% slider range without invalid NaN state",
 
     goalInput.value = "200.5";
     await goalInput.dispatch("input");
-    assert.equal(raisedSlider.max, "270.675");
+    assert.equal(raisedSlider.max, "401");
     assert.equal(raisedSlider.value, "120");
     assert.match(raisedSlider.getAttribute("aria-valuetext"), /59\.9% of goal/);
 

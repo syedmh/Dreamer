@@ -358,21 +358,66 @@ test("teachers are omitted and campus geometry is deeply frozen", () => {
       baseY: 578,
       scale: .52,
       bounds: { left: 390, right: 431.6, top: 527.04, bottom: 578 }
+    },
+    {
+      slot: 5,
+      x: 455,
+      baseY: 602,
+      scale: .48,
+      bounds: { left: 455, right: 493.4, top: 554.96, bottom: 602 }
+    },
+    {
+      slot: 6,
+      x: 357,
+      baseY: 625,
+      scale: .5,
+      bounds: { left: 357, right: 397, top: 576, bottom: 625 }
+    },
+    {
+      slot: 7,
+      x: 422,
+      baseY: 640,
+      scale: .5,
+      bounds: { left: 422, right: 462, top: 591, bottom: 640 }
     }
   ]);
   assert.equal(new Set(
     scene.campus.distantSchools.map(({ slot }) => slot)
-  ).size, 4);
+  ).size, 7);
   assert.ok(scene.campus.distantSchools.every(({ bounds }) =>
     bounds.right < 540
     && bounds.bottom < scene.campus.bus.bounds.top
   ));
-  for (let index = 1; index < scene.campus.distantSchools.length; index += 1) {
+  for (let index = 1; index < 5; index += 1) {
     assert.ok(
       scene.campus.distantSchools[index - 1].bounds.right
         < scene.campus.distantSchools[index].bounds.left
     );
   }
+  assert.ok(
+    scene.campus.distantSchools[5].bounds.left
+      < scene.campus.distantSchools[2].bounds.right
+  );
+  assert.ok(
+    scene.campus.distantSchools[5].bounds.right
+      > scene.campus.distantSchools[3].bounds.left
+  );
+  assert.ok(
+    scene.campus.distantSchools[5].bounds.bottom
+      > scene.campus.distantSchools[3].bounds.bottom
+  );
+  assert.ok(
+    scene.campus.distantSchools[6].bounds.left
+      < scene.campus.distantSchools[3].bounds.right
+  );
+  assert.ok(
+    scene.campus.distantSchools[6].bounds.right
+      > scene.campus.distantSchools[4].bounds.left
+  );
+  assert.ok(
+    scene.campus.distantSchools[6].bounds.bottom
+      > scene.campus.distantSchools[4].bounds.bottom
+  );
   assert.ok(scene.campus.distantSchools[1].bounds.right < 154.1);
   assert.ok(scene.campus.distantSchools[2].bounds.left > 309.2);
   assert.deepEqual(scene.campus.bus.bounds, {

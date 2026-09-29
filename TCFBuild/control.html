@@ -25,6 +25,26 @@
       <span id="operation-status" role="status" aria-live="polite">Waiting for live state.</span>
     </section>
 
+    <section class="card preview-card">
+      <h2>Live school display</h2>
+      <div class="preview-frame">
+        <iframe id="display-preview" title="Live preview of the school building display"></iframe>
+      </div>
+    </section>
+
+    <form id="build-summary-form" class="card">
+      <h2>Together We Build</h2>
+      <div class="amount-grid">
+        <label>Seattle Schools
+          <input id="seattle-schools-input" name="seattleSchools" type="number" min="0" max="9007199254740991" step="1" required>
+        </label>
+        <label>Operation Cost
+          <input id="operation-cost-input" name="operationCost" type="number" min="0" max="9007199254740991" step="any" required>
+        </label>
+      </div>
+      <button class="primary form-submit" type="submit">Apply build summary</button>
+    </form>
+
     <form id="progress-form" class="card">
       <h2>Fundraiser progress</h2>
       <div class="amount-grid">
@@ -32,12 +52,22 @@
           <input id="raised-input" name="raised" type="number" min="0" max="9007199254740991" step="any" required>
         </label>
         <label>Goal
-          <input id="goal-input" name="goal" type="number" min="0.01" max="6671999447956289" step="any" required>
+          <input id="goal-input" name="goal" type="number" min="0.01" max="4503599627370495.5" step="any" required>
         </label>
       </div>
       <label class="slider-label">Quick progress
-        <input id="raised-slider" type="range" min="0" max="135000" step="any">
+        <input id="raised-slider" type="range" min="0" max="200000" step="any">
       </label>
+      <div class="action-grid shortcut-grid" aria-label="Keyboard-equivalent progress controls">
+        <button type="button" data-progress-set="0">Set 0%</button>
+        <button type="button" data-progress-set="1">Set 100%</button>
+      </div>
+      <div class="action-grid donation-grid" aria-label="Quick donation additions">
+        <button type="button" data-raised-add="500">Add $500</button>
+        <button type="button" data-raised-add="1000">Add $1,000</button>
+        <button type="button" data-raised-add="5000">Add $5,000</button>
+        <button type="button" data-raised-add="10000">Add $10,000</button>
+      </div>
       <button class="primary" type="submit">Apply raised and goal</button>
     </form>
 
@@ -49,6 +79,10 @@
         <button id="clapping-toggle" class="toggle" type="button" aria-pressed="false">Start clapping</button>
         <button id="thank-you-toggle" class="toggle" type="button" aria-pressed="true">Hide thank-you bubbles</button>
         <button id="continuous-toggle" class="toggle" type="button" aria-pressed="false">Start continuous fireworks</button>
+        <button id="celebration-toggle" class="toggle celebration-toggle" type="button" aria-pressed="false">Start celebration</button>
+        <button id="build-summary-toggle" class="toggle" type="button" aria-pressed="true">Hide build summary</button>
+        <button id="keyboard-legend-toggle" class="toggle" type="button" aria-pressed="false">Show key legend</button>
+        <button id="keypress-toggle" class="toggle" type="button" aria-pressed="true">Disable keyboard controls</button>
       </div>
     </section>
 
@@ -62,7 +96,7 @@
         <button type="button" data-action="school.add">Drop next school</button>
         <button type="button" data-action="school.remove">Remove last school</button>
       </div>
-      <p class="note">One-time effects require an open display. Fullscreen is display-local; press <kbd>F</kbd> on the display keyboard.</p>
+      <p class="note">The dashboard mirrors every practical display action. Fullscreen remains display-local because the browser requires direct interaction with that window.</p>
     </section>
   </main>
   <script type="module" src="/src/control.mjs"></script>

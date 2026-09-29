@@ -109,7 +109,7 @@ const FIREWORK_SAFE_REGIONS = Object.freeze([
     id: "left-sky",
     zone: "left",
     // Clear of the HTML header above and the hillside/swing set below.
-    bounds: Object.freeze({ left: 80, top: 175, right: 520, bottom: 490 }),
+    bounds: Object.freeze({ left: 80, top: 75, right: 520, bottom: 390 }),
     shapes: Object.freeze(["classic", "ring", "star", "chrysanthemum", "willow"]),
     scale: Object.freeze([.72, 1.02])
   }),
@@ -117,7 +117,7 @@ const FIREWORK_SAFE_REGIONS = Object.freeze([
     id: "center-sky",
     zone: "center",
     // Between the header and the school roof, ending left of the tower/flag.
-    bounds: Object.freeze({ left: 430, top: 165, right: 825, bottom: 375 }),
+    bounds: Object.freeze({ left: 430, top: 65, right: 825, bottom: 275 }),
     shapes: Object.freeze(["classic", "ring", "star", "chrysanthemum"]),
     scale: Object.freeze([.68, .94])
   }),
@@ -125,7 +125,7 @@ const FIREWORK_SAFE_REGIONS = Object.freeze([
     id: "upper-sky",
     zone: "upper",
     // Compact high bursts between the title edge and the flag pole.
-    bounds: Object.freeze({ left: 790, top: 38, right: 950, bottom: 292 }),
+    bounds: Object.freeze({ left: 790, top: 0, right: 950, bottom: 192 }),
     shapes: Object.freeze(["classic", "ring", "star"]),
     scale: Object.freeze([.54, .72])
   }),
@@ -133,7 +133,7 @@ const FIREWORK_SAFE_REGIONS = Object.freeze([
     id: "right-sky",
     zone: "right",
     // Below the progress card and above the right school wing.
-    bounds: Object.freeze({ left: 1105, top: 280, right: 1535, bottom: 380 }),
+    bounds: Object.freeze({ left: 1105, top: 180, right: 1535, bottom: 280 }),
     shapes: Object.freeze(["ring", "star"]),
     scale: Object.freeze([.42, .52])
   })
@@ -149,7 +149,9 @@ const FIREWORK_FULL_DURATION_MS = 1450;
 const FIREWORK_REDUCED_DURATION_MS = 680;
 const TCF_FIREWORK_DURATION_MS = 5000;
 const FIREWORK_MAX_ACTIVE = 14;
-const DISTANT_SCHOOL_DROP_START_Y = 145;
+const DISTANT_SCHOOL_EVENT_CENTER_X = 800;
+const DISTANT_SCHOOL_EVENT_BOTTOM_Y = 820;
+const CAMPUS_RAISE_Y = 150;
 const THANK_YOU_MESSAGES = Object.freeze([
   Object.freeze({ text: "Thank You", language: "en", direction: "ltr" }),
   Object.freeze({ text: "شکریہ", language: "ur", direction: "rtl" }),
@@ -378,9 +380,15 @@ function createDistantSchoolController(root, dataRoot, slots) {
     const motion = svg("g", {
       class: "distant-school-drop-motion"
     }, position);
+    const finalCenterX = slot.x + 40 * slot.scale;
+    const finalBottomY = slot.baseY + 2 * slot.scale;
+    motion.style.setProperty(
+      "--school-drop-x",
+      `${((DISTANT_SCHOOL_EVENT_CENTER_X - finalCenterX) / slot.scale).toFixed(2)}px`
+    );
     motion.style.setProperty(
       "--school-drop-y",
-      `${((DISTANT_SCHOOL_DROP_START_Y - slot.bounds.top) / slot.scale).toFixed(2)}px`
+      `${((DISTANT_SCHOOL_EVENT_BOTTOM_Y - finalBottomY) / slot.scale).toFixed(2)}px`
     );
 
     svg("ellipse", {
@@ -418,7 +426,10 @@ function createDistantSchoolController(root, dataRoot, slots) {
       stroke: "#17352A",
       "stroke-width": 2
     }, motion);
-    for (const x of [10, 57]) {
+    for (const [index, x] of [10, 57].entries()) {
+      const eye = svg("g", {
+        class: `distant-school-eye distant-school-eye--${index === 0 ? "left" : "right"}`
+      }, motion);
       svg("rect", {
         x,
         y: -45,
@@ -428,7 +439,7 @@ function createDistantSchoolController(root, dataRoot, slots) {
         fill: "#8BE0FA",
         stroke: "#17352A",
         "stroke-width": 2
-      }, motion);
+      }, eye);
       svg("line", {
         x1: x + 6.5,
         y1: -44,
@@ -436,7 +447,19 @@ function createDistantSchoolController(root, dataRoot, slots) {
         y2: -33,
         stroke: "#FFF7DF",
         "stroke-width": 1.5
-      }, motion);
+      }, eye);
+      svg("circle", {
+        cx: x + 6.5,
+        cy: -38.5,
+        r: 2.4,
+        fill: "#17352A"
+      }, eye);
+      svg("circle", {
+        cx: x + 5.8,
+        cy: -39.3,
+        r: .65,
+        fill: "#FFF7DF"
+      }, eye);
     }
 
     svg("line", {
@@ -470,43 +493,99 @@ function createDistantSchoolController(root, dataRoot, slots) {
       fill: "#FFF7DF",
       transform: "scale(.55) translate(26 -67)"
     }, motion);
+    svg("rect", {
+      x: 4,
+      y: -59,
+      width: 72,
+      height: 12,
+      rx: 2,
+      fill: "#FFF7DF",
+      stroke: "#078447",
+      "stroke-width": 1.5
+    }, motion);
+    const schoolLabel = svg("text", {
+      x: 40,
+      y: -50,
+      fill: "#075F38",
+      "font-size": 7,
+      "font-weight": 900,
+      "text-anchor": "middle",
+      "letter-spacing": .05
+    }, motion);
+    schoolLabel.textContent = "New Seattle School";
 
-    schools.set(slot.slot, { position, motion });
+    schools.set(slot.slot, { position, motion, generation: 0 });
   }
 
-  function dropDistantSchool(slotNumber, { reducedMotion = false } = {}) {
+  function showDistantSchool(slotNumber, {
+    phase = "pending",
+    generation = 1,
+    startedAt = 0,
+    completesAt = startedAt + 6500,
+    now = Date.now(),
+    reducedMotion = false
+  } = {}) {
     const school = schools.get(Number(slotNumber));
     if (!school) return droppedCount;
     const wasDropped = school.position.dataset.dropped === "true";
+    const wasDropping = school.motion.attributes?.get?.("class")
+      === "distant-school-drop-motion is-dropping"
+      || school.motion.getAttribute?.("class")
+        === "distant-school-drop-motion is-dropping";
     if (!wasDropped) droppedCount += 1;
 
     school.position.dataset.state = "dropped";
     school.position.dataset.dropped = "true";
-    school.position.dataset.dropRun = String(
-      Number(school.position.dataset.dropRun || 0) + 1
-    );
+    school.position.dataset.phase = phase;
+    school.position.dataset.generation = String(generation);
     school.position.dataset.reducedMotion = String(Boolean(reducedMotion));
-    school.motion.setAttribute("class", "distant-school-drop-motion");
-    if (!reducedMotion) {
-      school.motion.getBoundingClientRect?.();
-      school.motion.setAttribute(
-        "class",
-        "distant-school-drop-motion is-dropping"
-      );
+    const pending = phase === "pending" && now < completesAt;
+    const generationChanged = school.generation !== generation;
+    school.generation = generation;
+    if (pending && !reducedMotion) {
+      if (generationChanged || !wasDropping) {
+        const elapsed = Math.max(0, now - startedAt);
+        school.motion.setAttribute("class", "distant-school-drop-motion");
+        school.motion.style.setProperty("animation-delay", `${-elapsed}ms`);
+        school.position.dataset.dropRun = String(
+          Number(school.position.dataset.dropRun || 0) + 1
+        );
+        school.motion.getBoundingClientRect?.();
+        school.motion.setAttribute(
+          "class",
+          "distant-school-drop-motion is-dropping"
+        );
+      }
+    } else {
+      school.motion.setAttribute("class", "distant-school-drop-motion");
+      school.motion.style.removeProperty("animation-delay");
     }
 
     dataRoot.dataset.distantSchools = String(droppedCount);
     return droppedCount;
   }
 
-  function removeLastDistantSchool() {
-    if (droppedCount === 0) return droppedCount;
-    const school = schools.get(droppedCount);
+  function hideDistantSchool(slotNumber) {
+    const school = schools.get(slotNumber);
+    if (!school || school.position.dataset.dropped !== "true") return;
     school.position.dataset.state = "inactive";
     school.position.dataset.dropped = "false";
+    school.position.dataset.phase = "inactive";
     school.position.dataset.reducedMotion = "false";
     school.motion.setAttribute("class", "distant-school-drop-motion");
-    droppedCount -= 1;
+    school.motion.style.removeProperty("animation-delay");
+    droppedCount = Math.max(0, droppedCount - 1);
+  }
+
+  function reconcileDistantSchools(entries = [], options = {}) {
+    const activeSlots = new Set(entries.map((entry) => Number(entry.slot)));
+    for (const slot of slots) {
+      if (!activeSlots.has(slot.slot)) hideDistantSchool(slot.slot);
+    }
+    for (const entry of entries) {
+      showDistantSchool(entry.slot, { ...entry, ...options });
+    }
+    droppedCount = entries.length;
     dataRoot.dataset.distantSchools = String(droppedCount);
     layer.dataset.distantSchools = String(droppedCount);
     return droppedCount;
@@ -516,13 +595,27 @@ function createDistantSchoolController(root, dataRoot, slots) {
   layer.dataset.distantSchools = "0";
 
   return Object.freeze({
+    layer,
     addDistantSchool(options) {
       if (droppedCount >= slots.length) return droppedCount;
-      const count = dropDistantSchool(droppedCount + 1, options);
+      const slot = droppedCount + 1;
+      const count = showDistantSchool(slot, {
+        generation: schools.get(slot).generation + 1,
+        startedAt: Date.now(),
+        completesAt: Date.now() + 6500,
+        ...options
+      });
       layer.dataset.distantSchools = String(count);
       return count;
     },
-    removeLastDistantSchool
+    removeLastDistantSchool() {
+      if (droppedCount === 0) return droppedCount;
+      hideDistantSchool(droppedCount);
+      dataRoot.dataset.distantSchools = String(droppedCount);
+      layer.dataset.distantSchools = String(droppedCount);
+      return droppedCount;
+    },
+    reconcileDistantSchools
   });
 }
 
@@ -565,13 +658,13 @@ function addLandscape(root, trees, distantSchools, dataRoot) {
   }, landscape);
   svg("circle", {
     cx: 740,
-    cy: 245,
+    cy: 95,
     r: 52,
     fill: "#FFF2B8"
   }, moon);
   svg("circle", {
     cx: 762,
-    cy: 228,
+    cy: 78,
     r: 48,
     fill: "#122746"
   }, moon);
@@ -581,21 +674,33 @@ function addLandscape(root, trees, distantSchools, dataRoot) {
     "aria-hidden": "true"
   }, landscape);
   svg("circle", {
-    cx: 265,
-    cy: 280,
+    cx: 145,
+    cy: 130,
     r: 64,
     fill: "#FFD45F",
     opacity: .95
   }, sun);
   svg("circle", {
-    cx: 265,
-    cy: 280,
+    cx: 145,
+    cy: 130,
     r: 90,
     fill: "none",
     stroke: "#FFD45F",
     "stroke-width": 4,
     opacity: .3
   }, sun);
+  const sunTcf = svg("text", {
+    class: "sun-tcf",
+    x: 145,
+    y: 132,
+    fill: "#075F38",
+    "font-size": 30,
+    "font-weight": 950,
+    "text-anchor": "middle",
+    "dominant-baseline": "middle",
+    "letter-spacing": 1.5
+  }, sun);
+  sunTcf.textContent = "TCF";
 
   const clouds = [
     [280, 190, 1.15, .84, false, -450, 1500, 34, -8],
@@ -634,24 +739,33 @@ function addLandscape(root, trees, distantSchools, dataRoot) {
   }
 
   svg("path", {
-    d: "M0 585 Q210 505 410 578 T810 568 T1210 552 T1600 565 V900 H0Z",
+    d: "M0 435 Q210 355 410 428 T810 418 T1210 402 T1600 415 V900 H0Z",
     fill: "#57BE74"
   }, landscape);
   svg("path", {
-    d: "M0 665 Q230 590 435 661 T845 648 T1240 632 T1600 650 V900 H0Z",
+    d: "M0 515 Q230 440 435 511 T845 498 T1240 482 T1600 500 V900 H0Z",
     fill: "url(#grass-gradient)"
   }, landscape);
 
+  const raisedDistantSchools = distantSchools.map((school) => ({
+    ...school,
+    baseY: school.baseY - CAMPUS_RAISE_Y,
+    bounds: {
+      ...school.bounds,
+      top: school.bounds.top - CAMPUS_RAISE_Y,
+      bottom: school.bounds.bottom - CAMPUS_RAISE_Y
+    }
+  }));
   const distantSchoolController = createDistantSchoolController(
     landscape,
     dataRoot,
-    distantSchools
+    raisedDistantSchools
   );
 
   for (const { x, y, scale, trunkHeight } of trees) {
     const tree = svg("g", {
       class: "tree",
-      transform: `translate(${x} ${y}) scale(${scale})`
+      transform: `translate(${x} ${y - CAMPUS_RAISE_Y}) scale(${scale})`
     }, landscape);
     svg("rect", {
       x: -10,
@@ -669,9 +783,9 @@ function addLandscape(root, trees, distantSchools, dataRoot) {
   svg("rect", {
     class: "night-ground-shade",
     x: 0,
-    y: 430,
+    y: 280,
     width: 1600,
-    height: 470,
+    height: 620,
     fill: "#07142F"
   }, landscape);
 
@@ -1218,7 +1332,7 @@ function appendTcfFirework(layer, fireworkIndex, reducedMotion, onRemove) {
     "data-state": "active",
     "aria-hidden": "true",
     focusable: "false",
-    transform: "translate(565 210)"
+    transform: "translate(425 160)"
   }, layer);
   group.style.setProperty(
     "--tcf-firework-duration",
@@ -1381,7 +1495,7 @@ function createFireworkController(sceneSvg) {
 function addPathAndShadow(root) {
   const layer = svg("g", { class: "path-and-shadow" }, root);
   svg("path", {
-    d: "M760 900 C815 790 875 720 918 688 L1008 688 C1055 724 1125 795 1180 900 Z",
+    d: "M650 1100 C750 900 840 740 918 688 L1008 688 C1090 744 1190 910 1290 1100 Z",
     fill: "#E7D6AD",
     opacity: .96
   }, layer);
@@ -2295,8 +2409,10 @@ function addStepsAndShrubs(root) {
 }
 
 function addPakistanFlag(root, flag) {
+  const scale = .65;
   const layer = svg("g", {
     class: "goal-flag",
+    transform: `translate(${flag.pole.x} ${flag.pole.bottom}) scale(${scale}) translate(${-flag.pole.x} ${-flag.pole.bottom})`,
     opacity: 0
   }, root);
   svg("rect", {
@@ -2555,33 +2671,38 @@ export function createFundraiserView(root, scene, config) {
     sceneDescriptionText
   );
   const fireworkController = createFireworkController(sceneSvg);
+  const campusLayer = svg("g", {
+    class: "campus-layer",
+    transform: `translate(0 ${-CAMPUS_RAISE_Y})`
+  }, sceneSvg);
   const {
     layer: swingsLayer,
     baseNodes: swingNodes,
     enhancementNodes: playgroundNodes
-  } = addSwings(sceneSvg, scene.campus.swings);
-  addPathAndShadow(sceneSvg);
-  addSchoolBlueprint(sceneSvg, scene.blocks);
-  const finishNodes = addApertureRecesses(sceneSvg);
+  } = addSwings(campusLayer, scene.campus.swings);
+  addPathAndShadow(campusLayer);
+  addSchoolBlueprint(campusLayer, scene.blocks);
+  const finishNodes = addApertureRecesses(campusLayer);
 
   const school = svg("g", {
     class: "school",
     filter: "url(#soft-shadow)"
-  }, sceneSvg);
+  }, campusLayer);
   const blockNodes = scene.blocks.map((block) => createBrickNode(block, school));
 
-  finishNodes.push(...addArchitecturalFinishes(sceneSvg));
-  finishNodes.push(...addStepsAndShrubs(sceneSvg));
+  finishNodes.push(...addArchitecturalFinishes(campusLayer));
+  finishNodes.push(...addStepsAndShrubs(campusLayer));
 
-  const goalFlag = addPakistanFlag(sceneSvg, scene.campus.flag);
+  const goalFlag = addPakistanFlag(campusLayer, scene.campus.flag);
   const teacherNodes = [];
-  const studentLayer = svg("g", { class: "students" }, sceneSvg);
+  const studentLayer = svg("g", { class: "students" }, campusLayer);
   const studentNodes = scene.students.map(
     (student) => createStudentNode(student, studentLayer)
   );
   const displayedStudentReveals = scene.students.map(() => 0);
-  const busNode = addSchoolBus(sceneSvg, scene.campus.bus);
-  const celebration = addCelebration(sceneSvg);
+  const busNode = addSchoolBus(campusLayer, scene.campus.bus);
+  const celebration = addCelebration(campusLayer);
+  sceneSvg.append(distantSchoolController.layer);
 
   const raisedDisplay = root.querySelector("#raised-display");
   const goalDisplay = root.querySelector("#goal-display");
@@ -2897,6 +3018,7 @@ export function createFundraiserView(root, scene, config) {
     clearKites: kiteController.clearKites,
     addDistantSchool: distantSchoolController.addDistantSchool,
     removeLastDistantSchool: distantSchoolController.removeLastDistantSchool,
+    reconcileDistantSchools: distantSchoolController.reconcileDistantSchools,
     setNightMode,
     setStudentsClapping,
     setThankYouVisible,

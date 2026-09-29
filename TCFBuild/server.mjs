@@ -4,7 +4,10 @@ import path from "node:path";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 import {
+  addRaisedAmount,
+  deriveDemoRaised,
   deriveSliderMaximum,
+  isAllowedRaisedStep,
   MAX_GOAL,
   MAX_RAISED,
   MIN_GOAL
@@ -22,9 +25,9 @@ const MIME_TYPES = new Map([
   [".jpeg", "image/jpeg"]
 ]);
 
-const SECURITY_HEADERS = Object.freeze({
+const BASE_SECURITY_HEADERS = Object.freeze({
   "Cache-Control": "no-store",
-  "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-5T7sWeLQQ4jOrxFZHC2c5KDWDLW/9fl6mf5bWn5D1IM='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
+  "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-5T7sWeLQQ4jOrxFZHC2c5KDWDLW/9fl6mf5bWn5D1IM='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
   "Cross-Origin-Resource-Policy": "same-origin",
   "Referrer-Policy": "no-referrer",
   "X-Content-Type-Options": "nosniff",
@@ -35,22 +38,35 @@ const DEFAULT_DISPLAY_PORT = 8080;
 const DEFAULT_CONTROL_PORT = 8081;
 const JSON_BODY_LIMIT = 4096;
 const HEARTBEAT_INTERVAL_MS = 15000;
+export const MAX_SSE_CLIENTS_PER_ROLE = 8;
+const MAX_SSE_PENDING_BYTES = 65536;
+const DEMO_UPDATE_INTERVAL_MS = 200;
+const DEMO_DURATION_MS = 144000;
+const MAX_DISTANT_SCHOOLS = 7;
+const DISTANT_SCHOOL_DROP_DURATION_MS = 6500;
+const SEATTLE_SCHOOL_BASELINE = 47;
 const BOOLEAN_STATE_FIELDS = new Set([
   "demoActive",
   "nightMode",
   "studentsClapping",
   "thankYouVisible",
-  "continuousFireworks"
+  "continuousFireworks",
+  "buildSummaryVisible",
+  "keyboardLegendVisible",
+  "keypressEnabled"
 ]);
 const ALLOWED_STATE_FIELDS = new Set([
   "raised",
   "goal",
+  "seattleSchools",
+  "operationCost",
   ...BOOLEAN_STATE_FIELDS
 ]);
 const ALLOWED_ACTIONS = new Set([
   "kite.add",
   "kite.clear",
   "firework.launch",
+  "firework.tcf",
   "firework.clear",
   "school.add",
   "school.remove"
@@ -83,7 +99,7 @@ const CONTROL_PATHS = new Set([
 
 function sendBuffer(request, response, statusCode, body, contentType, extraHeaders = {}) {
   response.writeHead(statusCode, {
-    ...SECURITY_HEADERS,
+    ...BASE_SECURITY_HEADERS,
     "Content-Type": contentType,
     "Content-Length": body.length,
     ...extraHeaders
@@ -117,70 +133,354 @@ function sendJson(request, response, statusCode, value, extraHeaders = {}) {
   );
 }
 
-export function createSharedState(initialState = {}) {
+export function createSharedState(initialState = {}, scheduler = {}) {
+  const now = scheduler.now ?? Date.now;
+  const scheduleTimeout = scheduler.setTimeout ?? setTimeout;
+  const cancelTimeout = scheduler.clearTimeout ?? clearTimeout;
+  const scheduleInterval = scheduler.setInterval ?? setInterval;
+  const cancelInterval = scheduler.clearInterval ?? clearInterval;
+  const normalizedInitialState = Object.fromEntries(
+    Object.entries(initialState).filter(([key]) => ALLOWED_STATE_FIELDS.has(key))
+  );
   let state = Object.freeze({
+    revision: 0,
     raised: 0,
     goal: 100000,
+    seattleSchools: 0,
+    operationCost: 0,
     demoActive: false,
     nightMode: false,
     studentsClapping: false,
     thankYouVisible: true,
     continuousFireworks: false,
-    ...initialState
+    buildSummaryVisible: true,
+    keyboardLegendVisible: false,
+    keypressEnabled: true,
+    ...normalizedInitialState,
+    distantSchools: Object.freeze([])
   });
   const clients = {
-    display: new Set(),
+    presentation: new Set(),
+    preview: new Set(),
     control: new Set()
   };
+  const schoolTimers = new Map();
+  const schoolGenerations = new Map();
+  let demoInterval = null;
+  let demoStartedAt = 0;
 
-  function writeEvent(client, event, value) {
-    client.write(`event: ${event}\ndata: ${JSON.stringify(value)}\n\n`);
+  function removeClientRecord(role, client) {
+    if (client.closed || !clients[role].delete(client)) return false;
+    client.closed = true;
+    client.response.off("drain", client.onDrain);
+    client.response.off("error", client.onError);
+    client.response.off("close", client.onClose);
+    return true;
   }
 
-  function broadcast(event, value, surfaces = ["display", "control"]) {
-    for (const surface of surfaces) {
-      for (const client of clients[surface]) {
-        writeEvent(client, event, value);
+  function removeClient(role, response) {
+    const client = [...clients[role]].find(
+      (candidate) => candidate.response === response
+    );
+    if (!client) return false;
+    const removed = removeClientRecord(role, client);
+    if (removed) broadcastPresence();
+    return removed;
+  }
+
+  function failClient(role, client, error) {
+    const removed = removeClientRecord(role, client);
+    if (!client.response.destroyed) client.response.destroy();
+    if (removed) broadcastPresence();
+  }
+
+  function enqueueClientWrite(role, client, payload) {
+    const bytes = Buffer.byteLength(payload);
+    if (client.pendingBytes + bytes > MAX_SSE_PENDING_BYTES) {
+      failClient(role, client, new Error("SSE client exceeded the pending write limit."));
+      return false;
+    }
+    client.queue.push(payload);
+    client.pendingBytes += bytes;
+    return true;
+  }
+
+  function writeClient(role, client, payload) {
+    if (client.closed) return false;
+    if (client.blocked) return enqueueClientWrite(role, client, payload);
+    try {
+      if (!client.response.write(payload)) client.blocked = true;
+      return true;
+    } catch (error) {
+      failClient(role, client, error);
+      return false;
+    }
+  }
+
+  function flushClient(role, client) {
+    if (client.closed) return;
+    client.blocked = false;
+    while (client.queue.length > 0 && !client.blocked) {
+      const payload = client.queue.shift();
+      client.pendingBytes -= Buffer.byteLength(payload);
+      writeClient(role, client, payload);
+    }
+  }
+
+  function writeEvent(role, client, event, value) {
+    writeClient(role, client, `event: ${event}\ndata: ${JSON.stringify(value)}\n\n`);
+  }
+
+  function broadcast(event, value, roles = ["presentation", "preview", "control"]) {
+    for (const role of roles) {
+      for (const client of clients[role]) {
+        writeEvent(role, client, event, value);
       }
     }
   }
 
-  function broadcastPresence() {
-    broadcast("presence", { displayConnected: clients.display.size > 0 });
+  function presence() {
+    const presentationConnected = clients.presentation.size > 0;
+    const previewConnected = clients.preview.size > 0;
+    return {
+      displayConnected: presentationConnected || previewConnected,
+      presentationConnected,
+      previewConnected
+    };
   }
+
+  function broadcastPresence() {
+    broadcast("presence", presence());
+  }
+
+  function updateState(patch) {
+    const changed = Object.entries(patch).some(
+      ([key, value]) => state[key] !== value
+    );
+    if (!changed) return state;
+    state = Object.freeze({
+      ...state,
+      ...patch,
+      revision: state.revision + 1
+    });
+    broadcast("state", state);
+    return state;
+  }
+
+  function stopDemoScheduler() {
+    if (demoInterval === null) return;
+    cancelInterval(demoInterval);
+    demoInterval = null;
+  }
+
+  function runDemoTick() {
+    if (!state.demoActive) return;
+    const elapsed = Math.max(0, now() - demoStartedAt);
+    if (elapsed >= DEMO_DURATION_MS) {
+      updateState({ raised: deriveSliderMaximum(state.goal) });
+      demoStartedAt = now();
+      return;
+    }
+    updateState({
+      raised: deriveDemoRaised(state.goal, elapsed / DEMO_DURATION_MS)
+    });
+  }
+
+  function startDemoScheduler() {
+    stopDemoScheduler();
+    demoStartedAt = now();
+    demoInterval = scheduleInterval(runDemoTick, DEMO_UPDATE_INTERVAL_MS);
+    demoInterval?.unref?.();
+  }
+
+  function update(patch) {
+    const wasDemoActive = state.demoActive;
+    const nextState = updateState(patch);
+    if ("demoActive" in patch && nextState.demoActive !== wasDemoActive) {
+      if (nextState.demoActive) {
+        startDemoScheduler();
+      } else {
+        stopDemoScheduler();
+      }
+    }
+    return nextState;
+  }
+
+  function command(value) {
+    switch (value.type) {
+      case "raised.add":
+        return update({
+          raised: Math.min(deriveSliderMaximum(state.goal), Math.max(
+            0,
+            value.amount > 0 && state.raised > MAX_RAISED - value.amount
+              ? MAX_RAISED
+              : state.raised + value.amount
+          )),
+          demoActive: false
+        });
+      case "raised.step":
+        return update({
+          raised: addRaisedAmount(state.raised, state.goal, value.fraction),
+          demoActive: false
+        });
+      case "raised.setRatio":
+        return update({
+          raised: Math.min(
+            deriveSliderMaximum(state.goal),
+            Math.max(0, state.goal * value.ratio)
+          ),
+          demoActive: false
+        });
+      case "state.toggle":
+        return update({ [value.field]: !state[value.field] });
+      case "celebration.toggle": {
+        const active = state.nightMode
+          && state.continuousFireworks
+          && state.thankYouVisible;
+        return update({
+          nightMode: !active,
+          continuousFireworks: !active,
+          thankYouVisible: !active
+        });
+      }
+      default:
+        throw new TypeError(`Unknown command "${value.type}".`);
+    }
+  }
+
+  function completeSchool(slot, generation) {
+    schoolTimers.delete(slot);
+    const school = state.distantSchools[slot - 1];
+    if (!school || school.generation !== generation || school.phase !== "pending") return;
+    const distantSchools = state.distantSchools.map((entry) => (
+      entry.slot === slot
+        ? Object.freeze({ ...entry, phase: "completed" })
+        : entry
+    ));
+    updateState({
+      distantSchools: Object.freeze(distantSchools),
+      seattleSchools: Math.max(0, Number(state.seattleSchools) || 0) + 1
+    });
+  }
+
+  function recordSchoolAction(type) {
+    if (type === "school.add") {
+      if (state.distantSchools.length >= MAX_DISTANT_SCHOOLS) {
+        return Object.freeze({
+          changed: false,
+          state,
+          error: "Cannot add another distant school: the seven-school maximum is already active."
+        });
+      }
+      const slot = state.distantSchools.length + 1;
+      const generation = (schoolGenerations.get(slot) ?? 0) + 1;
+      schoolGenerations.set(slot, generation);
+      const startedAt = now();
+      const school = Object.freeze({
+        slot,
+        phase: "pending",
+        generation,
+        startedAt,
+        completesAt: startedAt + DISTANT_SCHOOL_DROP_DURATION_MS
+      });
+      const distantSchools = Object.freeze([...state.distantSchools, school]);
+      const nextState = updateState({
+        distantSchools,
+        ...(slot === 1 ? { seattleSchools: SEATTLE_SCHOOL_BASELINE } : {})
+      });
+      const timer = scheduleTimeout(
+        () => completeSchool(slot, generation),
+        DISTANT_SCHOOL_DROP_DURATION_MS
+      );
+      timer?.unref?.();
+      schoolTimers.set(slot, timer);
+      return Object.freeze({ changed: true, state: nextState });
+    }
+    if (type !== "school.remove") {
+      throw new TypeError(`Unknown school action "${type}".`);
+    }
+    if (state.distantSchools.length === 0) {
+      return Object.freeze({
+        changed: false,
+        state,
+        error: "Cannot remove a distant school: no distant schools are active."
+      });
+    }
+    const school = state.distantSchools.at(-1);
+    const timer = schoolTimers.get(school.slot);
+    if (timer !== undefined) {
+      cancelTimeout(timer);
+      schoolTimers.delete(school.slot);
+    }
+    return Object.freeze({
+      changed: true,
+      state: updateState({
+      distantSchools: Object.freeze(state.distantSchools.slice(0, -1)),
+      ...(school.phase === "completed"
+        ? { seattleSchools: Math.max(0, (Number(state.seattleSchools) || 0) - 1) }
+        : {})
+      })
+    });
+  }
+
+  if (state.demoActive) startDemoScheduler();
 
   return Object.freeze({
     getState: () => state,
-    hasDisplayClient: () => clients.display.size > 0,
-    addClient(surface, response) {
-      clients[surface].add(response);
-      writeEvent(response, "snapshot", {
+    hasPresentationClient: () => clients.presentation.size > 0,
+    canAddClient: (role) => clients[role].size < MAX_SSE_CLIENTS_PER_ROLE,
+    addClient(role, response) {
+      if (clients[role].size >= MAX_SSE_CLIENTS_PER_ROLE) return false;
+      const client = {
+        response,
+        queue: [],
+        pendingBytes: 0,
+        blocked: false,
+        closed: false,
+        onDrain: null,
+        onError: null,
+        onClose: null
+      };
+      client.onDrain = () => flushClient(role, client);
+      client.onError = (error) => failClient(role, client, error);
+      client.onClose = () => {
+        if (removeClientRecord(role, client)) broadcastPresence();
+      };
+      response.on("drain", client.onDrain);
+      response.on("error", client.onError);
+      response.on("close", client.onClose);
+      clients[role].add(client);
+      writeEvent(role, client, "snapshot", {
         state,
-        displayConnected: clients.display.size > 0
+        ...presence()
       });
-      if (surface === "display") broadcastPresence();
+      broadcastPresence();
+      return !client.closed;
     },
-    removeClient(surface, response) {
-      const removed = clients[surface].delete(response);
-      if (removed && surface === "display") broadcastPresence();
-    },
-    update(patch) {
-      state = Object.freeze({ ...state, ...patch });
-      broadcast("state", state);
-      return state;
-    },
+    removeClient,
+    update,
+    command,
+    recordSchoolAction,
     sendAction(action) {
       broadcast("action", action);
     },
     heartbeat() {
-      for (const surface of ["display", "control"]) {
-        for (const client of clients[surface]) client.write(": heartbeat\n\n");
+      for (const role of ["presentation", "preview", "control"]) {
+        for (const client of clients[role]) {
+          writeClient(role, client, ": heartbeat\n\n");
+        }
       }
     },
     closeClients() {
-      for (const surface of ["display", "control"]) {
-        for (const client of clients[surface]) client.end();
-        clients[surface].clear();
+      stopDemoScheduler();
+      for (const timer of schoolTimers.values()) cancelTimeout(timer);
+      schoolTimers.clear();
+      for (const role of ["presentation", "preview", "control"]) {
+        for (const client of clients[role]) {
+          removeClientRecord(role, client);
+          client.response.end();
+        }
+        clients[role].clear();
       }
     }
   });
@@ -243,10 +543,24 @@ function validateStatePatch(value, currentState) {
   if (keys.some((key) => !ALLOWED_STATE_FIELDS.has(key))) {
     return "State patch contains an unknown field.";
   }
+
   for (const field of BOOLEAN_STATE_FIELDS) {
     if (field in value && typeof value[field] !== "boolean") {
       return `${field} must be a boolean.`;
     }
+  }
+  if ("seattleSchools" in value && (
+    !Number.isSafeInteger(value.seattleSchools) || value.seattleSchools < 0
+  )) {
+    return "seattleSchools must be a non-negative whole number.";
+  }
+  if ("operationCost" in value && (
+    typeof value.operationCost !== "number"
+      || !Number.isFinite(value.operationCost)
+      || value.operationCost < 0
+      || value.operationCost > MAX_RAISED
+  )) {
+    return "operationCost must be a finite non-negative number.";
   }
 
   const raised = "raised" in value ? value.raised : currentState.raised;
@@ -260,12 +574,70 @@ function validateStatePatch(value, currentState) {
     return "goal must be a finite number within the allowed range.";
   }
   if (raised > deriveSliderMaximum(goal)) {
-    return "raised must be no more than 135% of goal.";
+    return "raised must be no more than 200% of goal.";
   }
   return null;
 }
 
-async function serveStatic(request, response, root, surface, pathname) {
+function validateCommand(value) {
+  const schemas = {
+    "raised.add": ["type", "amount"],
+    "raised.step": ["type", "fraction"],
+    "raised.setRatio": ["type", "ratio"],
+    "state.toggle": ["type", "field"],
+    "celebration.toggle": ["type"]
+  };
+  const keys = schemas[value.type];
+  if (!keys || Object.keys(value).length !== keys.length
+    || keys.some((key) => !(key in value))) {
+    return "Unknown or invalid command.";
+  }
+  if (value.type === "raised.add"
+    && (typeof value.amount !== "number" || !Number.isFinite(value.amount))) {
+    return "amount must be a finite number.";
+  }
+  if (value.type === "raised.step"
+    && !isAllowedRaisedStep(value.fraction)) {
+    return "fraction must be one of -0.05, -0.01, 0.01, or 0.05.";
+  }
+  if (value.type === "raised.setRatio"
+    && (
+      typeof value.ratio !== "number"
+      || !Number.isFinite(value.ratio)
+      || value.ratio < 0
+      || value.ratio > 2
+    )) {
+    return "ratio must be a finite number from 0 through 2.";
+  }
+  if (value.type === "state.toggle"
+    && !BOOLEAN_STATE_FIELDS.has(value.field)) {
+    return "field must be an allowed boolean state field.";
+  }
+  return null;
+}
+
+function createStaticSecurityHeaders(surface, runtime, isDisplayDocument) {
+  const headers = { ...BASE_SECURITY_HEADERS };
+  const frameOrigins = surface === "display"
+    ? `http://127.0.0.1:${runtime.controlPort} http://localhost:${runtime.controlPort}`
+    : `http://127.0.0.1:${runtime.displayPort} http://localhost:${runtime.displayPort}`;
+  if (surface === "control") {
+    headers["Content-Security-Policy"] = headers["Content-Security-Policy"].replace(
+      "frame-src 'none'",
+      `frame-src ${frameOrigins}`
+    );
+  }
+  if (isDisplayDocument) {
+    headers["Content-Security-Policy"] = headers["Content-Security-Policy"].replace(
+      "frame-ancestors 'none'",
+      `frame-ancestors ${frameOrigins}`
+    );
+    delete headers["X-Frame-Options"];
+  }
+  return headers;
+}
+
+async function serveStatic(request, response, root, surface, runtime, pathname) {
   const allowedPaths = surface === "display" ? DISPLAY_PATHS : CONTROL_PATHS;
   const rootPath = surface === "display" ? "/index.html" : "/control.html";
   if (pathname === "/") pathname = rootPath;
@@ -292,8 +664,13 @@ async function serveStatic(request, response, root, surface, pathname) {
       sendText(request, response, 404, "Not Found\n");
       return;
     }
+    const securityHeaders = createStaticSecurityHeaders(
+      surface,
+      runtime,
+      surface === "display" && relativePath === "index.html"
+    );
     response.writeHead(200, {
-      ...SECURITY_HEADERS,
+      ...securityHeaders,
       "Content-Type": MIME_TYPES.get(path.extname(filePath).toLowerCase())
         ?? "application/octet-stream",
       "Content-Length": fileStat.size
@@ -318,7 +695,11 @@ async function serveStatic(request, response, root, surface, pathname) {
 
 export function createServer(rootDirectory, {
   surface = "display",
-  sharedState = createSharedState()
+  sharedState = createSharedState(),
+  runtime = {
+    displayPort: DEFAULT_DISPLAY_PORT,
+    controlPort: DEFAULT_CONTROL_PORT
+  }
 } = {}) {
   if (!["display", "control"].includes(surface)) {
     throw new TypeError(`Unknown server surface "${surface}".`);
@@ -343,19 +724,46 @@ export function createServer(rootDirectory, {
       return;
     }
 
+    if (pathname === "/api/runtime") {
+      if (request.method !== "GET" && request.method !== "HEAD") {
+        sendText(request, response, 405, "Method Not Allowed\n", { Allow: "GET, HEAD" });
+        return;
+      }
+      sendJson(request, response, 200, {
+        displayPort: runtime.displayPort
+      });
+      return;
+    }
+
     if (pathname === "/events") {
       if (request.method !== "GET") {
         sendText(request, response, 405, "Method Not Allowed\n", { Allow: "GET" });
         return;
       }
+      const requestedRole = new URL(request.url, "http://localhost")
+        .searchParams.get("role");
+      const role = requestedRole ?? (surface === "display" ? "presentation" : "control");
+      const validRole = surface === "display"
+        ? ["presentation", "preview"].includes(role)
+        : role === "control";
+      if (!validRole) {
+        sendJson(request, response, 400, { error: "Invalid event stream role." });
+        return;
+      }
+      if (!sharedState.canAddClient(role)) {
+        sendJson(request, response, 503, { error: "Event stream capacity reached." }, {
+          "Retry-After": "1"
+        });
+        return;
+      }
       response.writeHead(200, {
-        ...SECURITY_HEADERS,
+        ...BASE_SECURITY_HEADERS,
         "Content-Type": "text/event-stream; charset=utf-8",
         Connection: "keep-alive"
       });
       response.write("retry: 1000\n\n");
-      sharedState.addClient(surface, response);
-      request.on("close", () => sharedState.removeClient(surface, response));
+      sharedState.addClient(role, response);
+      request.on("close", () => sharedState.removeClient(role, response));
       return;
     }
 
@@ -385,6 +793,29 @@ export function createServer(rootDirectory, {
         return;
       }
       sendJson(request, response, 200, sharedState.update(parsed.value));
+      return;
+    }
+
+    if (pathname === "/api/commands") {
+      if (request.method !== "POST") {
+        sendText(request, response, 405, "Method Not Allowed\n", { Allow: "POST" });
+        return;
+      }
+      if (!validateMutationOrigin(request)) {
+        sendText(request, response, 403, "Forbidden\n");
+        return;
+      }
+      const parsed = await readJsonBody(request);
+      if (parsed.error) {
+        sendText(request, response, parsed.error, parsed.message);
+        return;
+      }
+      const validationError = validateCommand(parsed.value);
+      if (validationError) {
+        sendJson(request, response, 400, { error: validationError });
+        return;
+      }
+      sendJson(request, response, 200, sharedState.command(parsed.value));
       return;
     }
 
@@ -419,15 +850,28 @@ export function createServer(rootDirectory, {
         sendJson(request, response, 400, { error: "Unknown or invalid action." });
         return;
       }
-      if (!sharedState.hasDisplayClient()) {
-        sendJson(request, response, 409, { error: "No display is connected." });
+      if (!sharedState.hasPresentationClient()) {
+        sendJson(request, response, 409, { error: "No presentation display is connected." });
         return;
       }
       const action = Object.freeze(actionId === undefined
         ? { type: parsed.value.type }
         : { type: parsed.value.type, id: actionId });
+      let actionState = sharedState.getState();
+      if (parsed.value.type === "school.add" || parsed.value.type === "school.remove") {
+        const schoolMutation = sharedState.recordSchoolAction(parsed.value.type);
+        if (!schoolMutation.changed) {
+          sendJson(request, response, 409, { error: schoolMutation.error });
+          return;
+        }
+        actionState = schoolMutation.state;
+      }
       sharedState.sendAction(action);
-      sendJson(request, response, 202, { accepted: true, action });
+      sendJson(request, response, 202, {
+        accepted: true,
+        action,
+        state: actionState
+      });
       return;
     }
 
@@ -435,7 +879,7 @@ export function createServer(rootDirectory, {
       sendText(request, response, 405, "Method Not Allowed\n", { Allow: "GET, HEAD" });
       return;
     }
-    await serveStatic(request, response, root, surface, pathname);
+    await serveStatic(request, response, root, surface, runtime, pathname);
   });
 }
 
@@ -497,13 +941,19 @@ function closeServer(server) {
 
 export function createApplication(rootDirectory) {
   const sharedState = createSharedState();
+  const runtime = {
+    displayPort: DEFAULT_DISPLAY_PORT,
+    controlPort: DEFAULT_CONTROL_PORT
+  };
   const displayServer = createServer(rootDirectory, {
     surface: "display",
-    sharedState
+    sharedState,
+    runtime
   });
   const controlServer = createServer(rootDirectory, {
     surface: "control",
-    sharedState
+    sharedState,
+    runtime
   });
   const heartbeat = setInterval(() => sharedState.heartbeat(), HEARTBEAT_INTERVAL_MS);
   heartbeat.unref?.();
@@ -515,6 +965,8 @@ export function createApplication(rootDirectory) {
       if (displayPort === controlPort) {
         throw new RangeError("Display and control ports must be different.");
       }
+      runtime.displayPort = displayPort;
+      runtime.controlPort = controlPort;
       const results = await Promise.allSettled([
         listen(displayServer, displayPort),
         listen(controlServer, controlPort)

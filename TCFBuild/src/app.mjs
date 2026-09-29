@@ -1,7 +1,6 @@
 import {
-  addRaisedAmount,
   clampAmount,
-  deriveDemoRaised,
+  DEFAULT_CONFIG,
   parseConfig
 } from "./config.mjs";
 import { createCurrencyFormatter } from "./currency.mjs";
@@ -15,24 +14,29 @@ const scene = createScene(config);
 const view = createFundraiserView(root, scene, config);
 const announcer = document.querySelector("#announcer");
 const keyboardHint = document.querySelector("#keyboard-hint");
+const buildSummaryCard = document.querySelector("#build-summary-card");
+const seattleSchoolsDisplay = document.querySelector("#seattle-schools-display");
+const operationCostDisplay = document.querySelector("#operation-cost-display");
 const money = createCurrencyFormatter(config.locale, config.currency);
 
 let state = {
-  raised: config.raised,
-  goal: config.goal,
+  raised: DEFAULT_CONFIG.raised,
+  goal: DEFAULT_CONFIG.goal,
+  seattleSchools: 0,
+  operationCost: 0,
   demoActive: false,
   nightMode: false,
   studentsClapping: false,
   thankYouVisible: true,
-  continuousFireworks: false
+  continuousFireworks: false,
+  buildSummaryVisible: true,
+  keyboardLegendVisible: false,
+  keypressEnabled: true,
+  distantSchools: []
 };
 let goal = state.goal;
 let targetRaised = state.raised;
 let displayedRaised = targetRaised;
-let demoActive = state.demoActive;
-let demoStartedAt = performance.now();
-let lastDemoPublishAt = 0;
-let demoPublishPending = false;
 let lastFrameAt = performance.now();
 let celebrationUntil = 0;
 let previousDisplayedRatio = displayedRaised / goal;
@@ -41,6 +45,8 @@ let continuousFireworksEnabled = false;
 let continuousFireworksTimeoutId = 0;
 let fireworksCleanupComplete = false;
 let nextActionSequence = 0;
+let highestAuthoritativeRevision = null;
+let initialUrlStateSent = false;
 const executedActionIds = new Set();
 const MAX_EXECUTED_ACTION_IDS = 256;
 
@@ -129,21 +135,51 @@ function synchronizeContinuousFireworks(enabled) {
   }
 }
 
-function applyState(nextState, { resetDemoClock = true } = {}) {
-  const demoStarting = !demoActive && nextState.demoActive;
+function applyState(nextState) {
+  const revision = Number.isInteger(nextState?.revision)
+    && nextState.revision >= 0
+    ? nextState.revision
+    : null;
+  if (
+    revision !== null
+    && highestAuthoritativeRevision !== null
+    && revision < highestAuthoritativeRevision
+  ) {
+    return false;
+  }
+  if (revision !== null) highestAuthoritativeRevision = revision;
   state = { ...state, ...nextState };
   goal = state.goal;
   targetRaised = clampAmount(state.raised);
-  demoActive = state.demoActive;
   view.setNightMode(state.nightMode);
   view.setStudentsClapping(state.studentsClapping);
   view.setThankYouVisible(state.thankYouVisible);
-  synchronizeContinuousFireworks(state.continuousFireworks);
-  if (demoStarting && resetDemoClock) {
-    demoStartedAt = performance.now();
-    lastDemoPublishAt = 0;
+  keyboardHint.hidden = !state.keyboardLegendVisible;
+  if (buildSummaryCard) {
+    buildSummaryCard.classList.toggle(
+      "is-hidden",
+      !state.buildSummaryVisible
+    );
+    buildSummaryCard.setAttribute(
+      "aria-hidden",
+      String(!state.buildSummaryVisible)
+    );
   }
+  if (seattleSchoolsDisplay) {
+    seattleSchoolsDisplay.textContent = Number(state.seattleSchools).toLocaleString(
+      config.locale
+    );
+  }
+  if (operationCostDisplay) {
+    operationCostDisplay.textContent = money.format(state.operationCost);
+  }
+  view.reconcileDistantSchools(state.distantSchools, {
+    now: Date.now(),
+    reducedMotion: reducedMotion()
+  });
+  synchronizeContinuousFireworks(state.continuousFireworks);
   scheduleFrame();
+  return true;
 }
 
 async function requestJson(url, options) {
@@ -161,20 +197,38 @@ async function requestJson(url, options) {
   return body;
 }
 
-async function mutateState(patch, successMessage) {
-  applyState(patch);
+async function refetchState() {
+  const authoritativeState = await requestJson("/api/state");
+  applyState(authoritativeState);
+  return authoritativeState;
+}
+
+async function mutate(url, body, successMessage) {
   try {
-    const authoritativeState = await requestJson("/api/state", {
-      method: "PATCH",
-      body: JSON.stringify(patch)
+    const authoritativeState = await requestJson(url, {
+      method: url === "/api/state" ? "PATCH" : "POST",
+      body: JSON.stringify(body)
     });
-    applyState(authoritativeState, { resetDemoClock: false });
-    if (successMessage) announce(successMessage);
+    const applied = applyState(authoritativeState);
+    if (applied && successMessage) announce(successMessage);
     return true;
-  } catch {
-    announce("Display updated locally; dashboard synchronization is temporarily unavailable.");
+  } catch (error) {
+    try {
+      await refetchState();
+    } catch {
+      root.dataset.connection = "reconnecting";
+    }
+    announce(error.message);
     return false;
   }
+}
+
+function patchState(patch, successMessage) {
+  return mutate("/api/state", patch, successMessage);
+}
+
+function sendCommand(command, successMessage) {
+  return mutate("/api/commands", command, successMessage);
 }
 
 function rememberActionId(actionId) {
@@ -210,29 +264,22 @@ function executeAction(action, { announceResult = true } = {}) {
       view.addFirework({ reducedMotion: reducedMotion(), source: "manual" });
       message = "Firework launched.";
       break;
+    case "firework.tcf":
+      view.addTcfFirework({ reducedMotion: reducedMotion() });
+      message = "TCF celebration firework launched.";
+      break;
     case "firework.clear":
       view.clearFireworks();
       message = "All fireworks cleared.";
       break;
     case "school.add": {
-      const previousCount = Number(root.dataset.distantSchools || 0);
-      const count = view.addDistantSchool({ reducedMotion: reducedMotion() });
-      if (count > previousCount) {
-        view.addTcfFirework({ reducedMotion: reducedMotion() });
-      }
-      message = count === previousCount
-        ? "All four distant schools are already present."
-        : `Distant school ${count} added.`;
+      view.addTcfFirework({ reducedMotion: reducedMotion() });
+      message = "Distant school drop accepted.";
       break;
     }
-    case "school.remove": {
-      const previousCount = Number(root.dataset.distantSchools || 0);
-      const count = view.removeLastDistantSchool();
-      message = count === previousCount
-        ? "There are no distant schools to remove."
-        : `Distant school ${previousCount} removed.`;
+    case "school.remove":
+      message = "Distant school removal accepted.";
       break;
-    }
     default:
       return "";
   }
@@ -243,16 +290,19 @@ function executeAction(action, { announceResult = true } = {}) {
 
 async function requestAction(type) {
   const action = { type, id: createActionId() };
-  const message = executeAction(action);
   try {
-    await requestJson("/api/actions", {
+    const result = await requestJson("/api/actions", {
       method: "POST",
       body: JSON.stringify(action)
     });
-  } catch {
-    if (message) {
-      announce(`${message} Control synchronization is temporarily unavailable.`);
+    if (result.state) applyState(result.state);
+  } catch (error) {
+    try {
+      await refetchState();
+    } catch {
+      root.dataset.connection = "reconnecting";
     }
+    announce(error.message);
   }
 }
 
@@ -262,13 +312,22 @@ function connectEvents() {
     announce("Live control connection is unavailable; keyboard controls remain active.");
     return;
   }
-  const events = new EventSource("/events");
+  const role = new URLSearchParams(window.location.search).get("client") === "preview"
+    ? "preview"
+    : "presentation";
+  const events = new EventSource(`/events?role=${role}`);
   events.addEventListener("open", () => {
     root.dataset.connection = "connected";
   });
   events.addEventListener("snapshot", (event) => {
     const snapshot = JSON.parse(event.data);
     applyState(snapshot.state);
+    if (!initialUrlStateSent) {
+      initialUrlStateSent = true;
+      if (Object.keys(config.authoritativeInitialState).length > 0) {
+        patchState(config.authoritativeInitialState);
+      }
+    }
   });
   events.addEventListener("state", (event) => {
     applyState(JSON.parse(event.data));
@@ -350,16 +409,31 @@ function toggleFullscreen() {
 document.addEventListener("keydown", (event) => {
   if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
   if (isEditingTarget(event.target)) return;
+  if (!state.keypressEnabled) return;
 
   if (isSpace(event)) {
     event.preventDefault();
-    keyboardHint.hidden = !keyboardHint.hidden;
-    announce(keyboardHint.hidden ? "Keyboard legends hidden." : "Keyboard legends shown.");
+    sendCommand(
+      { type: "state.toggle", field: "keyboardLegendVisible" },
+      state.keyboardLegendVisible
+        ? "Keyboard legends hidden."
+        : "Keyboard legends shown."
+    );
     return;
   }
 
   const stepFraction = event.shiftKey ? .05 : .01;
   switch (event.key.toLowerCase()) {
+    case "y": {
+      event.preventDefault();
+      sendCommand(
+        { type: "state.toggle", field: "buildSummaryVisible" },
+        state.buildSummaryVisible
+          ? "Together We Build summary hidden."
+          : "Together We Build summary shown."
+      );
+      break;
+    }
     case "s":
       event.preventDefault();
       requestAction("school.add");
@@ -370,8 +444,8 @@ document.addEventListener("keydown", (event) => {
       break;
     case "d":
       event.preventDefault();
-      mutateState(
-        { demoActive: !state.demoActive },
+      sendCommand(
+        { type: "state.toggle", field: "demoActive" },
         state.demoActive
           ? "Fundraiser demonstration paused."
           : "Fundraiser demonstration started."
@@ -379,22 +453,22 @@ document.addEventListener("keydown", (event) => {
       break;
     case "n":
       event.preventDefault();
-      mutateState(
-        { nightMode: !state.nightMode },
+      sendCommand(
+        { type: "state.toggle", field: "nightMode" },
         state.nightMode ? "Day mode enabled." : "Night mode enabled."
       );
       break;
     case "o":
       event.preventDefault();
-      mutateState(
-        { studentsClapping: !state.studentsClapping },
+      sendCommand(
+        { type: "state.toggle", field: "studentsClapping" },
         state.studentsClapping ? "Students stopped clapping." : "Students started clapping."
       );
       break;
     case "p":
       event.preventDefault();
-      mutateState(
-        { thankYouVisible: !state.thankYouVisible },
+      sendCommand(
+        { type: "state.toggle", field: "thankYouVisible" },
         state.thankYouVisible
           ? "Student thank-you messages hidden."
           : "Student thank-you messages enabled."
@@ -402,8 +476,8 @@ document.addEventListener("keydown", (event) => {
       break;
     case "w":
       event.preventDefault();
-      mutateState(
-        { continuousFireworks: !state.continuousFireworks },
+      sendCommand(
+        { type: "state.toggle", field: "continuousFireworks" },
         state.continuousFireworks
           ? "Continuous fireworks stopped."
           : "Continuous fireworks started."
@@ -428,38 +502,32 @@ document.addEventListener("keydown", (event) => {
     case "arrowright":
     case "arrowup":
       event.preventDefault();
-      {
-        const raised = addRaisedAmount(targetRaised, goal, stepFraction);
-        mutateState({
-          raised,
-          demoActive: false
-        }, `${money.format(raised)} raised toward a goal of ${money.format(goal)}.`);
-      }
+      sendCommand(
+        { type: "raised.step", fraction: stepFraction },
+        `Raised amount increased toward a goal of ${money.format(goal)}.`
+      );
       break;
     case "arrowleft":
     case "arrowdown":
       event.preventDefault();
-      {
-        const raised = addRaisedAmount(targetRaised, goal, -stepFraction);
-        mutateState({
-          raised,
-          demoActive: false
-        }, `${money.format(raised)} raised toward a goal of ${money.format(goal)}.`);
-      }
+      sendCommand(
+        { type: "raised.step", fraction: -stepFraction },
+        `Raised amount decreased toward a goal of ${money.format(goal)}.`
+      );
       break;
     case "home":
       event.preventDefault();
-      mutateState({
-        raised: 0,
-        demoActive: false
-      }, `${money.format(0)} raised toward a goal of ${money.format(goal)}.`);
+      sendCommand(
+        { type: "raised.setRatio", ratio: 0 },
+        `${money.format(0)} raised toward a goal of ${money.format(goal)}.`
+      );
       break;
     case "end":
       event.preventDefault();
-      mutateState({
-        raised: goal,
-        demoActive: false
-      }, `${money.format(goal)} raised toward a goal of ${money.format(goal)}.`);
+      sendCommand(
+        { type: "raised.setRatio", ratio: 1 },
+        `${money.format(goal)} raised toward a goal of ${money.format(goal)}.`
+      );
       break;
   }
 });
@@ -468,39 +536,11 @@ document.addEventListener("visibilitychange", handleVisibilityChange);
 window.addEventListener("pagehide", cleanupFireworks, { once: true });
 window.addEventListener("unload", cleanupFireworks, { once: true });
 
-async function publishDemoProgress(now) {
-  if (demoPublishPending || now - lastDemoPublishAt < 250) return;
-  demoPublishPending = true;
-  lastDemoPublishAt = now;
-  try {
-    await requestJson("/api/state", {
-      method: "PATCH",
-      body: JSON.stringify({ raised: targetRaised })
-    });
-  } catch {
-    root.dataset.connection = "reconnecting";
-  } finally {
-    demoPublishPending = false;
-  }
-}
-
 function frame(now) {
   const delta = Math.min(50, Math.max(0, now - lastFrameAt));
   lastFrameAt = now;
-  let demoCompleted = false;
 
-  if (demoActive) {
-    const elapsed = Math.max(0, now - demoStartedAt);
-    demoCompleted = elapsed >= config.demoDurationMs;
-    targetRaised = deriveDemoRaised(
-      goal,
-      demoCompleted ? 1 : elapsed / config.demoDurationMs
-    );
-    state.raised = targetRaised;
-    publishDemoProgress(now);
-  }
-
-  displayedRaised = demoCompleted || reducedMotion()
+  displayedRaised = reducedMotion()
     ? targetRaised
     : exponentialStep(displayedRaised, targetRaised, delta, config.animationTimeConstantMs);
   if (Math.abs(displayedRaised - targetRaised) < .01) displayedRaised = targetRaised;
@@ -519,13 +559,8 @@ function frame(now) {
     reducedMotion: reducedMotion(),
     celebrationActive: now < celebrationUntil
   });
-  if (demoActive && demoCompleted && !renderResult.needsFrame) {
-    demoStartedAt = now;
-    lastDemoPublishAt = 0;
-  }
   if (
-    demoActive
-    || displayedRaised !== targetRaised
+    displayedRaised !== targetRaised
     || now < celebrationUntil
     || renderResult.needsFrame
   ) {
