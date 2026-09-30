@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/TCFUploader/TCFUploader.csproj" />
+  <Project Path="tests/TCFUploader.Tests/TCFUploader.Tests.csproj" />
+</Solution>
