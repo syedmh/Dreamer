@@ -7,6 +7,7 @@ public enum PresentationKey
     D,
     E,
     F,
+    G,
     I,
     L,
     N,
@@ -27,6 +28,7 @@ public readonly record struct PresentationInputDecision(
     bool ExitAvatar,
     bool EnterAvatar)
 {
+    public bool StartGirlEntrance { get; init; }
     public bool ToggleNeonBackground { get; init; }
     public bool ToggleNeonAnimation { get; init; }
     public bool ToggleNeonColorCycle { get; init; }
@@ -83,6 +85,11 @@ public static class PresentationInputPolicy
                 new PresentationInputDecision
                 {
                     ToggleNeonColorCycle = true,
+                },
+            PresentationKey.G =>
+                new PresentationInputDecision
+                {
+                    StartGirlEntrance = true,
                 },
             PresentationKey.D =>
                 new PresentationInputDecision(

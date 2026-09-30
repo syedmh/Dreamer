@@ -1,0 +1,90 @@
+{
+  "name": "T21 PR validation",
+  "on": {
+    "pull_request": {
+      "paths": [
+        "HusayniaSite/**"
+      ]
+    },
+    "workflow_dispatch": {}
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "t21-pr-${{ github.event.pull_request.number || github.ref }}",
+    "cancel-in-progress": true
+  },
+  "jobs": {
+    "validate": {
+      "name": "Locked build, test, scan, and artifact",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 60,
+      "env": {
+        "HUSAYNIA_REPOSITORY_ROOT": "${{ github.workspace }}/HusayniaSite"
+      },
+      "defaults": {
+        "run": {
+          "shell": "pwsh",
+          "working-directory": "HusayniaSite"
+        }
+      },
+      "steps": [
+        {
+          "name": "Checkout exact revision",
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Validate canonical Husaynia checkout root",
+          "run": "$workspace = (Resolve-Path -LiteralPath $env:GITHUB_WORKSPACE).Path; $root = (Resolve-Path -LiteralPath $env:HUSAYNIA_REPOSITORY_ROOT).Path; $expected = Join-Path $workspace 'HusayniaSite'; if ($root -cne $expected -or -not $root.StartsWith($workspace + [IO.Path]::DirectorySeparatorChar, [StringComparison]::Ordinal) -or -not (Test-Path -LiteralPath (Join-Path $root 'HusayniaSite.sln') -PathType Leaf) -or -not (Test-Path -LiteralPath (Join-Path $root 'eng') -PathType Container) -or -not (Test-Path -LiteralPath (Join-Path $root 'pipelines') -PathType Container)) { throw 'T21 canonical Dreamer/HusayniaSite checkout root validation failed.' }"
+        },
+        {
+          "name": "Install SDK from global.json",
+          "uses": "actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9",
+          "with": {
+            "global-json-file": "HusayniaSite/global.json",
+            "cache": true,
+            "cache-dependency-path": "HusayniaSite/**/packages.lock.json"
+          }
+        },
+        {
+          "name": "Restore exact local tools",
+          "run": "dotnet tool restore --tool-manifest .config/dotnet-tools.json"
+        },
+        {
+          "name": "Run fail-closed PR validation",
+          "run": "./eng/ci/Invoke-PrValidation.ps1 -RepositoryRoot $env:HUSAYNIA_REPOSITORY_ROOT -Ci -ArtifactVersion \"0.0.${{ github.run_number }}-pr.${{ github.run_attempt }}\" -CommitSha \"${{ github.sha }}\" -OutputRoot \"$env:RUNNER_TEMP/release\""
+        },
+        {
+          "name": "Run strict T21 harness with environmental blockers fail-closed",
+          "run": "./eng/test/Invoke-T21Validation.ps1"
+        },
+        {
+          "name": "Upload immutable validation artifact",
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "Husaynia-pr-${{ github.run_id }}-${{ github.run_attempt }}",
+            "path": "${{ runner.temp }}/release",
+            "if-no-files-found": "error",
+            "retention-days": 30
+          }
+        },
+        {
+          "name": "Retain validation reports on failure",
+          "if": "${{ failure() }}",
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "Husaynia-pr-failure-reports-${{ github.run_id }}-${{ github.run_attempt }}",
+            "path": "${{ runner.temp }}/t21-reports",
+            "if-no-files-found": "warn",
+            "retention-days": 30
+          }
+        }
+      ]
+    }
+  }
+}

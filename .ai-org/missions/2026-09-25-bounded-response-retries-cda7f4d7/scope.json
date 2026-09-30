@@ -1,0 +1,17 @@
+{
+  "objective": "Give each image/prompt variant bounded Azure-response retries while preserving successful variants and shared rate limits.",
+  "userApprovals": {
+    "expanded_response_retries": true,
+    "retry_existing_failed_variants": true,
+    "duplicateChargeRiskDisclosed": true
+  },
+  "attemptBudget": "Four total lifetime attempts per job: initial submission plus up to three retries; preserve historical attempt rows and numbering.",
+  "eligibleResponses": "Unclassified HTTP 400 and HTTP 408/409/429/5xx from Azure; never retry explicit authentication, permission, invalid-parameter or content-policy rejections.",
+  "uncertainTransport": "No definitive HTTP response, cancellation, timeout/connection loss and recovered in-flight requests remain protected from replay.",
+  "existingFailures": "An explicit CLI option reconsiders only eligible failed variants, with exact source-version validation, current request identity adoption, immutable prior-failure/transition audit and transactional state guards. Never reset successful variants or the whole queue.",
+  "scheduling": "Exponential backoff, provider retry hints, shared completion-based 2-RPM pacing and cancellation remain intact.",
+  "compatibility": "Opt-in expanded policy; defaults remain conservative. No database migration, no source renaming, no new dependencies.",
+  "config": "Enable opted-in Azure-response retry policy and four total attempts in active interactive config; preserve current prompt texts and all other settings.",
+  "workflow": "Development and build only. Tests, reviews, QA and final judgment paused by CTO.",
+  "liveExecution": "Not authorized or performed by this development task; no automatic actual-image submission."
+}

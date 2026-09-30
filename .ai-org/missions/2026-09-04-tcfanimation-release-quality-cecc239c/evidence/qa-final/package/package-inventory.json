@@ -1,0 +1,15 @@
+{
+  "root": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\TCFAnimation\\Build",
+  "files": 187,
+  "directories": 1,
+  "exeBytes": 100185624,
+  "exeSha256": "6421D47A982DD97427C4F2DCAC0F79F9E06F4D411AE8CEB7F4606A8EFB5EF9E9",
+  "dllBytes": 78336,
+  "dllSha256": "EA9CFB0D15853B1340962E2F3E13630B7C739E9918D352C2E76B8FE8DED65A2A",
+  "deniedCount": 0,
+  "denied": [
+    null
+  ],
+  "capturesExists": false,
+  "stagingCount": 0
+}

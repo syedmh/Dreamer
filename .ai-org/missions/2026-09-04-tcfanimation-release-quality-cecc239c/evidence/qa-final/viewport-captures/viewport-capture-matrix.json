@@ -1,0 +1,87 @@
+{
+  "passed": true,
+  "logicalViewport": "1920x1080",
+  "configuredOverride": "1280x720",
+  "stretchMode": "canvas_items",
+  "stretchAspect": "keep",
+  "caseCount": 6,
+  "records": [
+    {
+      "name": "default-1280x720",
+      "engineArguments": [],
+      "width": 1280,
+      "height": 720,
+      "aspect": 1.7777777777777777,
+      "bytes": 153609,
+      "sha256": "C1851D04A4626523593D5EC513626A19028F14BDB7F59076C0691766CB6BD0DA",
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\viewport-captures\\default-1280x720.png"
+    },
+    {
+      "name": "requested-1920x1080",
+      "engineArguments": [
+        "--resolution",
+        "1920x1080"
+      ],
+      "width": 1920,
+      "height": 1080,
+      "aspect": 1.7777777777777777,
+      "bytes": 242205,
+      "sha256": "79C65C86CC73E562C0479722E3FE92AA8848C2200F6EAE2101E121FC47817EE9",
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\viewport-captures\\requested-1920x1080.png"
+    },
+    {
+      "name": "requested-1536x960",
+      "engineArguments": [
+        "--resolution",
+        "1536x960"
+      ],
+      "width": 1536,
+      "height": 864,
+      "aspect": 1.7777777777777777,
+      "bytes": 210646,
+      "sha256": "9C91911FEFDB034D25642171ABF72A13BD9D3B4C11231D0372FCEE3E2CAF5295",
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\viewport-captures\\requested-1536x960.png"
+    },
+    {
+      "name": "requested-1536x864",
+      "engineArguments": [
+        "--resolution",
+        "1536x864"
+      ],
+      "width": 1536,
+      "height": 864,
+      "aspect": 1.7777777777777777,
+      "bytes": 210646,
+      "sha256": "9C91911FEFDB034D25642171ABF72A13BD9D3B4C11231D0372FCEE3E2CAF5295",
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\viewport-captures\\requested-1536x864.png"
+    },
+    {
+      "name": "requested-1280x720",
+      "engineArguments": [
+        "--resolution",
+        "1280x720"
+      ],
+      "width": 1280,
+      "height": 720,
+      "aspect": 1.7777777777777777,
+      "bytes": 153609,
+      "sha256": "C1851D04A4626523593D5EC513626A19028F14BDB7F59076C0691766CB6BD0DA",
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\viewport-captures\\requested-1280x720.png"
+    },
+    {
+      "name": "requested-1000x800",
+      "engineArguments": [
+        "--resolution",
+        "1000x800"
+      ],
+      "width": 1000,
+      "height": 562,
+      "aspect": 1.7793594306049823,
+      "bytes": 101264,
+      "sha256": "646A0F335DB9246E2C65B819455ABB6E840CBEAD4C4E985AB4B8651E422E269F",
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\viewport-captures\\requested-1000x800.png"
+    }
+  ],
+  "stagingCount": 0,
+  "cleanup": true
+}

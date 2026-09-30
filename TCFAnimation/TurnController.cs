@@ -28,6 +28,8 @@ public partial class TurnController : Node2D
         new Texture2D[DirectionalTurnStateMachine.CrossArmFrameCount];
     private readonly Texture2D[] _crossArmReleaseFrames =
         new Texture2D[DirectionalTurnStateMachine.CrossArmReleaseFrameCount];
+    private readonly Texture2D[] _girlFrames =
+        new Texture2D[GirlEntranceStateMachine.FrameCount];
     private readonly Texture2D[] _schoolLeftFrames = new Texture2D[3];
     private readonly Texture2D[] _schoolRightFrames = new Texture2D[3];
     private readonly Texture2D[] _schoolLeftWalkFrames =
@@ -51,9 +53,11 @@ public partial class TurnController : Node2D
     private readonly SchoolSceneStateMachine _schoolScene = new();
     private readonly CelebrationStateMachine _celebration = new();
     private readonly AvatarPresenceStateMachine _avatarPresence = new();
+    private readonly GirlEntranceStateMachine _girlEntrance = new();
 
     private Sprite2D _schoolBackground = null!;
     private Sprite2D _character = null!;
+    private Sprite2D _girlCharacter = null!;
     private DialogueUi _dialogueUi = null!;
     private NeonLogoBackground _neonBackground = null!;
     private FireworksLayer _fireworks = null!;
@@ -66,6 +70,7 @@ public partial class TurnController : Node2D
     private string? _pendingSchoolActionMessage;
     private string? _captureRoot;
     private string? _capturePath;
+    private GirlCaptureSnapshot? _captureGirlSnapshot;
     private int _captureCountdown;
     private double _walkSpeedMultiplier = 1.0;
     private bool _startupTerminating;
@@ -105,6 +110,7 @@ public partial class TurnController : Node2D
 
             _schoolBackground = GetNode<Sprite2D>("SchoolBackground");
             _character = GetNode<Sprite2D>("Character");
+            _girlCharacter = GetNode<Sprite2D>("GirlCharacter");
             _dialogueUi = GetNode<DialogueUi>("DialogueUi");
             _schoolBackground.ZIndex = -2;
             _character.Visible = false;
@@ -159,6 +165,7 @@ public partial class TurnController : Node2D
                 "CrossArmRelease",
                 "release",
                 _crossArmReleaseFrames);
+            LoadGirlFrames(_girlFrames);
             LoadFrames(
                 "SchoolCharacter/LeftTurn",
                 _schoolLeftFrames);
@@ -215,6 +222,13 @@ public partial class TurnController : Node2D
             _character.Scale =
                 Vector2.One * AnimationGeometry.CharacterScale;
             _character.TextureFilter = TextureFilterEnum.Nearest;
+            _girlCharacter.Position = new Vector2(
+                AnimationGeometry.ViewportWidth / 2.0f,
+                ViewportHeight / 2.0f);
+            _girlCharacter.Scale =
+                Vector2.One * AnimationGeometry.CharacterScale;
+            _girlCharacter.TextureFilter = TextureFilterEnum.Linear;
+            ApplyGirlVisuals();
 
             if (verifyRuntime)
             {
@@ -250,6 +264,12 @@ public partial class TurnController : Node2D
         {
             return;
         }
+
+        if (_captureGirlSnapshot is null)
+        {
+            _girlEntrance.Advance(delta);
+        }
+        ApplyGirlVisuals();
 
         if (_capturePath is not null)
         {
@@ -487,6 +507,7 @@ public partial class TurnController : Node2D
                 Key.D => PresentationKey.D,
                 Key.E => PresentationKey.E,
                 Key.F => PresentationKey.F,
+                Key.G => PresentationKey.G,
                 Key.I => PresentationKey.I,
                 Key.L => PresentationKey.L,
                 Key.N => PresentationKey.N,
@@ -505,6 +526,13 @@ public partial class TurnController : Node2D
                 keyEvent.Echo,
                 dialogueEditing: false,
                 _celebration.Phase);
+
+        if (decision.StartGirlEntrance)
+        {
+            StartGirlEntrance();
+            GetViewport().SetInputAsHandled();
+            return;
+        }
 
         if (decision.ToggleLegend)
         {
@@ -854,6 +882,21 @@ public partial class TurnController : Node2D
         ApplyCurrentFrame();
     }
 
+    private bool StartGirlEntrance()
+    {
+        AnimationOffscreenCenters offscreen =
+            CalculateGirlOffscreenCenters();
+        bool started = _girlEntrance.TryStart(
+            offscreen.Left,
+            AnimationGeometry.ViewportWidth / 2.0);
+        if (started)
+        {
+            ApplyGirlVisuals();
+        }
+
+        return started;
+    }
+
     private void StartAvatarExit()
     {
         if (!_avatarPresence.IsVisible)
@@ -899,6 +942,18 @@ public partial class TurnController : Node2D
             MathF.Abs(_character.Scale.X),
             AnimationGeometry.LeftWalkVisibleX,
             AnimationGeometry.RightWalkVisibleX);
+    }
+
+    private AnimationOffscreenCenters CalculateGirlOffscreenCenters()
+    {
+        Rect2 visibleRect = GetViewport().GetVisibleRect();
+        return AnimationGeometry.CalculateOffscreenCenters(
+            visibleRect.Position.X,
+            visibleRect.Size.X,
+            AnimationGeometry.CanvasCenterX,
+            MathF.Abs(_girlCharacter.Scale.X),
+            AnimationGeometry.GirlLeftVisibleX,
+            AnimationGeometry.GirlRightVisibleX);
     }
 
     private void StartCelebration()
@@ -1087,6 +1142,18 @@ public partial class TurnController : Node2D
         }
     }
 
+    private static void LoadGirlFrames(Texture2D[] destination)
+    {
+        for (int index = 0; index < destination.Length; index++)
+        {
+            string path =
+                $"res://Frames/GirlWalk/girl_{index:00}.png";
+            destination[index] = GD.Load<Texture2D>(path)
+                ?? throw new InvalidOperationException(
+                    $"Could not load required girl frame: {path}");
+        }
+    }
+
     private static bool IsRuntimeVerificationRequested(
         IReadOnlyList<string> arguments)
     {
@@ -1166,6 +1233,7 @@ public partial class TurnController : Node2D
             _clapFrames,
             _crossArmFrames,
             _crossArmReleaseFrames,
+            _girlFrames,
             _schoolLeftFrames,
             _schoolRightFrames,
             _schoolLeftWalkFrames,
@@ -1198,10 +1266,10 @@ public partial class TurnController : Node2D
             }
         }
 
-        if (frameCount != 66)
+        if (frameCount != 78)
         {
             throw new InvalidOperationException(
-                $"Loaded {frameCount} runtime frames; expected 66.");
+                $"Loaded {frameCount} runtime frames; expected 78.");
         }
 
         if (_actionMessageLoadStatus != ActionMessageLoadStatus.Success)
@@ -1238,7 +1306,22 @@ public partial class TurnController : Node2D
             || _actionLegend.IsLegendVisible
             || _avatarPresence.Phase != AvatarPresencePhase.Hidden
             || _character.Visible
-            || ActionLegendLayout.Entries.Length != 19
+            || ReferenceEquals(_character, _girlCharacter)
+            || _girlCharacter.Visible
+            || !_girlCharacter.Centered
+            || _girlCharacter.ZIndex != 1
+            || _girlCharacter.Position
+                != new Vector2(
+                    AnimationGeometry.ViewportWidth / 2.0f,
+                    ViewportHeight / 2.0f)
+            || _girlCharacter.Scale
+                != Vector2.One * AnimationGeometry.CharacterScale
+            || _girlCharacter.TextureFilter != TextureFilterEnum.Linear
+            || _girlFrames.Length != GirlEntranceStateMachine.FrameCount
+            || !ReferenceEquals(
+                _girlCharacter.Texture,
+                _girlFrames[0])
+            || ActionLegendLayout.Entries.Length != 20
             || _neonLogoTexture.GetWidth() != 2062
             || _neonLogoTexture.GetHeight() != 763
             || _smallLogoTexture.GetWidth() != 128
@@ -1246,8 +1329,230 @@ public partial class TurnController : Node2D
         )
         {
             throw new InvalidOperationException(
-                "Initial Avatar, neon background, effects, or legend state is invalid.");
+                "Initial Avatar, girl, neon background, effects, or legend state is invalid.");
         }
+
+        Vector2 avatarPosition = _character.Position;
+        bool avatarVisible = _character.Visible;
+        Texture2D? avatarTexture = _character.Texture;
+        AvatarPresencePhase avatarPresencePhase = _avatarPresence.Phase;
+        TurnDirection avatarDirection = _turn.CurrentDirection;
+        int avatarFrame = _turn.CurrentFrame;
+        SchoolScenePhase schoolPhase = _schoolScene.Phase;
+        CelebrationPhase celebrationPhase = _celebration.Phase;
+        bool fireworksActive = _fireworks.IsActive;
+        bool logoRainActive = _logoRain.IsActive;
+
+        AnimationOffscreenCenters girlOffscreen =
+            CalculateGirlOffscreenCenters();
+        float expectedGirlStartX = -187.5f;
+        if (girlOffscreen.Left != expectedGirlStartX)
+        {
+            throw new InvalidOperationException(
+                $"Girl start X is {girlOffscreen.Left}; "
+                + $"expected {expectedGirlStartX}.");
+        }
+        if (!StartGirlEntrance())
+        {
+            throw new InvalidOperationException(
+                "Girl entrance did not start from the hidden state.");
+        }
+        float girlRightEdgeAtStart =
+            _girlCharacter.Position.X
+            + (
+                AnimationGeometry.GirlRightVisibleX
+                - AnimationGeometry.CanvasCenterX
+            ) * MathF.Abs(_girlCharacter.Scale.X);
+        if (
+            _girlEntrance.Phase
+                != GirlEntrancePhase.EnteringFromLeft
+            || _girlEntrance.CurrentFrame != 0
+            || _girlEntrance.CharacterX != expectedGirlStartX
+            || _girlCharacter.Position.X != expectedGirlStartX
+            || !_girlCharacter.Visible
+            || !ReferenceEquals(
+                _girlCharacter.Texture,
+                _girlFrames[0])
+            || girlRightEdgeAtStart
+                != GetViewport().GetVisibleRect().Position.X
+        )
+        {
+            throw new InvalidOperationException(
+                "Girl entrance did not begin fully offscreen left on frame 0.");
+        }
+
+        GirlEntrancePhase repeatedStartPhase = _girlEntrance.Phase;
+        double repeatedStartX = _girlEntrance.CharacterX;
+        int repeatedStartFrame = _girlEntrance.CurrentFrame;
+        bool repeatedStartVisible = _girlCharacter.Visible;
+        Texture2D? repeatedStartTexture = _girlCharacter.Texture;
+        if (
+            StartGirlEntrance()
+            || _girlEntrance.Phase != repeatedStartPhase
+            || _girlEntrance.CharacterX != repeatedStartX
+            || _girlEntrance.CurrentFrame != repeatedStartFrame
+            || _girlCharacter.Visible != repeatedStartVisible
+            || !ReferenceEquals(
+                _girlCharacter.Texture,
+                repeatedStartTexture)
+        )
+        {
+            throw new InvalidOperationException(
+                "Repeated girl entrance start was not idempotent.");
+        }
+
+        double girlFrameSeconds =
+            1.0 / AnimationConfig.Current.GirlWalkFps;
+        const int girlCompletionTick = 48;
+        if (
+            AnimationConfig.Current.GirlEntrySeconds != 6.0
+            || AnimationConfig.Current.GirlWalkFps != 8.0
+        )
+        {
+            throw new InvalidOperationException(
+                "Girl runtime smoke requires the shipped 6-second, 8-FPS defaults.");
+        }
+
+        HashSet<int> observedGirlFrames =
+            [_girlEntrance.CurrentFrame];
+        bool verifiedFrameElevenWrap = false;
+        bool verifiedFrameTwelveRestart = false;
+        bool verifiedLastEnteringTick = false;
+        for (int tick = 1; tick < girlCompletionTick; tick++)
+        {
+            int expectedFrame =
+                tick % (GirlEntranceStateMachine.FrameCount - 1);
+            if (!_girlEntrance.Advance(girlFrameSeconds))
+            {
+                throw new InvalidOperationException(
+                    $"Girl entrance stopped before nominal tick {tick}.");
+            }
+            ApplyGirlVisuals();
+            if (
+                _girlEntrance.CurrentFrame != expectedFrame
+                || _girlEntrance.CurrentFrame
+                    == GirlEntranceStateMachine.FrameCount - 1
+                || !_girlEntrance.IsEntering
+                || _girlEntrance.CharacterX >= CelebrationCenterX
+                || !ReferenceEquals(
+                    _girlCharacter.Texture,
+                    _girlFrames[expectedFrame])
+                || ReferenceEquals(
+                    _girlCharacter.Texture,
+                    _girlFrames[GirlEntranceStateMachine.FrameCount - 1])
+            )
+            {
+                throw new InvalidOperationException(
+                    $"Girl nominal tick {tick} did not use repeated "
+                    + $"locomotion frame {expectedFrame} before center.");
+            }
+            observedGirlFrames.Add(_girlEntrance.CurrentFrame);
+
+            if (tick == 11)
+            {
+                verifiedFrameElevenWrap =
+                    _girlEntrance.CurrentFrame == 0
+                    && !ReferenceEquals(
+                        _girlCharacter.Texture,
+                        _girlFrames[
+                            GirlEntranceStateMachine.FrameCount - 1]);
+            }
+            else if (tick == 12)
+            {
+                verifiedFrameTwelveRestart =
+                    _girlEntrance.CurrentFrame == 1
+                    && !ReferenceEquals(
+                        _girlCharacter.Texture,
+                        _girlFrames[
+                            GirlEntranceStateMachine.FrameCount - 1]);
+            }
+            else if (tick == girlCompletionTick - 1)
+            {
+                verifiedLastEnteringTick =
+                    _girlEntrance.CurrentFrame == 3
+                    && _girlEntrance.Phase
+                        == GirlEntrancePhase.EnteringFromLeft
+                    && _girlEntrance.CharacterX < CelebrationCenterX;
+            }
+        }
+        if (
+            !verifiedFrameElevenWrap
+            || !verifiedFrameTwelveRestart
+            || !verifiedLastEnteringTick
+            || !observedGirlFrames.SetEquals(
+                Enumerable.Range(
+                    0,
+                    GirlEntranceStateMachine.FrameCount - 1))
+        )
+        {
+            throw new InvalidOperationException(
+                "Girl entry cadence did not cover frames 0 through 10 "
+                + "with the required 11/8, 12/8, and 5.875-second states.");
+        }
+
+        if (!_girlEntrance.Advance(girlFrameSeconds))
+        {
+            throw new InvalidOperationException(
+                "Girl entrance did not complete on the final nominal tick.");
+        }
+        ApplyGirlVisuals();
+        observedGirlFrames.Add(_girlEntrance.CurrentFrame);
+        if (
+            _girlEntrance.Phase != GirlEntrancePhase.Visible
+            || _girlEntrance.IsEntering
+            || !_girlEntrance.IsVisible
+            || _girlEntrance.CharacterX != CelebrationCenterX
+            || _girlEntrance.CurrentFrame
+                != GirlEntranceStateMachine.FrameCount - 1
+            || _girlCharacter.Position.X != CelebrationCenterX
+            || !_girlCharacter.Visible
+            || !ReferenceEquals(
+                _girlCharacter.Texture,
+                _girlFrames[GirlEntranceStateMachine.FrameCount - 1])
+            || !observedGirlFrames.SetEquals(
+                Enumerable.Range(0, GirlEntranceStateMachine.FrameCount))
+        )
+        {
+            throw new InvalidOperationException(
+                "Girl entrance did not atomically complete at center on "
+                + "frame 11 after observing frames 0 through 10.");
+        }
+
+        Vector2 completedGirlPosition = _girlCharacter.Position;
+        Texture2D? completedGirlTexture = _girlCharacter.Texture;
+        if (
+            _girlEntrance.Advance(girlFrameSeconds)
+            || _girlEntrance.Phase != GirlEntrancePhase.Visible
+            || _girlEntrance.CharacterX != CelebrationCenterX
+            || _girlEntrance.CurrentFrame
+                != GirlEntranceStateMachine.FrameCount - 1
+            || _girlCharacter.Position != completedGirlPosition
+            || !ReferenceEquals(
+                _girlCharacter.Texture,
+                completedGirlTexture)
+        )
+        {
+            throw new InvalidOperationException(
+                "Completed girl entrance did not hold its final state.");
+        }
+
+        if (
+            _character.Position != avatarPosition
+            || _character.Visible != avatarVisible
+            || !ReferenceEquals(_character.Texture, avatarTexture)
+            || _avatarPresence.Phase != avatarPresencePhase
+            || _turn.CurrentDirection != avatarDirection
+            || _turn.CurrentFrame != avatarFrame
+            || _schoolScene.Phase != schoolPhase
+            || _celebration.Phase != celebrationPhase
+            || _fireworks.IsActive != fireworksActive
+            || _logoRain.IsActive != logoRainActive
+        )
+        {
+            throw new InvalidOperationException(
+                "Girl entrance mutated Avatar or choreography state.");
+        }
+
         if (
             !_neonBackground.Toggle()
             || !_neonBackground.IsShowing
@@ -1344,11 +1649,14 @@ public partial class TurnController : Node2D
         }
 
         GD.Print(
-            "RUNTIME_SMOKE_PASS character_textures=66 "
+            "RUNTIME_SMOKE_PASS character_textures=78 "
+            + "girl_entrance=true girl_textures=12 "
+            + "girl_cadence=0..10_repeat_terminal_11=true "
+            + "girl_walk_fps=8 girl_entry_seconds=6 "
             + "school_backgrounds=6 dimensions="
             + string.Join(",", backgroundDimensions)
             + " dialogue_ui=true "
-            + "action_messages=8 legend_entries=19 initial_blank=true "
+            + "action_messages=8 legend_entries=20 initial_blank=true "
             + "neon_background=true neon_animation_default=false "
             + "neon_color_cycle_default=false neon_text_color=white "
             + FormattableString.Invariant(
@@ -1374,9 +1682,7 @@ public partial class TurnController : Node2D
 
     private void ApplyCurrentFrame()
     {
-        _character.Visible =
-            _capturePath is not null
-            || _avatarPresence.IsVisible;
+        _character.Visible = _avatarPresence.IsVisible;
         if (!_character.Visible)
         {
             return;
@@ -1486,6 +1792,16 @@ public partial class TurnController : Node2D
         _character.Texture = frames[_turn.CurrentFrame];
     }
 
+    private void ApplyGirlVisuals()
+    {
+        _girlCharacter.Visible = _girlEntrance.IsVisible;
+        _girlCharacter.Position = new Vector2(
+            (float)_girlEntrance.CharacterX,
+            _girlCharacter.Position.Y);
+        _girlCharacter.Texture =
+            _girlFrames[_girlEntrance.CurrentFrame];
+    }
+
     private Texture2D GetCelebrationCharacterTexture(
         CelebrationCharacterAnimation animation,
         int frame)
@@ -1565,6 +1881,7 @@ public partial class TurnController : Node2D
         string? dialoguePreview = null;
         SchoolCaptureSelection? schoolCapture = null;
         CelebrationSnapshot? celebrationCapture = null;
+        GirlCaptureSnapshot? girlCapture = null;
         bool legendVisible = false;
         bool hideBubble = false;
         bool logoRainVisible = false;
@@ -1575,6 +1892,7 @@ public partial class TurnController : Node2D
         int dialogueOptionCount = 0;
         int schoolOptionCount = 0;
         int celebrationOptionCount = 0;
+        int girlOptionCount = 0;
         int legendOptionCount = 0;
         int hideBubbleOptionCount = 0;
         int logoRainOptionCount = 0;
@@ -1590,6 +1908,7 @@ public partial class TurnController : Node2D
             const string schoolPrefix = "--capture-school=";
             const string celebrationPrefix =
                 "--capture-celebration=";
+            const string girlPrefix = "--capture-girl=";
 
             if (argument.StartsWith(framePrefix, StringComparison.Ordinal))
             {
@@ -1659,6 +1978,18 @@ public partial class TurnController : Node2D
                     "--capture-celebration");
                 celebrationCapture = ParseCelebrationCapture(
                     argument[celebrationPrefix.Length..]);
+            }
+            else if (
+                argument.StartsWith(
+                    girlPrefix,
+                    StringComparison.Ordinal)
+            )
+            {
+                EnsureSingleOption(
+                    ref girlOptionCount,
+                    "--capture-girl");
+                girlCapture = CaptureModePolicy.ParseGirlSnapshot(
+                    argument[girlPrefix.Length..]);
             }
             else if (
                 string.Equals(
@@ -1733,17 +2064,16 @@ public partial class TurnController : Node2D
             return null;
         }
 
-        int baseSnapshotCount =
-            (captureFrame is null ? 0 : 1)
-            + (schoolCapture is null ? 0 : 1)
-            + (celebrationCapture is null ? 0 : 1);
-        if (capturePath is null || baseSnapshotCount != 1)
+        if (capturePath is null)
         {
             throw new ArgumentException(
-                "Capture mode requires --capture-path and exactly one of "
-                + "--capture-frame, --capture-school, or "
-                + "--capture-celebration.");
+                "Capture mode requires --capture-path.");
         }
+        CaptureModePolicy.ValidateBaseSnapshots(
+            captureFrame is not null,
+            schoolCapture is not null,
+            celebrationCapture is not null,
+            girlCapture is not null);
 
         if (
             captureFrame is not null
@@ -1768,6 +2098,7 @@ public partial class TurnController : Node2D
             dialoguePreview,
             schoolCapture,
             celebrationCapture,
+            girlCapture,
             legendVisible,
             hideBubble,
             logoRainVisible,
@@ -1784,7 +2115,13 @@ public partial class TurnController : Node2D
 
         _captureRoot = captureMode.Root;
         _capturePath = captureMode.Path;
-        _avatarPresence.SetVisible(_character.Position.X);
+        if (CaptureModePolicy.ShouldShowAvatar(
+            captureMode.Frame is not null,
+            captureMode.SchoolCapture is not null,
+            captureMode.CelebrationCapture is not null))
+        {
+            _avatarPresence.SetVisible(_character.Position.X);
+        }
         if (captureMode.CelebrationCapture is not null)
         {
             _schoolScene.CancelToBlack(CharacterProgressFromPosition());
@@ -1856,13 +2193,22 @@ public partial class TurnController : Node2D
                     schoolCapture.SchoolNumber.ToString());
             }
         }
-        else
+        else if (captureMode.Frame is not null)
         {
             _turn.Reset(
                 captureMode.Direction,
-                captureMode.Frame
-                    ?? throw new InvalidOperationException(
-                        "Capture frame is missing."));
+                captureMode.Frame.Value);
+        }
+        if (captureMode.GirlCapture is not null)
+        {
+            AnimationOffscreenCenters offscreen =
+                CalculateGirlOffscreenCenters();
+            _girlEntrance.SetDevelopmentSnapshot(
+                captureMode.GirlCapture.Value,
+                offscreen.Left,
+                AnimationGeometry.ViewportWidth / 2.0);
+            _captureGirlSnapshot = captureMode.GirlCapture;
+            ApplyGirlVisuals();
         }
         ConfigureDialoguePreview(captureMode.DialoguePreview);
         if (captureMode.HideBubble)
@@ -2054,6 +2400,9 @@ public partial class TurnController : Node2D
             File.Move(stagingPath, _capturePath!, overwrite: false);
             published = true;
 
+            bool dialogueInputFocused =
+                _dialogueUi.IsEditing
+                && GetViewport().GuiGetFocusOwner() is LineEdit;
             GD.Print(
                 $"CAPTURE_SAVED direction={_turn.CurrentDirection} "
                 + $"frame={_turn.CurrentFrame} "
@@ -2063,7 +2412,17 @@ public partial class TurnController : Node2D
                 + $"legend={_actionLegend.IsLegendVisible} "
                 + $"fireworks={_fireworks.IsActive} "
                 + $"logo_rain={_logoRain.IsActive} "
-                + $"neon={_neonBackground.IsShowing} path={_capturePath}");
+                + $"neon={_neonBackground.IsShowing} "
+                + $"girl_snapshot="
+                + $"{_captureGirlSnapshot?.ToString().ToLowerInvariant() ?? "none"} "
+                + $"girl_phase={_girlEntrance.Phase} "
+                + FormattableString.Invariant(
+                    $"girl_x={_girlEntrance.CharacterX:0.###} ")
+                + $"girl_frame={_girlEntrance.CurrentFrame} "
+                + $"girl_visible={_girlCharacter.Visible.ToString().ToLowerInvariant()} "
+                + $"dialogue_editing={_dialogueUi.IsEditing.ToString().ToLowerInvariant()} "
+                + $"dialogue_input_focused={dialogueInputFocused.ToString().ToLowerInvariant()} "
+                + $"path={_capturePath}");
             GetTree().Quit();
         }
         catch (Exception exception)
@@ -2114,6 +2473,7 @@ public partial class TurnController : Node2D
         string? DialoguePreview,
         SchoolCaptureSelection? SchoolCapture,
         CelebrationSnapshot? CelebrationCapture,
+        GirlCaptureSnapshot? GirlCapture,
         bool LegendVisible,
         bool HideBubble,
         bool LogoRainVisible,

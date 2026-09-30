@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'none'; img-src 'none'; font-src 'none'; object-src 'none'; frame-src 'none'; media-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Life Memoir Writer browser tests</title>
+  <style>
+    body{max-width:70rem;margin:2rem auto;padding:0 1rem;color:#18212f;background:#f3f5f7;font:16px/1.5 system-ui,sans-serif}
+    h1{color:#10233d}.summary{padding:1rem;border:2px solid #183153;background:#fff}
+    li{margin:.4rem 0}.pass{color:#07583f}.fail{color:#a61b1b;font-weight:700}
+    #ui-test-fixture{position:absolute;left:-10000px;width:10px;height:10px;overflow:hidden}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Life Memoir Writer browser tests</h1>
+    <p>Dependency-free tests running directly in this browser. No network access is used.</p>
+    <p id="test-summary" class="summary" role="status" aria-live="polite">Running…</p>
+    <ol id="test-results"></ol>
+    <div id="ui-test-fixture" aria-hidden="true"></div>
+  </main>
+
+  <script src="../js/namespace.js"></script>
+  <script src="../js/domain.js"></script>
+  <script src="../js/validation.js"></script>
+  <script src="../js/persistence.js"></script>
+  <script src="../js/prompts.js"></script>
+  <script src="../js/backup.js"></script>
+  <script src="../js/export.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="test-runner.js"></script>
+</body>
+</html>

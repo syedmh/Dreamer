@@ -1,0 +1,61 @@
+{
+  "missionId": "2026-08-28-husaynia-site-t21-r12",
+  "objective": "Implement T21-R12 trusted completed-run identity so titles cannot suppress canonical nonproduction dispatch.",
+  "classification": "security-rework",
+  "size": "medium",
+  "state": "VALIDATING",
+  "workflow": "rework",
+  "definitionOfDone": [
+    "Display titles and run titles are never authority for completed-run reuse or deduplication.",
+    "Reusable producer runs require exact GitHub API metadata, immutable artifact digest, canonical dispatch-input hash, protected-workflow attestation, and expected producer graph.",
+    "Wrong, stale, replayed, malformed, missing, or ambiguous records cannot suppress or authorize canonical dispatch.",
+    "Completed-run-only R/P/I/M/S sequencing, APPLY-before-dispatch, one immutable application checksum, and manual-disabled Production remain unchanged.",
+    "Independent test, security, review, and judge gates evaluate the rework."
+  ],
+  "gates": {
+    "localEvidence": "pass",
+    "cachedActionlint": "pending-no-accessible-cached-binary-and-installation-prohibited",
+    "tests": "pending",
+    "security": "pending",
+    "review": "pending",
+    "judge": "pending"
+  },
+  "tasks": [
+    {
+      "id": "T21-R12",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "R12 fixture API 25/25 (19 simulated, 0 actual dispatches, 0 mutations); lifecycle 22/22 (6 simulated, 0 actual); enabled path 12/12; pipeline definitions 47/47 (11 workflows, 36 run bodies); migration authorization 17/17; aggregate ContractOnly 17/17; exit-code contract 2/2; parser 10 scripts and 11 workflows with 0 errors; final secret scan 91 files, 1,417,719 bytes, 0 findings. Authentication, deployments, receipts, database/cloud/resource/secret mutations, installs, restores, and actual C6 builds were all zero."
+    },
+    {
+      "id": "T21-R12-INDEPENDENT-TEST",
+      "owner": "test-engineer",
+      "status": "PENDING",
+      "evidence": "Independent gate not run by implementation owner."
+    },
+    {
+      "id": "T21-R12-SECURITY",
+      "owner": "security-engineer",
+      "status": "PENDING",
+      "evidence": "Independent gate not run by implementation owner."
+    },
+    {
+      "id": "T21-R12-REVIEW",
+      "owner": "code-reviewer",
+      "status": "PENDING",
+      "evidence": "Independent gate not run by implementation owner."
+    },
+    {
+      "id": "T21-R12-JUDGE",
+      "owner": "engineering-judge",
+      "status": "PENDING",
+      "evidence": "Independent gate not run; no self-approval."
+    }
+  ],
+  "blockers": [
+    "Cached actionlint was not present in the repository or accessible Agency caches; installation/download was prohibited."
+  ],
+  "reworkCount": 12,
+  "nextAction": "Run cached actionlint when an approved cached binary is supplied, then execute independent test, security, review, and judge gates. Do not self-approve.",
+  "updatedAt": "2026-08-28T00:21:11.527-07:00"
+}

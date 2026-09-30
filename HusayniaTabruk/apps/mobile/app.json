@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "Tabruk",
+    "slug": "tabruk",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "tabruk",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "org.husaynia.tabruk"
+    },
+    "android": {
+      "package": "org.husaynia.tabruk"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

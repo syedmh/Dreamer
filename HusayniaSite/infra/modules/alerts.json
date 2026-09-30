@@ -1,0 +1,202 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.46.1.21595",
+      "templateHash": "16691203217201930973"
+    }
+  },
+  "parameters": {
+    "deployResources": {
+      "type": "bool"
+    },
+    "location": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "object"
+    },
+    "actionGroupName": {
+      "type": "string"
+    },
+    "webAppName": {
+      "type": "string"
+    },
+    "sqlServerName": {
+      "type": "string"
+    },
+    "sqlDatabaseName": {
+      "type": "string"
+    },
+    "applicationInsightsName": {
+      "type": "string"
+    },
+    "availabilityTestName": {
+      "type": "string"
+    },
+    "approvedEmailReceivers": {
+      "type": "array"
+    },
+    "runbookUrl": {
+      "type": "string"
+    },
+    "alertOwner": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "invalidReceivers": "[filter(parameters('approvedEmailReceivers'), lambda('receiver', or(or(empty(trim(lambdaVariables('receiver').name)), not(contains(lambdaVariables('receiver').emailAddress, '@'))), contains(lambdaVariables('receiver').emailAddress, ' '))))]",
+    "normalizedRunbookUrl": "[toLower(trim(parameters('runbookUrl')))]",
+    "runbookUrlValid": "[and(and(and(and(and(startsWith(variables('normalizedRunbookUrl'), 'https://'), greater(length(variables('normalizedRunbookUrl')), 11)), contains(replace(variables('normalizedRunbookUrl'), 'https://', ''), '.')), not(contains(variables('normalizedRunbookUrl'), '@'))), not(contains(variables('normalizedRunbookUrl'), '?'))), not(contains(variables('normalizedRunbookUrl'), '#')))]",
+    "alertingInputsValid": "[and(and(and(greater(length(parameters('approvedEmailReceivers')), 0), equals(length(variables('invalidReceivers')), 0)), variables('runbookUrlValid')), not(empty(trim(parameters('alertOwner')))))]"
+  },
+  "resources": [
+    {
+      "condition": "[and(parameters('deployResources'), variables('alertingInputsValid'))]",
+      "type": "Microsoft.Insights/actionGroups",
+      "apiVersion": "2023-01-01",
+      "name": "[parameters('actionGroupName')]",
+      "location": "global",
+      "tags": "[union(parameters('tags'), createObject('alertOwner', parameters('alertOwner'), 'runbookUrl', parameters('runbookUrl')))]",
+      "properties": {
+        "copy": [
+          {
+            "name": "emailReceivers",
+            "count": "[length(parameters('approvedEmailReceivers'))]",
+            "input": {
+              "name": "[parameters('approvedEmailReceivers')[copyIndex('emailReceivers')].name]",
+              "emailAddress": "[parameters('approvedEmailReceivers')[copyIndex('emailReceivers')].emailAddress]",
+              "useCommonAlertSchema": true
+            }
+          }
+        ],
+        "groupShortName": "[take(replace(parameters('actionGroupName'), '-', ''), 12)]",
+        "enabled": true
+      }
+    },
+    {
+      "condition": "[and(parameters('deployResources'), variables('alertingInputsValid'))]",
+      "type": "Microsoft.Insights/metricAlerts",
+      "apiVersion": "2018-03-01",
+      "name": "[format('{0}-synthetic-availability', parameters('webAppName'))]",
+      "location": "global",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "description": "[format('Synthetic availability failure. Owner: {0}. Runbook: {1}', parameters('alertOwner'), parameters('runbookUrl'))]",
+        "severity": 1,
+        "enabled": true,
+        "scopes": [
+          "[resourceId('Microsoft.Insights/webtests', parameters('availabilityTestName'))]",
+          "[resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))]"
+        ],
+        "evaluationFrequency": "PT1M",
+        "windowSize": "PT5M",
+        "criteria": {
+          "odata.type": "Microsoft.Azure.Monitor.WebtestLocationAvailabilityCriteria",
+          "webTestId": "[resourceId('Microsoft.Insights/webtests', parameters('availabilityTestName'))]",
+          "componentId": "[resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))]",
+          "failedLocationCount": 1
+        },
+        "actions": [
+          {
+            "actionGroupId": "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
+          }
+        ],
+        "autoMitigate": true,
+        "targetResourceType": "Microsoft.Insights/webtests",
+        "targetResourceRegion": "global"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
+      ]
+    },
+    {
+      "condition": "[and(parameters('deployResources'), variables('alertingInputsValid'))]",
+      "type": "Microsoft.Insights/metricAlerts",
+      "apiVersion": "2018-03-01",
+      "name": "[format('{0}-http5xx', parameters('webAppName'))]",
+      "location": "global",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "description": "[format('App Service HTTP 5xx response count. Owner: {0}. Runbook: {1}', parameters('alertOwner'), parameters('runbookUrl'))]",
+        "severity": 2,
+        "enabled": true,
+        "scopes": [
+          "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+        ],
+        "evaluationFrequency": "PT5M",
+        "windowSize": "PT15M",
+        "criteria": {
+          "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+          "allOf": [
+            {
+              "name": "Http5xx",
+              "metricName": "Http5xx",
+              "metricNamespace": "Microsoft.Web/sites",
+              "operator": "GreaterThan",
+              "threshold": 0,
+              "timeAggregation": "Total",
+              "criterionType": "StaticThresholdCriterion"
+            }
+          ]
+        },
+        "actions": [
+          {
+            "actionGroupId": "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
+          }
+        ],
+        "autoMitigate": true,
+        "targetResourceType": "Microsoft.Web/sites",
+        "targetResourceRegion": "[parameters('location')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
+      ]
+    },
+    {
+      "condition": "[and(parameters('deployResources'), variables('alertingInputsValid'))]",
+      "type": "Microsoft.Insights/metricAlerts",
+      "apiVersion": "2018-03-01",
+      "name": "[format('{0}-{1}-capacity', parameters('sqlServerName'), parameters('sqlDatabaseName'))]",
+      "location": "global",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "description": "[format('Azure SQL capacity pressure. Owner: {0}. Runbook: {1}', parameters('alertOwner'), parameters('runbookUrl'))]",
+        "severity": 2,
+        "enabled": true,
+        "scopes": [
+          "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlServerName'), parameters('sqlDatabaseName'))]"
+        ],
+        "evaluationFrequency": "PT5M",
+        "windowSize": "PT15M",
+        "criteria": {
+          "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+          "allOf": [
+            {
+              "name": "SqlCpuPercent",
+              "metricName": "cpu_percent",
+              "metricNamespace": "Microsoft.Sql/servers/databases",
+              "operator": "GreaterThan",
+              "threshold": 90,
+              "timeAggregation": "Average",
+              "criterionType": "StaticThresholdCriterion"
+            }
+          ]
+        },
+        "actions": [
+          {
+            "actionGroupId": "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
+          }
+        ],
+        "autoMitigate": true,
+        "targetResourceType": "Microsoft.Sql/servers/databases",
+        "targetResourceRegion": "[parameters('location')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
+      ]
+    }
+  ]
+}

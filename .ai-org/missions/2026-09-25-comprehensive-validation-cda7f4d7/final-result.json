@@ -1,0 +1,52 @@
+{
+  "status": "COMPLETED",
+  "verdict": "APPROVED",
+  "objective": "unpause all phases, finish everything, revise all work we done and take it through all phases",
+  "scope": "TCFComic comprehensive offline software completion; not deployment or live-generation authorization.",
+  "independentJudge": "final-verdict.md",
+  "gateIndex": "gate-evidence.json",
+  "changes": [
+    "Bounded fail-closed provider classification inspects structured types, original envelopes and duplicate JSON members using one coherent snapshot.",
+    "Future complete response evidence and whole-history authorization prevent unverifiable legacy, moderation, unknown and unanswered replay; final dispatch checks job/history atomically.",
+    "Public and Azure transports reject redirects; provider identifiers are strictly validated before worker transfer and persistence.",
+    "Queued denial precedes admission repair and retains immutable failure/staging evidence across restarts.",
+    "Both response-time and pre-dispatch exhaustion commit terminal state before fallible quarantine, retaining cooldown and preventing unflagged budget-change replay.",
+    "Documentation and legitimate fixtures updated; extensive independent SDK, provenance, CAS, crash, privacy, preservation, exhaustion and operator regressions added."
+  ],
+  "finalRegression": {"passed": 1775, "failed": 0, "skipped": 2, "deselected": 3, "seconds": 306.85},
+  "separateProbes": {"passed": 32, "failed": 0},
+  "security": {"verdict": "PASS", "focusedPassed": 163, "unresolvedFindings": 0},
+  "review": {"verdict": "APPROVED", "focusedPassedReportedByReviewer": 141},
+  "operatorQA": {"verdict": "PASS", "journeys": 16, "focusedPassed": 99, "unchangedSecurityPassed": 43},
+  "judgeSpotCheck": {"passed": 201, "failed": 0, "skipped": 0, "seconds": 10.92},
+  "performance": {
+    "allThreeRequiredCases": "PASS",
+    "detectionP95Seconds": 0.2760,
+    "thousandFileCapacitySeconds": 66.486,
+    "idleObservationSeconds": 301.143,
+    "idleAverageCpuPercent": 0.00519,
+    "idleAverageWorkingSetMiB": 29.057,
+    "idlePeakWorkingSetMiB": 29.102,
+    "qualification": "Prior actual executions independently verified; final failure-only fix does not invalidate them."
+  },
+  "build": {"verdict": "PASS", "commandsPassed": 7, "wheelModulesVerified": 24, "recordHashesVerified": 28, "wheelSha256": "c692c27ff79967a50ade12f18cac9a11b51a7e6e3508d6460981bbdccc55df3e"},
+  "integrity": {
+    "finalManifestEntriesVerified": 74,
+    "activeConfigBeforeAndAfterSha256": "A09C04DC523701A99F86ACE2362D016577F1F1D6C5F357E68E3F9C01799FCA8A",
+    "productionDataAccess": false,
+    "productionResetOrMigration": false,
+    "liveCalls": 0,
+    "gitCommitsOrPushes": 0,
+    "unrelatedProjectChanges": false
+  },
+  "risks": [
+    "Two native Windows symlink tests require unavailable privilege.",
+    "Executed on Windows Python 3.13.15; other runtime environments not certified.",
+    "No live provider/browser validation or fresh online dependency advisory audit.",
+    "Accurate clock across restarts and documented local filesystem/path-reopen assumptions remain.",
+    "Unverifiable old diagnostics deny replay rather than being upgraded.",
+    "Azure moderation can prevent generation; no guarantee of two outputs."
+  ],
+  "remainingRequiredWork": [],
+  "counting": "Gate selections overlap; do not sum counts into a unique total."
+}

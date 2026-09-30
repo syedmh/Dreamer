@@ -1,0 +1,177 @@
+{
+  "name": "T21 trusted protected operations",
+  "on": {
+    "workflow_call": {
+      "inputs": {
+        "operation": { "required": true, "type": "string" },
+        "stage": { "required": true, "type": "string" },
+        "sourceReleaseRunId": { "required": true, "type": "string" },
+        "expectedAppSha256": { "required": true, "type": "string" },
+        "preflightRunId": { "required": false, "type": "string", "default": "" },
+        "stageOperationInputsRunId": { "required": false, "type": "string", "default": "" },
+        "migrationAuthorizationRunId": { "required": false, "type": "string", "default": "" },
+        "ctoAuthorizationRunId": { "required": false, "type": "string", "default": "" },
+        "ctoApprovalReference": { "required": false, "type": "string", "default": "" }
+      },
+      "outputs": {
+        "artifactName": {
+          "description": "Checksum-bound raw preflight artifact name",
+          "value": "${{ jobs.protected-operation.outputs.artifactName }}"
+        }
+      }
+    }
+  },
+  "permissions": {},
+  "jobs": {
+    "protected-operation": {
+      "if": "${{ (inputs.operation == 'Preflight' || inputs.operation == 'StageOperations') && (inputs.stage == 'Development' || inputs.stage == 'Staging' || inputs.stage == 'Production') }}",
+      "permissions": {
+        "actions": "read",
+        "attestations": "write",
+        "id-token": "write"
+      },
+      "runs-on": "ubuntu-24.04",
+      "environment": {
+        "name": "${{ inputs.stage == 'Production' && 'Husaynia-Production' || format('Husaynia-{0}-Operations', inputs.stage) }}"
+      },
+      "concurrency": {
+        "group": "t21-trusted-${{ github.repository }}-${{ inputs.stage }}-${{ inputs.sourceReleaseRunId }}",
+        "cancel-in-progress": false
+      },
+      "timeout-minutes": 120,
+      "outputs": {
+        "artifactName": "${{ steps.producer.outputs.artifact-name }}"
+      },
+      "defaults": {
+        "run": {
+          "shell": "pwsh"
+        }
+      },
+      "steps": [
+        {
+          "name": "Validate caller selectors and external subject marker before token request",
+          "env": {
+            "T21_STAGE": "${{ inputs.stage }}",
+            "T21_OPERATION": "${{ inputs.operation }}",
+            "T21_CALLER_WORKFLOW_REF": "${{ github.workflow_ref }}",
+            "T21_RELEASE_RUN_ID": "${{ inputs.sourceReleaseRunId }}",
+            "T21_EXPECTED_APP_SHA256": "${{ inputs.expectedAppSha256 }}",
+            "T21_PREFLIGHT_RUN_ID": "${{ inputs.preflightRunId }}",
+            "T21_STAGE_INPUT_RUN_ID": "${{ inputs.stageOperationInputsRunId }}",
+            "T21_MIGRATION_AUTHORIZATION_RUN_ID": "${{ inputs.migrationAuthorizationRunId }}",
+            "T21_CTO_AUTHORIZATION_RUN_ID": "${{ inputs.ctoAuthorizationRunId }}",
+            "T21_CTO_APPROVAL_REFERENCE": "${{ inputs.ctoApprovalReference }}",
+            "T21_TRUSTED_WORKFLOW_REF": "${{ vars.T21_TRUSTED_WORKFLOW_REF }}",
+            "T21_STAGE_INPUTS_WORKFLOW_REF": "${{ vars.T21_STAGE_INPUTS_WORKFLOW_REF }}",
+            "T21_CTO_AUTHORIZATION_WORKFLOW_REF": "${{ vars.T21_CTO_AUTHORIZATION_WORKFLOW_REF }}",
+            "T21_MIGRATION_AUTHORIZATION_WORKFLOW_REF": "${{ vars.T21_MIGRATION_AUTHORIZATION_WORKFLOW_REF }}",
+            "T21_TRUSTED_BUNDLE_SHA256": "${{ vars.T21_TRUSTED_BUNDLE_SHA256 }}",
+            "T21_STAGE_TARGET_METADATA_JSON": "${{ vars.T21_STAGE_TARGET_METADATA_JSON }}",
+            "T21_TRUSTED_OIDC_SUBJECTS_JSON": "${{ vars.T21_TRUSTED_OIDC_SUBJECTS_JSON }}"
+          },
+          "run": "$rows = @([pscustomobject]@{ stage = 'Development'; workflowRef = 'syedmh/Dreamer/.github/workflows/operation-evidence-producer.yml@refs/heads/main' },[pscustomobject]@{ stage = 'Staging'; workflowRef = 'syedmh/Dreamer/.github/workflows/operation-evidence-producer.yml@refs/heads/main' },[pscustomobject]@{ stage = 'Production'; workflowRef = 'syedmh/Dreamer/.github/workflows/production-operation-evidence.yml@refs/heads/main' }); $caller = @($rows | Where-Object { $_.stage -ceq $env:T21_STAGE -and $_.workflowRef -ceq $env:T21_CALLER_WORKFLOW_REF }); $pinnedRefs = @(@{ value = $env:T21_TRUSTED_WORKFLOW_REF; pattern = '^syedmh/Dreamer/\\.github/workflows/trusted-protected-operations\\.yml@[a-f0-9]{40}$' },@{ value = $env:T21_STAGE_INPUTS_WORKFLOW_REF; pattern = '^syedmh/Dreamer/\\.github/workflows/stage-operation-inputs\\.yml@[a-f0-9]{40}$' },@{ value = $env:T21_CTO_AUTHORIZATION_WORKFLOW_REF; pattern = '^syedmh/Dreamer/\\.github/workflows/cto-authorization-record\\.yml@[a-f0-9]{40}$' },@{ value = $env:T21_MIGRATION_AUTHORIZATION_WORKFLOW_REF; pattern = '^syedmh/Dreamer/\\.github/workflows/migration-apply-authorization\\.yml@[a-f0-9]{40}$' }); $pinsValid = @($pinnedRefs | Where-Object { $_.value -notmatch $_.pattern -or $_.value.EndsWith('@' + ('0' * 40)) }).Count -eq 0; $baseValid = $env:T21_OPERATION -in @('Preflight','StageOperations') -and $env:T21_STAGE -in @('Development','Staging','Production') -and $caller.Count -eq 1 -and $env:T21_RELEASE_RUN_ID -match '^[1-9][0-9]*$' -and $env:T21_RELEASE_RUN_ID -cne $env:GITHUB_RUN_ID -and $env:T21_EXPECTED_APP_SHA256 -match '^[a-f0-9]{64}$' -and $env:T21_EXPECTED_APP_SHA256 -notmatch '^0{64}$' -and $env:T21_TRUSTED_BUNDLE_SHA256 -match '^[a-f0-9]{64}$' -and $env:T21_TRUSTED_BUNDLE_SHA256 -notmatch '^0{64}$' -and -not [string]::IsNullOrWhiteSpace($env:T21_STAGE_TARGET_METADATA_JSON) -and $pinsValid; $stageOperationsValid = if ($env:T21_OPERATION -ceq 'StageOperations') { $ids = @($env:T21_PREFLIGHT_RUN_ID,$env:T21_STAGE_INPUT_RUN_ID,$env:T21_MIGRATION_AUTHORIZATION_RUN_ID); @($ids | Where-Object { $_ -notmatch '^[1-9][0-9]*$' -or $_ -ceq $env:GITHUB_RUN_ID }).Count -eq 0 -and $env:T21_PREFLIGHT_RUN_ID -cne $env:T21_STAGE_INPUT_RUN_ID } else { [string]::IsNullOrWhiteSpace($env:T21_PREFLIGHT_RUN_ID) -and [string]::IsNullOrWhiteSpace($env:T21_STAGE_INPUT_RUN_ID) -and [string]::IsNullOrWhiteSpace($env:T21_MIGRATION_AUTHORIZATION_RUN_ID) }; $productionValid = if ($env:T21_OPERATION -ceq 'StageOperations' -and $env:T21_STAGE -ceq 'Production') { $env:T21_CTO_AUTHORIZATION_RUN_ID -match '^[1-9][0-9]*$' -and $env:T21_CTO_AUTHORIZATION_RUN_ID -cne $env:GITHUB_RUN_ID -and $env:T21_CTO_APPROVAL_REFERENCE -match '^[A-Za-z0-9][A-Za-z0-9._:/#-]{0,127}$' } else { [string]::IsNullOrWhiteSpace($env:T21_CTO_AUTHORIZATION_RUN_ID) -and [string]::IsNullOrWhiteSpace($env:T21_CTO_APPROVAL_REFERENCE) }; if (-not $baseValid -or -not $stageOperationsValid -or -not $productionValid) { throw 'T21 completed prior-run selectors, exact caller, pins, or Production-only authorization inputs are invalid.' }; try { $subjects = @($env:T21_TRUSTED_OIDC_SUBJECTS_JSON | ConvertFrom-Json -DateKind String) } catch { throw 'T21 external exact-subject marker is absent or malformed before token request.' }; if ($subjects.Count -ne 3 -or @($subjects | Where-Object { $_ -isnot [string] -or [string]::IsNullOrWhiteSpace($_) }).Count -ne 0 -or @($subjects | Select-Object -Unique).Count -ne 3) { throw 'T21 external exact-subject marker does not match the three frozen caller rows.' }"
+        },
+        {
+          "name": "Resolve canonical C6 and compare protected archive before extraction",
+          "env": {
+            "GITHUB_TOKEN": "${{ github.token }}",
+            "T21_RELEASE_RUN_ID": "${{ inputs.sourceReleaseRunId }}",
+            "T21_EXPECTED_APP_SHA256": "${{ inputs.expectedAppSha256 }}",
+            "T21_TRUSTED_BUNDLE_SHA256": "${{ vars.T21_TRUSTED_BUNDLE_SHA256 }}",
+            "T21_STAGE_TARGET_METADATA_JSON": "${{ vars.T21_STAGE_TARGET_METADATA_JSON }}"
+          },
+          "run": "if ($PSVersionTable.PSVersion -lt [version]'7.4.0') { throw 'Binary-safe native redirection is unavailable.' }\nif ($env:T21_RELEASE_RUN_ID -notmatch '^[1-9][0-9]*$' -or $env:T21_EXPECTED_APP_SHA256 -notmatch '^[a-f0-9]{64}$' -or $env:T21_TRUSTED_BUNDLE_SHA256 -notmatch '^[a-f0-9]{64}$' -or [string]::IsNullOrWhiteSpace($env:T21_STAGE_TARGET_METADATA_JSON)) { throw 'T21 immutable C6 selector, protected bundle SHA, or protected stage metadata is malformed.' }\n$run = gh api ('repos/{0}/actions/runs/{1}' -f $env:GITHUB_REPOSITORY, $env:T21_RELEASE_RUN_ID) | ConvertFrom-Json\n$consumer = gh api ('repos/{0}/actions/runs/{1}' -f $env:GITHUB_REPOSITORY, $env:GITHUB_RUN_ID) | ConvertFrom-Json\n$artifacts = gh api ('repos/{0}/actions/runs/{1}/artifacts' -f $env:GITHUB_REPOSITORY, $env:T21_RELEASE_RUN_ID) | ConvertFrom-Json\n$artifactMatches = @($artifacts.artifacts | Where-Object { $_.workflow_run.id -eq $run.id -and $_.name -match '^husaynia-site-[0-9A-Za-z][0-9A-Za-z._-]{0,127}$' -and $_.expired -eq $false -and $_.digest -match '^sha256:[a-f0-9]{64}$' })\n$updated = [DateTimeOffset]::Parse([string]$run.updated_at)\n$consumerCreated = [DateTimeOffset]::Parse([string]$consumer.created_at)\nif ($run.repository.full_name -ne 'syedmh/Dreamer' -or $run.path -ne '.github/workflows/release-build-and-nonproduction.yml' -or $run.head_branch -ne 'main' -or $run.status -ne 'completed' -or $run.conclusion -ne 'success' -or [string]$run.id -ceq [string]$consumer.id -or $updated.Offset -ne [TimeSpan]::Zero -or $consumerCreated.Offset -ne [TimeSpan]::Zero -or $updated -gt $consumerCreated -or $artifactMatches.Count -ne 1) { throw 'T21 C6 GitHub API identity/digest/consumer binding failed.' }\n$artifact = $artifactMatches[0]\n$carrier = Join-Path $env:RUNNER_TEMP 'c6-carrier.zip'\nif (Test-Path -LiteralPath $carrier) { throw 'T21 C6 carrier path was not empty before download.' }\n& gh api ('repos/{0}/actions/artifacts/{1}/zip' -f $env:GITHUB_REPOSITORY, $artifact.id) > $carrier\n$downloadExit = $LASTEXITCODE\nif ($downloadExit -ne 0 -or -not (Test-Path -LiteralPath $carrier -PathType Leaf)) { if (Test-Path -LiteralPath $carrier) { [IO.File]::Delete($carrier) }; throw 'T21 C6 binary download failed or produced no carrier.' }\n$carrierLength = (Get-Item -LiteralPath $carrier).Length\nif ($carrierLength -lt 1 -or $carrierLength -gt 2GB) { [IO.File]::Delete($carrier); throw 'T21 C6 carrier exceeds size, count, or decompression limits.' }\nif ((Get-FileHash -LiteralPath $carrier -Algorithm SHA256).Hash.ToLowerInvariant() -cne $artifact.digest.Substring(7)) { [IO.File]::Delete($carrier); throw 'T21 C6 carrier archive digest changed.' }\nAdd-Type -AssemblyName System.IO.Compression\n$expectedEntryName = 'operations/protected-execution-bundle.zip'\n$fixedBundlePath = Join-Path $env:RUNNER_TEMP 't21-trusted-protected-execution-bundle.zip'\nif (Test-Path -LiteralPath $fixedBundlePath) { throw 'T21 fixed trusted bundle path was not empty.' }\n$archiveStream = [IO.File]::Open($carrier,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read)\n$archive = $null\n$createdFixedBundle = $false\ntry {\n  $archive = [IO.Compression.ZipArchive]::new($archiveStream,[IO.Compression.ZipArchiveMode]::Read,$false)\n  $entries = @($archive.Entries)\n  if ($entries.Count -lt 1 -or $entries.Count -gt 4096) { throw 'T21 C6 carrier exceeds size, count, or decompression limits.' }\n  $seen = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)\n  $bundleEntry = $null\n  $totalBytes = [int64]0\n  foreach ($entry in $entries) {\n    $name = [string]$entry.FullName\n    $segments = @($name.TrimEnd('/').Split('/'))\n    $attributes = [uint32]([int64]$entry.ExternalAttributes -band 0xffffffffL)\n    $unixType = (($attributes -shr 16) -band 0xf000)\n    if ([string]::IsNullOrWhiteSpace($name) -or $name.Length -gt 512 -or $name -match '[\\x00-\\x1F\\x7F-\\x9F]' -or $name.Contains('\\') -or $name.StartsWith('/') -or $name -match '^[A-Za-z]:' -or $name.Contains('//') -or $name.Normalize([Text.NormalizationForm]::FormC) -cne $name -or @($segments | Where-Object { [string]::IsNullOrWhiteSpace($_) -or $_ -in @('.','..') -or $_.Length -gt 255 -or $_ -cne $_.Trim() -or $_.EndsWith('.') -or $_.Contains(':') -or $_ -match '^(?i:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\\..*)?$' }).Count -ne 0 -or -not $seen.Add($name.TrimEnd('/')) -or $unixType -notin @(0,0x4000,0x8000) -or ($attributes -band 0x400) -ne 0) { throw 'T21 C6 carrier entry name or type is unsafe.' }\n    if (-not $name.EndsWith('/')) {\n      if ($entry.Length -lt 0 -or $entry.CompressedLength -lt 0 -or $entry.Length -gt 1GB -or ($entry.Length -gt 0 -and $entry.CompressedLength -eq 0) -or ($entry.CompressedLength -gt 0 -and ([decimal]$entry.Length/[decimal]$entry.CompressedLength) -gt 1000)) { throw 'T21 C6 carrier exceeds size, count, or decompression limits.' }\n      $totalBytes += $entry.Length\n      if ($totalBytes -gt 8GB) { throw 'T21 C6 carrier exceeds size, count, or decompression limits.' }\n      if ($name -ceq $expectedEntryName) { if ($null -ne $bundleEntry -or $entry.Length -gt 32MB) { throw 'T21 C6 carrier does not contain exactly one canonical protected execution archive.' }; $bundleEntry = $entry }\n    }\n  }\n  if ($null -eq $bundleEntry) { throw 'T21 C6 carrier does not contain exactly one canonical protected execution archive.' }\n  $entryStream = $bundleEntry.Open()\n  $outputStream = [IO.File]::Open($fixedBundlePath,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)\n  $createdFixedBundle = $true\n  $hasher = [Security.Cryptography.IncrementalHash]::CreateHash([Security.Cryptography.HashAlgorithmName]::SHA256)\n  try {\n    $buffer = [byte[]]::new(128KB); $copied = [int64]0\n    while (($read = $entryStream.Read($buffer,0,$buffer.Length)) -gt 0) { $copied += $read; if ($copied -gt 32MB -or $copied -gt $bundleEntry.Length) { throw 'T21 C6 carrier exceeds size, count, or decompression limits.' }; $hasher.AppendData($buffer,0,$read); $outputStream.Write($buffer,0,$read) }\n    if ($copied -ne $bundleEntry.Length) { throw 'T21 C6 carrier protected archive length changed while streaming.' }\n    $outputStream.Flush($true)\n    $actualBundleSha256 = [Convert]::ToHexString($hasher.GetHashAndReset()).ToLowerInvariant()\n  }\n  finally { $hasher.Dispose(); $outputStream.Dispose(); $entryStream.Dispose() }\n  if ($actualBundleSha256 -cne $env:T21_TRUSTED_BUNDLE_SHA256) { throw 'T21 protected archive does not match the protected external SHA before extraction.' }\n}\ncatch { if ($createdFixedBundle -and (Test-Path -LiteralPath $fixedBundlePath)) { [IO.File]::Delete($fixedBundlePath) }; throw }\nfinally { if ($null -ne $archive) { $archive.Dispose() } else { $archiveStream.Dispose() } }\n('T21_TRUSTED_BUNDLE_ARCHIVE={0}' -f $fixedBundlePath) | Add-Content -LiteralPath $env:GITHUB_ENV -Encoding utf8\n[IO.File]::WriteAllText((Join-Path $env:RUNNER_TEMP 'stage-target.json'),$env:T21_STAGE_TARGET_METADATA_JSON,[Text.UTF8Encoding]::new($false))"
+        },
+        {
+          "name": "Validate bundle and resolve all completed pre-OIDC provenance",
+          "env": {
+            "GITHUB_TOKEN": "${{ github.token }}",
+            "T21_OPERATION": "${{ inputs.operation }}",
+            "T21_STAGE": "${{ inputs.stage }}",
+            "T21_RELEASE_RUN_ID": "${{ inputs.sourceReleaseRunId }}",
+            "T21_EXPECTED_APP_SHA256": "${{ inputs.expectedAppSha256 }}",
+            "T21_PREFLIGHT_RUN_ID": "${{ inputs.preflightRunId }}",
+            "T21_STAGE_INPUT_RUN_ID": "${{ inputs.stageOperationInputsRunId }}",
+            "T21_MIGRATION_AUTHORIZATION_RUN_ID": "${{ inputs.migrationAuthorizationRunId }}",
+            "T21_CTO_AUTHORIZATION_RUN_ID": "${{ inputs.ctoAuthorizationRunId }}",
+            "T21_CTO_APPROVAL_REFERENCE": "${{ inputs.ctoApprovalReference }}",
+            "T21_CALLER_WORKFLOW_REF": "${{ github.workflow_ref }}",
+            "T21_TRUSTED_WORKFLOW_REF": "${{ vars.T21_TRUSTED_WORKFLOW_REF }}",
+            "T21_STAGE_INPUTS_WORKFLOW_REF": "${{ vars.T21_STAGE_INPUTS_WORKFLOW_REF }}",
+            "T21_CTO_AUTHORIZATION_WORKFLOW_REF": "${{ vars.T21_CTO_AUTHORIZATION_WORKFLOW_REF }}",
+            "T21_MIGRATION_AUTHORIZATION_WORKFLOW_REF": "${{ vars.T21_MIGRATION_AUTHORIZATION_WORKFLOW_REF }}",
+            "T21_TRUSTED_BUNDLE_SHA256": "${{ vars.T21_TRUSTED_BUNDLE_SHA256 }}"
+          },
+          "run": "if (-not (Test-Path -LiteralPath $env:T21_TRUSTED_BUNDLE_ARCHIVE -PathType Leaf)) { throw 'Protected archive was not hash-verified before extraction.' }; $bundleRoot = Join-Path $env:RUNNER_TEMP 'protected-bundle'; Expand-Archive -LiteralPath $env:T21_TRUSTED_BUNDLE_ARCHIVE -DestinationPath $bundleRoot; $bundleRoot = (Resolve-Path -LiteralPath $bundleRoot).Path; & \"$bundleRoot/eng/artifact/Test-ProtectedExecutionBundle.ps1\" -ExtractedRoot $bundleRoot -ExpectedApplicationSha256 $env:T21_EXPECTED_APP_SHA256; if ($LASTEXITCODE -ne 0) { throw 'C6 protected bundle validation failed.' }; Get-ChildItem -LiteralPath $bundleRoot -Recurse -File -Force | ForEach-Object { $_.IsReadOnly = $true }; if (-not $IsWindows) { & chmod -R a-w -- $bundleRoot; if ($LASTEXITCODE -ne 0) { throw 'Could not make the protected bundle read-only.' } }; & \"$bundleRoot/eng/artifact/Test-ProtectedExecutionBundle.ps1\" -ExtractedRoot $bundleRoot -ExpectedApplicationSha256 $env:T21_EXPECTED_APP_SHA256 -RequireReadOnly; if ($LASTEXITCODE -ne 0) { throw 'C6 protected bundle read-only validation failed.' }; $env:T21_TRUSTED_BUNDLE_ROOT = $bundleRoot; \"T21_TRUSTED_BUNDLE_ROOT=$bundleRoot\" | Add-Content -LiteralPath $env:GITHUB_ENV -Encoding utf8; & \"$bundleRoot/eng/promotion/Test-ExternalTrustMarker.ps1\" -ValidateBundleOnly -ExpectedBundleSha256 $env:T21_TRUSTED_BUNDLE_SHA256 -ActualBundleSha256 $env:T21_TRUSTED_BUNDLE_SHA256; $policyPath = \"$bundleRoot/pipelines/config/protected-operation-policy.json\"; $resolver = \"$bundleRoot/eng/promotion/Resolve-GitHubArtifactProvenance.ps1\"; $releaseOutput = Join-Path $env:RUNNER_TEMP 'release'; & $resolver -ExpectedRole release-c6 -RunId $env:T21_RELEASE_RUN_ID -ConsumerRunId $env:GITHUB_RUN_ID -Stage $env:T21_STAGE -ApplicationSha256 $env:T21_EXPECTED_APP_SHA256 -BundleSha256 $env:T21_TRUSTED_BUNDLE_SHA256 -OutputRoot $releaseOutput -PolicyPath $policyPath; if ($LASTEXITCODE -ne 0) { throw 'T21 canonical completed release provenance resolution failed.' }; $releasePath = Join-Path $releaseOutput 'verified-provenance.json'; $release = Get-Content -LiteralPath $releasePath -Raw | ConvertFrom-Json -DateKind String; $releaseRoot = Join-Path (Join-Path $releaseOutput 'artifact') ([string]$release.artifact.name); $manifestPath = Join-Path $releaseRoot 'release/release-manifest.json'; $manifestSha = (Get-FileHash -LiteralPath $manifestPath -Algorithm SHA256).Hash.ToLowerInvariant(); \"T21_RELEASE_VERIFIED_PROVENANCE_PATH=$releasePath\" | Add-Content -LiteralPath $env:GITHUB_ENV -Encoding utf8; if ($env:T21_OPERATION -ceq 'StageOperations') { & $resolver -ExpectedRole trusted-preflight -RunId $env:T21_PREFLIGHT_RUN_ID -ConsumerRunId $env:GITHUB_RUN_ID -Stage $env:T21_STAGE -ApplicationSha256 $env:T21_EXPECTED_APP_SHA256 -BundleSha256 $env:T21_TRUSTED_BUNDLE_SHA256 -ReleaseManifestSha256 $manifestSha -ReleaseCommitSha $release.run.commitSha -ExpectedTopLevelCallerWorkflowRef $env:T21_CALLER_WORKFLOW_REF -ExpectedProducerWorkflowRef $env:T21_TRUSTED_WORKFLOW_REF -OutputRoot (Join-Path $env:RUNNER_TEMP 'preflight') -PolicyPath $policyPath; & $resolver -ExpectedRole stage-operation-inputs -RunId $env:T21_STAGE_INPUT_RUN_ID -ConsumerRunId $env:GITHUB_RUN_ID -Stage $env:T21_STAGE -ApplicationSha256 $env:T21_EXPECTED_APP_SHA256 -BundleSha256 $env:T21_TRUSTED_BUNDLE_SHA256 -ReleaseManifestSha256 $manifestSha -ReleaseCommitSha $release.run.commitSha -ExpectedTopLevelCallerWorkflowRef $env:T21_CALLER_WORKFLOW_REF -ExpectedProducerWorkflowRef $env:T21_STAGE_INPUTS_WORKFLOW_REF -OutputRoot (Join-Path $env:RUNNER_TEMP 'stage-inputs') -PolicyPath $policyPath; if ($env:T21_STAGE -ceq 'Production') { & $resolver -ExpectedRole cto-authorization -RunId $env:T21_CTO_AUTHORIZATION_RUN_ID -ConsumerRunId $env:GITHUB_RUN_ID -Stage Production -ApplicationSha256 $env:T21_EXPECTED_APP_SHA256 -BundleSha256 $env:T21_TRUSTED_BUNDLE_SHA256 -ReleaseManifestSha256 $manifestSha -ReleaseCommitSha $release.run.commitSha -ExpectedTopLevelCallerWorkflowRef 'syedmh/Dreamer/.github/workflows/cto-authorization-record.yml@refs/heads/main' -ExpectedProducerWorkflowRef $env:T21_CTO_AUTHORIZATION_WORKFLOW_REF -OutputRoot (Join-Path $env:RUNNER_TEMP 'cto-authorization') -PolicyPath $policyPath }; $preflightEvidencePath = Join-Path $env:RUNNER_TEMP 'preflight/artifact/migration-preflight.json'; & $resolver -ExpectedRole migration-authorization -RunId $env:T21_MIGRATION_AUTHORIZATION_RUN_ID -ConsumerRunId $env:GITHUB_RUN_ID -Stage $env:T21_STAGE -ApplicationSha256 $env:T21_EXPECTED_APP_SHA256 -BundleSha256 $env:T21_TRUSTED_BUNDLE_SHA256 -ReleaseManifestSha256 $manifestSha -ReleaseCommitSha $release.run.commitSha -PreflightEvidenceSha256 (Get-FileHash -LiteralPath $preflightEvidencePath -Algorithm SHA256).Hash.ToLowerInvariant() -ExpectedTopLevelCallerWorkflowRef 'syedmh/Dreamer/.github/workflows/migration-apply-authorization.yml@refs/heads/main' -ExpectedProducerWorkflowRef $env:T21_MIGRATION_AUTHORIZATION_WORKFLOW_REF -OutputRoot (Join-Path $env:RUNNER_TEMP 'migration-authorization') -PolicyPath $policyPath }; $arguments = @{ Operation = $env:T21_OPERATION; Stage = $env:T21_STAGE; ExpectedAppSha256 = $env:T21_EXPECTED_APP_SHA256; ExpectedBundleSha256 = $env:T21_TRUSTED_BUNDLE_SHA256; ReleaseVerifiedProvenancePath = $releasePath; StageTargetMetadataPath = (Join-Path $env:RUNNER_TEMP 'stage-target.json'); PolicyPath = $policyPath }; if ($env:T21_OPERATION -ceq 'StageOperations') { $arguments.PreflightVerifiedProvenancePath = (Join-Path $env:RUNNER_TEMP 'preflight/verified-provenance.json'); $arguments.StageOperationInputVerifiedProvenancePath = (Join-Path $env:RUNNER_TEMP 'stage-inputs/verified-provenance.json'); $arguments.MigrationAuthorizationVerifiedProvenancePath = (Join-Path $env:RUNNER_TEMP 'migration-authorization/verified-provenance.json'); if ($env:T21_STAGE -ceq 'Production') { $arguments.CtoAuthorizationVerifiedProvenancePath = (Join-Path $env:RUNNER_TEMP 'cto-authorization/verified-provenance.json'); $arguments.CtoApprovalReference = $env:T21_CTO_APPROVAL_REFERENCE } }; & \"$bundleRoot/eng/promotion/Test-TrustedProtectedOperationInputs.ps1\" @arguments"
+        },
+        {
+          "name": "Enforce immutable stage enablement before token request",
+          "if": "${{ inputs.operation == 'Preflight' }}",
+          "env": {
+            "T21_STAGE": "${{ inputs.stage }}",
+            "T21_EXPECTED_APP_SHA256": "${{ inputs.expectedAppSha256 }}"
+          },
+          "run": ". \"$env:T21_TRUSTED_BUNDLE_ROOT/eng/common/Release.Common.ps1\"; . \"$env:T21_TRUSTED_BUNDLE_ROOT/eng/artifact/migrations/bundle/Migration.Common.ps1\"; $policy = Get-Content -LiteralPath \"$env:T21_TRUSTED_BUNDLE_ROOT/pipelines/config/protected-operation-policy.json\" -Raw | ConvertFrom-Json; $null = Assert-StageDeploymentEnabled -Policy $policy -Stage $env:T21_STAGE -Operation 'Trusted protected Preflight'; $null = Assert-MigrationSqlRuntimeCompatibility -BundleRoot $env:T21_TRUSTED_BUNDLE_ROOT -ExpectedApplicationSha256 $env:T21_EXPECTED_APP_SHA256"
+        },
+        {
+          "name": "Mint OIDC only after verified provenance",
+          "if": "${{ inputs.operation == 'Preflight' }}",
+          "env": {
+            "T21_EXTERNAL_WORKFLOW_REF": "${{ vars.T21_TRUSTED_WORKFLOW_REF }}",
+            "T21_EXTERNAL_SUBJECTS": "${{ vars.T21_TRUSTED_OIDC_SUBJECTS_JSON }}",
+            "T21_EXTERNAL_BUNDLE_SHA256": "${{ vars.T21_TRUSTED_BUNDLE_SHA256 }}"
+          },
+          "run": "$response = Invoke-RestMethod -Method Get -Uri \"$env:ACTIONS_ID_TOKEN_REQUEST_URL&audience=api%3A%2F%2FAzureADTokenExchange\" -Headers @{ Authorization = \"bearer $env:ACTIONS_ID_TOKEN_REQUEST_TOKEN\" }; $payload = $response.value.Split('.')[1].Replace('-','+').Replace('_','/'); while ($payload.Length % 4) { $payload += '=' }; [IO.File]::WriteAllBytes((Join-Path $env:RUNNER_TEMP 'oidc-claims.json'),[Convert]::FromBase64String($payload)); & \"$env:T21_TRUSTED_BUNDLE_ROOT/eng/promotion/Test-ExternalTrustMarker.ps1\" -ClaimsPath (Join-Path $env:RUNNER_TEMP 'oidc-claims.json') -Stage '${{ inputs.stage }}' -ExpectedWorkflowRef $env:T21_EXTERNAL_WORKFLOW_REF -ExpectedSubjectsJson $env:T21_EXTERNAL_SUBJECTS -ExpectedBundleSha256 $env:T21_EXTERNAL_BUNDLE_SHA256 -ActualBundleSha256 $env:T21_EXTERNAL_BUNDLE_SHA256"
+        },
+        {
+          "name": "Login with externally bound stage identity",
+          "if": "${{ inputs.operation == 'Preflight' }}",
+          "uses": "azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6",
+          "with": {
+            "client-id": "${{ inputs.stage == 'Development' && vars.AZURE_CLIENT_ID_DEVELOPMENT || inputs.stage == 'Staging' && vars.AZURE_CLIENT_ID_STAGING || vars.AZURE_CLIENT_ID_PRODUCTION }}",
+            "tenant-id": "${{ inputs.stage == 'Development' && vars.AZURE_TENANT_ID_DEVELOPMENT || inputs.stage == 'Staging' && vars.AZURE_TENANT_ID_STAGING || vars.AZURE_TENANT_ID_PRODUCTION }}",
+            "subscription-id": "${{ inputs.stage == 'Development' && vars.AZURE_SUBSCRIPTION_ID_DEVELOPMENT || inputs.stage == 'Staging' && vars.AZURE_SUBSCRIPTION_ID_STAGING || vars.AZURE_SUBSCRIPTION_ID_PRODUCTION }}"
+          }
+        },
+        {
+          "name": "Recheck immutable extraction",
+          "if": "${{ inputs.operation == 'Preflight' }}",
+          "run": "& \"$env:T21_TRUSTED_BUNDLE_ROOT/eng/artifact/Test-ProtectedExecutionBundle.ps1\" -ExtractedRoot $env:T21_TRUSTED_BUNDLE_ROOT -ExpectedApplicationSha256 '${{ inputs.expectedAppSha256 }}' -RequireReadOnly"
+        },
+        {
+          "name": "Produce canonical attested raw preflight after read-only login",
+          "id": "producer",
+          "if": "${{ inputs.operation == 'Preflight' }}",
+          "env": {
+            "T21_STAGE": "${{ inputs.stage }}",
+            "T21_EXPECTED_APP_SHA256": "${{ inputs.expectedAppSha256 }}",
+            "T21_TRUSTED_BUNDLE_SHA256": "${{ vars.T21_TRUSTED_BUNDLE_SHA256 }}",
+            "T21_TOP_LEVEL_CALLER_WORKFLOW_REF": "${{ github.workflow_ref }}",
+            "T21_PRODUCER_WORKFLOW_REF": "${{ vars.T21_TRUSTED_WORKFLOW_REF }}",
+            "T21_MIGRATION_IDENTITY_MODE": "readonly"
+          },
+          "run": "$outputRoot = Join-Path $env:RUNNER_TEMP 'raw-evidence'; & \"$env:T21_TRUSTED_BUNDLE_ROOT/eng/promotion/Invoke-OperationEvidenceProducer.ps1\" -Mode Preflight -Stage $env:T21_STAGE -ExpectedAppSha256 $env:T21_EXPECTED_APP_SHA256 -ReleaseVerifiedProvenancePath $env:T21_RELEASE_VERIFIED_PROVENANCE_PATH -TopLevelCallerWorkflowRef $env:T21_TOP_LEVEL_CALLER_WORKFLOW_REF -ProducerWorkflowRef $env:T21_PRODUCER_WORKFLOW_REF -ProducerRunId $env:GITHUB_RUN_ID -ProducerRunAttempt ([int]$env:GITHUB_RUN_ATTEMPT) -ProducerCommitSha $env:GITHUB_SHA -StageTargetMetadataPath (Join-Path $env:RUNNER_TEMP 'stage-target.json') -OutputRoot $outputRoot -TrustedBundleSha256 $env:T21_TRUSTED_BUNDLE_SHA256 -PolicyPath \"$env:T21_TRUSTED_BUNDLE_ROOT/pipelines/config/protected-operation-policy.json\" -AllowProtectedOperations; if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath (Join-Path $outputRoot 't21-producer-manifest.json') -PathType Leaf)) { throw 'T21 canonical raw-preflight producer did not create its manifest.' }; \"artifact-name=raw-$($env:T21_STAGE.ToLowerInvariant())-preflight-$env:T21_EXPECTED_APP_SHA256\" | Add-Content -LiteralPath $env:GITHUB_OUTPUT -Encoding utf8"
+        },
+        {
+          "name": "Upload canonical raw preflight producer artifact",
+          "if": "${{ inputs.operation == 'Preflight' }}",
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "${{ steps.producer.outputs.artifact-name }}",
+            "path": "${{ runner.temp }}/raw-evidence",
+            "if-no-files-found": "error",
+            "overwrite": false
+          }
+        },
+        {
+          "name": "Attest raw producer manifest",
+          "if": "${{ inputs.operation == 'Preflight' }}",
+          "uses": "actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be",
+          "with": {
+            "subject-path": "${{ runner.temp }}/raw-evidence/t21-producer-manifest.json"
+          }
+        }
+      ]
+    }
+  }
+}

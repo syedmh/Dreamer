@@ -1,0 +1,158 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.46.1.21595",
+      "templateHash": "5990592027944892698"
+    }
+  },
+  "parameters": {
+    "deployResources": {
+      "type": "bool"
+    },
+    "location": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "object"
+    },
+    "sqlServerName": {
+      "type": "string"
+    },
+    "sqlDatabaseName": {
+      "type": "string"
+    },
+    "sqlSkuName": {
+      "type": "string"
+    },
+    "sqlSkuTier": {
+      "type": "string"
+    },
+    "sqlSkuCapacity": {
+      "type": "int"
+    },
+    "backupStorageRedundancy": {
+      "type": "string"
+    },
+    "publicNetworkAccess": {
+      "type": "string"
+    },
+    "firewallRules": {
+      "type": "array"
+    },
+    "logAnalyticsWorkspaceResourceId": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2023-08-01-preview",
+      "name": "[parameters('sqlServerName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "version": "12.0",
+        "publicNetworkAccess": "[parameters('publicNetworkAccess')]",
+        "minimalTlsVersion": "1.2"
+      }
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Sql/servers/auditingSettings",
+      "apiVersion": "2023-08-01-preview",
+      "name": "[format('{0}/{1}', parameters('sqlServerName'), 'default')]",
+      "properties": {
+        "state": "Enabled",
+        "isAzureMonitorTargetEnabled": true,
+        "auditActionsAndGroups": [
+          "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP",
+          "FAILED_DATABASE_AUTHENTICATION_GROUP"
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]"
+      ]
+    },
+    {
+      "copy": {
+        "name": "sqlFirewallRuleResources",
+        "count": "[length(parameters('firewallRules'))]"
+      },
+      "condition": "[and(parameters('deployResources'), equals(parameters('publicNetworkAccess'), 'Enabled'))]",
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "apiVersion": "2023-08-01-preview",
+      "name": "[format('{0}/{1}', parameters('sqlServerName'), parameters('firewallRules')[copyIndex()].name)]",
+      "properties": {
+        "startIpAddress": "[parameters('firewallRules')[copyIndex()].startIpAddress]",
+        "endIpAddress": "[parameters('firewallRules')[copyIndex()].endIpAddress]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Sql/servers/databases",
+      "apiVersion": "2023-08-01-preview",
+      "name": "[format('{0}/{1}', parameters('sqlServerName'), parameters('sqlDatabaseName'))]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "sku": {
+        "name": "[parameters('sqlSkuName')]",
+        "tier": "[parameters('sqlSkuTier')]",
+        "capacity": "[parameters('sqlSkuCapacity')]"
+      },
+      "properties": {
+        "requestedBackupStorageRedundancy": "[parameters('backupStorageRedundancy')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Insights/diagnosticSettings",
+      "apiVersion": "2021-05-01-preview",
+      "scope": "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlServerName'), parameters('sqlDatabaseName'))]",
+      "name": "sql-to-log-analytics",
+      "properties": {
+        "workspaceId": "[parameters('logAnalyticsWorkspaceResourceId')]",
+        "logs": [
+          {
+            "category": "Errors",
+            "enabled": true
+          },
+          {
+            "category": "Timeouts",
+            "enabled": true
+          },
+          {
+            "category": "Blocks",
+            "enabled": true
+          },
+          {
+            "category": "Deadlocks",
+            "enabled": true
+          },
+          {
+            "category": "SQLSecurityAuditEvents",
+            "enabled": true
+          }
+        ],
+        "metrics": [
+          {
+            "category": "Basic",
+            "enabled": true
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlServerName'), parameters('sqlDatabaseName'))]"
+      ]
+    }
+  ]
+}

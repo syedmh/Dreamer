@@ -1,0 +1,10 @@
+{
+  "implementation": "Process-only --retry-input-rejection permits guarded current-request adoption for never-sent MPO input rejections; defaults stay fail-closed.",
+  "developerEvidence": "Changed-prompt explicit-retry regression failed before implementation; 96 new cases passed afterward.",
+  "independentTests": {"fullNonperformanceBeforeIndependentAdditions": "1052 passed, 2 Windows symlink privilege skips, 3 performance exclusions", "combinedRetryFiles": "109 passed including 13 independent additions", "negativeControls": "9 expected failures across 5 guard-removal controls; subsequent clean independent run 13 passed"},
+  "review": "APPROVED; 33 independent in-memory CAS/audit checks passed; no blocking security findings.",
+  "operatorQA": "Real offline CLI subprocesses: default changed-prompt failure exit 4 with zero calls, explicit retry exit 0 same job one current-prompt call, repeat idempotent, watch flag rejected exit 2.",
+  "judge": "APPROVED for bounded offline fix and operator handoff.",
+  "runtime": "No live photo submission, browser authentication, watcher startup, or real database mutation.",
+  "handoff": "User stops watcher, executes one-shot process with --retry-input-rejection and existing photo path, then restarts normal watcher after success."
+}

@@ -1,0 +1,36 @@
+{
+  "objective": "Resume every paused phase, review accumulated TCFComic work, fix defects, and reach an evidence-backed final verdict.",
+  "authorization": "User explicitly resumed all phases on September 25, 2026. Code, tests, review and remediation authorized; no commits, production resets, live submissions or policy bypasses.",
+  "features": [
+    "Folder scanning/stability, immutable staging, input/output validation including JPEG-named MPO primary photo handling",
+    "Azure and public OpenAI transports, secure interactive corporate authentication, safe diagnostic reporting",
+    "Durable queue, shutdown/recovery, atomic publication, rate limiting and bounded retries",
+    "Named prompt variants, independent original-image transformations, per-variant idempotency, progress and heartbeat",
+    "Explicit state archival reset with locking, cooldown preservation and no existing-database upgrade",
+    "Guarded explicit input and provider-failure reconsideration with immutable audits and lifetime attempt limits",
+    "Configuration, packaging, documentation and current prompt preservation"
+  ],
+  "requiredPhases": ["requirements", "architecture", "task planning", "implementation/remediation", "independent tests", "security review", "code review", "operator QA", "final independent judgment"],
+  "nonNegotiables": [
+    "No actual incoming/output/state/photo access by validation agents; use synthetic isolated fixtures.",
+    "Preserve exact current active prompt strings and configuration unless a specific correction is approved.",
+    "Do not migrate the existing production queue or reset it.",
+    "No new live image requests or browser authentication; prior diagnostic authorization was one request and is exhausted.",
+    "Moderation-blocked requests remain terminal, not bypassed or rewritten for evasion.",
+    "Never weaken tests to obtain passing results; fixture/API compatibility corrections must preserve intended assertions.",
+    "No commits, pushes, destructive operations, additional dependencies without demonstrated need, or unrelated TCFAnimation changes."
+  ],
+  "knownEvidence": {
+    "lastFullSuiteBeforeRetryChanges": "1163 passed, 2 Windows privilege symlink skips, 3 performance deselections",
+    "subsequentChanges": "Expanded Azure retries, explicit failed-variant recovery, read-only config validation and moderation diagnostics only compiled/built; these need full independent coverage.",
+    "confirmedModeration": "One authorized live diagnostic returned HTTP 400 moderation_blocked/image_generation_user_error. User's latest DSC_5492.JPG log also explicitly reports moderation_blocked.",
+    "remainingLimitations": "Native symlink privileges absent; persisted cooldown assumes accurate OS clock across restarts; existing documented path-reopen race assumptions require evaluation without claiming new guarantees."
+  },
+  "acceptance": [
+    "Actual executed full regression and relevant performance tests; independently added missing negative/recovery/SDK contract coverage.",
+    "Independent review and security with no unresolved blocking findings.",
+    "Real offline CLI operator journeys demonstrate two variants or truthful per-variant terminal failure, no replay of success, and safe reset/recovery.",
+    "Artifacts and wheel are buildable; documentation accurately describes flags, statuses, limits and real error behavior.",
+    "Final judge distinguishes software correctness from guaranteed image generation: provider moderation can legitimately prevent one output."
+  ]
+}

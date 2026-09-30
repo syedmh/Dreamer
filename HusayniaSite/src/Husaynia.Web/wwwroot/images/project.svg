@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc" viewBox="0 0 800 520">
+  <title id="title">Husaynia project placeholder</title>
+  <desc id="desc">A synthetic illustration of a building project with cranes and a crimson sky.</desc>
+  <rect width="800" height="520" fill="#890000"/>
+  <path d="M0 390 180 285l145 80 160-150 315 175v130H0z" fill="#fffaf3"/>
+  <path d="M105 80h16v300h-16zm8 0h310v16H113zM400 80h15v250h-15zm8 0h240v16H408z" fill="#e7b24a"/>
+  <path d="m400 96-90 125h180z" fill="none" stroke="#e7b24a" stroke-width="10"/>
+  <rect x="230" y="330" width="340" height="145" fill="#5d0000"/>
+  <path d="M350 475V365h100v110z" fill="#f4d7b4"/>
+</svg>

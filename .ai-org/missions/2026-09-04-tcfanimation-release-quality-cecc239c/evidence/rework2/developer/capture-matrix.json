@@ -1,0 +1,90 @@
+{
+  "passed": true,
+  "caseCount": 8,
+  "positiveRoot": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\TCFAnimation\\Build\\Captures",
+  "positiveBytes": 149185,
+  "positiveSha256": "F6648042B13AFAD7AFF298A2C1A52DE03E885F0E0B32B13CCA9238556C31AB36",
+  "noOverwritePreserved": true,
+  "stagingCount": 0,
+  "cases": [
+    {
+      "name": "positive",
+      "passed": true,
+      "exitCode": 0,
+      "marker": "CAPTURE_SAVED",
+      "bytes": 149185,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\r\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU\r\n\r\nCAPTURE_ROOT kind=executable_adjacent\r\nCAPTURE_SAVED direction=Left frame=0 path=C:\\Users\\syedhu\\source\\repos\\Dreamer\\TCFAnimation\\Build\\Captures\\rc2-positive.png",
+      "stderr": ""
+    },
+    {
+      "name": "no-overwrite",
+      "passed": true,
+      "exitCode": 1,
+      "marker": "CAPTURE_MODE_FAIL",
+      "expectedType": "IOException",
+      "expectedMessage": "already exists",
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\r\n\r\nCAPTURE_ROOT kind=executable_adjacent",
+      "stderr": "ERROR: CAPTURE_MODE_FAIL error=IOException message=Capture file already exists: C:\\Users\\syedhu\\source\\repos\\Dreamer\\TCFAnimation\\Build\\Captures\\rc2-positive.png\r\n   at: void TCFAnimation.TurnController._Ready() (:0)\r\n   C# backtrace (most recent call first):\r\n       [0] void Godot.GD.PushError(string)\r\n       [1] void TCFAnimation.TurnController._Ready()\r\n       [2] bool Godot.Node.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [3] bool Godot.CanvasItem.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [4] bool Godot.Node2D.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [5] bool TCFAnimation.TurnController.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [6] Godot.NativeInterop.godot_bool Godot.Bridge.CSharpInstanceBridge.Call(nint, Godot.NativeInterop.godot_string_name*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant_call_error*, Godot.NativeInterop.godot_variant*)"
+    },
+    {
+      "name": "parent-traversal",
+      "passed": true,
+      "exitCode": 1,
+      "marker": "CAPTURE_MODE_FAIL",
+      "expectedType": "ArgumentException",
+      "expectedMessage": "without directories",
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\r\n\r\nCAPTURE_ROOT kind=executable_adjacent",
+      "stderr": "ERROR: CAPTURE_MODE_FAIL error=ArgumentException message=Capture path must be a file name without directories. (Parameter 'requestedFileName')\r\n   at: void TCFAnimation.TurnController._Ready() (:0)\r\n   C# backtrace (most recent call first):\r\n       [0] void Godot.GD.PushError(string)\r\n       [1] void TCFAnimation.TurnController._Ready()\r\n       [2] bool Godot.Node.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [3] bool Godot.CanvasItem.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [4] bool Godot.Node2D.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [5] bool TCFAnimation.TurnController.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [6] Godot.NativeInterop.godot_bool Godot.Bridge.CSharpInstanceBridge.Call(nint, Godot.NativeInterop.godot_string_name*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant_call_error*, Godot.NativeInterop.godot_variant*)"
+    },
+    {
+      "name": "absolute",
+      "passed": true,
+      "exitCode": 1,
+      "marker": "CAPTURE_MODE_FAIL",
+      "expectedType": "ArgumentException",
+      "expectedMessage": "without directories",
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\r\n\r\nCAPTURE_ROOT kind=executable_adjacent",
+      "stderr": "ERROR: CAPTURE_MODE_FAIL error=ArgumentException message=Capture path must be a file name without directories. (Parameter 'requestedFileName')\r\n   at: void TCFAnimation.TurnController._Ready() (:0)\r\n   C# backtrace (most recent call first):\r\n       [0] void Godot.GD.PushError(string)\r\n       [1] void TCFAnimation.TurnController._Ready()\r\n       [2] bool Godot.Node.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [3] bool Godot.CanvasItem.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [4] bool Godot.Node2D.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [5] bool TCFAnimation.TurnController.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [6] Godot.NativeInterop.godot_bool Godot.Bridge.CSharpInstanceBridge.Call(nint, Godot.NativeInterop.godot_string_name*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant_call_error*, Godot.NativeInterop.godot_variant*)"
+    },
+    {
+      "name": "nested",
+      "passed": true,
+      "exitCode": 1,
+      "marker": "CAPTURE_MODE_FAIL",
+      "expectedType": "ArgumentException",
+      "expectedMessage": "without directories",
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\r\n\r\nCAPTURE_ROOT kind=executable_adjacent",
+      "stderr": "ERROR: CAPTURE_MODE_FAIL error=ArgumentException message=Capture path must be a file name without directories. (Parameter 'requestedFileName')\r\n   at: void TCFAnimation.TurnController._Ready() (:0)\r\n   C# backtrace (most recent call first):\r\n       [0] void Godot.GD.PushError(string)\r\n       [1] void TCFAnimation.TurnController._Ready()\r\n       [2] bool Godot.Node.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [3] bool Godot.CanvasItem.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [4] bool Godot.Node2D.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [5] bool TCFAnimation.TurnController.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [6] Godot.NativeInterop.godot_bool Godot.Bridge.CSharpInstanceBridge.Call(nint, Godot.NativeInterop.godot_string_name*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant_call_error*, Godot.NativeInterop.godot_variant*)"
+    },
+    {
+      "name": "wrong-extension",
+      "passed": true,
+      "exitCode": 1,
+      "marker": "CAPTURE_MODE_FAIL",
+      "expectedType": "ArgumentException",
+      "expectedMessage": ".png extension",
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\r\n\r\nCAPTURE_ROOT kind=executable_adjacent",
+      "stderr": "ERROR: CAPTURE_MODE_FAIL error=ArgumentException message=Capture file name must use the .png extension. (Parameter 'requestedFileName')\r\n   at: void TCFAnimation.TurnController._Ready() (:0)\r\n   C# backtrace (most recent call first):\r\n       [0] void Godot.GD.PushError(string)\r\n       [1] void TCFAnimation.TurnController._Ready()\r\n       [2] bool Godot.Node.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [3] bool Godot.CanvasItem.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [4] bool Godot.Node2D.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [5] bool TCFAnimation.TurnController.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [6] Godot.NativeInterop.godot_bool Godot.Bridge.CSharpInstanceBridge.Call(nint, Godot.NativeInterop.godot_string_name*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant_call_error*, Godot.NativeInterop.godot_variant*)"
+    },
+    {
+      "name": "invalid-direction",
+      "passed": true,
+      "exitCode": 1,
+      "marker": "CAPTURE_MODE_FAIL",
+      "expectedType": "ArgumentException",
+      "expectedMessage": "Invalid capture direction",
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\r\n\r\nCAPTURE_ROOT kind=executable_adjacent",
+      "stderr": "ERROR: CAPTURE_MODE_FAIL error=ArgumentException message=Invalid capture direction: sideways\r\n   at: void TCFAnimation.TurnController._Ready() (:0)\r\n   C# backtrace (most recent call first):\r\n       [0] void Godot.GD.PushError(string)\r\n       [1] void TCFAnimation.TurnController._Ready()\r\n       [2] bool Godot.Node.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [3] bool Godot.CanvasItem.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [4] bool Godot.Node2D.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [5] bool TCFAnimation.TurnController.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [6] Godot.NativeInterop.godot_bool Godot.Bridge.CSharpInstanceBridge.Call(nint, Godot.NativeInterop.godot_string_name*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant_call_error*, Godot.NativeInterop.godot_variant*)"
+    },
+    {
+      "name": "headless-render-unavailable",
+      "passed": true,
+      "exitCode": 1,
+      "marker": "CAPTURE_FAILED",
+      "expectedType": "InvalidOperationException",
+      "expectedMessage": "active rendering backend",
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\r\n\r\nCAPTURE_ROOT kind=executable_adjacent",
+      "stderr": "ERROR: Parameter \"t\" is null.\r\n   at: texture_2d_get (servers/rendering/dummy/storage/texture_storage.h:106)\r\n   C# backtrace (most recent call first):\r\n       [0] Godot.GodotObject Godot.NativeCalls.godot_icall_0_63(nint, nint)\r\n       [1] Godot.Image Godot.Texture2D.GetImage()\r\n       [2] void TCFAnimation.TurnController.CaptureFrameAndQuit()\r\n       [3] void TCFAnimation.TurnController._Process(double)\r\n       [4] bool Godot.Node.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [5] bool Godot.CanvasItem.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [6] bool Godot.Node2D.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [7] bool TCFAnimation.TurnController.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [8] Godot.NativeInterop.godot_bool Godot.Bridge.CSharpInstanceBridge.Call(nint, Godot.NativeInterop.godot_string_name*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant_call_error*, Godot.NativeInterop.godot_variant*)\r\nERROR: CAPTURE_FAILED error=InvalidOperationException message=Viewport capture requires an active rendering backend. path=C:\\Users\\syedhu\\source\\repos\\Dreamer\\TCFAnimation\\Build\\Captures\\rc2-headless-unavailable.png\r\n   at: void TCFAnimation.TurnController.CaptureFrameAndQuit() (:0)\r\n   C# backtrace (most recent call first):\r\n       [0] void Godot.GD.PushError(string)\r\n       [1] void TCFAnimation.TurnController.CaptureFrameAndQuit()\r\n       [2] void TCFAnimation.TurnController._Process(double)\r\n       [3] bool Godot.Node.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [4] bool Godot.CanvasItem.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [5] bool Godot.Node2D.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [6] bool TCFAnimation.TurnController.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [7] Godot.NativeInterop.godot_bool Godot.Bridge.CSharpInstanceBridge.Call(nint, Godot.NativeInterop.godot_string_name*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant_call_error*, Godot.NativeInterop.godot_variant*)"
+    }
+  ]
+}

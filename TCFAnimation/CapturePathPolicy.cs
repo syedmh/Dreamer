@@ -29,6 +29,62 @@ public readonly record struct CaptureRootResolution(
     string Root,
     string Kind);
 
+public static class CaptureModePolicy
+{
+    public static GirlCaptureSnapshot ParseGirlSnapshot(string value)
+    {
+        return value switch
+        {
+            "start" => GirlCaptureSnapshot.Start,
+            "mid" => GirlCaptureSnapshot.Mid,
+            "final" => GirlCaptureSnapshot.Final,
+            _ => throw new ArgumentException(
+                $"Invalid girl capture snapshot: {value}"),
+        };
+    }
+
+    public static void ValidateBaseSnapshots(
+        bool hasFrame,
+        bool hasSchool,
+        bool hasCelebration,
+        bool hasGirl)
+    {
+        if (hasGirl)
+        {
+            if (hasFrame || hasCelebration)
+            {
+                throw new ArgumentException(
+                    "--capture-girl can be used over black or neon, "
+                    + "or combined with --capture-school; it is "
+                    + "incompatible with --capture-frame and "
+                    + "--capture-celebration.");
+            }
+
+            return;
+        }
+
+        int baseSnapshotCount =
+            (hasFrame ? 1 : 0)
+            + (hasSchool ? 1 : 0)
+            + (hasCelebration ? 1 : 0);
+        if (baseSnapshotCount != 1)
+        {
+            throw new ArgumentException(
+                "Capture mode requires exactly one of --capture-frame, "
+                + "--capture-school, --capture-celebration, or "
+                + "--capture-girl.");
+        }
+    }
+
+    public static bool ShouldShowAvatar(
+        bool hasFrame,
+        bool hasSchool,
+        bool hasCelebration)
+    {
+        return hasFrame || hasSchool || hasCelebration;
+    }
+}
+
 public static class CaptureRootResolver
 {
     public const string ExecutableAdjacentKind = "executable_adjacent";

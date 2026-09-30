@@ -1,0 +1,15 @@
+export const authTheme = {
+  accent: "#6B1F2B",
+  accentPressed: "#551823",
+  background: "#F6F1E9",
+  border: "#D5C8B1",
+  errorBackground: "#FCE8E6",
+  errorBorder: "#C94034",
+  errorText: "#8C1D18",
+  mutedText: "#5E6A73",
+  panel: "#FFFFFF",
+  panelAlt: "#FBF8F3",
+  primaryText: "#1F2933",
+  primaryTextOnAccent: "#FFFFFF",
+  successTint: "#D8E7D0",
+};

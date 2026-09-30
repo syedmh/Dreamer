@@ -15,5 +15,10 @@ z_index = -1
 visible = false
 centered = true
 
+[node name="GirlCharacter" type="Sprite2D" parent="."]
+visible = false
+centered = true
+z_index = 1
+
 [node name="DialogueUi" type="CanvasLayer" parent="."]
 script = ExtResource("2_dialogue")

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0.0",
+  "source": "https://www.husaynia.org/",
+  "sourceVersion": "husaynia-20260817T230407Z",
+  "capturedAtUtc": "2026-08-17T23:04:07.9739074+00:00",
+  "rightsProfile": "public-fidelity-evidence-only; publication/reuse requires ownership or license confirmation; excludes third-party embeds, analytics/payment payloads, submissions, and private/export-only data",
+  "mode": "dry-run",
+  "candidates": [
+    {
+      "sourceKey": "source-f5188aeacdf12ef1",
+      "sourceVersion": "husaynia-20260817T230407Z",
+      "sourceChecksum": "3bfbe9f3b0b6f6b13ae95a652949b2d895657ddf842d68508859e19dcd04ef8e",
+      "kind": "editable-setting",
+      "sourceUri": "https://www.husaynia.org/",
+      "targetKey": "target-editable-setting-299c2623bdac0e93",
+      "canonicalPath": "/",
+      "payloadRef": "forms-widgets.json",
+      "mediaRefs": [],
+      "dependencyKeys": [],
+      "decision": "conflict",
+      "conflictReason": "Provider credentials, payment configuration, form destinations and widget settings are not observable from public GET evidence."
+    }
+  ]
+}

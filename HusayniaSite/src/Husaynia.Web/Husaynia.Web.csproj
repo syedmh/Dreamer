@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="..\Husaynia.Application\Husaynia.Application.csproj" />
+    <ProjectReference Include="..\Husaynia.Infrastructure\Husaynia.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

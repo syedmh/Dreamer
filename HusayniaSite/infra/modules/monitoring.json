@@ -1,0 +1,119 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.46.1.21595",
+      "templateHash": "1980093394259757081"
+    }
+  },
+  "parameters": {
+    "deployResources": {
+      "type": "bool"
+    },
+    "location": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "object"
+    },
+    "logAnalyticsName": {
+      "type": "string"
+    },
+    "applicationInsightsName": {
+      "type": "string"
+    },
+    "logAnalyticsSkuName": {
+      "type": "string"
+    },
+    "logRetentionDays": {
+      "type": "int"
+    },
+    "availabilityTestName": {
+      "type": "string"
+    },
+    "availabilityTestUrl": {
+      "type": "string"
+    },
+    "availabilityTestLocations": {
+      "type": "array"
+    },
+    "availabilityTestFrequencySeconds": {
+      "type": "int"
+    },
+    "availabilityTestTimeoutSeconds": {
+      "type": "int"
+    },
+    "webAppName": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2023-09-01",
+      "name": "[parameters('logAnalyticsName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "sku": {
+          "name": "[parameters('logAnalyticsSkuName')]"
+        },
+        "retentionInDays": "[parameters('logRetentionDays')]"
+      }
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[parameters('applicationInsightsName')]",
+      "location": "[parameters('location')]",
+      "kind": "web",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "Application_Type": "web",
+        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsName'))]",
+        "DisableIpMasking": false,
+        "Request_Source": "rest"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Insights/webtests",
+      "apiVersion": "2022-06-15",
+      "name": "[parameters('availabilityTestName')]",
+      "location": "global",
+      "kind": "standard",
+      "tags": "[union(parameters('tags'), createObject(format('hidden-link:{0}', resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))), 'Resource', format('hidden-link:{0}', resourceId('Microsoft.Web/sites', parameters('webAppName'))), 'Resource'))]",
+      "properties": {
+        "SyntheticMonitorId": "[parameters('availabilityTestName')]",
+        "Name": "[parameters('availabilityTestName')]",
+        "Enabled": true,
+        "Frequency": "[parameters('availabilityTestFrequencySeconds')]",
+        "Timeout": "[parameters('availabilityTestTimeoutSeconds')]",
+        "Kind": "standard",
+        "RetryEnabled": true,
+        "Locations": "[parameters('availabilityTestLocations')]",
+        "Request": {
+          "RequestUrl": "[parameters('availabilityTestUrl')]",
+          "HttpVerb": "GET",
+          "ParseDependentRequests": false,
+          "FollowRedirects": true
+        },
+        "ValidationRules": {
+          "ExpectedHttpStatusCode": 200,
+          "SSLCheck": true,
+          "SSLCertRemainingLifetimeCheck": 7
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))]"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "authentication": "Explicit InteractiveBrowserCredential; no CLI, default credential chain, key fallback, or password form.",
+  "credentialLifecycle": "Single bounded authentication subprocess per CLI invocation; Microsoft browser sign-in at startup, memory-only cache, silent refresh, private pipe.",
+  "preflight": "Acquire suitable token before claiming queued work so auth failures cannot create provider attempts or need rollback.",
+  "transport": "Per-image worker receives short-lived token via in-memory spawn IPC; Authorization Bearer only, preserve Azure v1 route and transport protections.",
+  "configuration": "Opt-in authentication interactive; default api_key preserved; optional validated corporate tenant and public-client application settings.",
+  "credentials": "No persistence; tokens excluded from repr and explicitly redacted in receiving processes.",
+  "scope": "Offline implementation and integration proof; no live sign-in, image calls, Entra application provisioning, or git operations.",
+  "references": [
+    "https://learn.microsoft.com/en-us/python/api/azure-identity/azure.identity.interactivebrowsercredential?view=azure-python",
+    "https://learn.microsoft.com/en-us/azure/developer/ai/keyless-connections",
+    "https://pypi.org/project/azure-identity/1.25.3/"
+  ]
+}

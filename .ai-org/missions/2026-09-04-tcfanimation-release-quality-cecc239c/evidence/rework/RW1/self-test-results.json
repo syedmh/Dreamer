@@ -1,0 +1,71 @@
+{
+  "status": "PASS",
+  "tests": 13,
+  "results": [
+    {
+      "name": "batch-static",
+      "passed": true,
+      "detail": "no environment reference, call, or delayed expansion"
+    },
+    {
+      "name": "batch-injection",
+      "passed": true,
+      "detail": "exit=1 fail_markers=1 sentinel=false"
+    },
+    {
+      "name": "script-candidate",
+      "passed": true,
+      "detail": "reason=candidate_not_exe sentinel=false"
+    },
+    {
+      "name": "mutated-candidate",
+      "passed": true,
+      "detail": "reason=unapproved_hash"
+    },
+    {
+      "name": "missing-companion",
+      "passed": true,
+      "detail": "reason=companion_missing"
+    },
+    {
+      "name": "mutated-companion",
+      "passed": true,
+      "detail": "reason=companion_unapproved"
+    },
+    {
+      "name": "configured-authoritative",
+      "passed": true,
+      "detail": "reason=configured_missing no_fallback=true"
+    },
+    {
+      "name": "configured-approved-copy",
+      "passed": true,
+      "detail": "source=GODOT_EXE version=4.5.1.stable.mono.official.f62fdbde1"
+    },
+    {
+      "name": "path-approved-copy",
+      "passed": true,
+      "detail": "source=PATH version=4.5.1.stable.mono.official.f62fdbde1"
+    },
+    {
+      "name": "bundled-approved",
+      "passed": true,
+      "detail": "source=bundled version=4.5.1.stable.mono.official.f62fdbde1"
+    },
+    {
+      "name": "template-before-clean",
+      "passed": true,
+      "detail": "exit=1 reason=template_missing build_sentinel=preserved"
+    },
+    {
+      "name": "mutated-template-before-clean",
+      "passed": true,
+      "detail": "exit=1 reason=template_unapproved build_sentinel=preserved"
+    },
+    {
+      "name": "launcher-exit-propagation",
+      "passed": true,
+      "detail": "unrelated_cwd=true child_exit=37 launcher_exit=37"
+    }
+  ]
+}

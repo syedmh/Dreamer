@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.husaynia.org/routes/route-manifest.schema.json",
+  "title": "Husaynia route manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "captureId",
+    "capturedAtUtc",
+    "sourceBaseUrl",
+    "routes"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "captureId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capturedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sourceBaseUrl": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://"
+    },
+    "routes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/route"
+      }
+    }
+  },
+  "$defs": {
+    "path": {
+      "type": "string",
+      "pattern": "^/(?!/)(?:[^?#]*)$",
+      "description": "Host-free, query-free unless contractually significant, decoded Unicode normalized to NFC."
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "routeId",
+        "legacyPath",
+        "canonicalPath",
+        "expectedStatus",
+        "templateKey",
+        "indexable",
+        "sitemap",
+        "assetKeys",
+        "dynamicRegionKeys",
+        "evidenceRefs"
+      ],
+      "properties": {
+        "routeId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "legacyPath": {
+          "$ref": "#/$defs/path"
+        },
+        "canonicalPath": {
+          "$ref": "#/$defs/path"
+        },
+        "expectedStatus": {
+          "type": "integer",
+          "enum": [200, 301, 308, 404, 410]
+        },
+        "redirectTarget": {
+          "$ref": "#/$defs/path"
+        },
+        "templateKey": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "contentKey": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "indexable": {
+          "type": "boolean"
+        },
+        "sitemap": {
+          "type": "boolean"
+        },
+        "metadataKey": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "assetKeys": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        },
+        "dynamicRegionKeys": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        },
+        "contentChecksum": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{64}$"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "expectedStatus": {
+                "const": 200
+              }
+            },
+            "required": ["expectedStatus"]
+          },
+          "then": {
+            "not": {
+              "required": ["redirectTarget"]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "expectedStatus": {
+                "enum": [301, 308]
+              }
+            },
+            "required": ["expectedStatus"]
+          },
+          "then": {
+            "required": ["redirectTarget"]
+          },
+          "else": {
+            "not": {
+              "required": ["redirectTarget"]
+            }
+          }
+        }
+      ],
+      "$comment": "Cross-route uniqueness, NFC normalization, redirect chains, and redirect cycles are enforced by IRouteManifestValidator. Raw /wp-* routes require an explicit redirect or 410 decision; /wp-content/uploads/** aliases are executable asset contracts."
+    }
+  }
+}

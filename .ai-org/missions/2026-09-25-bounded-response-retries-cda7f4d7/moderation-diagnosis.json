@@ -1,0 +1,21 @@
+{
+  "authorization": "User approved one diagnostic request for DSC_5326.JPG using current pakistani-80s prompt.",
+  "execution": {
+    "requestsSubmitted": 1,
+    "automaticRetries": 0,
+    "httpStatus": 400,
+    "providerCode": "moderation_blocked",
+    "providerType": "image_generation_user_error",
+    "requestId": "c7671b2a-1373-463c-86b2-eef69eec91c8",
+    "outputProduced": false,
+    "originalHashUnchanged": true,
+    "queueRecordsUnchanged": true,
+    "coordination": "Destination locks held, existing cooldown checked, 30-second completion cooldown observed before release."
+  },
+  "diagnosis": "Authorized reproduction confirms an explicit moderation rejection. Earlier saved request details cannot identify its exact code, but reported classifier behavior is consistent with the previously unrecognized moderation_blocked value.",
+  "fix": "Added moderation_blocked to recognized permanent content-policy codes; readable diagnostics now describe policy rejection and expanded retries remain blocked for that code.",
+  "build": "python -m compileall -q .\\src\\tcfcomic: exit 0",
+  "tests": "Not run; paused by CTO.",
+  "cleanup": "Temporary diagnostic script and staged image/output temporary files removed. Sanitized diagnostic receipt retained in session files; no raw response, tokens or prompt persisted.",
+  "remaining": "Moderation does not establish which input or generated-output element triggered rejection. No additional image submissions authorized."
+}

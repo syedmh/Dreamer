@@ -1,0 +1,583 @@
+{
+  "passed": true,
+  "caseCount": 24,
+  "failures": [],
+  "records": [
+    {
+      "name": "rc2-test-default-center",
+      "requested": "default",
+      "scenario": "center",
+      "expectedWidth": 1280,
+      "expectedHeight": 720,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-default-center.png",
+      "width": 1280,
+      "height": 720,
+      "bbox": [
+        538,
+        150,
+        739,
+        700
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "F6648042B13AFAD7AFF298A2C1A52DE03E885F0E0B32B13CCA9238556C31AB36",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-default-left-dialogue",
+      "requested": "default",
+      "scenario": "left-dialogue",
+      "expectedWidth": 1280,
+      "expectedHeight": 720,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-default-left-dialogue.png",
+      "width": 1280,
+      "height": 720,
+      "bbox": [
+        22,
+        61,
+        280,
+        700
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "35B71A646748FE8EDE1EEE0C277D49E5020D64ADFABC0C9726CA4C056201954F",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-default-right-dialogue",
+      "requested": "default",
+      "scenario": "right-dialogue",
+      "expectedWidth": 1280,
+      "expectedHeight": 720,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-default-right-dialogue.png",
+      "width": 1280,
+      "height": 720,
+      "bbox": [
+        946,
+        61,
+        1260,
+        700
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "C1851D04A4626523593D5EC513626A19028F14BDB7F59076C0691766CB6BD0DA",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-default-input-dialogue",
+      "requested": "default",
+      "scenario": "input-dialogue",
+      "expectedWidth": 1280,
+      "expectedHeight": 720,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-default-input-dialogue.png",
+      "width": 1280,
+      "height": 720,
+      "bbox": [
+        538,
+        150,
+        1263,
+        704
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "F42916FA2A9047D778CB81EB452F5F756C6F87B0FD2E8726BC857E2344BBEC2E",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1920x1080-center",
+      "requested": "1920x1080",
+      "scenario": "center",
+      "expectedWidth": 1920,
+      "expectedHeight": 1080,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1920x1080-center.png",
+      "width": 1920,
+      "height": 1080,
+      "bbox": [
+        806,
+        225,
+        1109,
+        1050
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "E21297D2CE01F3388298326E2866DE73103920CBD23A8E948A63C38E5668D48D",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1920x1080-left-dialogue",
+      "requested": "1920x1080",
+      "scenario": "left-dialogue",
+      "expectedWidth": 1920,
+      "expectedHeight": 1080,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1920x1080-left-dialogue.png",
+      "width": 1920,
+      "height": 1080,
+      "bbox": [
+        34,
+        92,
+        420,
+        1050
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "A6AD9599A350CB7199DC70485527C30C1B7EA4DD74F58742B48CA3D3A9E6F8D9",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1920x1080-right-dialogue",
+      "requested": "1920x1080",
+      "scenario": "right-dialogue",
+      "expectedWidth": 1920,
+      "expectedHeight": 1080,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1920x1080-right-dialogue.png",
+      "width": 1920,
+      "height": 1080,
+      "bbox": [
+        1420,
+        92,
+        1891,
+        1050
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "79C65C86CC73E562C0479722E3FE92AA8848C2200F6EAE2101E121FC47817EE9",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1920x1080-input-dialogue",
+      "requested": "1920x1080",
+      "scenario": "input-dialogue",
+      "expectedWidth": 1920,
+      "expectedHeight": 1080,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1920x1080-input-dialogue.png",
+      "width": 1920,
+      "height": 1080,
+      "bbox": [
+        806,
+        225,
+        1896,
+        1056
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "06F5E6E2AB47E141B5AAD2B569BE08B398030B52C2F3BED785F0B5087A1A7769",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1536x960-center",
+      "requested": "1536x960",
+      "scenario": "center",
+      "expectedWidth": 1536,
+      "expectedHeight": 864,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1536x960-center.png",
+      "width": 1536,
+      "height": 864,
+      "bbox": [
+        645,
+        180,
+        887,
+        840
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "18A2E0EC2920A4A69DA9489CC919EE61D0095BDCB8962C3BADDA420C048F3F58",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1536x960-left-dialogue",
+      "requested": "1536x960",
+      "scenario": "left-dialogue",
+      "expectedWidth": 1536,
+      "expectedHeight": 864,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1536x960-left-dialogue.png",
+      "width": 1536,
+      "height": 864,
+      "bbox": [
+        27,
+        73,
+        336,
+        840
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "9C4C9477A5FA93314B295C797F75E1E7E58DE83E5145B78C996A953D63DEF0B0",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1536x960-right-dialogue",
+      "requested": "1536x960",
+      "scenario": "right-dialogue",
+      "expectedWidth": 1536,
+      "expectedHeight": 864,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1536x960-right-dialogue.png",
+      "width": 1536,
+      "height": 864,
+      "bbox": [
+        1135,
+        73,
+        1512,
+        840
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "9C91911FEFDB034D25642171ABF72A13BD9D3B4C11231D0372FCEE3E2CAF5295",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1536x960-input-dialogue",
+      "requested": "1536x960",
+      "scenario": "input-dialogue",
+      "expectedWidth": 1536,
+      "expectedHeight": 864,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1536x960-input-dialogue.png",
+      "width": 1536,
+      "height": 864,
+      "bbox": [
+        645,
+        180,
+        1516,
+        844
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "605355BD48A06BB9D7FD89032ED5C371AE60B2AFFBE7F57EB6FA96C9BFA0156E",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1536x864-center",
+      "requested": "1536x864",
+      "scenario": "center",
+      "expectedWidth": 1536,
+      "expectedHeight": 864,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1536x864-center.png",
+      "width": 1536,
+      "height": 864,
+      "bbox": [
+        645,
+        180,
+        887,
+        840
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "18A2E0EC2920A4A69DA9489CC919EE61D0095BDCB8962C3BADDA420C048F3F58",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1536x864-left-dialogue",
+      "requested": "1536x864",
+      "scenario": "left-dialogue",
+      "expectedWidth": 1536,
+      "expectedHeight": 864,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1536x864-left-dialogue.png",
+      "width": 1536,
+      "height": 864,
+      "bbox": [
+        27,
+        73,
+        336,
+        840
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "9C4C9477A5FA93314B295C797F75E1E7E58DE83E5145B78C996A953D63DEF0B0",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1536x864-right-dialogue",
+      "requested": "1536x864",
+      "scenario": "right-dialogue",
+      "expectedWidth": 1536,
+      "expectedHeight": 864,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1536x864-right-dialogue.png",
+      "width": 1536,
+      "height": 864,
+      "bbox": [
+        1135,
+        73,
+        1512,
+        840
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "9C91911FEFDB034D25642171ABF72A13BD9D3B4C11231D0372FCEE3E2CAF5295",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1536x864-input-dialogue",
+      "requested": "1536x864",
+      "scenario": "input-dialogue",
+      "expectedWidth": 1536,
+      "expectedHeight": 864,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1536x864-input-dialogue.png",
+      "width": 1536,
+      "height": 864,
+      "bbox": [
+        645,
+        180,
+        1516,
+        844
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "605355BD48A06BB9D7FD89032ED5C371AE60B2AFFBE7F57EB6FA96C9BFA0156E",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1280x720-center",
+      "requested": "1280x720",
+      "scenario": "center",
+      "expectedWidth": 1280,
+      "expectedHeight": 720,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1280x720-center.png",
+      "width": 1280,
+      "height": 720,
+      "bbox": [
+        538,
+        150,
+        739,
+        700
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "F6648042B13AFAD7AFF298A2C1A52DE03E885F0E0B32B13CCA9238556C31AB36",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1280x720-left-dialogue",
+      "requested": "1280x720",
+      "scenario": "left-dialogue",
+      "expectedWidth": 1280,
+      "expectedHeight": 720,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1280x720-left-dialogue.png",
+      "width": 1280,
+      "height": 720,
+      "bbox": [
+        22,
+        61,
+        280,
+        700
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "35B71A646748FE8EDE1EEE0C277D49E5020D64ADFABC0C9726CA4C056201954F",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1280x720-right-dialogue",
+      "requested": "1280x720",
+      "scenario": "right-dialogue",
+      "expectedWidth": 1280,
+      "expectedHeight": 720,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1280x720-right-dialogue.png",
+      "width": 1280,
+      "height": 720,
+      "bbox": [
+        946,
+        61,
+        1260,
+        700
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "C1851D04A4626523593D5EC513626A19028F14BDB7F59076C0691766CB6BD0DA",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1280x720-input-dialogue",
+      "requested": "1280x720",
+      "scenario": "input-dialogue",
+      "expectedWidth": 1280,
+      "expectedHeight": 720,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1280x720-input-dialogue.png",
+      "width": 1280,
+      "height": 720,
+      "bbox": [
+        538,
+        150,
+        1263,
+        704
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "F42916FA2A9047D778CB81EB452F5F756C6F87B0FD2E8726BC857E2344BBEC2E",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1000x800-center",
+      "requested": "1000x800",
+      "scenario": "center",
+      "expectedWidth": 1000,
+      "expectedHeight": 562,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1000x800-center.png",
+      "width": 1000,
+      "height": 562,
+      "bbox": [
+        420,
+        117,
+        577,
+        546
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "724E437CD256AC5C970CED397B9EF770DC0CE6E8F4E908664693761995CB2A87",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1000x800-left-dialogue",
+      "requested": "1000x800",
+      "scenario": "left-dialogue",
+      "expectedWidth": 1000,
+      "expectedHeight": 562,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1000x800-left-dialogue.png",
+      "width": 1000,
+      "height": 562,
+      "bbox": [
+        17,
+        47,
+        219,
+        546
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "9A95E42786748A01739CA774E348EA11F241EACA185895A6CE9D7A030FDCB787",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1000x800-right-dialogue",
+      "requested": "1000x800",
+      "scenario": "right-dialogue",
+      "expectedWidth": 1000,
+      "expectedHeight": 562,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1000x800-right-dialogue.png",
+      "width": 1000,
+      "height": 562,
+      "bbox": [
+        739,
+        47,
+        984,
+        546
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "646A0F335DB9246E2C65B819455ABB6E840CBEAD4C4E985AB4B8651E422E269F",
+      "passed": true
+    },
+    {
+      "name": "rc2-test-1000x800-input-dialogue",
+      "requested": "1000x800",
+      "scenario": "input-dialogue",
+      "expectedWidth": 1000,
+      "expectedHeight": 562,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1000x800-input-dialogue.png",
+      "width": 1000,
+      "height": 562,
+      "bbox": [
+        420,
+        117,
+        987,
+        549
+      ],
+      "borderNonblack": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "sha256": "DF2604ECC83EE78C54D94CCED0F940791DD89AA02F17E4CD54CF7E22CE79AB81",
+      "passed": true
+    }
+  ]
+}

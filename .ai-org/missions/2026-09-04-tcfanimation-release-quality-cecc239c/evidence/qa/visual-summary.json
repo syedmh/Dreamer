@@ -1,0 +1,16 @@
+{
+  "frames": 33,
+  "groups": {
+    "LeftTurn": 3,
+    "RightTurn": 3,
+    "LeftWalk": 6,
+    "RightWalk": 6,
+    "Clap": 6,
+    "CrossArm": 3,
+    "CrossArmRelease": 6
+  },
+  "all_dimensions_512x864": true,
+  "all_opaque": true,
+  "walk_mirror_mismatch_pixels": 0,
+  "boundary_count": 45
+}

@@ -5,6 +5,8 @@ const double TurnFps = 8.0;
 
 RunTurnCases();
 RunAnimationGeometryCases();
+RunGirlEntranceCases();
+RunGirlCaptureCases();
 RunLeftWalkCases();
 RunRightWalkCases();
 RunWalkPlaybackSpeedCases();
@@ -54,7 +56,12 @@ Console.WriteLine(
     + "action_messages=true celebration_seconds=30 "
     + "fireworks_deterministic=true logo_rain_seconds=10 "
     + "legend=true neon_background=true c_manual_clap=true "
-    + "l_legend=true "
+    + "l_legend=true legend_entries=20 "
+    + "girl_phases=true girl_frames=12 girl_input=true "
+    + "girl_offscreen_left=-187.5 girl_center=960 "
+    + "girl_cadence=0..10_repeat_terminal_11=true "
+    + "girl_hold_frame=11 girl_idempotent=true "
+    + "girl_capture=start,mid,final girl_capture_combinations=true "
     + "wave_assets=false");
 return;
 
@@ -1445,6 +1452,355 @@ static void RunAnimationGeometryCases()
             437.0f));
 }
 
+static void RunGirlEntranceCases()
+{
+    AnimationConfig.Install(AnimationConfig.Defaults);
+    AssertTrue(
+        "girl phases are exactly Hidden EnteringFromLeft Visible",
+        Enum.GetNames<GirlEntrancePhase>().SequenceEqual(
+            [
+                nameof(GirlEntrancePhase.Hidden),
+                nameof(GirlEntrancePhase.EnteringFromLeft),
+                nameof(GirlEntrancePhase.Visible),
+            ]));
+    AssertEqual(
+        "girl frame count remains fixed",
+        GirlEntranceStateMachine.FrameCount,
+        12);
+    AssertEqual(
+        "girl left visible bound",
+        AnimationGeometry.GirlLeftVisibleX,
+        108.0f);
+    AssertEqual(
+        "girl top visible bound",
+        AnimationGeometry.GirlTopVisibleY,
+        57.0f);
+    AssertEqual(
+        "girl right visible bound",
+        AnimationGeometry.GirlRightVisibleX,
+        406.0f);
+    AssertEqual(
+        "girl bottom visible bound",
+        AnimationGeometry.GirlBottomVisibleY,
+        840.0f);
+    AssertEqual(
+        "girl fully offscreen-left center",
+        AnimationGeometry.GirlOffscreenCenters.Left,
+        -187.5f);
+
+    GirlEntranceStateMachine invalid = new();
+    AssertThrows<ArgumentOutOfRangeException>(
+        "girl start rejects NaN left coordinate",
+        () => invalid.TryStart(double.NaN, 960.0));
+    AssertThrows<ArgumentOutOfRangeException>(
+        "girl start rejects infinite center coordinate",
+        () => invalid.TryStart(-187.5, double.PositiveInfinity));
+    AssertThrows<ArgumentOutOfRangeException>(
+        "girl advance rejects negative delta",
+        () => invalid.Advance(-0.001));
+    AssertThrows<ArgumentOutOfRangeException>(
+        "girl advance rejects nonfinite delta",
+        () => invalid.Advance(double.NaN));
+
+    GirlEntranceStateMachine girl = new();
+    AssertTrue(
+        "girl starts hidden on frame zero",
+        girl.Phase == GirlEntrancePhase.Hidden
+        && !girl.IsVisible
+        && !girl.IsEntering
+        && girl.CurrentFrame == 0);
+    AssertTrue(
+        "girl ignores zero delta while hidden",
+        !girl.Advance(0.0));
+    AssertTrue(
+        "girl starts exactly once from offscreen left",
+        girl.TryStart(
+            AnimationGeometry.GirlOffscreenCenters.Left,
+            AnimationGeometry.ViewportWidth / 2.0)
+        && girl.Phase == GirlEntrancePhase.EnteringFromLeft
+        && girl.IsVisible
+        && girl.IsEntering
+        && girl.CurrentFrame == 0);
+    AssertNear(
+        "girl start x is fully offscreen left",
+        girl.CharacterX,
+        -187.5,
+        0.0);
+
+    double frameStep = 1.0 / AnimationConfig.Current.GirlWalkFps;
+    const int completionTick = 48;
+    HashSet<int> observedFrames = [girl.CurrentFrame];
+    for (int tick = 1; tick < completionTick; tick++)
+    {
+        int expectedFrame =
+            tick % (GirlEntranceStateMachine.FrameCount - 1);
+        AssertTrue(
+            $"girl nominal tick {tick} advances",
+            girl.Advance(frameStep));
+        AssertEqual(
+            $"girl nominal tick {tick} uses repeated locomotion frame",
+            girl.CurrentFrame,
+            expectedFrame);
+        AssertTrue(
+            $"girl nominal tick {tick} forbids terminal frame 11",
+            girl.CurrentFrame != GirlEntranceStateMachine.FrameCount - 1);
+        observedFrames.Add(girl.CurrentFrame);
+
+        if (tick == 1)
+        {
+            double xBeforeRepeatedStart = girl.CharacterX;
+            int frameBeforeRepeatedStart = girl.CurrentFrame;
+            GirlEntrancePhase phaseBeforeRepeatedStart = girl.Phase;
+            AssertTrue(
+                "girl repeated start is rejected without mutation",
+                !girl.TryStart(-999.0, 123.0)
+                && girl.CharacterX == xBeforeRepeatedStart
+                && girl.CurrentFrame == frameBeforeRepeatedStart
+                && girl.Phase == phaseBeforeRepeatedStart);
+        }
+        else if (tick == 11)
+        {
+            AssertEqual(
+                "girl t=11/8 frame",
+                girl.CurrentFrame,
+                0);
+            AssertTrue(
+                "girl t=11/8 forbids frame 11",
+                girl.CurrentFrame
+                    != GirlEntranceStateMachine.FrameCount - 1);
+        }
+        else if (tick == 12)
+        {
+            AssertEqual(
+                "girl t=12/8 frame",
+                girl.CurrentFrame,
+                1);
+            AssertTrue(
+                "girl t=12/8 forbids frame 11",
+                girl.CurrentFrame
+                    != GirlEntranceStateMachine.FrameCount - 1);
+        }
+        else if (tick == completionTick - 1)
+        {
+            AssertEqual(
+                "girl t=5.875 frame",
+                girl.CurrentFrame,
+                3);
+            AssertEqual(
+                "girl t=5.875 phase",
+                girl.Phase,
+                GirlEntrancePhase.EnteringFromLeft);
+            AssertNear(
+                "girl t=5.875 x",
+                girl.CharacterX,
+                936.09375,
+                0.000001);
+            AssertTrue(
+                "girl t=5.875 remains entering before center",
+                girl.IsEntering
+                && girl.CharacterX
+                    < AnimationGeometry.ViewportWidth / 2.0);
+        }
+    }
+    AssertTrue(
+        "girl entrance observes every locomotion frame 0 through 10",
+        observedFrames.SetEquals(
+            Enumerable.Range(
+                0,
+                GirlEntranceStateMachine.FrameCount - 1)));
+
+    AssertTrue(
+        "girl final nominal tick changes state",
+        girl.Advance(frameStep));
+    AssertTrue(
+        "girl completes at exact center on final frame",
+        girl.Phase == GirlEntrancePhase.Visible
+        && girl.IsVisible
+        && !girl.IsEntering
+        && girl.CharacterX == AnimationGeometry.ViewportWidth / 2.0
+        && girl.CurrentFrame == GirlEntranceStateMachine.FrameCount - 1);
+    AssertEqual(
+        "girl t=6 phase",
+        girl.Phase,
+        GirlEntrancePhase.Visible);
+    AssertNear(
+        "girl t=6 exact center x",
+        girl.CharacterX,
+        AnimationGeometry.ViewportWidth / 2.0,
+        0.0);
+    AssertEqual(
+        "girl t=6 terminal frame",
+        girl.CurrentFrame,
+        GirlEntranceStateMachine.FrameCount - 1);
+    observedFrames.Add(girl.CurrentFrame);
+    AssertTrue(
+        "girl complete timeline observes frames 0 through 11",
+        observedFrames.SetEquals(
+            Enumerable.Range(0, GirlEntranceStateMachine.FrameCount)));
+    double completedX = girl.CharacterX;
+    int completedFrame = girl.CurrentFrame;
+    AssertTrue(
+        "girl visible hold ignores advancement and repeated start",
+        !girl.Advance(100.0)
+        && !girl.TryStart(-187.5, 960.0)
+        && girl.CharacterX == completedX
+        && girl.CurrentFrame == completedFrame
+        && girl.Phase == GirlEntrancePhase.Visible);
+}
+
+static void RunGirlCaptureCases()
+{
+    AnimationConfig.Install(AnimationConfig.Defaults);
+    AssertTrue(
+        "girl capture snapshots are exactly Start Mid Final",
+        Enum.GetNames<GirlCaptureSnapshot>().SequenceEqual(
+            [
+                nameof(GirlCaptureSnapshot.Start),
+                nameof(GirlCaptureSnapshot.Mid),
+                nameof(GirlCaptureSnapshot.Final),
+            ]));
+    AssertEqual(
+        "girl capture parses start",
+        CaptureModePolicy.ParseGirlSnapshot("start"),
+        GirlCaptureSnapshot.Start);
+    AssertEqual(
+        "girl capture parses mid",
+        CaptureModePolicy.ParseGirlSnapshot("mid"),
+        GirlCaptureSnapshot.Mid);
+    AssertEqual(
+        "girl capture parses final",
+        CaptureModePolicy.ParseGirlSnapshot("final"),
+        GirlCaptureSnapshot.Final);
+    foreach (string invalid in new[] { "", "Start", "middle", "final:extra" })
+    {
+        AssertThrows<ArgumentException>(
+            $"girl capture rejects selector {invalid}",
+            () => CaptureModePolicy.ParseGirlSnapshot(invalid));
+    }
+
+    CaptureModePolicy.ValidateBaseSnapshots(
+        hasFrame: false,
+        hasSchool: false,
+        hasCelebration: false,
+        hasGirl: true);
+    CaptureModePolicy.ValidateBaseSnapshots(
+        hasFrame: false,
+        hasSchool: true,
+        hasCelebration: false,
+        hasGirl: true);
+    CaptureModePolicy.ValidateBaseSnapshots(
+        hasFrame: true,
+        hasSchool: false,
+        hasCelebration: false,
+        hasGirl: false);
+    CaptureModePolicy.ValidateBaseSnapshots(
+        hasFrame: false,
+        hasSchool: true,
+        hasCelebration: false,
+        hasGirl: false);
+    CaptureModePolicy.ValidateBaseSnapshots(
+        hasFrame: false,
+        hasSchool: false,
+        hasCelebration: true,
+        hasGirl: false);
+    AssertTrue(
+        "girl-only capture keeps Avatar hidden",
+        !CaptureModePolicy.ShouldShowAvatar(
+            hasFrame: false,
+            hasSchool: false,
+            hasCelebration: false));
+    AssertTrue(
+        "girl school composition keeps Avatar visible",
+        CaptureModePolicy.ShouldShowAvatar(
+            hasFrame: false,
+            hasSchool: true,
+            hasCelebration: false));
+    AssertTrue(
+        "legacy base captures keep Avatar visible",
+        CaptureModePolicy.ShouldShowAvatar(
+            hasFrame: true,
+            hasSchool: false,
+            hasCelebration: false)
+        && CaptureModePolicy.ShouldShowAvatar(
+            hasFrame: false,
+            hasSchool: false,
+            hasCelebration: true));
+    AssertThrows<ArgumentException>(
+        "girl capture rejects frame composition",
+        () => CaptureModePolicy.ValidateBaseSnapshots(
+            hasFrame: true,
+            hasSchool: false,
+            hasCelebration: false,
+            hasGirl: true));
+    AssertThrows<ArgumentException>(
+        "girl capture rejects celebration composition",
+        () => CaptureModePolicy.ValidateBaseSnapshots(
+            hasFrame: false,
+            hasSchool: false,
+            hasCelebration: true,
+            hasGirl: true));
+    AssertThrows<ArgumentException>(
+        "capture rejects no base snapshot",
+        () => CaptureModePolicy.ValidateBaseSnapshots(
+            hasFrame: false,
+            hasSchool: false,
+            hasCelebration: false,
+            hasGirl: false));
+    AssertThrows<ArgumentException>(
+        "capture rejects school and celebration together",
+        () => CaptureModePolicy.ValidateBaseSnapshots(
+            hasFrame: false,
+            hasSchool: true,
+            hasCelebration: true,
+            hasGirl: false));
+
+    GirlEntranceStateMachine start = new();
+    start.SetDevelopmentSnapshot(
+        GirlCaptureSnapshot.Start,
+        AnimationGeometry.GirlOffscreenCenters.Left,
+        AnimationGeometry.ViewportWidth / 2.0);
+    AssertTrue(
+        "girl start capture is exact",
+        start.Phase == GirlEntrancePhase.EnteringFromLeft
+        && start.IsVisible
+        && start.IsEntering
+        && start.CharacterX == -187.5
+        && start.CurrentFrame == 0);
+
+    GirlEntranceStateMachine mid = new();
+    mid.SetDevelopmentSnapshot(
+        GirlCaptureSnapshot.Mid,
+        AnimationGeometry.GirlOffscreenCenters.Left,
+        AnimationGeometry.ViewportWidth / 2.0);
+    AssertTrue(
+        "girl mid capture uses configured half duration",
+        mid.Phase == GirlEntrancePhase.EnteringFromLeft
+        && mid.IsVisible
+        && mid.IsEntering
+        && mid.CharacterX == 386.25
+        && mid.CurrentFrame == 2);
+
+    GirlEntranceStateMachine final = new();
+    final.SetDevelopmentSnapshot(
+        GirlCaptureSnapshot.Final,
+        AnimationGeometry.GirlOffscreenCenters.Left,
+        AnimationGeometry.ViewportWidth / 2.0);
+    AssertTrue(
+        "girl final capture holds centered terminal frame",
+        final.Phase == GirlEntrancePhase.Visible
+        && final.IsVisible
+        && !final.IsEntering
+        && final.CharacterX == 960.0
+        && final.CurrentFrame == GirlEntranceStateMachine.FrameCount - 1
+        && !final.Advance(1.0));
+    AssertThrows<ArgumentOutOfRangeException>(
+        "girl capture rejects unknown snapshot enum",
+        () => new GirlEntranceStateMachine().SetDevelopmentSnapshot(
+            (GirlCaptureSnapshot)999,
+            -187.5,
+            960.0));
+}
+
 static void RunTurnCases()
 {
     DirectionalTurnStateMachine turn = NewState();
@@ -2821,11 +3177,15 @@ static void RunLegendAndPresentationInputCases()
     AssertEqual(
         "legend contains exact active entry count",
         ActionLegendLayout.Entries.Length,
-        19);
+        20);
     AssertTrue(
-        "legend accurately lists D E F S R N O I C L and fullscreen controls",
+        "legend accurately lists D E G F S R N O I C L and fullscreen controls",
         ActionLegendLayout.Entries.Any(line => line.StartsWith("D "))
         && ActionLegendLayout.Entries.Any(line => line.StartsWith("E "))
+        && ActionLegendLayout.Entries.Any(
+            line =>
+                line.StartsWith("G ")
+                && line.Contains("left", StringComparison.OrdinalIgnoreCase))
         &&
         ActionLegendLayout.Entries.Any(line => line.StartsWith("F "))
         && ActionLegendLayout.Entries.Any(line => line.StartsWith("S "))
@@ -2942,6 +3302,41 @@ static void RunLegendAndPresentationInputCases()
             PresentationKey.E,
             true,
             false,
+            dialogueEditing: true,
+            CelebrationPhase.Inactive),
+        default);
+    AssertTrue(
+        "G starts the independent girl entrance when intentionally pressed",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.G,
+            pressed: true,
+            echo: false,
+            dialogueEditing: false,
+            CelebrationPhase.Clapping).StartGirlEntrance);
+    AssertEqual(
+        "G release is ignored",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.G,
+            pressed: false,
+            echo: false,
+            dialogueEditing: false,
+            CelebrationPhase.Inactive),
+        default);
+    AssertEqual(
+        "G echo is ignored",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.G,
+            pressed: true,
+            echo: true,
+            dialogueEditing: false,
+            CelebrationPhase.Inactive),
+        default);
+    AssertEqual(
+        "G typed while dialogue editing remains ordinary text",
+        PresentationInputPolicy.Resolve(
+            PresentationKey.G,
+            pressed: true,
+            echo: false,
             dialogueEditing: true,
             CelebrationPhase.Inactive),
         default);
@@ -3071,6 +3466,8 @@ static void RunAnimationConfigCases()
             {
               "turnFps": 9.0,
               "walkFps": 7.0,
+              "girlWalkFps": 12.0,
+              "girlEntrySeconds": 2.0,
               "clapFps": 10.0,
               "crossArmFps": 11.0,
               "crossArmReleaseFps": 12.0,
@@ -3110,6 +3507,8 @@ static void RunAnimationConfigCases()
         && configuredTurn.ClapFrameDurationSeconds == 1.0 / 10.0
         && configuredTurn.CrossArmFrameDurationSeconds == 1.0 / 11.0
         && configuredTurn.CrossArmReleaseFrameDurationSeconds == 1.0 / 12.0
+        && AnimationConfig.Current.GirlWalkFps == 12.0
+        && AnimationConfig.Current.GirlEntrySeconds == 2.0
         && AnimationConfig.Current.AvatarEntrySeconds == 6.5
         && AnimationConfig.Current.AvatarExitFullSpanSeconds == 7.5
         && AnimationConfig.Current.NeonIntensity == 0.65
@@ -3141,6 +3540,8 @@ static void RunAnimationConfigCases()
                 {
                   "turnFps": 8,
                   "walkFps": 6,
+                  "girlWalkFps": 8,
+                  "girlEntrySeconds": 6,
                   "clapFps": 8,
                   "crossArmFps": 8,
                   "crossArmReleaseFps": 8,
@@ -3163,6 +3564,46 @@ static void RunAnimationConfigCases()
                   "unexpected": 1
                 }
                 """)));
+    AssertEqual(
+        "girl timing defaults are exact",
+        (
+            AnimationConfig.Defaults.GirlWalkFps,
+            AnimationConfig.Defaults.GirlEntrySeconds
+        ),
+        (8.0, 6.0));
+    AnimationConfig.Install(
+        AnimationConfig.Defaults with
+        {
+            GirlWalkFps = 8.0,
+            GirlEntrySeconds = 1.5,
+        });
+    AssertEqual(
+        "girl timing accepts exact 12-frame product boundary",
+        AnimationConfig.Current.GirlWalkFps
+            * AnimationConfig.Current.GirlEntrySeconds,
+        12.0);
+    AssertThrows<InvalidDataException>(
+        "girl timing rejects product below frame count",
+        () => AnimationConfig.Install(
+            AnimationConfig.Defaults with
+            {
+                GirlWalkFps = 8.0,
+                GirlEntrySeconds = 1.49,
+            }));
+    AssertThrows<InvalidDataException>(
+        "girl timing rejects zero walk fps",
+        () => AnimationConfig.Install(
+            AnimationConfig.Defaults with
+            {
+                GirlWalkFps = 0.0,
+            }));
+    AssertThrows<InvalidDataException>(
+        "girl timing rejects nonfinite entry duration",
+        () => AnimationConfig.Install(
+            AnimationConfig.Defaults with
+            {
+                GirlEntrySeconds = double.PositiveInfinity,
+            }));
     AnimationConfig.Install(AnimationConfig.Defaults);
 }
 

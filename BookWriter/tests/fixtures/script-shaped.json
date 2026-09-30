@@ -1,0 +1,51 @@
+{
+  "format": "dreamer.life-memoir.backup",
+  "formatVersion": 1,
+  "exportedAt": "2026-08-12T20:00:00.000Z",
+  "appVersion": "1.0.0",
+  "collection": {
+    "schemaVersion": 1,
+    "collectionId": "10000000-0000-4000-8000-000000000001",
+    "revision": 0,
+    "createdAt": "2026-08-12T20:00:00.000Z",
+    "updatedAt": "2026-08-12T20:00:00.000Z",
+    "book": {
+      "title": "<script>alert('title')</script>",
+      "subtitle": "",
+      "authorName": "",
+      "dedication": "",
+      "preface": ""
+    },
+    "chapters": [],
+    "unassignedMemoryIds": [
+      "20000000-0000-4000-8000-000000000001"
+    ],
+    "memories": {
+      "20000000-0000-4000-8000-000000000001": {
+        "id": "20000000-0000-4000-8000-000000000001",
+        "title": "<img src=x onerror=alert(1)>",
+        "memoryText": "<script>window.memoirExecuted=true</script>\n\nUnicode: 東京 — café",
+        "dateText": "",
+        "people": [],
+        "places": [],
+        "themes": [],
+        "sensoryDetails": "",
+        "promptResponses": {
+          "context": "",
+          "people": "",
+          "setting": "",
+          "senses": "",
+          "emotions": "",
+          "significance": "",
+          "beforeAfter": ""
+        },
+        "narrativeText": "",
+        "createdAt": "2026-08-12T20:00:00.000Z",
+        "updatedAt": "2026-08-12T20:00:00.000Z"
+      }
+    },
+    "settings": {
+      "backupReminderDismissedAt": null
+    }
+  }
+}

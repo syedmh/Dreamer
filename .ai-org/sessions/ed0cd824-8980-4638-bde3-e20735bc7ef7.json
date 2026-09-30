@@ -1,0 +1,48 @@
+{
+  "sessionId": "ed0cd824-8980-4638-bde3-e20735bc7ef7",
+  "missionId": "2026-09-09-tcf-interactive-playground-ed0cd824",
+  "missionDir": ".ai-org/missions/2026-09-09-tcf-interactive-playground-ed0cd824",
+  "objective": "Extract the first nine Girl frames and perform only a front-facing to right-facing turn.",
+  "classification": "feature",
+  "size": "medium",
+  "state": "COMPLETED",
+  "workflow": "feature-fast-development",
+  "definitionOfDone": [
+    "Nine PNG assets use the measured irregular boundaries of source panels 1 through 9",
+    "Girl starts centered and front-facing",
+    "Girl animates through frames 1 through 9 and holds the right-facing profile",
+    "Walking, dialogue, and the second scene are removed",
+    "Key 1 replays the turn and Escape hides the Girl"
+  ],
+  "gates": {
+    "implementation": "passed",
+    "tests": "passed: 8/8",
+    "review": "paused_by_cto_for_dev_mode",
+    "e2e": "passed: live Chrome front and right profile captures",
+    "judge": "paused_by_cto_for_dev_mode"
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "owner": "architect",
+      "status": "DONE",
+      "evidence": "Dependency-free Canvas 2D and JSON architecture selected for 4K."
+    },
+    {
+      "id": "T2",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "Complete TCFPlay implementation and 10/10 tests."
+    },
+    {
+      "id": "T3",
+      "owner": "test-engineer",
+      "status": "DONE",
+      "evidence": "Independent gate passed 32 checks with 0 failures."
+    }
+  ],
+  "blockers": [],
+  "reworkCount": 1,
+  "nextAction": "None; focused right-turn preview is running on port 8080.",
+  "updatedAt": "2026-09-09T12:55:00.000-07:00"
+}

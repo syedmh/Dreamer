@@ -1,0 +1,686 @@
+{
+  "schemaVersion": "1.0.0",
+  "captureId": "husaynia-20260816T064216Z",
+  "capturedAtUtc": "2026-08-16T06:42:16.0995276+00:00",
+  "sourceBaseUrl": "https://www.husaynia.org/",
+  "routes": [
+    {
+      "routeId": "route-8a5edab282632443",
+      "legacyPath": "/",
+      "canonicalPath": "/",
+      "expectedStatus": 200,
+      "templateKey": "home",
+      "contentKey": "content-8a5edab282632443",
+      "indexable": true,
+      "sitemap": false,
+      "metadataKey": "metadata-8a5edab282632443",
+      "assetKeys": [
+        "asset-002f4f08e5d0ac3c",
+        "asset-023217bce9599fc9",
+        "asset-03b732bca99311a0",
+        "asset-050c5be3a0d6e69a",
+        "asset-059401fa2b98b28f",
+        "asset-0685d31ea0e0d9fa",
+        "asset-0689518515b9031e",
+        "asset-069894c39bfa9632",
+        "asset-08350f986ad02f8b",
+        "asset-09780aa59e70f1f4",
+        "asset-0a904d2c465027a4",
+        "asset-0acedde71d1f640d",
+        "asset-0c35e61a85cc0a92",
+        "asset-0ccf72464e6287d6",
+        "asset-0e60edb47d2161e4",
+        "asset-0eb002debf996ef9",
+        "asset-10ca66051a2a1c85",
+        "asset-11ee76b1236715be",
+        "asset-14449b6d573601c5",
+        "asset-148b2100ba899f2d",
+        "asset-14b0ca290be2d75e",
+        "asset-16efeb77b2643884",
+        "asset-17f9d60e1715a80f",
+        "asset-1a7bcd612b42cef6",
+        "asset-20a84e0bf41ec804",
+        "asset-20ce99d330c564f4",
+        "asset-218217c5d9c665d6",
+        "asset-249113122fbae9a7",
+        "asset-25cc3c98a5287e45",
+        "asset-27754a13811bf9d3",
+        "asset-27853971709cc013",
+        "asset-280ee7db7e4154e0",
+        "asset-28ed9bcfb3035a96",
+        "asset-2df4ba390e533cc1",
+        "asset-2e771248054d5910",
+        "asset-313922c23888904d",
+        "asset-36ef7fd3f8c3f422",
+        "asset-36f71952d63cafe4",
+        "asset-38eb41d0496f5764",
+        "asset-3930b5ce60199c05",
+        "asset-3a52637ad30d5b09",
+        "asset-3a782a21801a549d",
+        "asset-3f82037e23fda62d",
+        "asset-406d0c27bd20d926",
+        "asset-411477b63beaffbd",
+        "asset-42b27bedf50d7a58",
+        "asset-44e5344fdbec7e0f",
+        "asset-45fbef1d82184de3",
+        "asset-491f684baa98bd2b",
+        "asset-4bae5b054129ad77",
+        "asset-50bf8f2f65cb1af1",
+        "asset-556d5b27f23bc02d",
+        "asset-581e6b718685df9f",
+        "asset-58a825ec541476a4",
+        "asset-5b9d2fd841bf3715",
+        "asset-5d45c2dfe6eef955",
+        "asset-5d7cc972ec5719f5",
+        "asset-61860eb4de5bf6db",
+        "asset-625b54e38b8ff7d2",
+        "asset-6459ee0453a4c666",
+        "asset-660b0ac08b6bce2a",
+        "asset-697be33d8aac110a",
+        "asset-6a67da6ad2c15f64",
+        "asset-6bcab9084e017648",
+        "asset-72823a2f5ab8b5ce",
+        "asset-7316074f56fa07cd",
+        "asset-73f389ab4ee3e3b5",
+        "asset-758b6c536300d59b",
+        "asset-7591eb5ed2b08deb",
+        "asset-75deb23ac281915d",
+        "asset-763115cda0bdfc36",
+        "asset-784668cb80071169",
+        "asset-7b0ab09e806d80a6",
+        "asset-7d7f160248c0a224",
+        "asset-80acd2aa2d5a5e27",
+        "asset-8242e937568a7031",
+        "asset-85d6f2e8e5d79b0c",
+        "asset-88cbb925d83c0b79",
+        "asset-88e787a1b5388015",
+        "asset-8bb976892ea493fb",
+        "asset-8d163df5cebe03f0",
+        "asset-8eb780052dcfe69c",
+        "asset-90ab407714bd5883",
+        "asset-943e259d7fe75ff9",
+        "asset-94c52a889ccbca4c",
+        "asset-960eef48a2e2d118",
+        "asset-973498063a7769bf",
+        "asset-984ddebd4286a144",
+        "asset-9b0b10c3ae04cc2d",
+        "asset-9d5e08d2f7e3c390",
+        "asset-9d6ebf47c6ef528c",
+        "asset-9f02aba82c3983f6",
+        "asset-9f5ce53b5af1c973",
+        "asset-a0bddd36ea2b085f",
+        "asset-a10de77ca0adbd3e",
+        "asset-a1e247f68ad5873d",
+        "asset-a392db1c01e8ed4b",
+        "asset-a4ea8a42ee3d7e19",
+        "asset-aa218332a0784563",
+        "asset-abe53a268f3cbd4f",
+        "asset-ad00d7da47749ba7",
+        "asset-addac1870af9fca6",
+        "asset-b04d771a669aa8f8",
+        "asset-b2af2ce85a7d7c5a",
+        "asset-b342976e3bc4bc06",
+        "asset-b43dba8b75bcd1d4",
+        "asset-b5ae8f9332e0a1fd",
+        "asset-b63a09f370a3e7db",
+        "asset-b7515e48f1c69ff7",
+        "asset-b81d090684934c34",
+        "asset-b84e253eb79a9f83",
+        "asset-b9b65e1e2c157958",
+        "asset-b9de63277e86e8f9",
+        "asset-ba8c3b26eddc0190",
+        "asset-bb0acd9f89379c75",
+        "asset-bda5a3baa433bcbc",
+        "asset-be45e3e71a505480",
+        "asset-bfe3dc2b115e9337",
+        "asset-c098181f31d7f094",
+        "asset-c0b24beef14def60",
+        "asset-c411e854958e5308",
+        "asset-c457b89c4a0a67a0",
+        "asset-c5182411b1a68ef3",
+        "asset-c5d4ca4b623df07a",
+        "asset-c5fcdec8598a71d4",
+        "asset-c699430078cbf3c4",
+        "asset-c73efcaa268a535f",
+        "asset-c981c6ba92ad9476",
+        "asset-cc0873b8683b9856",
+        "asset-cc8118773d717277",
+        "asset-ccc678bcb8210538",
+        "asset-cf6b03bf9215229f",
+        "asset-d339f9834cf5396e",
+        "asset-d4d7e07861b0b89a",
+        "asset-d5fde7c8b7d55259",
+        "asset-daf338e7bbcbba6f",
+        "asset-dcb5cfe754218194",
+        "asset-dd32ef4a1e6eb2bb",
+        "asset-e090e698ceecbf92",
+        "asset-e248b67794d1a540",
+        "asset-e5929a8bc610ab28",
+        "asset-e61e0d94bd9afb34",
+        "asset-e631672cca3f2034",
+        "asset-e6a245fbacd1f316",
+        "asset-e72ce1179a525020",
+        "asset-e9faeb523c0574de",
+        "asset-eadfd8cfcf05f734",
+        "asset-ebbec36508a062fb",
+        "asset-ec01ce787a03eeb3",
+        "asset-eee7ee4130227656",
+        "asset-f02b3588c224db56",
+        "asset-f055b0a2d9e02309",
+        "asset-f84c7b70febc615a",
+        "asset-f87ca5bbcd8f057e",
+        "asset-fc94c721b6fa36ec",
+        "asset-fd0add39d1cb96e5",
+        "asset-fd868562b9c65ef3"
+      ],
+      "dynamicRegionKeys": [
+        "dynamic-07fbd5ffab231fa0",
+        "dynamic-1701a1ef716c23b2",
+        "dynamic-175b412fada2260c",
+        "dynamic-26cb50f1dddea2f6",
+        "dynamic-2dd85e26266e28cd",
+        "dynamic-3bf02d72fe1cbf6c",
+        "dynamic-4375a765ded0adb3",
+        "dynamic-4bd3bb223bd39db2",
+        "dynamic-5a06f154fa4f6e96",
+        "dynamic-65115e636320d372",
+        "dynamic-67ee0a400804a2ff",
+        "dynamic-84c68770e0eae071",
+        "dynamic-910a8f7f5e1169b0",
+        "dynamic-930062d7c38134af",
+        "dynamic-95893747b19c6ff4",
+        "dynamic-a9445f5fa1c3fd3e",
+        "dynamic-af0338bb6feb74ea",
+        "dynamic-bd8ebfc5ba5dd64a",
+        "dynamic-be8195283a8beafc",
+        "dynamic-bfd785382897848a",
+        "dynamic-cfd921c15d93b5b9",
+        "dynamic-ec649b82c4f610f7",
+        "dynamic-ee0a1bd8feebe361"
+      ],
+      "evidenceRefs": [
+        "raw/html/home.html",
+        "http-inventory.json",
+        "metadata-inventory.json"
+      ],
+      "contentChecksum": "e1e63a20bb6a849120a58b2ea5b06a08e1888f684caa8aedf63b8e623056dcee"
+    },
+    {
+      "routeId": "route-0cb1a94fa1ca5c2d",
+      "legacyPath": "/events/",
+      "canonicalPath": "/events/",
+      "expectedStatus": 200,
+      "templateKey": "content-page",
+      "indexable": true,
+      "sitemap": false,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-fc39fd6bcca9f87b",
+      "legacyPath": "/feed/",
+      "canonicalPath": "/feed/",
+      "expectedStatus": 200,
+      "templateKey": "content-page",
+      "indexable": true,
+      "sitemap": false,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-b82370ba2acca69a",
+      "legacyPath": "/page-sitemap.xml",
+      "canonicalPath": "/page-sitemap.xml",
+      "expectedStatus": 200,
+      "templateKey": "machine-feed",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-0e424091fd258930",
+      "legacyPath": "/post-archive-sitemap.xml",
+      "canonicalPath": "/post-archive-sitemap.xml",
+      "expectedStatus": 200,
+      "templateKey": "machine-feed",
+      "contentKey": "content-0e424091fd258930",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "raw/endpoints/post-archive-sitemap.xml.xml",
+        "http-inventory.json",
+        "capture-summary.json"
+      ],
+      "contentChecksum": "30d1e273caf54df1e1e1293b14da7994a108a189c052892b7d97517fc99a1698"
+    },
+    {
+      "routeId": "route-6eb5b70f5c28f406",
+      "legacyPath": "/post-sitemap.xml",
+      "canonicalPath": "/post-sitemap.xml",
+      "expectedStatus": 200,
+      "templateKey": "machine-feed",
+      "contentKey": "content-6eb5b70f5c28f406",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "raw/endpoints/post-sitemap.xml.xml",
+        "http-inventory.json",
+        "capture-summary.json"
+      ],
+      "contentChecksum": "80616f7db66ac03c125f8d9e30fc3a739eff2960f6be6b54574ec265a65d3cd6"
+    },
+    {
+      "routeId": "route-adada1317532a28b",
+      "legacyPath": "/robots.txt",
+      "canonicalPath": "/robots.txt",
+      "expectedStatus": 200,
+      "templateKey": "content-page",
+      "contentKey": "content-adada1317532a28b",
+      "indexable": true,
+      "sitemap": false,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "raw/endpoints/robots.txt.bin",
+        "http-inventory.json",
+        "capture-summary.json"
+      ],
+      "contentChecksum": "c33ad6ad65e49a2aa4131ff546147511fcf01f9204bd61614534569f428afc88"
+    },
+    {
+      "routeId": "route-7efd2a819481844e",
+      "legacyPath": "/sitemap.xml",
+      "canonicalPath": "/sitemap.xml",
+      "expectedStatus": 200,
+      "templateKey": "machine-feed",
+      "contentKey": "content-7efd2a819481844e",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "raw/endpoints/sitemap.xml.xml",
+        "http-inventory.json",
+        "capture-summary.json"
+      ],
+      "contentChecksum": "adb138c2a7ee8fcf17d7801d426e45d7a7ae7ad21f88d2fa15235ca6e593b678"
+    },
+    {
+      "routeId": "route-25f87c25ec3308eb",
+      "legacyPath": "/tribe_events-sitemap.xml",
+      "canonicalPath": "/tribe_events-sitemap.xml",
+      "expectedStatus": 200,
+      "templateKey": "machine-feed",
+      "contentKey": "content-25f87c25ec3308eb",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "raw/endpoints/tribe_events-sitemap.xml.xml",
+        "http-inventory.json",
+        "capture-summary.json"
+      ],
+      "contentChecksum": "62efc976d49c5106c863f883763a5d9e2aede6568f5e0d484c47a6eb3210ccb0"
+    },
+    {
+      "routeId": "route-03e9961a62f869fd",
+      "legacyPath": "/wp-content/uploads/2022/08/Untitled-1-4-1024x1024.png",
+      "canonicalPath": "/wp-content/uploads/2022/08/Untitled-1-4-1024x1024.png",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-6459ee0453a4c666",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-6459ee0453a4c666"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_2022_08_Untitled-1-4-1024x1024.png-6459ee0453a4c666.png"
+      ],
+      "contentChecksum": "59fb2112bdc0ca105207c7e5e6797a2ecd40d1c0bb67260d309cbfd9396c20a6"
+    },
+    {
+      "routeId": "route-247493efbcfa8d83",
+      "legacyPath": "/wp-content/uploads/2022/08/Untitled-1-4-150x150.png",
+      "canonicalPath": "/wp-content/uploads/2022/08/Untitled-1-4-150x150.png",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-ec01ce787a03eeb3",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-ec01ce787a03eeb3"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_2022_08_Untitled-1-4-150x150.png-ec01ce787a03eeb3.png"
+      ],
+      "contentChecksum": "2c4786994ca564cd587cd0f5eec994a01d0c191099e8e8c129ae3867b5744b48"
+    },
+    {
+      "routeId": "route-3a3fa9fbc53c5245",
+      "legacyPath": "/wp-content/uploads/2022/08/Untitled-1-4-1536x1536.png",
+      "canonicalPath": "/wp-content/uploads/2022/08/Untitled-1-4-1536x1536.png",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-b342976e3bc4bc06",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-b342976e3bc4bc06"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_2022_08_Untitled-1-4-1536x1536.png-b342976e3bc4bc06.png"
+      ],
+      "contentChecksum": "acdc7de6183fff5f6549ec8d99310330fffa986a42982dacb3327f806514eda3"
+    },
+    {
+      "routeId": "route-807a13c1a11149dc",
+      "legacyPath": "/wp-content/uploads/2022/08/Untitled-1-4-2048x2048.png",
+      "canonicalPath": "/wp-content/uploads/2022/08/Untitled-1-4-2048x2048.png",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-b9de63277e86e8f9",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-b9de63277e86e8f9"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_2022_08_Untitled-1-4-2048x2048.png-b9de63277e86e8f9.png"
+      ],
+      "contentChecksum": "9586eaf088ec17948181a8ef299a357795daecdbe5320394d832b8281603f6dd"
+    },
+    {
+      "routeId": "route-008c2bb738ca57f2",
+      "legacyPath": "/wp-content/uploads/2022/08/Untitled-1-4-300x300.png",
+      "canonicalPath": "/wp-content/uploads/2022/08/Untitled-1-4-300x300.png",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-3930b5ce60199c05",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-3930b5ce60199c05"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_2022_08_Untitled-1-4-300x300.png-3930b5ce60199c05.png"
+      ],
+      "contentChecksum": "4864c5954ab8863272d028e41b49ad299a027f76d32f3345f677ad1565744699"
+    },
+    {
+      "routeId": "route-b26ba812a430c74b",
+      "legacyPath": "/wp-content/uploads/2022/08/Untitled-1-4-768x768.png",
+      "canonicalPath": "/wp-content/uploads/2022/08/Untitled-1-4-768x768.png",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-f02b3588c224db56",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-f02b3588c224db56"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_2022_08_Untitled-1-4-768x768.png-f02b3588c224db56.png"
+      ],
+      "contentChecksum": "570a7324b07255fc3755d04ce6319bc63a735f0809ffccfcf54f10c9f62b2aba"
+    },
+    {
+      "routeId": "route-81e5ac11e10cd60b",
+      "legacyPath": "/wp-content/uploads/2022/08/Untitled-1-4-80x80.png",
+      "canonicalPath": "/wp-content/uploads/2022/08/Untitled-1-4-80x80.png",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-9b0b10c3ae04cc2d",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-9b0b10c3ae04cc2d"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_2022_08_Untitled-1-4-80x80.png-9b0b10c3ae04cc2d.png"
+      ],
+      "contentChecksum": "7833d12e1da49ee9e7cfbf6f29ee31c4182602eb91cdf752dcba8b646ffd4d0e"
+    },
+    {
+      "routeId": "route-36b90db3ed582b17",
+      "legacyPath": "/wp-content/uploads/2022/08/cropped-Untitled-1-4-192x192.png",
+      "canonicalPath": "/wp-content/uploads/2022/08/cropped-Untitled-1-4-192x192.png",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-94c52a889ccbca4c",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-94c52a889ccbca4c"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_2022_08_cropped-Untitled-1-4-192x192.png-94c52a889ccbca4c.png"
+      ],
+      "contentChecksum": "c8681cdadb0f799f5bbcbe5ae76ae2a9efb1a4c86f005e32927df68356405bfe"
+    },
+    {
+      "routeId": "route-d9b63e6d2f5ca0e8",
+      "legacyPath": "/wp-content/uploads/2022/08/cropped-Untitled-1-4-32x32.png",
+      "canonicalPath": "/wp-content/uploads/2022/08/cropped-Untitled-1-4-32x32.png",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-249113122fbae9a7",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-249113122fbae9a7"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_2022_08_cropped-Untitled-1-4-32x32.png-249113122fbae9a7.png"
+      ],
+      "contentChecksum": "83175356a046f811676ebe1f4cc68eb7001408cdfe73431cb943150bb3ab3e73"
+    },
+    {
+      "routeId": "route-c18ff28476386a21",
+      "legacyPath": "/wp-content/uploads/2023/04/main-prayer-hall-view-01_.jpg",
+      "canonicalPath": "/wp-content/uploads/2023/04/main-prayer-hall-view-01_.jpg",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-e6a245fbacd1f316",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-e6a245fbacd1f316"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_2023_04_main-prayer-hall-view-01_.jpg-e6a245fbacd1f316.jpg"
+      ],
+      "contentChecksum": "c6cc974c4ef7a59c8743cda3a59ae5b87d81efec32e10d186e3797e3858171ad"
+    },
+    {
+      "routeId": "route-9015fa3537a3f4df",
+      "legacyPath": "/wp-content/uploads/2023/05/cam-01-1.jpg",
+      "canonicalPath": "/wp-content/uploads/2023/05/cam-01-1.jpg",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-88e787a1b5388015",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-88e787a1b5388015"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_2023_05_cam-01-1.jpg-88e787a1b5388015.jpg"
+      ],
+      "contentChecksum": "e2b9279a9150a2ee8db2ade4c52b642c325027de3eebf503dc497ae002e060a7"
+    },
+    {
+      "routeId": "route-016bb9a08a16bfa0",
+      "legacyPath": "/wp-content/uploads/2025/07/cam-04-bird-night-1.jpg",
+      "canonicalPath": "/wp-content/uploads/2025/07/cam-04-bird-night-1.jpg",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-943e259d7fe75ff9",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-943e259d7fe75ff9"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_2025_07_cam-04-bird-night-1.jpg-943e259d7fe75ff9.jpg"
+      ],
+      "contentChecksum": "66cd945091eaaeb6172c8aba86ea458401cc945d67a5b74b72e46f6eb71005ac"
+    },
+    {
+      "routeId": "route-69f4219e7193ffee",
+      "legacyPath": "/wp-content/uploads/astra-addon/astra-addon-66d282d80b6582-46336369.css",
+      "canonicalPath": "/wp-content/uploads/astra-addon/astra-addon-66d282d80b6582-46336369.css",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-002f4f08e5d0ac3c",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-002f4f08e5d0ac3c"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_astra-addon_astra-addon-66d282d80b6582-46336369.css-002f4f08e5d0ac3c.css"
+      ],
+      "contentChecksum": "4f455f50e5eccd60148d2efb6f65928d7562109cdfbdcf7cbdd9092beeba4bf7"
+    },
+    {
+      "routeId": "route-ddd5c31bbd71f234",
+      "legacyPath": "/wp-content/uploads/astra-addon/astra-addon-66d282d8103fe1-00647392.js",
+      "canonicalPath": "/wp-content/uploads/astra-addon/astra-addon-66d282d8103fe1-00647392.js",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-9d5e08d2f7e3c390",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-9d5e08d2f7e3c390"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_astra-addon_astra-addon-66d282d8103fe1-00647392.js-9d5e08d2f7e3c390.js"
+      ],
+      "contentChecksum": "2c7909af05f26943fc68b10facf8d58b5b78c77d7b4437ca8656b193e0e4a639"
+    },
+    {
+      "routeId": "route-88fb2f7587d8317a",
+      "legacyPath": "/wp-content/uploads/astra-addon/astra-addon-dynamic-css-post-975.css",
+      "canonicalPath": "/wp-content/uploads/astra-addon/astra-addon-dynamic-css-post-975.css",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-dcb5cfe754218194",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-dcb5cfe754218194"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_astra-addon_astra-addon-dynamic-css-post-975.css-dcb5cfe754218194.css"
+      ],
+      "contentChecksum": "b45d5321f287c4840ad9a047016124620e04569d16d306d2093dcbc96c8e2974"
+    },
+    {
+      "routeId": "route-2185c02cd11fe4be",
+      "legacyPath": "/wp-content/uploads/astra/astra-theme-dynamic-css-post-975.css",
+      "canonicalPath": "/wp-content/uploads/astra/astra-theme-dynamic-css-post-975.css",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-ba8c3b26eddc0190",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-ba8c3b26eddc0190"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_astra_astra-theme-dynamic-css-post-975.css-ba8c3b26eddc0190.css"
+      ],
+      "contentChecksum": "e23c89430e43c10172b2d85cf7e1a5551b9db13fb0c6075bbdb01fc3f9f6bd64"
+    },
+    {
+      "routeId": "route-b7c3d1d8cd8f6992",
+      "legacyPath": "/wp-content/uploads/elementor/css/post-8.css",
+      "canonicalPath": "/wp-content/uploads/elementor/css/post-8.css",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-ebbec36508a062fb",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-ebbec36508a062fb"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_elementor_css_post-8.css-ebbec36508a062fb.css"
+      ],
+      "contentChecksum": "28e9f42a0e7a154099600426e5967747ca1dc39da00c015ec9866cb8e865683f"
+    },
+    {
+      "routeId": "route-94dd1323300ad807",
+      "legacyPath": "/wp-content/uploads/elementor/css/post-975.css",
+      "canonicalPath": "/wp-content/uploads/elementor/css/post-975.css",
+      "expectedStatus": 200,
+      "templateKey": "asset-alias",
+      "contentKey": "asset-e248b67794d1a540",
+      "indexable": false,
+      "sitemap": false,
+      "assetKeys": [
+        "asset-e248b67794d1a540"
+      ],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "media-inventory.json",
+        "assets/wp-content_uploads_elementor_css_post-975.css-e248b67794d1a540.css"
+      ],
+      "contentChecksum": "50fbadc90d8ecd4a90a895ebe3a7592e65ad7e14ec1cb9e58e3c7165e8ac967a"
+    }
+  ]
+}

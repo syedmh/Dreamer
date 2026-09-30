@@ -1,0 +1,19 @@
+{
+  "captureId": "husaynia-20260816T033708Z",
+  "capturedAtUtc": "2026-08-16T04:57:18.7721679+00:00",
+  "operatingSystem": "Microsoft Windows 10.0.26200",
+  "architecture": "X64",
+  "dotNetSdkVersion": "10.0.400",
+  "playwrightPackageVersion": "1.62.0",
+  "chromiumVersion": "151.0.7922.34",
+  "chromiumExecutable": "C:\\Users\\syedhu\\AppData\\Local\\ms-playwright\\chromium-1234\\chrome-win64\\chrome.exe",
+  "browserInstallCommand": "pwsh tools/Husaynia.BaselineCapture/bin/Release/net10.0/playwright.ps1 install --no-shell chromium",
+  "browserCacheKey": "Microsoft Windows 10.0.26200|X64|9d737d7bfb7ffe174866ac35ffb42a3fc2f02f5bcd77acc571b8142e265575f3|1.62.0",
+  "networkPolicyVersion": "adr-009-v1",
+  "navigationAttempts": 3,
+  "navigationAttemptTimeoutSeconds": 10,
+  "readinessTimeoutSeconds": 30,
+  "captureTimeoutSeconds": 45,
+  "interCaptureDelayMilliseconds": 3000,
+  "toolingOnlyDependency": true
+}

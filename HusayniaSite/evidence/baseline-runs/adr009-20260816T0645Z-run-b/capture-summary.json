@@ -1,0 +1,23 @@
+{
+  "captureId": "husaynia-recapture-20260816T065521Z",
+  "startedAtUtc": "2026-08-16T06:55:21.7653637+00:00",
+  "completedAtUtc": "2026-08-16T06:57:14.4056768+00:00",
+  "sourceBaseUrl": "https://www.husaynia.org/",
+  "noSubmit": true,
+  "sitemapCount": 0,
+  "routeCount": 0,
+  "successfulRouteCount": 0,
+  "redirectCount": 0,
+  "metadataCount": 0,
+  "assetCount": 0,
+  "downloadedAssetCount": 0,
+  "formCount": 0,
+  "dynamicRegionCount": 0,
+  "screenshotCount": 36,
+  "successfulScreenshotCount": 1,
+  "qualityPassScreenshotCount": 1,
+  "residualRiskCount": 0,
+  "durationSeconds": 112.6403131,
+  "networkRequestCount": 204,
+  "cacheHitCount": 0
+}

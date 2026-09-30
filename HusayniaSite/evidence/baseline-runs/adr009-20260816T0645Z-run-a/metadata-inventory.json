@@ -1,0 +1,30 @@
+[
+  {
+    "url": "https://www.husaynia.org/",
+    "title": "Husaynia Islamic Society of Seattle",
+    "description": "Husaynia society is determined to go beyond rituals to strategic implementation of Imam Husayn\u2019s message in the western society, as bearing the true message of Islam. We plan to build an interfaith community where people come together to share and discuss ideas and work on things they are passionate about. Recognizing we belong to one human race means we have a responsibility to act as a community to affirmatively address issues of social justice.",
+    "canonical": "https://www.husaynia.org/",
+    "robots": "max-image-preview:large",
+    "openGraphTitle": "Husaynia Islamic Society of Seattle",
+    "openGraphDescription": "Husaynia society is determined to go beyond rituals to strategic implementation of Imam Husayn\u2019s message in the western society, as bearing the true message of Islam. We plan to build an interfaith community where people come together to share and discuss ideas and work on things they are passionate about. Recognizing we belong to one human race means we have a responsibility to act as a community to affirmatively address issues of social justice.",
+    "openGraphImage": "https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png",
+    "twitterCard": "summary_large_image",
+    "jsonLdTypes": [
+      "BreadcrumbList",
+      "ContactPoint",
+      "EntryPoint",
+      "ImageObject",
+      "ListItem",
+      "LocalBusiness",
+      "Organization",
+      "PostalAddress",
+      "SearchAction",
+      "WebPage",
+      "WebSite"
+    ],
+    "language": "en-US",
+    "direction": "ltr",
+    "h1": "\u0625\u0646 \u0644\u0642\u062A\u0644 \u0627\u0644\u062D\u064F\u0633\u064A\u0646 \u062D\u0631\u0627\u0631\u0629\u064C \u0641\u064A \u0642\u0644\u0648\u0628 \u0627\u0644\u0645\u0624\u0645\u0646\u064A\u0646 \u0644\u0627 \u062A\u0628\u0631\u062F \u0623\u0628\u062F\u0627\u064B",
+    "contentSha256": "e1e63a20bb6a849120a58b2ea5b06a08e1888f684caa8aedf63b8e623056dcee"
+  }
+]

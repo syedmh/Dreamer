@@ -1,0 +1,78 @@
+{
+  "failingBefore": {
+    "boundary": "Right_turn1_to_turn2",
+    "shoulder": 16.0,
+    "waist": 6.0,
+    "oldLabelGate": "accepted",
+    "explicitTurningGate": "rejected"
+  },
+  "boundaryCounts": {
+    "stationary": 27,
+    "turning": 6,
+    "walking": 12
+  },
+  "movingMaxima": {
+    "head": 5.89861,
+    "torso": 13.796428,
+    "shoulder": 10.0,
+    "waist": 9.0,
+    "baseline": 11.0,
+    "height": 12.0
+  },
+  "rightDirectional": {
+    "Right_front_to_turn1": {
+      "head": 3.66671039502657,
+      "torso": 1.3407597719008493,
+      "shoulder": 7.0,
+      "waist": 6.0,
+      "baseline": 1.0,
+      "height": 5.0
+    },
+    "Right_turn1_to_turn2": {
+      "head": 3.3915156962719664,
+      "torso": 6.4888547017841915,
+      "shoulder": 10.0,
+      "waist": 0.0,
+      "baseline": 6.0,
+      "height": 12.0
+    }
+  },
+  "classificationNegativeKinds": [
+    "turning",
+    "walking"
+  ],
+  "rightTranslations": [
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      -6
+    ],
+    [
+      2,
+      0
+    ]
+  ],
+  "baselineDelta": {
+    "changed": [
+      "Frames/RightTurn/turn_1.png"
+    ],
+    "details": {
+      "Frames/RightTurn/turn_1.png": {
+        "before": {
+          "bytes": 181913,
+          "sha256": "D891561FE5E5414A984AC3DFA061DE48050BC73B2E2C96500BDFDBDB0B3BA9D1",
+          "pixelSha256": "135E18DF13D6760EE056624D230663F1211B2577B42EDF868FD7E0CE545BD7F0"
+        },
+        "after": {
+          "bytes": 181927,
+          "sha256": "188D76A038B4AFD94DE02877CCF1A5F38417011070D5550E88253DCB4F867BC6",
+          "pixelSha256": "D5908E450307D2AA96B5DA3E7E89885170CDA24DB1BD9516259294726FAB3F59"
+        }
+      }
+    }
+  },
+  "passedBoundaries": 45
+}

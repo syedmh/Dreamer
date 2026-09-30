@@ -1,0 +1,21 @@
+{
+  "objective": "Unpause all phases and complete everything we done across the agents to have a high quality code",
+  "scopeSinceLastApproval": [
+    "check-auth read-only diagnostic (src/tcfcomic/auth_probe.py, azure_access.py, cli.py, authentication.py)",
+    "definitive Azure 401/403 stop-on-denial (providers/openai.py, processor.py)",
+    "auth-probe deadline/IPC race fix",
+    "provider.fallbacks fallback variants (config.py, processor.py)",
+    "config.azure.yaml / config.azure.interactive.yaml prompt sync; painted fallback prompts",
+    "README updates; tests/integration/test_access_diagnostics.py, test_fallback_variants.py"
+  ],
+  "priorApproval": ".ai-org/missions/2026-09-25-comprehensive-validation-cda7f4d7/final-result.json",
+  "constraints": ["No live Azure requests or browser sign-in by agents", "Do not modify output/ or incoming/ or user prompt text", "No commits", "No DB schema migration"],
+  "definitionOfDone": [
+    "Full test suite executed with counts; no failures",
+    "Code review APPROVED",
+    "Zero unresolved Critical/High security findings",
+    "Offline operator journeys for check-auth, stop-on-403, fallbacks pass",
+    "README accurate for new commands/config",
+    "Engineering judge APPROVED"
+  ]
+}

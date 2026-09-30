@@ -18,6 +18,7 @@ public static class ActionLegendLayout
         "0       Exit school + hide bubble",
         "D       Exit nearest screen edge",
         "E       Enter from right",
+        "G       Girl enters from left",
         "F       Start 30s celebration",
         "S       Stop celebration",
         "R       Rain logos for 10s",

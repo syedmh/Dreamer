@@ -1,0 +1,595 @@
+{
+  "schemaVersion": "1.0.0",
+  "missionId": "2026-08-14-husaynia-site-modernization",
+  "status": "READY",
+  "objective": "Convert the approved Husaynia.org replica architecture into a dependency-ordered, independently verifiable implementation plan with frozen interfaces and collision-free parallel ownership.",
+  "repositoryRoot": "C:\\Users\\syedhu\\source\\repos\\Dreamer",
+  "implementationRoot": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\HusayniaSite",
+  "authoritativeInputs": [
+    ".ai-org/missions/2026-08-14-husaynia-site-modernization/requirements.md",
+    ".ai-org/missions/2026-08-14-husaynia-site-modernization/definition-of-done.md",
+    ".ai-org/missions/2026-08-14-husaynia-site-modernization/architecture.md",
+    ".ai-org/missions/2026-08-14-husaynia-site-modernization/decisions.md",
+    ".ai-org/missions/2026-08-14-husaynia-site-modernization/adr/ADR-001-modular-monolith.md",
+    ".ai-org/missions/2026-08-14-husaynia-site-modernization/adr/ADR-002-azure-baseline.md",
+    ".ai-org/missions/2026-08-14-husaynia-site-modernization/adr/ADR-003-versioned-content.md",
+    ".ai-org/missions/2026-08-14-husaynia-site-modernization/adr/ADR-004-identity-audit.md",
+    ".ai-org/missions/2026-08-14-husaynia-site-modernization/adr/ADR-005-integrations.md",
+    ".ai-org/missions/2026-08-14-husaynia-site-modernization/adr/ADR-006-payments.md",
+    ".ai-org/missions/2026-08-14-husaynia-site-modernization/adr/ADR-007-migration-url-contract.md",
+    ".ai-org/missions/2026-08-14-husaynia-site-modernization/adr/ADR-008-immutable-promotion.md"
+  ],
+  "prohibitions": [
+    "Do not modify Husaynia/",
+    "Do not modify shared active-mission.json",
+    "Do not choose or authorize paid Azure SKUs",
+    "Do not provision or deploy Production",
+    "Do not execute real payments or public form submissions",
+    "Do not place secrets or live credentials in source, artifacts, logs, screenshots, or documentation",
+    "Do not commit or push"
+  ],
+  "frozenInterfaces": {
+    "routeManifest": {
+      "canonicalSchemaPath": "contracts/routes/route-manifest.schema.json",
+      "instancePath": "evidence/baseline/route-manifest.json",
+      "rootRequired": ["schemaVersion", "captureId", "capturedAtUtc", "sourceBaseUrl", "routes"],
+      "routeRequired": ["routeId", "legacyPath", "canonicalPath", "expectedStatus", "templateKey", "indexable", "sitemap", "assetKeys", "dynamicRegionKeys", "evidenceRefs"],
+      "statuses": [200, 301, 308, 404, 410],
+      "invariants": [
+        "Paths are leading-slash, host-free, NFC-normalized.",
+        "Canonical paths and route IDs are unique.",
+        "A 200 route has no redirect target.",
+        "A redirect has exactly one approved target and one hop.",
+        "Raw WordPress technical routes require an explicit redirect or 410 decision.",
+        "/wp-content/uploads/** aliases are executable asset contracts."
+      ]
+    },
+    "contentModel": {
+      "namespace": "Husaynia.Application.Contracts",
+      "errorModel": "Result<TSuccess,TError>",
+      "methods": [
+        "IContentReader.GetByPathAsync(string path, CancellationToken ct)",
+        "IContentReader.GetPreviewAsync(ContentId id, RevisionId revisionId, PreviewToken token, CancellationToken ct)",
+        "IContentEditor.SaveDraftAsync(ContentDraft draft, RevisionId? expectedDraft, UserContext actor, CancellationToken ct)",
+        "IPublisher.PublishAsync(ContentId id, RevisionId expectedDraft, UserContext actor, CancellationToken ct)",
+        "IPublisher.UnpublishAsync(ContentId id, RowVersion expectedVersion, UserContext actor, CancellationToken ct)",
+        "IPublisher.RollbackAsync(ContentId id, RevisionId priorRevision, RowVersion expectedVersion, UserContext actor, CancellationToken ct)",
+        "IEventReader.GetBySlugAsync(string slug, CancellationToken ct)",
+        "ICalendarExporter.ExportAsync(EventSelection selection, CancellationToken ct)",
+        "IPrayerScheduleService.GetMonthAsync(YearMonth month, string timeZoneId, CancellationToken ct)",
+        "IPublicSearch.SearchAsync(string query, int page, int pageSize, CancellationToken ct)",
+        "IFormSubmissionService.SubmitAsync(FormSubmissionCommand command, RequestFingerprint fingerprint, CancellationToken ct)",
+        "IDonationService.CreateCheckoutAsync(DonationIntent intent, string idempotencyKey, CancellationToken ct)",
+        "IDonationService.HandleWebhookAsync(ReadOnlyMemory<byte> body, string signature, CancellationToken ct)",
+        "IImportPlanner.PlanAsync(ImportSource source, ImportMode mode, CancellationToken ct)",
+        "IImportExecutor.ApplyAsync(ImportPlanId planId, UserContext actor, CancellationToken ct)"
+      ],
+      "invariants": [
+        "ContentItem identity is stable.",
+        "ContentRevision is immutable.",
+        "Draft and published revision pointers update atomically.",
+        "Rollback creates and publishes a new revision.",
+        "Typed operational data is not forced into generic content JSON."
+      ]
+    },
+    "rolePermissionMatrix": {
+      "roles": ["SiteAdministrator", "ContentEditor", "EventEditor", "MediaEditor", "DonationOperator", "ReadOnlyAuditor"],
+      "policies": ["SiteAdministration", "ContentManagement", "EventManagement", "MediaManagement", "DonationOperations", "AuditRead"],
+      "publicRegistration": false,
+      "mfaRequiredForPrivilegedRoles": true,
+      "capabilities": {
+        "usersRolesIntegrationsSettings": {"SiteAdministrator": "RW", "ReadOnlyAuditor": "reports:R"},
+        "pagesAnnouncementsReligiousContent": {"SiteAdministrator": "RW", "ContentEditor": "RW", "ReadOnlyAuditor": "audit:R"},
+        "eventsAndIcal": {"SiteAdministrator": "RW", "EventEditor": "RW", "ReadOnlyAuditor": "audit:R"},
+        "mediaAndAliases": {"SiteAdministrator": "RW", "MediaEditor": "RW", "ReadOnlyAuditor": "audit:R"},
+        "donationStatusAndReconciliation": {"SiteAdministrator": "RW", "DonationOperator": "RW", "ReadOnlyAuditor": "reports:R"},
+        "auditAndOperationalReports": {"SiteAdministrator": "RW", "DonationOperator": "limited:R", "ReadOnlyAuditor": "R"}
+      },
+      "auditRequiredFor": ["allowed privileged attempt", "denied privileged attempt"]
+    },
+    "externalAdapters": {
+      "ownership": "Ports in Application; provider SDK implementations in Infrastructure.",
+      "methods": [
+        "IPrayerSource.GetAsync(PrayerSourceRequest request, CancellationToken ct)",
+        "ISocialFeedProvider.FetchAsync(SocialFeedRequest request, CancellationToken ct)",
+        "IMediaStore.PutAsync(MediaWriteRequest request, CancellationToken ct)",
+        "IMediaStore.OpenReadAsync(MediaReadRequest request, CancellationToken ct)",
+        "IUploadSafetyValidator.ValidateAsync(UploadCandidate candidate, CancellationToken ct)",
+        "IOutboundMessageSender.SendAsync(OutboundMessage message, CancellationToken ct)",
+        "IPaymentGateway.CreateCheckoutAsync(PaymentCheckoutRequest request, string idempotencyKey, CancellationToken ct)",
+        "IPaymentGateway.VerifyWebhookAsync(ReadOnlyMemory<byte> body, string signature, CancellationToken ct)",
+        "IJobLeaseStore.TryAcquireAsync(JobKey key, WorkerIdentity worker, TimeSpan lease, CancellationToken ct)"
+      ],
+      "invariants": [
+        "Explicit connect and overall timeouts.",
+        "Retries only for safe idempotent reads.",
+        "Public prayer/social reads use persisted snapshots.",
+        "Provider diagnostics never appear in public responses."
+      ]
+    },
+    "migrationManifest": {
+      "canonicalSchemaPaths": ["contracts/migration/import-manifest.schema.json", "contracts/migration/import-report.schema.json"],
+      "rootRequired": ["schemaVersion", "source", "sourceVersion", "capturedAtUtc", "rightsProfile", "candidates"],
+      "candidateRequired": ["sourceKey", "sourceVersion", "sourceChecksum", "kind", "targetKey", "payloadRef", "mediaRefs", "dependencyKeys", "decision"],
+      "decisions": ["create", "update", "skip", "conflict", "orphan", "reject"],
+      "defaultMode": "dry-run",
+      "idempotencyKey": "sourceKey + sourceVersion",
+      "conflictRule": "A target changed since planning becomes conflict and is never silently overwritten."
+    },
+    "pipelineArtifact": {
+      "namePattern": "husaynia-site-{version}",
+      "requiredPaths": [
+        "app/Husaynia.Web.zip",
+        "migrations/sql/*.sql",
+        "migrations/bundle/*",
+        "contracts/route-manifest.json",
+        "contracts/import-manifest.schema.json",
+        "sbom/sbom.spdx.json",
+        "reports/test-results/**",
+        "reports/security/**",
+        "reports/accessibility/**",
+        "release/release-manifest.json",
+        "release/SHA256SUMS"
+      ],
+      "releaseManifestRequired": ["schemaVersion", "version", "commitSha", "builtAtUtc", "dotnetSdk", "files", "databaseCompatibility", "requiredConfigurationKeys", "prohibitedLiveConfigurationInNonProduction"],
+      "promotionRule": "The same application archive SHA-256 is promoted through Development, Staging, and separately authorized Production; environment configuration never rebuilds it."
+    },
+    "composition": {
+      "moduleContract": "IHusayniaModule",
+      "registration": "T02-owned deterministic discovery from Program.cs.",
+      "efConfiguration": "ApplyConfigurationsFromAssembly",
+      "exclusiveOwners": {
+        "solutionProjectCompositionFiles": "T02",
+        "generatedEfMigrationsAndSnapshot": "T18",
+        "sharedLayoutsAndBaseDesignSystem": "T13",
+        "pipelines": "T21",
+        "documentation": "T22"
+      }
+    }
+  },
+  "tasks": [
+    {
+      "id": "T01",
+      "title": "Capture approved live baseline and executable route/content evidence",
+      "ownerCapability": "frontend-specialist",
+      "objective": "Create repeatable no-submit crawl, screenshot, metadata, media, checksum, form/widget observation, and manifest capture tooling and capture the timestamped baseline.",
+      "dependencies": [],
+      "ownedPaths": ["HusayniaSite/tools/Husaynia.BaselineCapture/**", "HusayniaSite/evidence/baseline/**", "HusayniaSite/tests/Husaynia.BaselineCapture.Tests/**"],
+      "inputsContracts": ["R-04..R-18", "R-25..R-32", "C1", "C5"],
+      "acceptanceCriteria": ["AC-01..AC-07", "AC-11..AC-15", "AC-21", "AC-22", "AC-35"],
+      "commandsEvidence": ["dotnet test tests/Husaynia.BaselineCapture.Tests", "dotnet run --project tools/Husaynia.BaselineCapture -- capture --no-submit", "Schema validation and retained screenshots/HTTP/SEO/media checksums"],
+      "exitCriteria": "All discoverable public routes/assets and named viewports are captured; dynamic/form unknowns are explicit residual risks; no form/payment is submitted.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T02",
+      "title": "Create solution foundation and land frozen contracts",
+      "ownerCapability": "developer",
+      "objective": "Create the .NET 10 solution, central build/package policy, projects, common contracts, module discovery, configuration validation, test scaffolds, and checked-in schemas.",
+      "dependencies": [],
+      "ownedPaths": ["HusayniaSite/HusayniaSite.sln", "HusayniaSite/global.json", "HusayniaSite/Directory.Build.props", "HusayniaSite/Directory.Packages.props", "HusayniaSite/NuGet.config", "HusayniaSite/src/Husaynia.Domain/Husaynia.Domain.csproj", "HusayniaSite/src/Husaynia.Application/Husaynia.Application.csproj", "HusayniaSite/src/Husaynia.Infrastructure/Husaynia.Infrastructure.csproj", "HusayniaSite/src/Husaynia.Web/Husaynia.Web.csproj", "HusayniaSite/tools/Husaynia.Migration/Husaynia.Migration.csproj", "HusayniaSite/tests/Husaynia.Domain.Tests/Husaynia.Domain.Tests.csproj", "HusayniaSite/tests/Husaynia.Application.Tests/Husaynia.Application.Tests.csproj", "HusayniaSite/tests/Husaynia.IntegrationTests/Husaynia.IntegrationTests.csproj", "HusayniaSite/tests/Husaynia.ContractTests/Husaynia.ContractTests.csproj", "HusayniaSite/tests/Husaynia.E2ETests/Husaynia.E2ETests.csproj", "HusayniaSite/tests/Husaynia.ArchitectureTests/Husaynia.ArchitectureTests.csproj", "HusayniaSite/tests/Husaynia.SystemValidation.Tests/Husaynia.SystemValidation.Tests.csproj", "HusayniaSite/src/Husaynia.Domain/Common/**", "HusayniaSite/src/Husaynia.Application/Contracts/**", "HusayniaSite/src/Husaynia.Web/Program.cs", "HusayniaSite/src/Husaynia.Web/Composition/**", "HusayniaSite/contracts/**"],
+      "inputsContracts": ["Architecture sections 2-5", "ADR-001", "C1..C7"],
+      "acceptanceCriteria": ["AC-29"],
+      "commandsEvidence": ["dotnet restore --locked-mode", "dotnet build -warnaserror", "dotnet test", "dotnet publish", "Architecture dependency/module discovery tests"],
+      "exitCriteria": "The empty modular solution builds/tests/publishes and later modules can add files without changing shared foundation.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T03",
+      "title": "Implement persistence and transaction foundation",
+      "ownerCapability": "database-specialist",
+      "objective": "Provide EF Core SQL context, common concurrency/audit fields, configuration discovery, transactions/idempotency primitives, design-time tooling, and DB fixtures.",
+      "dependencies": ["T02"],
+      "ownedPaths": ["HusayniaSite/src/Husaynia.Infrastructure/Persistence/Core/**", "HusayniaSite/src/Husaynia.Infrastructure/Persistence/Transactions/**", "HusayniaSite/tests/Husaynia.IntegrationTests/Persistence/Core/**"],
+      "inputsContracts": ["Architecture section 6", "C2", "C7", "ADR-003", "ADR-004", "ADR-006", "ADR-007"],
+      "acceptanceCriteria": ["AC-16", "AC-19", "AC-29", "AC-35"],
+      "commandsEvidence": ["Integration tests against disposable SQL Server/Azure SQL-compatible instance", "dotnet ef dbcontext info", "Concurrency and rollback tests"],
+      "exitCriteria": "Modules add discovered configurations without context edits and transaction/concurrency behavior is proven.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T04",
+      "title": "Implement Identity authorization and append-only audit",
+      "ownerCapability": "backend-specialist",
+      "objective": "Implement six roles/policies, MFA, disabled registration, deny-by-default endpoint/use-case authorization, account administration, and allowed/denied audit events.",
+      "dependencies": ["T03"],
+      "ownedPaths": ["HusayniaSite/src/Husaynia.Domain/Identity/**", "HusayniaSite/src/Husaynia.Application/Identity/**", "HusayniaSite/src/Husaynia.Infrastructure/Identity/**", "HusayniaSite/src/Husaynia.Web/Areas/Admin/Identity/**", "HusayniaSite/tests/Husaynia.Application.Tests/Identity/**", "HusayniaSite/tests/Husaynia.IntegrationTests/Identity/**"],
+      "inputsContracts": ["C3", "C7", "R-19..R-24", "ADR-004"],
+      "acceptanceCriteria": ["AC-18", "AC-26", "AC-33"],
+      "commandsEvidence": ["Complete identity-by-capability role matrix integration suite", "Audit correlation assertions", "Registration and MFA policy tests"],
+      "exitCriteria": "Only matrix-authorized operations succeed and every permitted/denied privileged attempt is audited safely.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T05",
+      "title": "Implement immutable content and editorial lifecycle",
+      "ownerCapability": "backend-specialist",
+      "objective": "Implement content/navigation/religious revisions, preview, publish/unpublish/rollback, sanitization, Unicode checksums, and SEO fields.",
+      "dependencies": ["T03", "T04"],
+      "ownedPaths": ["HusayniaSite/src/Husaynia.Domain/Content/**", "HusayniaSite/src/Husaynia.Application/Content/**", "HusayniaSite/src/Husaynia.Infrastructure/Content/**", "HusayniaSite/src/Husaynia.Web/Areas/Admin/Content/**", "HusayniaSite/tests/Husaynia.Domain.Tests/Content/**", "HusayniaSite/tests/Husaynia.Application.Tests/Content/**", "HusayniaSite/tests/Husaynia.IntegrationTests/Content/**"],
+      "inputsContracts": ["C2", "C3", "C7", "ADR-003", "R-08", "R-09", "R-18", "R-19A", "R-24"],
+      "acceptanceCriteria": ["AC-05", "AC-06", "AC-18", "AC-19", "AC-21"],
+      "commandsEvidence": ["Revision/publish concurrency tests", "Unicode round-trip fixtures", "Preview expiry/noindex and role tests"],
+      "exitCriteria": "Published revisions are immutable, drafts do not leak, and rollback republishes as a new revision.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T06",
+      "title": "Implement events, programs, recurrence, and iCal",
+      "ownerCapability": "backend-specialist",
+      "objective": "Implement event/program states, recurrence occurrences, timezone-aware reads, editor lifecycle, and RFC-compliant iCal.",
+      "dependencies": ["T03", "T04"],
+      "ownedPaths": ["HusayniaSite/src/Husaynia.Domain/Calendar/**", "HusayniaSite/src/Husaynia.Application/Calendar/**", "HusayniaSite/src/Husaynia.Infrastructure/Calendar/**", "HusayniaSite/src/Husaynia.Web/Areas/Admin/Calendar/**", "HusayniaSite/tests/Husaynia.Domain.Tests/Calendar/**", "HusayniaSite/tests/Husaynia.Application.Tests/Calendar/**", "HusayniaSite/tests/Husaynia.IntegrationTests/Calendar/**"],
+      "inputsContracts": ["C2", "C3", "C7", "R-11", "R-21", "America/Los_Angeles"],
+      "acceptanceCriteria": ["AC-09", "AC-10", "AC-18", "AC-19"],
+      "commandsEvidence": ["Recurrence/timezone/DST tests", "Independent iCal parser tests", "Draft/past/future visibility tests"],
+      "exitCriteria": "Event lifecycle and public/iCal output are deterministic and canonical.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T07",
+      "title": "Implement deterministic prayer schedules and fallback",
+      "ownerCapability": "backend-specialist",
+      "objective": "Implement configurable Snohomish profiles, DST-aware sources/calculation, persisted snapshots, overrides, stale labels, and isolated failure behavior.",
+      "dependencies": ["T03", "T04"],
+      "ownedPaths": ["HusayniaSite/src/Husaynia.Domain/Prayer/**", "HusayniaSite/src/Husaynia.Application/Prayer/**", "HusayniaSite/src/Husaynia.Infrastructure/Prayer/**", "HusayniaSite/src/Husaynia.Web/Areas/Admin/Prayer/**", "HusayniaSite/tests/Husaynia.Domain.Tests/Prayer/**", "HusayniaSite/tests/Husaynia.Application.Tests/Prayer/**", "HusayniaSite/tests/Husaynia.IntegrationTests/Prayer/**"],
+      "inputsContracts": ["C2", "C4", "C7", "R-10", "ADR-005"],
+      "acceptanceCriteria": ["AC-07", "AC-08", "AC-18", "AC-25"],
+      "commandsEvidence": ["Fixed-clock DST tests", "Profile hash determinism", "Override precedence", "Timeout/cache/unavailable tests"],
+      "exitCriteria": "Schedules are deterministic; overrides apply last; outages do not cascade.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T08",
+      "title": "Implement safe versioned media and stable aliases",
+      "ownerCapability": "backend-specialist",
+      "objective": "Implement Blob-backed immutable media versions, upload safety, stable aliases, range/ETag/cache behavior, and replace/archive workflow.",
+      "dependencies": ["T03", "T04"],
+      "ownedPaths": ["HusayniaSite/src/Husaynia.Domain/Media/**", "HusayniaSite/src/Husaynia.Application/Media/**", "HusayniaSite/src/Husaynia.Infrastructure/Media/**", "HusayniaSite/src/Husaynia.Web/Areas/Admin/Media/**", "HusayniaSite/src/Husaynia.Web/Features/MediaDelivery/**", "HusayniaSite/tests/Husaynia.Application.Tests/Media/**", "HusayniaSite/tests/Husaynia.IntegrationTests/Media/**"],
+      "inputsContracts": ["C3", "C4", "C7", "R-20", "R-26", "R-28"],
+      "acceptanceCriteria": ["AC-18", "AC-20", "AC-22", "AC-26"],
+      "commandsEvidence": ["Upload abuse/type/size/corruption/path tests", "Range/ETag tests", "Replacement alias tests"],
+      "exitCriteria": "Only safe files are served and approved stable paths survive replacement.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T09",
+      "title": "Implement persisted social snapshots and consent-safe feeds",
+      "ownerCapability": "backend-specialist",
+      "objective": "Implement provider normalization, local snapshots, refresh jobs/state, stale/empty/error states, and consent-controlled embed descriptors.",
+      "dependencies": ["T03"],
+      "ownedPaths": ["HusayniaSite/src/Husaynia.Domain/Social/**", "HusayniaSite/src/Husaynia.Application/Social/**", "HusayniaSite/src/Husaynia.Infrastructure/Social/**", "HusayniaSite/tests/Husaynia.Application.Tests/Social/**", "HusayniaSite/tests/Husaynia.IntegrationTests/Social/**"],
+      "inputsContracts": ["C4", "C7", "ADR-005", "R-12", "R-44", "R-47"],
+      "acceptanceCriteria": ["AC-11", "AC-12", "AC-25", "AC-27"],
+      "commandsEvidence": ["Healthy/timeout/rate-limit/empty/stale tests", "Assertion public reads never invoke provider"],
+      "exitCriteria": "Public social reads are local and failures return safe accessible state data.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T10",
+      "title": "Implement published-only search projection",
+      "ownerCapability": "database-specialist",
+      "objective": "Implement SearchDocument projection, Azure SQL Full-Text query adapter, safe bounds/ranking/Unicode handling, and dependency-unavailable state.",
+      "dependencies": ["T03", "T05", "T06"],
+      "ownedPaths": ["HusayniaSite/src/Husaynia.Domain/Search/**", "HusayniaSite/src/Husaynia.Application/Search/**", "HusayniaSite/src/Husaynia.Infrastructure/Search/**", "HusayniaSite/tests/Husaynia.Application.Tests/Search/**", "HusayniaSite/tests/Husaynia.IntegrationTests/Search/**"],
+      "inputsContracts": ["C2", "C7", "R-13", "R-43"],
+      "acceptanceCriteria": ["AC-13", "AC-24", "AC-25"],
+      "commandsEvidence": ["Published/private fixtures", "Empty/Unicode/oversize/injection tests", "Query plan/index evidence"],
+      "exitCriteria": "Search is bounded and can never expose drafts, admin, donor, or form data.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T11",
+      "title": "Implement contact and pledge submission workflows",
+      "ownerCapability": "backend-specialist",
+      "objective": "Implement versioned forms, durable submission/delivery jobs, duplicate/anti-abuse controls, retention, and non-public sinks.",
+      "dependencies": ["T03", "T04"],
+      "ownedPaths": ["HusayniaSite/src/Husaynia.Domain/Forms/**", "HusayniaSite/src/Husaynia.Application/Forms/**", "HusayniaSite/src/Husaynia.Infrastructure/Forms/**", "HusayniaSite/src/Husaynia.Web/Areas/Admin/Forms/**", "HusayniaSite/tests/Husaynia.Application.Tests/Forms/**", "HusayniaSite/tests/Husaynia.IntegrationTests/Forms/**"],
+      "inputsContracts": ["C3", "C4", "C7", "T01 form baseline", "R-14", "R-47"],
+      "acceptanceCriteria": ["AC-14", "AC-18", "AC-25", "AC-33"],
+      "commandsEvidence": ["Required/malformed/oversize/duplicate/bot tests", "Atomic persist+job tests", "Delivery retry tests"],
+      "exitCriteria": "Invalid/bot inputs create no partial workflow; valid input creates one auditable record/job.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T12",
+      "title": "Implement Stripe Checkout and webhook-authoritative donations",
+      "ownerCapability": "backend-specialist",
+      "objective": "Implement configurable sandbox Checkout, read-only status pages, verified webhook authority, atomic idempotent completion/ledger, reconciliation, and privacy-safe operator views.",
+      "dependencies": ["T03", "T04"],
+      "ownedPaths": ["HusayniaSite/src/Husaynia.Domain/Donations/**", "HusayniaSite/src/Husaynia.Application/Donations/**", "HusayniaSite/src/Husaynia.Infrastructure/Donations/**", "HusayniaSite/src/Husaynia.Web/Areas/Admin/Donations/**", "HusayniaSite/src/Husaynia.Web/Features/StripeWebhook/**", "HusayniaSite/tests/Husaynia.Domain.Tests/Donations/**", "HusayniaSite/tests/Husaynia.Application.Tests/Donations/**", "HusayniaSite/tests/Husaynia.IntegrationTests/Donations/**"],
+      "inputsContracts": ["C2", "C3", "C4", "C7", "ADR-006", "T01 payment baseline", "Sandbox only"],
+      "acceptanceCriteria": ["AC-15", "AC-16", "AC-17", "AC-18", "AC-25", "AC-26"],
+      "commandsEvidence": ["Invalid/decline/cancel/3DS sandbox tests", "Concurrent webhook replay test", "Data leak inspection"],
+      "exitCriteria": "Only verified webhooks complete donations; duplicate/concurrent events create one completion and ledger entry.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T13",
+      "title": "Build public shell, design system, content, and religious templates",
+      "ownerCapability": "frontend-specialist",
+      "objective": "Reproduce shared shell/navigation/design tokens and content/religious/legal templates with responsive, keyboard, audio, and accessible states.",
+      "dependencies": ["T01", "T05"],
+      "ownedPaths": ["HusayniaSite/src/Husaynia.Web/Views/Shared/**", "HusayniaSite/src/Husaynia.Web/Features/PublicContent/**", "HusayniaSite/src/Husaynia.Web/wwwroot/css/base/**", "HusayniaSite/src/Husaynia.Web/wwwroot/css/content/**", "HusayniaSite/src/Husaynia.Web/wwwroot/js/navigation/**", "HusayniaSite/src/Husaynia.Web/wwwroot/assets/brand/**", "HusayniaSite/tests/Husaynia.E2ETests/Shell/**", "HusayniaSite/tests/Husaynia.E2ETests/Content/**"],
+      "inputsContracts": ["C1", "C2", "C7", "T01 baseline", "R-04..R-09", "R-18"],
+      "acceptanceCriteria": ["AC-01", "AC-02", "AC-03", "AC-05", "AC-06", "AC-23", "AC-28"],
+      "commandsEvidence": ["Playwright named viewport screenshots", "Keyboard navigation tests", "axe scans", "Religious text/audio fixtures"],
+      "exitCriteria": "Shared/content templates meet baseline tolerance with no horizontal overflow or serious accessibility issue.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T14",
+      "title": "Build calendar, prayer, and social public templates",
+      "ownerCapability": "frontend-specialist",
+      "objective": "Build event/calendar/iCal, prayer, and social snapshot healthy/stale/empty/error public interfaces.",
+      "dependencies": ["T06", "T07", "T09", "T13"],
+      "ownedPaths": ["HusayniaSite/src/Husaynia.Web/Features/PublicCalendar/**", "HusayniaSite/src/Husaynia.Web/Features/PublicPrayer/**", "HusayniaSite/src/Husaynia.Web/Features/PublicSocial/**", "HusayniaSite/src/Husaynia.Web/wwwroot/css/calendar/**", "HusayniaSite/src/Husaynia.Web/wwwroot/css/prayer/**", "HusayniaSite/src/Husaynia.Web/wwwroot/css/social/**", "HusayniaSite/src/Husaynia.Web/wwwroot/js/calendar/**", "HusayniaSite/src/Husaynia.Web/wwwroot/js/social/**", "HusayniaSite/tests/Husaynia.E2ETests/CalendarPrayerSocial/**"],
+      "inputsContracts": ["C1", "C2", "C7", "T01 dynamic baseline"],
+      "acceptanceCriteria": ["AC-01", "AC-03", "AC-07..AC-12", "AC-23", "AC-25", "AC-28"],
+      "commandsEvidence": ["Playwright state fixtures", "iCal parse/download", "Responsive and axe tests"],
+      "exitCriteria": "All dynamic states are visually approved, accessible, and usable during provider faults.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T15",
+      "title": "Build media, search, forms, and donation public journeys",
+      "ownerCapability": "frontend-specialist",
+      "objective": "Build gallery/lightbox/load-more, search, contact/pledge, and configurable sandbox donation public journeys.",
+      "dependencies": ["T08", "T10", "T11", "T12", "T13", "T16"],
+      "ownedPaths": ["HusayniaSite/src/Husaynia.Web/Features/PublicMedia/**", "HusayniaSite/src/Husaynia.Web/Features/PublicSearch/**", "HusayniaSite/src/Husaynia.Web/Features/PublicForms/**", "HusayniaSite/src/Husaynia.Web/Features/PublicDonations/**", "HusayniaSite/src/Husaynia.Web/wwwroot/css/media/**", "HusayniaSite/src/Husaynia.Web/wwwroot/css/search/**", "HusayniaSite/src/Husaynia.Web/wwwroot/css/forms/**", "HusayniaSite/src/Husaynia.Web/wwwroot/css/donations/**", "HusayniaSite/src/Husaynia.Web/wwwroot/js/media/**", "HusayniaSite/src/Husaynia.Web/wwwroot/js/forms/**", "HusayniaSite/src/Husaynia.Web/wwwroot/js/donations/**", "HusayniaSite/tests/Husaynia.E2ETests/MediaSearchFormsDonations/**"],
+      "inputsContracts": ["C1", "C2", "C7", "T01 baseline", "T16 consent API"],
+      "acceptanceCriteria": ["AC-01", "AC-03", "AC-11..AC-17", "AC-20", "AC-23", "AC-27", "AC-28"],
+      "commandsEvidence": ["Playwright validation/error/duplicate/cancel/status tests", "axe/responsive tests", "Sandbox redirect stubs", "Network/cookie assertions"],
+      "exitCriteria": "Named public journeys work without exposing private data or pre-consent tracking.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T16",
+      "title": "Implement URL, SEO, redirect, consent, and web security controls",
+      "ownerCapability": "backend-specialist",
+      "objective": "Implement route manifest enforcement, explicit endpoints, one-hop redirects, SEO feeds/metadata, versioned consent, CSP nonce, security headers, CSRF, and safe errors.",
+      "dependencies": ["T01", "T04", "T05", "T06", "T08", "T09", "T12"],
+      "ownedPaths": ["HusayniaSite/src/Husaynia.Application/SeoRouting/**", "HusayniaSite/src/Husaynia.Infrastructure/SeoRouting/**", "HusayniaSite/src/Husaynia.Domain/Operations/Consent/**", "HusayniaSite/src/Husaynia.Application/Operations/Consent/**", "HusayniaSite/src/Husaynia.Web/Features/SeoRouting/**", "HusayniaSite/src/Husaynia.Web/Middleware/**", "HusayniaSite/src/Husaynia.Web/wwwroot/js/consent/**", "HusayniaSite/tests/Husaynia.ContractTests/RoutesSeo/**", "HusayniaSite/tests/Husaynia.IntegrationTests/WebSecurityConsent/**"],
+      "inputsContracts": ["C1", "C3", "C7", "R-27..R-30", "R-45", "R-47"],
+      "acceptanceCriteria": ["AC-04", "AC-21", "AC-22", "AC-26", "AC-27"],
+      "commandsEvidence": ["Route/loop/chain contract tests", "SEO/XML/JSON-LD validation", "Security header/CSRF/CSP tests", "Consent network tests"],
+      "exitCriteria": "Manifest statuses/canonicals match, optional scripts default off, and mandatory web controls pass.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T17",
+      "title": "Implement manifest-driven migration and reconciliation CLI",
+      "ownerCapability": "migration-specialist",
+      "objective": "Implement crawl/media and later WordPress adapters, canonical candidate planning, rights checks, dry-run, idempotent apply, conflicts, reconciliation, and reports.",
+      "dependencies": ["T01", "T03", "T05", "T06", "T08", "T12"],
+      "ownedPaths": ["HusayniaSite/tools/Husaynia.Migration/Program.cs", "HusayniaSite/tools/Husaynia.Migration/Commands/**", "HusayniaSite/tools/Husaynia.Migration/Sources/**", "HusayniaSite/tools/Husaynia.Migration/Reporting/**", "HusayniaSite/tools/Husaynia.Migration/appsettings*.json", "HusayniaSite/src/Husaynia.Application/Migration/**", "HusayniaSite/src/Husaynia.Infrastructure/Migration/**", "HusayniaSite/tests/Husaynia.ContractTests/Migration/**", "HusayniaSite/tests/Husaynia.IntegrationTests/Migration/**"],
+      "inputsContracts": ["C1", "C5", "C7", "ADR-007"],
+      "acceptanceCriteria": ["AC-04", "AC-05", "AC-06", "AC-21", "AC-22", "AC-35"],
+      "commandsEvidence": ["Schema tests", "Repeated dry-run/apply", "Editor-change conflict test", "Crawl and synthetic WP reconciliation reports"],
+      "exitCriteria": "Replay is non-destructive/idempotent and every candidate receives an accountable checksum-backed decision.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T18",
+      "title": "Consolidate relational schema and create initial migration",
+      "ownerCapability": "database-specialist",
+      "objective": "Validate all entities, constraints, indexes, rowversions, and full-text setup; generate repeatable migration bundle/scripts and prove failure recovery.",
+      "dependencies": ["T04", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "T12", "T17", "T19"],
+      "ownedPaths": ["HusayniaSite/src/Husaynia.Infrastructure/Persistence/Migrations/**", "HusayniaSite/tests/Husaynia.IntegrationTests/Persistence/CompleteSchema/**"],
+      "inputsContracts": ["Architecture section 6", "C6", "C7"],
+      "acceptanceCriteria": ["AC-16", "AC-18..AC-20", "AC-29", "AC-31", "AC-35"],
+      "commandsEvidence": ["dotnet ef migrations add InitialCreate", "Idempotent script and bundle generation", "Fresh apply/replay", "Induced failure test", "Constraint/index inspection"],
+      "exitCriteria": "A clean DB reaches the complete schema repeatably and critical invariants are DB-enforced.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T19",
+      "title": "Implement durable jobs, health, telemetry, redaction, and operations controls",
+      "ownerCapability": "backend-specialist",
+      "objective": "Implement DB job leases/retries/dead letters, health/readiness, OpenTelemetry correlation, redaction, staleness metrics, retention workflows, and validated options.",
+      "dependencies": ["T03"],
+      "ownedPaths": ["HusayniaSite/src/Husaynia.Domain/Operations/Jobs/**", "HusayniaSite/src/Husaynia.Application/Operations/Jobs/**", "HusayniaSite/src/Husaynia.Application/Operations/Health/**", "HusayniaSite/src/Husaynia.Application/Operations/Telemetry/**", "HusayniaSite/src/Husaynia.Application/Operations/Retention/**", "HusayniaSite/src/Husaynia.Infrastructure/Operations/**", "HusayniaSite/src/Husaynia.Web/Features/Operations/**", "HusayniaSite/tests/Husaynia.Application.Tests/Operations/**", "HusayniaSite/tests/Husaynia.IntegrationTests/Operations/**"],
+      "inputsContracts": ["C4", "C7", "ADR-005", "R-44", "R-47", "R-48", "R-50"],
+      "acceptanceCriteria": ["AC-17", "AC-25", "AC-27", "AC-32", "AC-33"],
+      "commandsEvidence": ["Lease/retry/dead-letter tests", "Health degradation tests", "Synthetic trace correlation", "Redaction and retention tests"],
+      "exitCriteria": "Failures are isolated/observable, logs are safe, and jobs recover after restart.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T20",
+      "title": "Define isolated Azure baseline with Bicep",
+      "ownerCapability": "infrastructure-specialist",
+      "objective": "Define non-provisioning parameterized Development/Staging/Production App Service, SQL, Storage, Key Vault, monitoring, identity, health, alerts, and recovery capabilities without SKU selection.",
+      "dependencies": ["T02"],
+      "ownedPaths": ["HusayniaSite/infra/**"],
+      "inputsContracts": ["ADR-002", "Architecture section 9", "C6"],
+      "acceptanceCriteria": ["AC-30", "AC-31", "AC-32", "AC-33"],
+      "commandsEvidence": ["az bicep build", "Bicep lint", "Non-deploying validation/what-if where authorized", "Isolation/no-literal-secret policy tests"],
+      "exitCriteria": "All stage templates validate and do not authorize SKU cost or deploy resources.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T21",
+      "title": "Implement PR and immutable promotion pipelines",
+      "ownerCapability": "devops-sre-specialist",
+      "objective": "Implement CI quality/scanning/artifact creation and checksum-preserving Development/Staging/manual-Production promotion definitions with explicit migrations and gates.",
+      "dependencies": ["T02", "T20"],
+      "ownedPaths": ["HusayniaSite/pipelines/**", "HusayniaSite/eng/**", "HusayniaSite/.config/dotnet-tools.json"],
+      "inputsContracts": ["C6", "ADR-008", "R-34..R-40"],
+      "acceptanceCriteria": ["AC-23", "AC-26", "AC-29", "AC-30", "AC-31"],
+      "commandsEvidence": ["Local pipeline script dry run", "Artifact SHA verification", "YAML validation", "Induced gate failure"],
+      "exitCriteria": "One artifact is built once, failed gates stop promotion, and Production remains manual/unexecuted.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T22",
+      "title": "Write developer, deployment, editor, security, and operations documentation",
+      "ownerCapability": "documentation-specialist",
+      "objective": "Document setup, contracts, tests, sandbox configuration, migration, Azure stages, rollback, roles/editorial flows, privacy/security, alerts, restore, rotation, and emergency procedures.",
+      "dependencies": ["T13", "T14", "T15", "T16", "T17", "T18", "T19", "T20", "T21"],
+      "ownedPaths": ["HusayniaSite/README.md", "HusayniaSite/docs/**"],
+      "inputsContracts": ["C1..C7", "Definition of Done Gate 8"],
+      "acceptanceCriteria": ["AC-33", "AC-34"],
+      "commandsEvidence": ["Clean-agent documentation rehearsal", "Link checker", "Secret pattern scan", "Role matrix diff"],
+      "exitCriteria": "A new developer/operator can build, test, configure sandbox dependencies, diagnose failures, and locate constraints without secrets.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T23",
+      "title": "Independently validate automated and contract coverage",
+      "ownerCapability": "test-engineer",
+      "objective": "Map every AC to executable evidence, add only missing system-validation tests, run all suites, and report reproducible defects.",
+      "dependencies": ["T14", "T15", "T16", "T17", "T18", "T19", "T21"],
+      "ownedPaths": ["HusayniaSite/tests/Husaynia.SystemValidation.Tests/**", "HusayniaSite/artifacts/validation/test-engineer/**"],
+      "inputsContracts": ["C1..C7", "Definition of Done Gate 4"],
+      "acceptanceCriteria": ["AC-01..AC-35"],
+      "commandsEvidence": ["Clean restore/build/test/publish", "All test levels", "Counts/skips/failures and artifact hashes"],
+      "exitCriteria": "Every AC has named passing evidence or a blocking defect and unexplained skips are zero.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T24",
+      "title": "Perform independent security and privacy gate",
+      "ownerCapability": "security-engineer",
+      "objective": "Threat-model and execute authorization, CSRF/CSP/header, upload, injection, secret, webhook, dependency, redaction, retention, and consent tests.",
+      "dependencies": ["T15", "T16", "T18", "T19", "T21"],
+      "ownedPaths": ["HusayniaSite/artifacts/validation/security-review/**"],
+      "inputsContracts": ["C3", "C4", "C6", "R-45..R-47"],
+      "acceptanceCriteria": ["AC-17", "AC-18", "AC-20", "AC-26", "AC-27"],
+      "commandsEvidence": ["Executed control tests/scans", "Severity-rated security report"],
+      "exitCriteria": "APPROVED with no unresolved Critical/High, otherwise CHANGES_REQUIRED with evidence.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T25",
+      "title": "Perform independent principal code review",
+      "ownerCapability": "code-reviewer",
+      "objective": "Review correctness, architecture, maintainability, errors, concurrency, performance, and contract compatibility.",
+      "dependencies": ["T15", "T16", "T17", "T18", "T19", "T21"],
+      "ownedPaths": ["HusayniaSite/artifacts/validation/code-review/**"],
+      "inputsContracts": ["Architecture", "ADRs", "C1..C7"],
+      "acceptanceCriteria": ["AC-04", "AC-13", "AC-16", "AC-18..AC-22", "AC-25", "AC-29..AC-35"],
+      "commandsEvidence": ["File/line review report", "APPROVED or CHANGES_REQUIRED verdict"],
+      "exitCriteria": "APPROVED with no correctness or maintainability blocker.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T26",
+      "title": "Execute full end-to-end, accessibility, visual, and browser QA",
+      "ownerCapability": "qa-engineer",
+      "objective": "Exercise all public/editor/operator journeys, fault states, WCAG checks, pixel baselines, responsive widths, and required browser/device matrix.",
+      "dependencies": ["T22", "T23", "T24", "T25"],
+      "ownedPaths": ["HusayniaSite/artifacts/validation/qa/**"],
+      "inputsContracts": ["T01 baseline", "C1", "C3", "Definition of Done Gate 6"],
+      "acceptanceCriteria": ["AC-01..AC-28", "AC-33", "AC-34"],
+      "commandsEvidence": ["Playwright matrix", "axe reports", "Screenshot diffs", "Manual keyboard/screen-reader/device records"],
+      "exitCriteria": "No severity-1/2 functional, visual, accessibility, security, or data-loss defect remains.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T27",
+      "title": "Rehearse non-production release readiness and recovery",
+      "ownerCapability": "devops-sre-specialist",
+      "objective": "In authorized non-production only, prove immutable artifact identity, migration/failure gates, health/crawl/performance, backup/media restore, rollback, alerts, and release packet.",
+      "dependencies": ["T22", "T23", "T24", "T25", "T26"],
+      "ownedPaths": ["HusayniaSite/artifacts/validation/release-readiness/**"],
+      "inputsContracts": ["C6", "ADR-008", "Externally supplied Development/Staging authorization"],
+      "acceptanceCriteria": ["AC-22", "AC-24", "AC-29..AC-35"],
+      "commandsEvidence": ["Package SHA records", "25 rps for 10 minutes report", "Induced failure transcript", "Timed restore report", "Migration reconciliation"],
+      "exitCriteria": "Development/Staging evidence passes; Production remains unexecuted and separately authorized.",
+      "status": "PENDING"
+    },
+    {
+      "id": "T28",
+      "title": "Independently judge the complete mission",
+      "ownerCapability": "engineering-judge",
+      "objective": "Verify R-01..R-54 and every applicable Definition of Done gate from real evidence, including residual export risk.",
+      "dependencies": ["T27"],
+      "ownedPaths": ["HusayniaSite/artifacts/validation/final-judgment/**"],
+      "inputsContracts": ["All mission artifacts", "C1..C7", "All retained evidence"],
+      "acceptanceCriteria": ["AC-01..AC-35"],
+      "commandsEvidence": ["Evidence index audit", "APPROVED or REJECTED judgment"],
+      "exitCriteria": "APPROVED only when all requirements/gates are proven or exceptions have explicit CTO owner, expiry, risk, and acceptance.",
+      "status": "PENDING"
+    }
+  ],
+  "waves": [
+    {
+      "id": "W1",
+      "readyNow": true,
+      "tasks": ["T01", "T02"],
+      "parallel": true,
+      "gate": "G1: baseline schemas validate with no submitted form/payment; clean solution restore/build/test/publish passes; C1..C7 are checked in."
+    },
+    {
+      "id": "W2",
+      "readyNow": false,
+      "tasks": ["T03", "T20", "T21"],
+      "parallel": "T03 and T20 parallel; T21 starts after T20.",
+      "gate": "G2: persistence concurrency tests pass; Bicep compiles/lints without provisioning; artifact builder emits C6 layout and SHA."
+    },
+    {
+      "id": "W3",
+      "readyNow": false,
+      "tasks": ["T04", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "T12", "T19"],
+      "parallel": "T04,T05,T06,T07,T08,T09,T11,T12,T19 fan out after T03; T10 starts after T05 and T06.",
+      "gate": "G3: module unit/integration suites prove role, idempotency, snapshot, upload, form, webhook, job, and redaction invariants."
+    },
+    {
+      "id": "W4",
+      "readyNow": false,
+      "tasks": ["T13", "T16", "T17"],
+      "parallel": true,
+      "gate": "G4: route/SEO/migration contracts pass; shared public shell meets initial visual/accessibility thresholds."
+    },
+    {
+      "id": "W5",
+      "readyNow": false,
+      "tasks": ["T14", "T15", "T18"],
+      "parallel": true,
+      "gate": "G5: complete schema applies; all public templates/journeys pass responsive, axe, visual, sandbox, and dependency-failure tests."
+    },
+    {
+      "id": "W6",
+      "readyNow": false,
+      "tasks": ["T22", "T23", "T24", "T25"],
+      "parallel": true,
+      "gate": "G6: documentation rehearsal and independent automated/security/code-review gates approve; failures create serialized module remediation."
+    },
+    {
+      "id": "W7",
+      "readyNow": false,
+      "tasks": ["T26"],
+      "parallel": false,
+      "gate": "G7: E2E/browser/WCAG/visual QA passes with no severity-1/2 defect."
+    },
+    {
+      "id": "W8",
+      "readyNow": false,
+      "tasks": ["T27"],
+      "parallel": false,
+      "gate": "G8: authorized Development/Staging-only release, restore, rollback, and identical checksum evidence passes; Production untouched."
+    },
+    {
+      "id": "W9",
+      "readyNow": false,
+      "tasks": ["T28"],
+      "parallel": false,
+      "gate": "G9: independent final judgment."
+    }
+  ],
+  "firstReadyTasks": [
+    {"taskId": "T01", "ownerCapability": "frontend-specialist"},
+    {"taskId": "T02", "ownerCapability": "developer"}
+  ],
+  "criticalPath": ["T02", "T03", "T04/T05/T06/T08/T12/T19", "T16/T17/T18", "T15", "T23/T24/T25", "T26", "T27", "T28"],
+  "blockingDecisions": [],
+  "nonBlockingCtoDecisionsBeforeProduction": [
+    "Approve or retain A-01 RPO 24h/RTO 4h.",
+    "Approve prayer baseline values and display tolerance.",
+    "Approve the captured donation modes/categories/form baseline.",
+    "Decide any costed Azure enhancement only if measured evidence requires it.",
+    "Authorize Production deployment separately.",
+    "Accept quantified residual fidelity risk if no authorized WordPress export is available."
+  ]
+}

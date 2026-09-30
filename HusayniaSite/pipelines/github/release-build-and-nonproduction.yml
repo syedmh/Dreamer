@@ -1,0 +1,62 @@
+{
+  "name": "T21 immutable release C6",
+  "on": {
+    "push": {
+      "branches": ["main"]
+    },
+    "workflow_dispatch": {}
+  },
+  "permissions": {},
+  "jobs": {
+    "build_release": {
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 60,
+      "env": {
+        "HUSAYNIA_REPOSITORY_ROOT": "${{ github.workspace }}/HusayniaSite"
+      },
+      "defaults": {
+        "run": {
+          "shell": "pwsh",
+          "working-directory": "HusayniaSite"
+        }
+      },
+      "outputs": {
+        "artifactRoot": "${{ steps.identity.outputs.artifactRoot }}",
+        "appSha256": "${{ steps.identity.outputs.appSha256 }}"
+      },
+      "steps": [
+        {
+          "name": "Checkout exact release source",
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 1
+          }
+        },
+        {
+          "name": "Validate canonical Husaynia checkout root",
+          "run": "$workspace = (Resolve-Path -LiteralPath $env:GITHUB_WORKSPACE).Path; $root = (Resolve-Path -LiteralPath $env:HUSAYNIA_REPOSITORY_ROOT).Path; $expected = Join-Path $workspace 'HusayniaSite'; if ($root -cne $expected -or -not $root.StartsWith($workspace + [IO.Path]::DirectorySeparatorChar, [StringComparison]::Ordinal) -or -not (Test-Path -LiteralPath (Join-Path $root 'HusayniaSite.sln') -PathType Leaf) -or -not (Test-Path -LiteralPath (Join-Path $root 'eng') -PathType Container) -or -not (Test-Path -LiteralPath (Join-Path $root 'pipelines') -PathType Container)) { throw 'T21 canonical Dreamer/HusayniaSite checkout root validation failed.' }"
+        },
+        {
+          "name": "Build sole canonical immutable C6 release",
+          "id": "identity",
+          "run": "$version = \"0.0.$env:GITHUB_RUN_NUMBER\"; $outputRoot = Join-Path $env:RUNNER_TEMP 'release-output'; $releaseOutput = @(& (Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'eng/ci/Invoke-PrValidation.ps1') -RepositoryRoot $env:HUSAYNIA_REPOSITORY_ROOT -ArtifactVersion $version -CommitSha $env:GITHUB_SHA -OutputRoot $outputRoot -Ci 2>&1); if ($LASTEXITCODE -ne 0) { $releaseOutput | Write-Output; throw 'T21 sole canonical C6 release validation or creation failed.' }; $artifactName = \"husaynia-site-$version\"; $artifactPath = Join-Path $outputRoot $artifactName; if (-not (Test-Path -LiteralPath $artifactPath -PathType Container)) { throw 'T21 canonical C6 release output is missing.' }; $appSha = (Get-FileHash -LiteralPath (Join-Path $artifactPath 'app/Husaynia.Web.zip') -Algorithm SHA256).Hash.ToLowerInvariant(); \"artifactRoot=$artifactName\" | Add-Content -LiteralPath $env:GITHUB_OUTPUT -Encoding utf8; \"appSha256=$appSha\" | Add-Content -LiteralPath $env:GITHUB_OUTPUT -Encoding utf8"
+        },
+        {
+          "name": "Upload sole canonical immutable C6 release",
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "${{ steps.identity.outputs.artifactRoot }}",
+            "path": "${{ runner.temp }}/release-output/${{ steps.identity.outputs.artifactRoot }}",
+            "if-no-files-found": "error",
+            "overwrite": false
+          }
+        }
+      ]
+    }
+  }
+}

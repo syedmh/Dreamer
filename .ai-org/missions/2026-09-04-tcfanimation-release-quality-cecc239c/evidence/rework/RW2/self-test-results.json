@@ -1,0 +1,86 @@
+{
+    "status":  "PASS",
+    "tests":  16,
+    "results":  [
+                    {
+                        "name":  "manifest-parser",
+                        "passed":  true,
+                        "detail":  "entries=50 seed_uids=6 denied=0"
+                    },
+                    {
+                        "name":  "copied-seed",
+                        "passed":  true,
+                        "detail":  "files=50 solution=false"
+                    },
+                    {
+                        "name":  "generated-solution",
+                        "passed":  true,
+                        "detail":  "length=994 hash=FE3E86D84D18FD948E059483F5CB09B956E4F7B91A0B33FACD337727A2F4EC79 inventory=51 projects=1 controller=false"
+                    },
+                    {
+                        "name":  "existing-solution",
+                        "passed":  true,
+                        "detail":  "reason=stage_solution_failed godot_executions=0"
+                    },
+                    {
+                        "name":  "generated-extra",
+                        "passed":  true,
+                        "detail":  "reason=stage_solution_failed godot_executions=0"
+                    },
+                    {
+                        "name":  "real-export",
+                        "passed":  true,
+                        "detail":  "exit=0 errors=0 pass_markers=1 exe=100203544 dll=71168 stages=0"
+                    },
+                    {
+                        "name":  "development-state",
+                        "passed":  true,
+                        "detail":  "before=463 after=463 unchanged=true"
+                    },
+                    {
+                        "name":  "runtime-smoke",
+                        "passed":  true,
+                        "detail":  "exit=0 marker=true"
+                    },
+                    {
+                        "name":  "import-failure",
+                        "passed":  true,
+                        "detail":  "exit=37 reason=stage_import_failed fail_markers=1 success=0 output=false stages=0 outside_sentinel=true"
+                    },
+                    {
+                        "name":  "export-failure",
+                        "passed":  true,
+                        "detail":  "exit=29 reason=stage_export_failed fail_markers=1 success=0 output=false stages=0 outside_sentinel=true"
+                    },
+                    {
+                        "name":  "zero-exit-import-error",
+                        "passed":  true,
+                        "detail":  "exit=1 reason=stage_import_failed fail_markers=1 success=0 output=false stages=0 outside_sentinel=true"
+                    },
+                    {
+                        "name":  "zero-exit-export-error",
+                        "passed":  true,
+                        "detail":  "exit=1 reason=stage_export_failed fail_markers=1 success=0 output=false stages=0 outside_sentinel=true"
+                    },
+                    {
+                        "name":  "missing-executable",
+                        "passed":  true,
+                        "detail":  "exit=1 reason=missing_output fail_markers=1 success=0 output=false stages=0 outside_sentinel=true"
+                    },
+                    {
+                        "name":  "missing-managed-dll",
+                        "passed":  true,
+                        "detail":  "exit=1 reason=missing_output fail_markers=1 success=0 output=false stages=0 outside_sentinel=true"
+                    },
+                    {
+                        "name":  "cleanup-failure",
+                        "passed":  true,
+                        "detail":  "exit=1 reason=stage_cleanup_failed fail_markers=1 success=0 output=false stages=0 outside_sentinel=true"
+                    },
+                    {
+                        "name":  "protected-baseline",
+                        "passed":  true,
+                        "detail":  "checked=74 missing=0 changed=0"
+                    }
+                ]
+}

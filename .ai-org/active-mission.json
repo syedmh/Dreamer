@@ -1,0 +1,121 @@
+{
+  "missionId": "2026-08-30-tcf-campus-overgoal",
+  "objective": "Use Logo.png as the browser tab and site icon, including the default favicon route.",
+  "classification": "feature",
+  "size": "medium",
+  "state": "IMPLEMENTATION",
+  "workflow": "feature",
+  "definitionOfDone": [
+    "Fireworks use vivid six-color palettes and randomize among classic radial, ring, star, chrysanthemum, and willow shapes with inspectable shape, region, source, motion, palette, center, extent, and lifecycle datasets.",
+    "Shape-aware left, center, upper, and right open-sky regions avoid the measured header/logo and progress overlays plus the school wings, tower, flag, hillside, and viewport clipping.",
+    "Key 1 remains one transient manual firework outside editable controls, ignores Ctrl/Meta/Alt and repeats, prevents default only when handled, and announces exactly \"Firework launched.\".",
+    "Key 2 toggles continuous fireworks outside editable controls, ignores Ctrl/Meta/Alt and repeats, prevents default only when handled, and announces exactly \"Continuous fireworks started.\" or \"Continuous fireworks stopped.\".",
+    "Continuous mode uses one self-scheduling randomized 350-1100ms timeout, sometimes launches a pair, exposes scheduler state, is idempotent on start, and caps active fireworks at 14.",
+    "Stopping continuous mode cancels its pending timeout immediately without removing active bursts, and automatic bursts never change the live-region announcement.",
+    "Continuous scheduling pauses while the document is hidden, resumes when visible while enabled, and pagehide/unload cleanup cancels scheduling and clears active effects.",
+    "Reduced motion uses a simplified opacity fade, 900-1700ms scheduling, and at most one launch per scheduler tick.",
+    "Fireworks remain decorative/non-focusable and do not change donation state, persistent kite count, or the scene description.",
+    "Space kites, F fullscreen-only behavior, Pakistan flag, hillside swings, TCF School Seattle, Logo.png, donation progression, and offline dependency-free behavior remain present.",
+    "Visible keyboard hints and README document the key 2 continuous-fireworks toggle.",
+    "src/app.mjs and src/render.mjs pass node --check and /, /index.html, /styles.css, /src/app.mjs, /src/render.mjs, and /Logo.png return HTTP 200 from a local server that is stopped after verification.",
+    "A local headless Chromium browser exercises shortcut exclusions, shape and region datasets, pair launches, scheduler start/stop, visibility handling, bounded active nodes, reduced motion, cleanup, and preserved scene behavior.",
+    "Independent tests, code review, browser QA, and engineering judgment remain paused by CTO direction and are not reported as passed."
+  ],
+  "gates": {
+    "requirements": "passed",
+    "architecture": "passed",
+    "tests": "paused_by_cto",
+    "security": "n/a",
+    "review": "paused_by_cto",
+    "e2e": "paused_by_cto",
+    "judge": "paused_by_cto"
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "Removed all production bus code and copy. Reworked the canonical left-hillside swings into a grounded A-frame at x=20-145 with four feet following the hill contour, two chain-supported seats, and progressive safety pads, climbing side, and pennants from 117%-125%. node --check passed for server.mjs, model.mjs, scene.mjs, and render.mjs; root and changed runtime assets returned HTTP 200 on port 62125; verification server was stopped."
+    },
+    {
+      "id": "T2",
+      "owner": "test-engineer",
+      "status": "PAUSED",
+      "evidence": "Paused by CTO for rapid visual development; historical bus-based tests were intentionally not edited or invoked."
+    },
+    {
+      "id": "T3",
+      "owner": "code-reviewer",
+      "status": "PAUSED",
+      "evidence": "Paused by CTO and not invoked for this rework."
+    },
+    {
+      "id": "T4",
+      "owner": "qa-engineer",
+      "status": "PAUSED",
+      "evidence": "Paused by CTO and not invoked for this rework."
+    },
+    {
+      "id": "T5",
+      "owner": "engineering-judge",
+      "status": "PAUSED",
+      "evidence": "Paused by CTO; no final judgment was fabricated."
+    },
+    {
+      "id": "T6",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "Changed index.html, src/currency.mjs, src/app.mjs, src/render.mjs, and styles.css. node --check passed for every changed MJS file. Root plus index.html, styles.css, app.mjs, currency.mjs, and render.mjs returned HTTP 200 on port 64096. Headless Chrome CDP exercises proved whole-number live/control/ARIA/announcement formatting; Space show/hide announcements and preventDefault behavior; repeat, input, button, and contenteditable exclusions; full-motion kite-breeze and reduced-motion animation none; and preservation of TCF School Seattle, /Logo.png, goal flag, swings, students, and teachers. The verification server was stopped after collection."
+    },
+    {
+      "id": "T7",
+      "owner": "frontend-specialist",
+      "status": "DONE",
+      "evidence": "Implemented capture-phase global additive Space handling and persistent randomized compact kites in src/app.mjs, src/render.mjs, styles.css, and index.html. Corrected explicit safe regions after VP inspection found an initial flag-overlap risk."
+    },
+    {
+      "id": "T8",
+      "owner": "vp-engineering",
+      "status": "DONE",
+      "evidence": "node --check passed for app.mjs and render.mjs. Headless Edge CDP verification proved body, number input, range slider, and close button Space presses each added exactly one kite with default prevented; button activation was suppressed; repeat and Alt/Ctrl/Meta added none; four kites persisted; no string nodes existed; all sampled bounds fit safe areas; decorative/count accessibility and full/reduced motion passed. Root, index.html, styles.css, app.mjs, render.mjs, and Logo.png returned HTTP 200. Verification server was stopped."
+    },
+    {
+      "id": "T9",
+      "owner": "vp-engineering",
+      "status": "DONE",
+      "evidence": "Reduced random kite scale from 0.68-0.98 to 0.30-0.48, reduced drift and placement padding, increased overlap-aware placement attempts, and expanded placement from three to five sky regions spanning the cloud bands. render.mjs passed node --check; root and render.mjs returned HTTP 200 on port 62437; verification server was stopped."
+    },
+    {
+      "id": "T10",
+      "owner": "frontend-specialist",
+      "status": "DONE",
+      "evidence": "Implemented a capture-phase global F/f handler in src/app.mjs that excludes repeat/Ctrl/Meta/Alt, prevents default, creates one firework, announces exactly \"Firework launched.\", and performs one requestFullscreen/exitFullscreen toggle attempt. Added a transient decorative firework controller, four explicit left open-sky safe regions, randomized palettes/rotation/scale, 14 radial streaks and sparks, full-motion and reduced-motion lifecycle styles, and updated keyboard copy. node --check src/app.mjs and node --check src/render.mjs passed. HTTP 200 was observed for /, /index.html, /styles.css, /src/app.mjs, /src/render.mjs, and /Logo.png on port 52595, and that exact server was stopped. Headless Chrome 151 CDP final validation passed: body, number input, range slider, and Shift+F button presses produced cumulative firework/fullscreen/preventDefault counts 1/2/3/4 with four simultaneous groups; request/exit counts were 2/2; repeat/Ctrl/Meta/Alt left counts unchanged at 4; every sampled group had aria-hidden=true, focusable=false, one flash, 14 streaks, 14 sparks, a safe non-blocking position, and 1.05s full animation; all four auto-removed; reduced motion used firework-reduced-fade for 0.52s and auto-removed; one Space kite remained persistent; raised amount, scene description, TCF School Seattle, flag, swings, students, teachers, and loaded Logo.png were preserved. An earlier browser probe exposed overly broad firework regions overlapping blocked content; the regions were narrowed and the complete final CDP run passed. The Chrome CDP listener was stopped by its exact listening PID after validation. Independent test/review/QA/judge gates remained paused and were not dispatched or reported as passed."
+    },
+    {
+      "id": "T11",
+      "owner": "vp-engineering",
+      "status": "DONE",
+      "evidence": "Changed the firework shortcut to 1 and restored F as a separate fullscreen-only handler. The 1 shortcut yields to editable controls so amount entry is not blocked. Updated index.html and README keyboard guidance. app.mjs passed node --check; root and app.mjs returned HTTP 200 on port 62438; verification server was stopped."
+    },
+    {
+      "id": "T12",
+      "owner": "frontend-specialist",
+      "status": "DONE",
+      "evidence": "Implemented five richer multicolor SVG firework shapes, shuffled shape-aware left/center/upper/right safe-region placement, inspectable burst/layer/app datasets, a maximum of 14 active bursts, and key 2 continuous scheduling with 350-1100ms full-motion delays, occasional pairs, immediate stop cancellation, hidden-page pause/resume, pagehide/unload cleanup, and 900-1700ms single-launch reduced-motion behavior. Preserved exact key 1 announcement and exclusions, Space kites, and F fullscreen-only behavior; updated visible hints and README. node --check passed for src/app.mjs and src/render.mjs. Runtime assets returned HTTP 200 on port 63321. Headless Chrome 151 CDP assertions passed for shortcuts, announcements, pair behavior, all five shapes, all four sky zones, six-color palettes, measured overlay avoidance, safe extents, active-node bound/removal, visibility handling, reduced-motion fade/scheduling, cleanup, and preserved donation/kite/school behavior. Independent gates remained paused and were not dispatched."
+    },
+    {
+      "id": "T13",
+      "owner": "vp-engineering",
+      "status": "DONE",
+      "evidence": "Updated index.html icon and apple-touch-icon links to /Logo.png. Removed the generated SVG favicon and mapped /favicon.ico to the same Logo.png asset in server.mjs. server.mjs passed node --check; root, /favicon.ico, and /Logo.png returned HTTP 200 on port 62439; favicon content type was image/png and its bytes matched Logo.png exactly; verification server was stopped."
+    }
+  ],
+  "blockers": [],
+  "reworkCount": 8,
+  "previousObjective": "Implement richer, broadly distributed randomized fireworks plus a key 2 continuous-fireworks toggle while preserving key 1, Space, and F behavior.",
+  "previousMission": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-08-30-tcf-school-visual-rework",
+  "missionRoot": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-08-30-tcf-campus-overgoal",
+  "repository": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\TCFBuild",
+  "nextAction": "Continue rapid development iteration and collect CTO feedback on the Logo.png site icon. Independent tests, review, browser QA, and judgment remain paused until the CTO resumes them.",
+  "updatedAt": "2026-08-31T12:21:56.6768587-07:00"
+}

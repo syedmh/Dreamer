@@ -1,0 +1,98 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.46.1.21595",
+      "templateHash": "6764183643774677378"
+    }
+  },
+  "parameters": {
+    "deployResources": {
+      "type": "bool"
+    },
+    "location": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "object"
+    },
+    "keyVaultName": {
+      "type": "string"
+    },
+    "keyVaultSkuName": {
+      "type": "string"
+    },
+    "publicNetworkAccess": {
+      "type": "string"
+    },
+    "allowedIpRules": {
+      "type": "array"
+    },
+    "logAnalyticsWorkspaceResourceId": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2023-07-01",
+      "name": "[parameters('keyVaultName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "tenantId": "[tenant().tenantId]",
+        "sku": {
+          "family": "A",
+          "name": "[parameters('keyVaultSkuName')]"
+        },
+        "enableRbacAuthorization": true,
+        "enablePurgeProtection": true,
+        "enableSoftDelete": true,
+        "softDeleteRetentionInDays": 90,
+        "publicNetworkAccess": "[parameters('publicNetworkAccess')]",
+        "networkAcls": {
+          "copy": [
+            {
+              "name": "ipRules",
+              "count": "[length(parameters('allowedIpRules'))]",
+              "input": {
+                "value": "[parameters('allowedIpRules')[copyIndex('ipRules')].value]"
+              }
+            }
+          ],
+          "bypass": "None",
+          "defaultAction": "Deny",
+          "virtualNetworkRules": []
+        }
+      }
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Insights/diagnosticSettings",
+      "apiVersion": "2021-05-01-preview",
+      "scope": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+      "name": "key-vault-to-log-analytics",
+      "properties": {
+        "workspaceId": "[parameters('logAnalyticsWorkspaceResourceId')]",
+        "logs": [
+          {
+            "category": "AuditEvent",
+            "enabled": true
+          }
+        ],
+        "metrics": [
+          {
+            "category": "AllMetrics",
+            "enabled": true
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "status": "FAIL",
+  "checked": 74,
+  "missing": [],
+  "changed": [
+    "CapturePathPolicy.cs",
+    "Frames/Clap/clap_00.png",
+    "Frames/Clap/clap_01.png",
+    "Frames/Clap/clap_02.png",
+    "Frames/Clap/clap_03.png",
+    "Frames/Clap/clap_04.png",
+    "Frames/Clap/clap_05.png",
+    "Frames/CrossArm/cross_00.png",
+    "Frames/CrossArm/cross_01.png",
+    "Frames/CrossArm/cross_02.png",
+    "Frames/CrossArmRelease/release_00.png",
+    "Frames/CrossArmRelease/release_01.png",
+    "Frames/CrossArmRelease/release_02.png",
+    "Frames/CrossArmRelease/release_03.png",
+    "Frames/CrossArmRelease/release_04.png",
+    "Frames/CrossArmRelease/release_05.png",
+    "Frames/LeftTurn/turn_0.png",
+    "Frames/LeftTurn/turn_1.png",
+    "Frames/LeftTurn/turn_2.png",
+    "Frames/RightTurn/turn_0.png",
+    "Frames/RightTurn/turn_2.png",
+    "project.godot",
+    "TurnController.cs"
+  ]
+}

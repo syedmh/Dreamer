@@ -1,0 +1,176 @@
+[
+  {
+    "scenario": "clap",
+    "samples": 25,
+    "changes": [
+      {
+        "index": 0,
+        "time_ms": 96.3,
+        "sha256_16": "72d10ed59ac11211",
+        "path": "clap-change-00.png"
+      },
+      {
+        "index": 1,
+        "time_ms": 215.0,
+        "sha256_16": "1a28d2f36c1ff1ff",
+        "path": "clap-change-01.png"
+      },
+      {
+        "index": 2,
+        "time_ms": 352.7,
+        "sha256_16": "932c69e5301c694f",
+        "path": "clap-change-02.png"
+      },
+      {
+        "index": 3,
+        "time_ms": 433.3,
+        "sha256_16": "cf7dda2493f3ea33",
+        "path": "clap-change-03.png"
+      },
+      {
+        "index": 4,
+        "time_ms": 565.2,
+        "sha256_16": "2d7128271baa111f",
+        "path": "clap-change-04.png"
+      },
+      {
+        "index": 5,
+        "time_ms": 698.1,
+        "sha256_16": "cf7dda2493f3ea33",
+        "path": "clap-change-05.png"
+      },
+      {
+        "index": 6,
+        "time_ms": 837.1,
+        "sha256_16": "932c69e5301c694f",
+        "path": "clap-change-06.png"
+      },
+      {
+        "index": 7,
+        "time_ms": 965.7,
+        "sha256_16": "1a28d2f36c1ff1ff",
+        "path": "clap-change-07.png"
+      },
+      {
+        "index": 8,
+        "time_ms": 1093.8,
+        "sha256_16": "932c69e5301c694f",
+        "path": "clap-change-08.png"
+      },
+      {
+        "index": 9,
+        "time_ms": 1216.0,
+        "sha256_16": "cf7dda2493f3ea33",
+        "path": "clap-change-09.png"
+      },
+      {
+        "index": 10,
+        "time_ms": 1347.3,
+        "sha256_16": "2d7128271baa111f",
+        "path": "clap-change-10.png"
+      },
+      {
+        "index": 11,
+        "time_ms": 1461.4,
+        "sha256_16": "cf7dda2493f3ea33",
+        "path": "clap-change-11.png"
+      },
+      {
+        "index": 12,
+        "time_ms": 1579.7,
+        "sha256_16": "932c69e5301c694f",
+        "path": "clap-change-12.png"
+      },
+      {
+        "index": 13,
+        "time_ms": 2154.5,
+        "sha256_16": "1a28d2f36c1ff1ff",
+        "path": "clap-change-13.png"
+      }
+    ],
+    "baseline_sha256_16": "a3b373a0b825aa89",
+    "exit": 0,
+    "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU",
+    "stderr": ""
+  },
+  {
+    "scenario": "cross-entry",
+    "samples": 12,
+    "changes": [
+      {
+        "index": 0,
+        "time_ms": 73.2,
+        "sha256_16": "63eb69ef698da41c",
+        "path": "cross-entry-change-00.png"
+      },
+      {
+        "index": 1,
+        "time_ms": 194.9,
+        "sha256_16": "bffe688eac89cbed",
+        "path": "cross-entry-change-01.png"
+      },
+      {
+        "index": 2,
+        "time_ms": 308.7,
+        "sha256_16": "753e2d137e99f47b",
+        "path": "cross-entry-change-02.png"
+      }
+    ],
+    "baseline_sha256_16": "a3b373a0b825aa89",
+    "exit": 0,
+    "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU",
+    "stderr": ""
+  },
+  {
+    "scenario": "cross-release",
+    "samples": 31,
+    "changes": [
+      {
+        "index": 0,
+        "time_ms": 87.1,
+        "sha256_16": "6f2fd53a0a169c89",
+        "path": "cross-release-change-00.png"
+      },
+      {
+        "index": 1,
+        "time_ms": 205.9,
+        "sha256_16": "679f38cd65dfcb81",
+        "path": "cross-release-change-01.png"
+      },
+      {
+        "index": 2,
+        "time_ms": 327.0,
+        "sha256_16": "da4391053772c72a",
+        "path": "cross-release-change-02.png"
+      },
+      {
+        "index": 3,
+        "time_ms": 456.0,
+        "sha256_16": "e7faa2631c226813",
+        "path": "cross-release-change-03.png"
+      },
+      {
+        "index": 4,
+        "time_ms": 571.6,
+        "sha256_16": "f28bba8f229879d6",
+        "path": "cross-release-change-04.png"
+      },
+      {
+        "index": 5,
+        "time_ms": 686.3,
+        "sha256_16": "a75cfda27e1d739d",
+        "path": "cross-release-change-05.png"
+      },
+      {
+        "index": 6,
+        "time_ms": 803.4,
+        "sha256_16": "f781859e7331b81d",
+        "path": "cross-release-change-06.png"
+      }
+    ],
+    "baseline_sha256_16": "a3b373a0b825aa89",
+    "exit": 0,
+    "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU",
+    "stderr": ""
+  }
+]

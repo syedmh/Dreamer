@@ -1,0 +1,10 @@
+{
+  "reset": "Opt-in watch --reset-state archives .tcfcomic under a collision-safe backup name in destination. Never recursively delete. Preserve sources/output/quarantine evidence. Refuse active destination. Wait existing request/429 cooldown interruptibly before reset, so new history cannot bypass rate limiting.",
+  "compatibility": "Keep legacy single-prompt YAML and existing queue format working unchanged. Do not upgrade old database. Fresh named-prompt state supports variant-qualified uniqueness. If config/state modes disagree, fail clearly and leave state unchanged.",
+  "configuration": "provider.prompts is an ordered mapping of safe unique names to prompt text, mutually exclusive with provider.prompt. Update only active interactive config; preserve its current first prompt exactly.",
+  "variants": ["tcf-school", "pakistani-80s"],
+  "processing": "Independent original-image input and per-variant durable jobs; no chaining. Both share destination lock, queue and provider rate/cooldown gate. One successful variant is never replayed because the other fails.",
+  "output": "Named-prompt filenames contain the variant name and retain collision-safe publication. Legacy filename contract unchanged. Multi-prompt one-shot prints each successful output path; exit is nonzero if any requested variant fails.",
+  "privacy": "No prompts, credentials, image bytes or metadata in logs. No real data used as test fixtures.",
+  "phaseStatus": "Only coding and tests active. Other gates paused, not passed."
+}

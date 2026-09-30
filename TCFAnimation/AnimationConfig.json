@@ -1,6 +1,8 @@
 {
   "turnFps": 8.0,
   "walkFps": 8.0,
+  "girlWalkFps": 8.0,
+  "girlEntrySeconds": 6.0,
   "clapFps": 8.0,
   "crossArmFps": 8.0,
   "crossArmReleaseFps": 8.0,

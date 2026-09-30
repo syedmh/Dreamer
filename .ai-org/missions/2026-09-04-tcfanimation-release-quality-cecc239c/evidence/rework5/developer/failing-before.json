@@ -1,0 +1,22 @@
+{
+  "date": "2026-09-04",
+  "sourceArtifact": "evidence/rework4/tests/independent-continuity.json",
+  "boundary": {
+    "label": "Right_turn1_to_turn2",
+    "classification": "moving",
+    "walking": false,
+    "head": 3.828755,
+    "torso": 1.250107,
+    "shoulder": 16.0,
+    "waist": 6.0,
+    "baseline": 12.0,
+    "height": 12.0,
+    "passedByPriorGate": true
+  },
+  "turningMutation": {
+    "shoulderDelta": 41.0,
+    "waistDelta": 4.0,
+    "acceptedByPriorLabelBasedGate": true,
+    "reason": "The prior moving gate checked shoulder and waist only when the label contained walk."
+  }
+}

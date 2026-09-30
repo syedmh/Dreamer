@@ -1,0 +1,28 @@
+{
+  "rootCause": "Ten previously generated output PNGs were moved to output\\Backup. Root paths no longer matched saved publication locations, so integrity recovery marked jobs FAILED/STATE_FAILED. Restoring files previously had no FAILED-to-SUCCEEDED reconciliation path.",
+  "fix": "Strict prior-publication evidence plus exact decoded PNG/hash, immutable audit and transactional full job/attempt CAS now reconcile restored outputs to SUCCEEDED without dispatch. Missing outputs receive actionable messages instead of provider-retry advice.",
+  "authorizedRestoration": {
+    "verifiedCopiesRestored": 10,
+    "jobsReconciledToSucceeded": 10,
+    "totalSucceededAfter": 15,
+    "protectedFailedAfter": 6,
+    "backupFilesUnchanged": true,
+    "configurationUnchanged": true,
+    "attemptRowsUnchanged": true,
+    "unrelatedJobsUnchanged": true,
+    "originalQuarantineEvidenceUnchanged": true,
+    "providerRequests": 0,
+    "authenticationCalls": 0,
+    "queueReset": false
+  },
+  "verification": {
+    "red": "Initial restoration regression failed: restored file left job FAILED.",
+    "independentParentRun": "python -m pytest -q tests\\integration\\test_restored_publication.py: 65 passed in 16.12s",
+    "developerSurroundingRuns": ["204 passed, 2 Windows privilege skips (includes new 65)", "180 passed in replay/security/provenance/crash subsets", "11 passed, 68 deselected in recovery/publication subset"],
+    "compilation": "python -m compileall -q .\\src\\tcfcomic: exit 0"
+  },
+  "remaining": "Six moderation-blocked or unverifiable historical provider failures are intentionally unchanged. No live resubmission authorized or needed for restored outputs.",
+  "workflow": "Development and explicitly approved focused regression/compilation completed. Broader phases remain paused.",
+  "receipt": "Session files\\verified-output-restoration-result.json",
+  "cleanup": "One-time restoration script deleted; evidence receipt retained."
+}

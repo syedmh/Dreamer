@@ -1,0 +1,267 @@
+{
+  "noSubmit": true,
+  "forms": [
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "formKey": "form-70143531e991fe62",
+      "method": "GET",
+      "action": "https://www.husaynia.org/",
+      "fields": [
+        {
+          "name": "s",
+          "type": "search",
+          "label": "Search for:",
+          "required": false,
+          "autocomplete": "off"
+        },
+        {
+          "name": null,
+          "type": "submit",
+          "label": null,
+          "required": false,
+          "autocomplete": null
+        },
+        {
+          "name": "id",
+          "type": "hidden",
+          "label": null,
+          "required": false,
+          "autocomplete": null
+        },
+        {
+          "name": "post_type",
+          "type": "hidden",
+          "label": null,
+          "required": false,
+          "autocomplete": null
+        }
+      ],
+      "submissionAttempted": false,
+      "riskClassification": "Observed markup only; validation, destination workflow, anti-abuse behavior, and success states require authorized non-production testing/export evidence."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "formKey": "form-101a2d359439087e",
+      "method": "GET",
+      "action": "https://www.husaynia.org/",
+      "fields": [
+        {
+          "name": "s",
+          "type": "search",
+          "label": "Search for:",
+          "required": false,
+          "autocomplete": "off"
+        },
+        {
+          "name": null,
+          "type": "submit",
+          "label": null,
+          "required": false,
+          "autocomplete": null
+        },
+        {
+          "name": "id",
+          "type": "hidden",
+          "label": null,
+          "required": false,
+          "autocomplete": null
+        },
+        {
+          "name": "post_type",
+          "type": "hidden",
+          "label": null,
+          "required": false,
+          "autocomplete": null
+        }
+      ],
+      "submissionAttempted": false,
+      "riskClassification": "Observed markup only; validation, destination workflow, anti-abuse behavior, and success states require authorized non-production testing/export evidence."
+    }
+  ],
+  "dynamicRegions": [
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-be8195283a8beafc",
+      "provider": "tribe-common tribe-events tribe-events-view tribe-events-view--list tribe-events-view--shortcode tribe-events-view--shortcode-e5ff5b3e",
+      "selector": "div.tribe-common",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-07fbd5ffab231fa0",
+      "provider": "tribe-common-l-container tribe-events-l-container",
+      "selector": "div.tribe-common-l-container",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-67ee0a400804a2ff",
+      "provider": "tribe-events-view-loader tribe-common-a11y-hidden",
+      "selector": "div.tribe-events-view-loader",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-3bf02d72fe1cbf6c",
+      "provider": "tribe-events-view-loader__dots tribe-common-c-loader",
+      "selector": "div.tribe-events-view-loader__dots",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-5a06f154fa4f6e96",
+      "provider": "tribe-events-header__messages tribe-events-c-messages tribe-common-b2 tribe-common-c-loader__dot tribe-common-c-loader__dot--third",
+      "selector": "div.tribe-events-header__messages",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-910a8f7f5e1169b0",
+      "provider": "tribe-events-c-messages__message tribe-events-c-messages__message--notice",
+      "selector": "div.tribe-events-c-messages__message",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-1701a1ef716c23b2",
+      "provider": "tribe-events-c-top-bar tribe-events-header__top-bar",
+      "selector": "div.tribe-events-c-top-bar",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-95893747b19c6ff4",
+      "provider": "tribe-events-c-top-bar__datepicker",
+      "selector": "div.tribe-events-c-top-bar__datepicker",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-26cb50f1dddea2f6",
+      "provider": "tribe-events-c-top-bar__datepicker-container",
+      "selector": "div.tribe-events-c-top-bar__datepicker-container",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-930062d7c38134af",
+      "provider": "tribe-events-c-top-bar__actions tribe-common-a11y-hidden",
+      "selector": "div.tribe-events-c-top-bar__actions",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-cfd921c15d93b5b9",
+      "provider": "tribe-events-calendar-list",
+      "selector": "div.tribe-events-calendar-list",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-65115e636320d372",
+      "provider": "tribe-events-c-subscribe-dropdown__container",
+      "selector": "div.tribe-events-c-subscribe-dropdown__container",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-af0338bb6feb74ea",
+      "provider": "tribe-events-c-subscribe-dropdown",
+      "selector": "div.tribe-events-c-subscribe-dropdown",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-ee0a1bd8feebe361",
+      "provider": "tribe-common-c-btn-border tribe-events-c-subscribe-dropdown__button",
+      "selector": "div.tribe-common-c-btn-border",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-ec649b82c4f610f7",
+      "provider": "tribe-events-c-subscribe-dropdown__content",
+      "selector": "div.tribe-events-c-subscribe-dropdown__content",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-a9445f5fa1c3fd3e",
+      "provider": "cff  cff-mob-cols-1 cff-carousel cff-palette-13 cff-timeline-feed cff-pag cff-all-reviews cff-nojs",
+      "selector": "#cff",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-4bd3bb223bd39db2",
+      "provider": "cff-html5-video",
+      "selector": "div.cff-html5-video",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-2dd85e26266e28cd",
+      "provider": "cff-album-item cff-video cff-col-3 cff-new cff-2110974339140244",
+      "selector": "#cff_1616784476702598",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-bfd785382897848a",
+      "provider": "cff-album-item cff-video cff-col-3 cff-new cff-2110974339140244",
+      "selector": "#cff_1574159237648788",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-84c68770e0eae071",
+      "provider": "cff-album-item cff-video cff-col-3 cff-new cff-2110974339140244",
+      "selector": "#cff_1517121029626967",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-175b412fada2260c",
+      "provider": "cff-album-item cff-video cff-col-3 cff-new cff-2110974339140244",
+      "selector": "#cff_3499101823579046",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-4375a765ded0adb3",
+      "provider": "cff-album-item cff-video cff-col-3 cff-new cff-2110974339140244",
+      "selector": "#cff_2034255020596839",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    },
+    {
+      "sourcePage": "https://www.husaynia.org/",
+      "regionKey": "dynamic-bd8ebfc5ba5dd64a",
+      "provider": "cff-album-item cff-video cff-col-3 cff-new cff-2110974339140244",
+      "selector": "#cff_2515457608974674",
+      "normalization": "Animations/transitions disabled; embedded frames and volatile social/calendar content masked during screenshots.",
+      "riskClassification": "Snapshot captures container/layout only. Live provider data, consent state, loading, empty, and upstream-error states require later controlled fixtures."
+    }
+  ]
+}

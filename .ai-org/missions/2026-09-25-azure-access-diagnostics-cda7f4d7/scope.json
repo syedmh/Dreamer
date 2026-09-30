@@ -1,0 +1,16 @@
+{
+  "objective": "Diagnose API-key HTTP 403 safely and stop an access-denied run before submitting remaining image variants.",
+  "evidence": "DSC_5476.JPG has three FAILED/PROVIDER_PERMANENT jobs, one definitive HTTP 403 attempt each. Current API-key and interactive configurations are synchronized apart from auth settings. No API key is available to this assistant session. Exact cloud-side access restriction remains unknown.",
+  "userApprovals": {"implement_auth_diagnostics": true, "focused_validation": true},
+  "deliverables": [
+    "check-auth --config performs one read-only Azure models-list HTTP request with no images, generation requests, queue access or resets.",
+    "Report bounded static access diagnostics and validated request IDs; never print credentials, prompts or full provider payloads.",
+    "Clearly qualify a successful models-list check: it does not prove image-edit deployment permissions or generation success.",
+    "Definitive Azure authentication/access denials stop process/watch after durably recording the first failure, leaving other queued variants unattempted.",
+    "Existing failed 403 jobs are not silently retried, reset, or switched to a different credential.",
+    "Document the diagnostic command and user-side execution in the same PowerShell window that holds the key.",
+    "Focused offline regression and compilation only; no live diagnostic or image submission by the assistant."
+  ],
+  "constraints": ["Preserve both actual configs and prompt text.", "No Azure policy changes or authorization bypass.", "No key persistence or fallback.", "No database migration or production-state mutation.", "No broad phase resumption."],
+  "reference": "Microsoft Learn Models - List documents GET {endpoint}/openai/models?api-version=2024-10-21 with api-key; use a verified documented endpoint, not an invented v1 operation."
+}

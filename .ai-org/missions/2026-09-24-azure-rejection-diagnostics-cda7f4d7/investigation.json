@@ -1,0 +1,38 @@
+{
+  "observations": [
+    "Actual local quarantine record confirms generic HTTP rejection classification.",
+    "The HTTP status and raw SDK exception were not retained and cannot be reconstructed.",
+    "Current api_key config uses correct declared deployment name gpt-image-2 and root endpoint.",
+    "Current image edit contract is /openai/v1/images/edits?api-version=preview.",
+    "No Azure API key exists in assistant process."
+  ],
+  "hypotheses": [
+    {"cause": "Authentication/access rejection", "status": "unresolved; need HTTP status"},
+    {"cause": "Deployment/route/API-version mismatch", "status": "unresolved; need HTTP status/provider code"},
+    {"cause": "Request format/model capability/content rejection", "status": "unresolved; need HTTP status/provider code"}
+  ],
+  "newObservation": {
+    "job": "2ee22825673d436a897c6f2cde359d34",
+    "httpStatus": 403,
+    "safeMessage": "The provider rejected the request. HTTP 403. Check resource permissions and network access rules.",
+    "knownProviderCode": null,
+    "rootCause": "Still unresolved: access denial does not identify the particular authentication, network, or resource policy.",
+    "managementAccess": "Azure CLI not installed in assistant environment; resource policy cannot be inspected locally.",
+    "nextEvidence": "Read-only resource properties: disableLocalAuth, publicNetworkAccess, networkAcls.defaultAction and applicable network/private-endpoint rules."
+  },
+  "interactiveDiagnosis": {
+    "firstLiveJob": "18e1f36e21b044d29a23a24a010f460c",
+    "firstLiveStatus": 400,
+    "authorizedDiagnostic": "Azure explicitly reported token tenant does not match resource tenant.",
+    "resourceTenantSource": "User supplied confirmed resource tenant after Azure did not advertise an authentication challenge.",
+    "configurationFix": "Pinned provider.tenant_id to b1a4f7cb-a159-44a6-ac48-6674e85c4ddc in config.azure.interactive.yaml.",
+    "successfulLiveJob": "cc46679c01a3498398a1e8869ec44d07",
+    "successfulAttemptDurationMs": 18661,
+    "successfulProcessExitCode": 0,
+    "verified": "SUCCEEDED, exactly one attempt, source SHA-256 preserved, exported PNG fully decoded and digest matched durable state.",
+    "output": "output/tenant-smoke-1000e5dcc665__2dbe8f9bc43b__cc46679c.png",
+    "imageDimensions": [1254, 1254],
+    "remaining": "Earlier API-key 403 cause was not independently established. Corporate Entra mode now works and does not require that key."
+  },
+  "decision": "Use tenant-pinned interactive corporate authentication. Do not change resource policies, model, or API route. Live image-edit success is verified."
+}

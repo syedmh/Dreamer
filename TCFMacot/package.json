@@ -1,0 +1,11 @@
+{
+  "name": "tcf-event-avatar",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:sprites": "python tools/build-sprite-avatar.py",
+    "start": "node server.mjs",
+    "test": "node --test"
+  }
+}

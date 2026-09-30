@@ -1,0 +1,67 @@
+{
+  "policyVersion": "adr-009-v2",
+  "allowedMethods": [
+    "GET",
+    "HEAD"
+  ],
+  "allowedOrigins": [
+    "https://www.husaynia.org"
+  ],
+  "allowedStaticHosts": [
+    "cdn.jsdelivr.net",
+    "cdnjs.cloudflare.com",
+    "fonts.googleapis.com",
+    "fonts.gstatic.com"
+  ],
+  "allowedStaticResourceTypes": [
+    "stylesheet",
+    "font",
+    "image"
+  ],
+  "blockedCapabilities": [
+    "form-submission",
+    "payment-hosts",
+    "analytics",
+    "trackers",
+    "websockets",
+    "eventsource",
+    "sendbeacon",
+    "service-workers",
+    "downloads",
+    "popups",
+    "unexpected-navigation"
+  ],
+  "pinnedDnsAnswers": {
+    "cdn.jsdelivr.net": [
+      "104.17.207.5",
+      "104.17.208.5"
+    ],
+    "cdnjs.cloudflare.com": [
+      "104.17.24.14",
+      "104.17.25.14"
+    ],
+    "fonts.googleapis.com": [
+      "142.251.46.74"
+    ],
+    "fonts.gstatic.com": [
+      "142.250.73.67"
+    ],
+    "www.husaynia.org": [
+      "104.21.76.77",
+      "172.67.191.103"
+    ]
+  },
+  "chromiumHostResolverRules": [
+    "MAP cdn.jsdelivr.net 104.17.207.5",
+    "MAP cdnjs.cloudflare.com 104.17.24.14",
+    "MAP fonts.googleapis.com 142.251.46.74",
+    "MAP fonts.gstatic.com 142.250.73.67",
+    "MAP www.husaynia.org 104.21.76.77"
+  ],
+  "navigationAttempts": 3,
+  "navigationAttemptTimeoutSeconds": 10,
+  "readinessTimeoutSeconds": 30,
+  "captureTimeoutSeconds": 45,
+  "interCaptureDelayMilliseconds": 3000,
+  "enforcement": "Fresh context/page/ledger per attempt; public GET/HEAD only; terminal request barrier; no DOM/layout mutation."
+}

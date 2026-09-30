@@ -1,0 +1,10 @@
+{
+  "rootEvidence": {"jobId": "4fadd1a8e8ce4134b602c508df783ab6", "status": "FAILED", "error": "INVALID_IMAGE", "attempts": 0, "matchesOriginalDefaultPromptIdentity": true, "matchesCurrentIdentity": false, "oldStageExists": false, "publicationReferences": false},
+  "contract": "process --retry-input-rejection opts one image into current request identity adoption; default/watch unchanged. It is not force reprocessing.",
+  "eligibility": "Existing JPEG-named MPO failed input INVALID_IMAGE, no historical attempts, exact source version, successful fresh bounded validation, matching safe provenance, no output/temp/stage artifacts or references.",
+  "transaction": "Preserve expected row CAS, source and evidence guards. Atomically adopt provider/model/prompt_hash with READY and newly staged path; preserve job ID and source/creation identity.",
+  "audit": "Reuse immutable bounded publisher. Original byte-exact failure plus canonical deterministic transition evidence keyed by full payload digest, using complete identity fingerprints and original-provenance digest; no raw prompts, endpoint, auth material or tokens.",
+  "failure": "Precommit transition evidence is preparation, not authorization; flag still required after rollback. Postcommit recovery follows adopted configuration. Never replay attempted or succeeded jobs.",
+  "observability": "Report changed request settings, not necessarily changed prompt, and show process-only opt-in command. Preserve existing error codes and stdout output-path contract.",
+  "validation": "Synthetic temp configs, fixtures and state only. Real photo and database remain untouched; user runs command personally."
+}

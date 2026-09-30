@@ -1,0 +1,81 @@
+{
+  "sessionId": "cecc239c-9a24-4dbf-8b8f-25bacb3e8db6",
+  "missionId": "2026-09-04-tcfanimation-release-quality-cecc239c",
+  "missionDir": ".ai-org/missions/2026-09-04-tcfanimation-release-quality-cecc239c",
+  "objective": "Complete TCFAnimation release-quality hardening and independent validation from the current working tree without commit or push.",
+  "classification": "feature",
+  "size": "large",
+  "state": "BLOCKED",
+  "workflow": "feature-hardening-release-readiness",
+  "definitionOfDone": [
+    "33-frame visual quality and continuity",
+    "runtime/dialogue/fullscreen controls",
+    "deterministic extraction and source immutability",
+    "safe launch/capture/export",
+    "clean package",
+    "independent tests/review/security/QA/judge"
+  ],
+  "gates": {
+    "requirements": "pass",
+    "architecture": "pass",
+    "implementation": "pass",
+    "tests": "pass",
+    "security": "pass",
+    "review": "pass",
+    "e2e": "blocked",
+    "judge": "rejected"
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "owner": "product-analyst",
+      "status": "DONE"
+    },
+    {
+      "id": "T2",
+      "owner": "architect",
+      "status": "DONE"
+    },
+    {
+      "id": "T3",
+      "owner": "developer",
+      "status": "DONE"
+    },
+    {
+      "id": "T4",
+      "owner": "test-engineer",
+      "status": "DONE"
+    },
+    {
+      "id": "T5",
+      "owner": "code-reviewer",
+      "status": "FAILED"
+    },
+    {
+      "id": "T6",
+      "owner": "security-engineer",
+      "status": "FAILED"
+    },
+    {
+      "id": "T7",
+      "owner": "qa-engineer",
+      "status": "PENDING"
+    },
+    {
+      "id": "T8",
+      "owner": "developer/specialist",
+      "status": "IN_PROGRESS"
+    },
+    {
+      "id": "T9",
+      "owner": "engineering-judge",
+      "status": "PENDING"
+    }
+  ],
+  "blockers": [
+    "Windows console session 1 is locked; foreground input desktop unavailable. Mandatory dialogue and physical 1536x960 E2E scenarios cannot be proven."
+  ],
+  "reworkCount": 5,
+  "nextAction": "CTO/user unlocks console session 1; QA reruns evidence/qa-final/run-final-foreground-e2e.py against unchanged release; then rejudge.",
+  "updatedAt": "2026-09-04T08:19:56.9313785-07:00"
+}

@@ -1,0 +1,30 @@
+{
+  "comparedAtUtc": "2026-08-16T05:10:48.1589135+00:00",
+  "runACapturedAtUtc": "2026-08-16T04:23:06.7172284+00:00",
+  "runBCapturedAtUtc": "2026-08-16T04:57:18.7721679+00:00",
+  "runAScreenshotCount": 36,
+  "runBScreenshotCount": 36,
+  "metricDifferenceCount": 0,
+  "pixelHashDifferenceCount": 5,
+  "comparedMetrics": [
+    "actualViewportWidth",
+    "actualViewportHeight",
+    "actualScreenWidth",
+    "actualScreenHeight",
+    "actualDevicePixelRatio",
+    "documentScrollWidth",
+    "documentScrollHeight",
+    "bodyWidth",
+    "bodyHeight",
+    "textLength",
+    "formCount",
+    "horizontalOverflow",
+    "fontsReady",
+    "incompleteImageCount",
+    "inFlightAllowedRequests",
+    "visibleLandmarks",
+    "overflowSources"
+  ],
+  "metricDifferences": [],
+  "passed": true
+}

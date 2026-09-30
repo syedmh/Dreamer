@@ -1,0 +1,26 @@
+{
+  "objective": "Investigate HTTP 400 for DSC_5326.JPG / pakistani-80s without resubmitting images.",
+  "runtimeEvidence": {
+    "jobId": "c2fae2e01a5149ef810c75f20a8f4a21",
+    "variant": "pakistani-80s",
+    "status": "FAILED",
+    "attempts": 1,
+    "durationMilliseconds": 131169,
+    "samePhotoOtherVariant": "tcf-school SUCCEEDED",
+    "sameVariantOtherPhotos": ["DSC_5279.JPG SUCCEEDED", "DSC_5365.JPG SUCCEEDED"],
+    "batchOutcome": "Five successful jobs, one failed job.",
+    "savedDetails": "Generic HTTP 400 only; no exact provider code, response text or request ID retained."
+  },
+  "conclusion": "The precise Azure rejection reason is unknown. Existing results do not support a general broken model/endpoint/prompt configuration claim.",
+  "development": [
+    "Recognize documented contentFilter and InvalidPayload codes.",
+    "Read allowlisted codes and parameters from bounded fixed SDK/nested error paths.",
+    "Include only strictly formatted hexadecimal/UUID provider request IDs.",
+    "Avoid misleading generic parameter hint when HTTP 400 includes a recognized specific code.",
+    "Continue excluding raw provider messages, payloads and credentials."
+  ],
+  "build": {"command": "python -m compileall -q .\\src\\tcfcomic", "exitCode": 0},
+  "tests": "Paused by CTO; not executed.",
+  "otherGates": "Paused by CTO; not passed.",
+  "limitations": ["New diagnostics cannot recover the discarded historical response.", "No live provider call or retry performed.", "Prompts, queue history and existing outputs unchanged."]
+}

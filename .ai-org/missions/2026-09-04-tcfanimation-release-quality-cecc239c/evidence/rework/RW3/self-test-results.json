@@ -1,0 +1,70 @@
+{
+  "status": "PASS",
+  "tests": 10,
+  "extractionPasses": [
+    {
+      "pass": 1,
+      "sources": 6,
+      "frames": 33,
+      "nonframes": 479
+    },
+    {
+      "pass": 2,
+      "sources": 6,
+      "frames": 33,
+      "nonframes": 479
+    }
+  ],
+  "results": [
+    {
+      "name": "exact-empty-filters",
+      "passed": true,
+      "detail": "positive=pass negative_controls=4"
+    },
+    {
+      "name": "metadata-token-controls",
+      "passed": true,
+      "detail": "ascii_matches=1 utf16_matches=1"
+    },
+    {
+      "name": "bounded-pack-controls",
+      "passed": true,
+      "detail": "entry_4mib_plus_1=preopen aggregate_16mib_plus_1=preopen out_of_pack=preopen"
+    },
+    {
+      "name": "oversized-source-precheck",
+      "passed": true,
+      "detail": "wrong_size=rejected path_open_calls=0 decode_sentinel=false"
+    },
+    {
+      "name": "six-source-streaming",
+      "passed": true,
+      "detail": "sources=6 chunk_size=1048576 predecode=true"
+    },
+    {
+      "name": "integrity-wiring",
+      "passed": true,
+      "detail": "extractors=4 validator=1 streaming_helper=true"
+    },
+    {
+      "name": "two-pass-determinism",
+      "passed": true,
+      "detail": "passes=2 sources=6 frames=33 encoded_and_decoded=unchanged nonframe_output=0"
+    },
+    {
+      "name": "isolated-package",
+      "passed": true,
+      "detail": "entries=73 engine_metadata=4 import_metadata=33 denied_tokens=0 scripts=2x1byte"
+    },
+    {
+      "name": "validator-read-only",
+      "passed": true,
+      "detail": "exit=0 marker=True files=512 unchanged=True"
+    },
+    {
+      "name": "protected-baseline",
+      "passed": true,
+      "detail": "checked=74 missing=0 changed=0"
+    }
+  ]
+}

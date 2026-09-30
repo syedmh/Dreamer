@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-09-04T07:59:55.2056115-07:00",
+  "sessionId": 1,
+  "userInteractive": true,
+  "foregroundHwnd": 0,
+  "logonUiSameSession": 1,
+  "inputDesktopOpen": false,
+  "sendInputAttempts": [
+    {
+      "method": "SetForegroundWindow+AttachThreadInput+SendInput",
+      "result": "failed",
+      "observedForegroundPid": 60556
+    },
+    {
+      "method": "topmost+real SendInput mouse click+SendInput",
+      "result": "failed",
+      "observedForegroundHwnd": 0
+    }
+  ],
+  "conclusion": "Desktop locked/unavailable for trustworthy foreground keyboard/clipboard control"
+}

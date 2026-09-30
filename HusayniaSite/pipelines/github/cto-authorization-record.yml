@@ -1,0 +1,152 @@
+{
+  "name": "T21 protected CTO authorization record",
+  "on": {
+    "workflow_dispatch": {
+      "inputs": {
+        "sourceReleaseRunId": {
+          "description": "Completed-success approved release C6 run ID",
+          "required": true,
+          "type": "string"
+        },
+        "preflightRunId": {
+          "description": "Completed-success trusted Production preflight run ID",
+          "required": true,
+          "type": "string"
+        },
+        "stageOperationInputsRunId": {
+          "description": "Completed-success Production prepared-input run ID",
+          "required": true,
+          "type": "string"
+        },
+        "expectedAppSha256": {
+          "description": "Expected immutable application SHA-256",
+          "required": true,
+          "type": "string"
+        },
+        "ctoApprovalReference": {
+          "description": "Approved Production change/environment approval reference",
+          "required": true,
+          "type": "string"
+        },
+        "expiresAtUtc": {
+          "description": "Authorization expiry, no more than 24 hours in the future",
+          "required": true,
+          "type": "string"
+        },
+        "decision": {
+          "description": "Explicit CTO authorization decision",
+          "required": true,
+          "type": "choice",
+          "options": ["DENY", "AUTHORIZE"]
+        }
+      }
+    }
+  },
+  "permissions": {
+    "actions": "read",
+    "attestations": "write",
+    "contents": "read",
+    "id-token": "write"
+  },
+  "jobs": {
+    "record-authorization": {
+      "if": "${{ vars.T21_CTO_AUTHORIZATION_RECORD_ENABLED == 'true' && vars.T21_PRODUCTION_DEPLOYMENT_ENABLED == 'true' }}",
+      "runs-on": "ubuntu-24.04",
+      "environment": "Husaynia-CTO-Authorization",
+      "timeout-minutes": 20,
+      "env": {
+        "HUSAYNIA_REPOSITORY_ROOT": "${{ github.workspace }}/HusayniaSite"
+      },
+      "defaults": {
+        "run": {
+          "shell": "pwsh",
+          "working-directory": "HusayniaSite"
+        }
+      },
+      "steps": [
+        {
+          "name": "Checkout authorization scripts",
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 1
+          }
+        },
+        {
+          "name": "Validate canonical Husaynia checkout root",
+          "run": "$workspace = (Resolve-Path -LiteralPath $env:GITHUB_WORKSPACE).Path; $root = (Resolve-Path -LiteralPath $env:HUSAYNIA_REPOSITORY_ROOT).Path; $expected = Join-Path $workspace 'HusayniaSite'; if ($root -cne $expected -or -not $root.StartsWith($workspace + [IO.Path]::DirectorySeparatorChar, [StringComparison]::Ordinal) -or -not (Test-Path -LiteralPath (Join-Path $root 'HusayniaSite.sln') -PathType Leaf) -or -not (Test-Path -LiteralPath (Join-Path $root 'eng') -PathType Container) -or -not (Test-Path -LiteralPath (Join-Path $root 'pipelines') -PathType Container)) { throw 'T21 canonical Dreamer/HusayniaSite checkout root validation failed.' }"
+        },
+        {
+          "name": "Validate protected selectors and frozen Production policy",
+          "env": {
+            "T21_RELEASE_RUN_ID": "${{ inputs.sourceReleaseRunId }}",
+            "T21_PREFLIGHT_RUN_ID": "${{ inputs.preflightRunId }}",
+            "T21_PREPARED_INPUT_RUN_ID": "${{ inputs.stageOperationInputsRunId }}",
+            "T21_EXPECTED_APP_SHA256": "${{ inputs.expectedAppSha256 }}",
+            "T21_CTO_APPROVAL_REFERENCE": "${{ inputs.ctoApprovalReference }}",
+            "T21_EXPECTED_BUNDLE_SHA256": "${{ vars.T21_TRUSTED_BUNDLE_SHA256 }}",
+            "T21_STAGE_TARGET_METADATA_JSON": "${{ vars.T21_STAGE_TARGET_METADATA_JSON }}"
+          },
+          "run": ". (Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'eng/common/Release.Common.ps1'); $policyPath = Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'pipelines/config/promotion-policy.json'; $policy = Get-Content -LiteralPath $policyPath -Raw | ConvertFrom-Json; $null = Assert-StageDeploymentEnabled -Policy $policy -Stage Production -Operation 'CTO deployment authorization workflow'; if ($env:T21_RELEASE_RUN_ID -notmatch '^[1-9][0-9]*$' -or $env:T21_PREFLIGHT_RUN_ID -notmatch '^[1-9][0-9]*$' -or $env:T21_PREPARED_INPUT_RUN_ID -notmatch '^[1-9][0-9]*$' -or $env:T21_PREFLIGHT_RUN_ID -ceq $env:T21_PREPARED_INPUT_RUN_ID -or $env:T21_EXPECTED_APP_SHA256 -notmatch '^[a-f0-9]{64}$' -or $env:T21_EXPECTED_BUNDLE_SHA256 -notmatch '^[a-f0-9]{64}$' -or $env:T21_CTO_APPROVAL_REFERENCE -notmatch '^[A-Za-z0-9][A-Za-z0-9._:/#-]{0,127}$' -or [string]::IsNullOrWhiteSpace($env:T21_STAGE_TARGET_METADATA_JSON)) { throw 'CTO authorization completed R/P/I selectors, target, bundle, or approval reference are malformed.' }; [IO.File]::WriteAllText((Join-Path $env:RUNNER_TEMP 'stage-target.json'), $env:T21_STAGE_TARGET_METADATA_JSON, [Text.UTF8Encoding]::new($false))"
+        },
+        {
+          "name": "Resolve completed release preflight and prepared-input provenance",
+          "env": {
+            "GITHUB_TOKEN": "${{ github.token }}",
+            "T21_RELEASE_RUN_ID": "${{ inputs.sourceReleaseRunId }}",
+            "T21_PREFLIGHT_RUN_ID": "${{ inputs.preflightRunId }}",
+            "T21_PREPARED_INPUT_RUN_ID": "${{ inputs.stageOperationInputsRunId }}",
+            "T21_EXPECTED_APP_SHA256": "${{ inputs.expectedAppSha256 }}",
+            "T21_EXPECTED_BUNDLE_SHA256": "${{ vars.T21_TRUSTED_BUNDLE_SHA256 }}",
+            "T21_TRUSTED_WORKFLOW_REF": "${{ vars.T21_TRUSTED_WORKFLOW_REF }}",
+            "T21_STAGE_INPUTS_WORKFLOW_REF": "${{ vars.T21_STAGE_INPUTS_WORKFLOW_REF }}"
+          },
+          "run": "$policyPath = Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'pipelines/config/promotion-policy.json'; $resolver = Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'eng/promotion/Resolve-GitHubArtifactProvenance.ps1'; & $resolver -ExpectedRole release-c6 -RunId $env:T21_RELEASE_RUN_ID -ConsumerRunId $env:GITHUB_RUN_ID -Stage Production -ApplicationSha256 $env:T21_EXPECTED_APP_SHA256 -BundleSha256 $env:T21_EXPECTED_BUNDLE_SHA256 -OutputRoot (Join-Path $env:RUNNER_TEMP 'release') -PolicyPath $policyPath; if ($LASTEXITCODE -ne 0) { throw 'CTO authorization release C6 provenance resolution failed.' }; $release = Get-Content -LiteralPath (Join-Path $env:RUNNER_TEMP 'release/verified-provenance.json') -Raw | ConvertFrom-Json -DateKind String; $releaseRoot = Join-Path (Join-Path $env:RUNNER_TEMP 'release/artifact') ([string]$release.artifact.name); $manifestPath = Join-Path $releaseRoot 'release/release-manifest.json'; $manifestSha = (Get-FileHash -LiteralPath $manifestPath -Algorithm SHA256).Hash.ToLowerInvariant(); $caller = 'syedmh/Dreamer/.github/workflows/production-operation-evidence.yml@refs/heads/main'; & $resolver -ExpectedRole trusted-preflight -RunId $env:T21_PREFLIGHT_RUN_ID -ConsumerRunId $env:GITHUB_RUN_ID -Stage Production -ApplicationSha256 $env:T21_EXPECTED_APP_SHA256 -BundleSha256 $env:T21_EXPECTED_BUNDLE_SHA256 -ReleaseManifestSha256 $manifestSha -ReleaseCommitSha $release.run.commitSha -ExpectedTopLevelCallerWorkflowRef $caller -ExpectedProducerWorkflowRef $env:T21_TRUSTED_WORKFLOW_REF -OutputRoot (Join-Path $env:RUNNER_TEMP 'preflight') -PolicyPath $policyPath; if ($LASTEXITCODE -ne 0) { throw 'CTO authorization completed preflight provenance resolution failed.' }; & $resolver -ExpectedRole stage-operation-inputs -RunId $env:T21_PREPARED_INPUT_RUN_ID -ConsumerRunId $env:GITHUB_RUN_ID -Stage Production -ApplicationSha256 $env:T21_EXPECTED_APP_SHA256 -BundleSha256 $env:T21_EXPECTED_BUNDLE_SHA256 -ReleaseManifestSha256 $manifestSha -ReleaseCommitSha $release.run.commitSha -ExpectedTopLevelCallerWorkflowRef $caller -ExpectedProducerWorkflowRef $env:T21_STAGE_INPUTS_WORKFLOW_REF -OutputRoot (Join-Path $env:RUNNER_TEMP 'prepared-inputs') -PolicyPath $policyPath; if ($LASTEXITCODE -ne 0) { throw 'CTO authorization completed prepared-input provenance resolution failed.' }"
+        },
+        {
+          "name": "Create checked Production change record and CTO authorization",
+          "env": {
+            "T21_EXPECTED_APP_SHA256": "${{ inputs.expectedAppSha256 }}",
+            "T21_EXPECTED_BUNDLE_SHA256": "${{ vars.T21_TRUSTED_BUNDLE_SHA256 }}",
+            "T21_CTO_APPROVAL_REFERENCE": "${{ inputs.ctoApprovalReference }}",
+            "T21_EXPIRES_AT_UTC": "${{ inputs.expiresAtUtc }}",
+            "T21_DECISION": "${{ inputs.decision }}",
+            "T21_CTO_AUTHORIZED_ACTOR_IDS": "${{ vars.T21_CTO_AUTHORIZED_ACTOR_IDS }}",
+            "T21_TRUSTED_WORKFLOW_REF": "${{ vars.T21_TRUSTED_WORKFLOW_REF }}",
+            "T21_STAGE_INPUTS_WORKFLOW_REF": "${{ vars.T21_STAGE_INPUTS_WORKFLOW_REF }}",
+            "T21_READONLY_PROBE_HOST": "${{ vars.T21_READONLY_PROBE_HOST }}",
+            "T21_CHANGE_RECORD_ENDPOINT": "${{ vars.T21_CHANGE_RECORD_ENDPOINT }}",
+            "T21_STAGE_READONLY_PROBE_TOKEN": "${{ secrets.T21_STAGE_READONLY_PROBE_TOKEN }}"
+          },
+          "run": "$policyPath = Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'pipelines/config/promotion-policy.json'; $output = Join-Path $env:RUNNER_TEMP \"cto-authorization-$env:T21_EXPECTED_APP_SHA256\"; New-Item -ItemType Directory -Path $output -Force | Out-Null; $changePath = Join-Path $output 'source-change-record.json'; & (Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'eng/promotion/New-StageOperationReport.ps1') -Stage Production -EvidenceType change-record -ExpectedAppSha256 $env:T21_EXPECTED_APP_SHA256 -ReleaseVerifiedProvenancePath (Join-Path $env:RUNNER_TEMP 'release/verified-provenance.json') -StageTargetMetadataPath (Join-Path $env:RUNNER_TEMP 'stage-target.json') -ReadOnlyProbeHost $env:T21_READONLY_PROBE_HOST -ChangeRecordEndpoint $env:T21_CHANGE_RECORD_ENDPOINT -ApprovalReference $env:T21_CTO_APPROVAL_REFERENCE -CtoAuthorizationOwner -OutputPath $changePath -PolicyPath $policyPath; if ($LASTEXITCODE -ne 0) { throw 'CTO-owned protected change-record check failed.' }; & (Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'eng/promotion/New-CtoAuthorizationRecord.ps1') -ExpectedAppSha256 $env:T21_EXPECTED_APP_SHA256 -ExpectedBundleSha256 $env:T21_EXPECTED_BUNDLE_SHA256 -ReleaseVerifiedProvenancePath (Join-Path $env:RUNNER_TEMP 'release/verified-provenance.json') -PreflightVerifiedProvenancePath (Join-Path $env:RUNNER_TEMP 'preflight/verified-provenance.json') -PreparedInputVerifiedProvenancePath (Join-Path $env:RUNNER_TEMP 'prepared-inputs/verified-provenance.json') -StageTargetMetadataPath (Join-Path $env:RUNNER_TEMP 'stage-target.json') -AuthorizedTopLevelCallerWorkflowRef 'syedmh/Dreamer/.github/workflows/production-operation-evidence.yml@refs/heads/main' -AuthorizedProducerWorkflowRef $env:T21_TRUSTED_WORKFLOW_REF -PreparedInputProducerWorkflowRef $env:T21_STAGE_INPUTS_WORKFLOW_REF -Decision $env:T21_DECISION -CtoApprovalReference $env:T21_CTO_APPROVAL_REFERENCE -SourceChangeRecordPath $changePath -ExpiresAtUtc $env:T21_EXPIRES_AT_UTC -AuthorizedByActor $env:GITHUB_ACTOR -AuthorizedByActorId $env:GITHUB_ACTOR_ID -AuthorizedActorIdAllowlist $env:T21_CTO_AUTHORIZED_ACTOR_IDS -AuthorizationRepository $env:GITHUB_REPOSITORY -AuthorizationWorkflowPath '.github/workflows/cto-authorization-record.yml' -AuthorizationRunId $env:GITHUB_RUN_ID -AuthorizationRunAttempt $env:GITHUB_RUN_ATTEMPT -AuthorizationRef $env:GITHUB_REF -AuthorizationCommitSha $env:GITHUB_SHA -OutputPath (Join-Path $output 'cto-authorization.json') -PolicyPath $policyPath; if ($LASTEXITCODE -ne 0) { throw 'CTO authorization v2.1 record creation failed.' }"
+        },
+        {
+          "name": "Create canonical CTO producer manifest",
+          "env": {
+            "T21_EXPECTED_APP_SHA256": "${{ inputs.expectedAppSha256 }}",
+            "T21_EXPECTED_BUNDLE_SHA256": "${{ vars.T21_TRUSTED_BUNDLE_SHA256 }}"
+          },
+          "run": "$release = Get-Content -LiteralPath (Join-Path $env:RUNNER_TEMP 'release/verified-provenance.json') -Raw | ConvertFrom-Json -DateKind String; $releaseRoot = Join-Path (Join-Path $env:RUNNER_TEMP 'release/artifact') ([string]$release.artifact.name); $manifestPath = Join-Path $releaseRoot 'release/release-manifest.json'; & (Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'eng/promotion/New-T21ProducerManifest.ps1') -ArtifactRoot (Join-Path $env:RUNNER_TEMP \"cto-authorization-$env:T21_EXPECTED_APP_SHA256\") -ProducerRole cto-authorization -Stage Production -ApplicationSha256 $env:T21_EXPECTED_APP_SHA256 -BundleSha256 $env:T21_EXPECTED_BUNDLE_SHA256 -ReleaseManifestSha256 (Get-FileHash -LiteralPath $manifestPath -Algorithm SHA256).Hash.ToLowerInvariant() -ReleaseCommitSha $release.run.commitSha -ReleaseRunId $release.run.runId -ReleaseRunAttempt $release.run.runAttempt -ProducerRunId $env:GITHUB_RUN_ID -ProducerRunAttempt $env:GITHUB_RUN_ATTEMPT -ProducerCommitSha $env:GITHUB_SHA -TopLevelCallerWorkflowRef 'syedmh/Dreamer/.github/workflows/cto-authorization-record.yml@refs/heads/main' -ProducerWorkflowRef \"syedmh/Dreamer/.github/workflows/cto-authorization-record.yml@$env:GITHUB_SHA\" -PolicyPath (Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'pipelines/config/promotion-policy.json'); if ($LASTEXITCODE -ne 0) { throw 'CTO authorization producer manifest creation failed.' }"
+        },
+        {
+          "name": "Publish protected authorization record",
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "cto-authorization-${{ inputs.expectedAppSha256 }}",
+            "path": "${{ runner.temp }}/cto-authorization-${{ inputs.expectedAppSha256 }}",
+            "if-no-files-found": "error",
+            "overwrite": false,
+            "retention-days": 30
+          }
+        },
+        {
+          "name": "Attest canonical CTO producer manifest",
+          "uses": "actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be",
+          "with": {
+            "subject-path": "${{ runner.temp }}/cto-authorization-${{ inputs.expectedAppSha256 }}/t21-producer-manifest.json"
+          }
+        }
+      ]
+    }
+  }
+}

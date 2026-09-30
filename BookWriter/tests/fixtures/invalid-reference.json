@@ -1,0 +1,36 @@
+{
+  "format": "dreamer.life-memoir.backup",
+  "formatVersion": 1,
+  "exportedAt": "2026-08-12T20:00:00.000Z",
+  "appVersion": "1.0.0",
+  "collection": {
+    "schemaVersion": 1,
+    "collectionId": "10000000-0000-4000-8000-000000000001",
+    "revision": 0,
+    "createdAt": "2026-08-12T20:00:00.000Z",
+    "updatedAt": "2026-08-12T20:00:00.000Z",
+    "book": {
+      "title": "",
+      "subtitle": "",
+      "authorName": "",
+      "dedication": "",
+      "preface": ""
+    },
+    "chapters": [
+      {
+        "id": "30000000-0000-4000-8000-000000000001",
+        "title": "Dangling reference",
+        "createdAt": "2026-08-12T20:00:00.000Z",
+        "updatedAt": "2026-08-12T20:00:00.000Z",
+        "memoryIds": [
+          "20000000-0000-4000-8000-000000000099"
+        ]
+      }
+    ],
+    "unassignedMemoryIds": [],
+    "memories": {},
+    "settings": {
+      "backupReminderDismissedAt": null
+    }
+  }
+}

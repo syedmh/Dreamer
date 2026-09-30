@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1.0.0",
+  "provenance": "Microsoft.Playwright 1.62.0 package-matched Chromium revision 1234 installed by playwright.ps1 install --no-shell chromium on Windows x64.",
+  "identities": [
+    {
+      "operatingSystem": "windows",
+      "architecture": "x64",
+      "playwrightVersion": "1.62.0",
+      "chromiumRevision": "1234",
+      "chromiumVersion": "151.0.7922.34",
+      "executableSha256": "409805a16d6416087e6b2f778df1cf8f7bbb267d6b99f6b5bb0a618eace234f2"
+    }
+  ]
+}

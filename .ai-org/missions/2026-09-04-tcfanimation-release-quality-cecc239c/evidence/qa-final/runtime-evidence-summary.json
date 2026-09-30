@@ -1,0 +1,143 @@
+{
+  "directional-entry": [
+    "directional-left-entry-00.png",
+    "directional-left-entry-01.png",
+    "directional-left-entry-02.png",
+    "directional-left-entry-03.png",
+    "directional-left-entry-04.png"
+  ],
+  "directional-reversal": [
+    "directional-reversal-to-left-00.png",
+    "directional-reversal-to-left-01.png",
+    "directional-reversal-to-left-02.png",
+    "directional-reversal-to-left-03.png",
+    "directional-reversal-to-left-04.png",
+    "directional-reversal-to-left-05.png"
+  ],
+  "directional-boundaries": [
+    "directional-00-idle.png",
+    "directional-both-held-neutral.png",
+    "directional-left-edge.png",
+    "directional-left-entry-00.png",
+    "directional-left-entry-01.png",
+    "directional-left-entry-02.png",
+    "directional-left-entry-03.png",
+    "directional-left-entry-04.png",
+    "directional-left-return.png",
+    "directional-reversal-to-left-00.png",
+    "directional-reversal-to-left-01.png",
+    "directional-reversal-to-left-02.png",
+    "directional-reversal-to-left-03.png",
+    "directional-reversal-to-left-04.png",
+    "directional-reversal-to-left-05.png",
+    "directional-right-edge.png",
+    "directional-right-return.png",
+    "directional-right-walk-before-reversal.png"
+  ],
+  "clap-sequence": [
+    "clap-step-00.png",
+    "clap-step-01.png",
+    "clap-step-02.png",
+    "clap-step-03.png",
+    "clap-step-04.png",
+    "clap-step-05.png",
+    "clap-step-06.png",
+    "clap-step-07.png",
+    "clap-step-08.png",
+    "clap-step-09.png",
+    "clap-step-10.png",
+    "clap-step-11.png",
+    "clap-step-12.png",
+    "clap-step-13.png",
+    "clap-step-14.png"
+  ],
+  "clap-interruption": [
+    "clap-before-interrupt.png",
+    "clap-c-ignored-while-moving.png",
+    "clap-direction-interrupted.png",
+    "clap-return-front.png",
+    "clap-step-00.png",
+    "clap-step-01.png",
+    "clap-step-02.png",
+    "clap-step-03.png",
+    "clap-step-04.png",
+    "clap-step-05.png",
+    "clap-step-06.png",
+    "clap-step-07.png",
+    "clap-step-08.png",
+    "clap-step-09.png",
+    "clap-step-10.png",
+    "clap-step-11.png",
+    "clap-step-12.png",
+    "clap-step-13.png",
+    "clap-step-14.png"
+  ],
+  "cross-entry": [
+    "cross-entry-00.png",
+    "cross-entry-01.png",
+    "cross-entry-02.png"
+  ],
+  "cross-release": [
+    "cross-release-00.png",
+    "cross-release-01.png",
+    "cross-release-02.png",
+    "cross-release-03.png",
+    "cross-release-04.png",
+    "cross-release-05.png",
+    "cross-release-complete-arrow-still-held.png"
+  ],
+  "cross-lock-recovery": [
+    "cross-arrow-repressed-moves.png",
+    "cross-entry-00.png",
+    "cross-entry-01.png",
+    "cross-entry-02.png",
+    "cross-held-inputs-blocked.png",
+    "cross-held.png",
+    "cross-release-00.png",
+    "cross-release-01.png",
+    "cross-release-02.png",
+    "cross-release-03.png",
+    "cross-release-04.png",
+    "cross-release-05.png",
+    "cross-release-complete-arrow-still-held.png"
+  ],
+  "dialogue": [
+    "dialogue-cancelled.png",
+    "dialogue-character-input-suppressed.png",
+    "dialogue-hidden-with-p.png",
+    "dialogue-input-unicode-wW.png",
+    "dialogue-left-edge-fullscreen.png",
+    "dialogue-left-edge-windowed.png",
+    "dialogue-right-edge-back-windowed.png",
+    "dialogue-right-edge-fullscreen.png",
+    "dialogue-right-edge-windowed.png",
+    "dialogue-submitted.png"
+  ],
+  "fullscreen": [
+    "fullscreen-00-windowed.png",
+    "fullscreen-alt-enter-dialogue-open-windowed.png",
+    "fullscreen-before-dialogue-escape.png",
+    "fullscreen-dialogue-escape-cancel-only.png",
+    "fullscreen-escape-exits.png",
+    "fullscreen-f11-dialogue-open.png"
+  ],
+  "speed": [
+    "speed-00-idle.png",
+    "speed-max-after-1400ms.png",
+    "speed-max-before-walk.png",
+    "speed-min-after-1400ms.png",
+    "speed-min-before-walk.png"
+  ],
+  "w-noop": [
+    "w-noop-after.png",
+    "w-noop-before.png"
+  ],
+  "w_noop_delta": {
+    "same_shape": true,
+    "changed_pixels": 0,
+    "max_channel_delta": 0,
+    "left_sha256": "2AC6C9B9C6E7E8750375B1B46CC09E66498DA97C79972A9CB8CDD29E61407687",
+    "right_sha256": "2AC6C9B9C6E7E8750375B1B46CC09E66498DA97C79972A9CB8CDD29E61407687"
+  },
+  "runtime_png_count": 73
+}

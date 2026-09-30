@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This sitemap was dynamically generated on 08/15/2026 at 8:37 pm by All in One SEO Pro - the original SEO plugin for WordPress. -->
+
+<?xml-stylesheet type="text/xsl" href="https://www.husaynia.org/default.xsl?sitemap=page"?>
+<urlset
+	xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+	xmlns:xhtml="http://www.w3.org/1999/xhtml"
+	xmlns:image="https://www.google.com/schemas/sitemap-image/1.1"
+>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/]]></loc>
+		<lastmod><![CDATA[2026-06-22T06:33:40+00:00]]></lastmod>
+		<changefreq><![CDATA[always]]></changefreq>
+		<priority><![CDATA[1]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://scontent-iad6-1.xx.fbcdn.net/v/t15.5256-10/725664116_2478844219302501_2937107625279631405_n.jpg]]></image:loc>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://scontent-iad3-1.xx.fbcdn.net/v/t15.5256-10/726420536_1025556400320118_153309633792335344_n.jpg]]></image:loc>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://scontent-iad3-1.xx.fbcdn.net/v/t15.5256-10/715829930_1562416235542525_3161202623933676529_n.jpg]]></image:loc>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/plugins/custom-facebook-feed-pro/assets/img/placeholder.png]]></image:loc>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2023/05/cam-01-1.jpg]]></image:loc>
+			<image:title><![CDATA[Cam 01 (1)]]></image:title>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2025/07/cam-04-bird-night-1.jpg]]></image:loc>
+			<image:title><![CDATA[Cam 04 Bird Night (1)]]></image:title>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2023/04/main-prayer-hall-view-01_.jpg]]></image:loc>
+			<image:title><![CDATA[Main Prayer Hall View 01_]]></image:title>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/overview/]]></loc>
+		<lastmod><![CDATA[2026-06-22T06:20:17+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/Capture-1.png]]></image:loc>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/prayer-timings/]]></loc>
+		<lastmod><![CDATA[2026-06-22T06:19:04+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/photos/]]></loc>
+		<lastmod><![CDATA[2026-06-22T05:33:48+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/plugins/custom-facebook-feed-pro/assets/img/placeholder.png]]></image:loc>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/build-husaynia/]]></loc>
+		<lastmod><![CDATA[2025-07-28T12:22:42+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2023/06/3.jpg]]></image:loc>
+			<image:title><![CDATA[3]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/donate-construction/]]></loc>
+		<lastmod><![CDATA[2025-07-02T02:51:19+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://34.238.62.25/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/donate/]]></loc>
+		<lastmod><![CDATA[2025-05-24T16:28:54+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2023/04/313195555_485927973560926_4478896905842388062_n.jpg]]></image:loc>
+			<image:title><![CDATA[313195555_485927973560926_4478896905842388062_n]]></image:title>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2023/04/topview.png]]></image:loc>
+			<image:caption><![CDATA[Exterior View [Top] ]]></image:caption>
+			<image:title><![CDATA[Exterior View [Top]]]></image:title>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2023/04/indoor-1.png]]></image:loc>
+			<image:caption><![CDATA[Interior View [Prayer Hall]]]></image:caption>
+			<image:title><![CDATA[Interior View [Prayer Hall]]]></image:title>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2023/04/khums.png.png]]></image:loc>
+			<image:title><![CDATA[Khums]]></image:title>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2023/04/307643254_3416012135303118_2183953325016368543_n.jpg]]></image:loc>
+			<image:title><![CDATA[307643254_3416012135303118_2183953325016368543_n]]></image:title>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2023/04/image_editor-1-1-1.png]]></image:loc>
+			<image:title><![CDATA[image_editor-1-1]]></image:title>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2024/10/5554657.jpg]]></image:loc>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2025/05/family-exchanging-gifts-eid-celebration-joyful-occasion-tradition-depicting-represents-bonds-gift-giving-customs-364441756.webp]]></image:loc>
+			<image:title><![CDATA[family-exchanging-gifts-eid-celebration-joyful-occasion-tradition-depicting-represents-bonds-gift-giving-customs-364441756]]></image:title>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/announcements/]]></loc>
+		<lastmod><![CDATA[2024-07-14T03:49:04+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://scontent-iad3-2.xx.fbcdn.net/v/t15.5256-10/450743135_464451096197358_8987811353997812423_n.jpg]]></image:loc>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/plugins/custom-facebook-feed-pro/assets/img/placeholder.png]]></image:loc>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://scontent-iad3-2.xx.fbcdn.net/v/t15.5256-10/451017916_1773722519830699_3701285310057793567_n.jpg]]></image:loc>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://scontent-iad3-2.xx.fbcdn.net/v/t15.5256-10/450600881_3293031821001421_5619520305092575444_n.jpg]]></image:loc>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://scontent-iad3-2.xx.fbcdn.net/v/t15.5256-10/450227615_360770646803328_2354037716253384934_n.jpg]]></image:loc>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://scontent-iad3-2.xx.fbcdn.net/v/t15.5256-10/450340532_999034971725997_6106002028508942609_n.jpg]]></image:loc>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://scontent-iad3-2.xx.fbcdn.net/v/t15.5256-10/450064466_1455497398671282_262716908805503242_n.jpg]]></image:loc>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/programs/]]></loc>
+		<lastmod><![CDATA[2024-07-04T07:04:29+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/pledge-construction/]]></loc>
+		<lastmod><![CDATA[2023-04-28T19:44:27+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/donate-majalis/]]></loc>
+		<lastmod><![CDATA[2023-04-28T19:26:22+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/donate-sadaqah/]]></loc>
+		<lastmod><![CDATA[2023-04-18T23:07:53+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/donate-operational-expenses/]]></loc>
+		<lastmod><![CDATA[2023-04-18T23:07:45+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/donate-khums/]]></loc>
+		<lastmod><![CDATA[2023-04-18T23:07:35+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/videos/]]></loc>
+		<lastmod><![CDATA[2022-10-25T06:32:34+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/plugins/custom-facebook-feed-pro/assets/img/placeholder.png]]></image:loc>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/islamic-calendar/]]></loc>
+		<lastmod><![CDATA[2022-08-27T07:34:43+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/7894_image_298941506_3386536731583992_9047009638007746997_n.jpg]]></image:loc>
+			<image:title><![CDATA[Shahadat-e-Imam Zain-ul-Abidin AS (English)]]></image:title>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/7870_image_300206888_3387664048137927_189777867879948609_n-5.jpg]]></image:loc>
+			<image:title><![CDATA[Majalis-e-Aza (English on Friday &#8211; Urdu on Saturday / Sunday)]]></image:title>
+		</image:image>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/contact-us/]]></loc>
+		<lastmod><![CDATA[2022-08-27T07:32:41+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/terms-of-use/]]></loc>
+		<lastmod><![CDATA[2022-08-27T07:30:45+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/privacy-policy/]]></loc>
+		<lastmod><![CDATA[2022-08-27T07:30:29+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+			<image:title><![CDATA[Husaynia Website Original Logo]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/fundraiser/]]></loc>
+		<lastmod><![CDATA[2025-07-09T22:51:14+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2023/06/3.jpg]]></image:loc>
+			<image:title><![CDATA[3]]></image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/donate-eid/]]></loc>
+		<lastmod><![CDATA[2025-05-24T17:20:37+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+		</image:image>
+	</url>
+	<url>
+		<loc><![CDATA[https://www.husaynia.org/donate-humanitarian-aid/]]></loc>
+		<lastmod><![CDATA[2025-05-24T16:26:19+00:00]]></lastmod>
+		<changefreq><![CDATA[weekly]]></changefreq>
+		<priority><![CDATA[0.7]]></priority>
+		<image:image>
+			<image:loc><![CDATA[https://www.husaynia.org/wp-content/uploads/2022/08/husaynia-website-original-logo.png]]></image:loc>
+		</image:image>
+	</url>
+</urlset>

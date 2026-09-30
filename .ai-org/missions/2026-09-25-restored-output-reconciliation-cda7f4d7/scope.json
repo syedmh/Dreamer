@@ -1,0 +1,14 @@
+{
+  "objective": "Fix misleading failed-response recovery for moved successful output images; restore verified output copies and reconcile only proven prior successes.",
+  "evidence": "Ten FAILED/STATE_FAILED jobs have one succeeded provider attempt and recorded publication identity. Their missing root output files are present in output\\Backup and all SHA-256 hashes match durable output_sha256. Five published outputs remain in root; six other variants have permanent/unknown provider rejection history.",
+  "userApproval": {"restore_verified_outputs": true, "focused_offline_checks": true},
+  "scope": [
+    "Preserve backups; copy only exact hash-verified expected outputs back without overwriting any destination.",
+    "Reconcile restored PNGs to SUCCEEDED through guarded application logic, not ad-hoc database patches.",
+    "Keep attempt history, job/source/request identities and failure audit intact.",
+    "Report missing/restored outputs separately from provider failures and protected moderation/unknown responses.",
+    "Synthetic focused regression and compilation only; other phases remain paused."
+  ],
+  "constraints": ["No live Azure requests or browser authentication.", "No queue reset, schema migration, output deletion, backup movement or overwrite.", "No changes to prompts/configuration.", "No moderation replay or promotion of failed provider attempts to success."],
+  "acceptance": ["Present exact validated PNG and proven prior successful publication safely returns to SUCCEEDED.", "Absent/corrupt/wrong-hash/reparse/unsafe/provenance-inconsistent files remain failed, with actionable messages.", "CAS races cannot promote a changed job or attempt history.", "Authorized ten output copies verified; no additional attempts or changes to protected failures."]
+}

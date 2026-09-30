@@ -1,0 +1,16 @@
+{
+  "workingDirectory": "C:\\Windows",
+  "launcher": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\TCFAnimation\\run-animation.bat",
+  "selected": "bundled",
+  "version": "4.5.1.stable.mono.official.f62fdbde1",
+  "sha256": "FD5C88FD05AFC7C2D965777320DEAEC5A80C31363C0BB33D7B48025376F96C5F",
+  "renderer": "OpenGL 3.3 NVIDIA 595.95",
+  "windowTitle": "TCFAnimation (DEBUG)",
+  "windowPids": [
+    65936,
+    66328
+  ],
+  "closeMethod": "WM_CLOSE fallback because input desktop locked",
+  "exitCode": 0,
+  "unexpectedErrors": []
+}

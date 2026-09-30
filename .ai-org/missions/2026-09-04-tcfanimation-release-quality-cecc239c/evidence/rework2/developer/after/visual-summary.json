@@ -1,0 +1,44 @@
+{
+  "frames": 33,
+  "boundaries": 45,
+  "all_boundaries_pass": true,
+  "all_bounds_inside_canvas": true,
+  "all_floor_negatives_black": true,
+  "front_pixels_identical": true,
+  "front_png_bytes_identical": true,
+  "shared_plate_exact": true,
+  "walk_mirrors": [
+    {
+      "index": 0,
+      "mismatch_pixels": 0
+    },
+    {
+      "index": 1,
+      "mismatch_pixels": 0
+    },
+    {
+      "index": 2,
+      "mismatch_pixels": 0
+    },
+    {
+      "index": 3,
+      "mismatch_pixels": 0
+    },
+    {
+      "index": 4,
+      "mismatch_pixels": 0
+    },
+    {
+      "index": 5,
+      "mismatch_pixels": 0
+    }
+  ],
+  "source_hashes": {
+    "LTurning.png": "9EDD38F303B17CD043EDCCABF2E6C2BC50F182B9A2B918B4BDECF1B2861E3A91",
+    "RTurning.png": "2D20B97B4BC630DBFF9D6DD932F3314A9BC6FE0587013E6C12E72BF1D40D5840",
+    "RWalking2.png": "CD56287A4830D068292793256DBEB5A29E1EB9D888520A5339FE3957E7B7FA3A",
+    "Clapping2.png": "FBB46FBEAD0D5815F4E23307240535C600C29D0DF650B493137D05E762319C00",
+    "CrossArm3.png": "276413B76F13D4940FD8B746D3AEA13D27922A47EACD750DCCC6FF622A6A8192",
+    "CrossArm4.png": "475614A7B2DB0B7469FA88E9B7B5F5C8548F8095B56DAD99F6270098E9174A3F"
+  }
+}

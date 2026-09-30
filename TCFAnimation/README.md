@@ -1,11 +1,12 @@
 # TCFAnimation
 
-Godot 4.5.1 Mono/C# directional turn, walking, dialogue, JSON-driven action
-messages, a timed celebration with procedural fireworks, a control legend,
-clap/cross-arm playback, and six scripted school platform-scene animations.
-The project targets .NET 8 and uses a 1920x1080 logical viewport.
-Normal startup is a completely blank black screen until **E** brings the
-Avatar in from the right.
+Godot 4.5.1 Mono/C# directional turn, walking, a distinct walking-girl
+entrance, dialogue, JSON-driven action messages, a timed celebration with
+procedural fireworks, a control legend, clap/cross-arm playback, and six
+scripted school platform-scene animations. The project targets .NET 8 and
+uses a 1920x1080 logical viewport. Normal startup is a completely blank black
+screen until **E** brings the Avatar in from the right or physical **G**
+starts the independent girl entrance from the left.
 
 ## Build everything
 
@@ -51,6 +52,17 @@ prints `GODOT_RESOLUTION_FAIL` and exits 1.
   the left edge wins.
 - **E**: cancel active choreography and effects, enter from fully offscreen
   right, walk left, and stop in a front-standing pose at screen center.
+- **Physical G**: start one distinct girl at the fully hidden
+  offscreen-left center x=`-187.5`. During entry,
+  `Frames/GirlWalk/girl_00.png` through `girl_10.png` repeat in order at
+  `girlWalkFps=8.0`; `girl_11.png` is forbidden during travel and is applied
+  atomically only when the `girlEntrySeconds=6.0` entrance reaches exact
+  stage center x=`960`, where it remains held. Repeated G presses while
+  entering or visible are
+  idempotent: they do not restart, reposition, or duplicate the girl.
+  This actor is independent of the Avatar, school, celebration, and effects
+  state. While dialogue input is open, typed `g`/`G` remains ordinary text;
+  key echo and key-release events never start the entrance.
 - **+/-**: adjust movement and walk playback together from `0.25x` to `3.0x`
   in `0.25x` steps. At `1.0x`, movement is 240 design pixels/second and both
   six-frame walks use `walkFps` (6 FPS by default). Turns use `turnFps`
@@ -151,9 +163,9 @@ prints `GODOT_RESOLUTION_FAIL` and exits 1.
   submission, wrapped to at most four lines, and clamped inside the logical
   viewport.
 - **P**: hide the current speech bubble while dialogue input is closed.
-- The legend lists Left/Right, +/-, 1-6, 0, F, S, R, X, C, Enter, P, L,
-  F11/Alt+Enter, and Escape, remains above black/school/fireworks visuals, and
-  stays visible until toggled.
+- The 20-entry legend lists Left/Right, +/-, 1-6, 0, D, E, G, F, S, R, N,
+  O, I, X, C, Enter, P, L, F11/Alt+Enter, and Escape, remains above
+  black/school/fireworks visuals, and stays visible until toggled.
 - **F11** or **Alt+Enter**: toggle fullscreen. **Escape** exits fullscreen
   while dialogue input is closed.
 
@@ -168,8 +180,8 @@ During scripted school release, entry/exit pre-position, partial-entry
 background normalization, synchronized entry/exit, clap, and final crossing,
 arrows, **C**, **X**, **+/-**, and dialogue opening are suppressed. **L** still
 toggles the legend and fullscreen controls remain global. While dialogue is
-already open, numeric characters, `C`, `F`, `L`, `R`, and `S` remain ordinary text input
-and never trigger choreography.
+already open, numeric characters, `C`, `F`, `G`, `L`, `R`, and `S` remain
+ordinary text input and never trigger choreography.
 At school idle, ordinary
 walk/cross/speed/dialogue controls are enabled over the school background;
 `0` resets the pose to a clean front state and begins right pre-position. At
@@ -188,6 +200,9 @@ celebration phase, and **R** can independently start or restart logo rain.
 **D** and **E** override active school or celebration choreography, clear
 their effects, and return to the black stage. While the Avatar is hidden or
 entering/exiting, ordinary Avatar controls cannot reveal or redirect it.
+The girl keeps advancing and holding independently through those Avatar,
+dialogue, school, and celebration control-flow states once physical G starts
+her entrance.
 **N** and **O** remain available during all choreography and change only the
 otherwise-black stage background and its animation.
 
@@ -219,6 +234,8 @@ falling back to a different timing.
 |---|---:|---|
 | `turnFps` | 8 | Left/right turn frame rate |
 | `walkFps` | 8 | Normal and scripted walking frame rate |
+| `girlWalkFps` | 8 | Entry playback rate for repeating `girl_00..girl_10`; `girl_11` is the terminal center hold |
+| `girlEntrySeconds` | 6 | Girl travel time from fully offscreen left to exact center; the product with `girlWalkFps` must be at least 12 |
 | `clapFps` | 8 | Manual, school, and celebration clap frame rate |
 | `crossArmFps` | 8 | Cross-arm entry frame rate |
 | `crossArmReleaseFps` | 8 | Cross-arm release frame rate |
@@ -245,9 +262,10 @@ working-tree files and must not be added to the runtime or export.
 
 ## Runtime geometry
 
-Every runtime frame is a 512x864 opaque RGBA PNG on exact black outside its
-regenerated character matte. The sprite canvas center is x=256 and runtime
-scale is `1.25`.
+Every legacy Avatar runtime frame is a 512x864 opaque RGBA PNG on exact black
+outside its regenerated character matte. The twelve walking-girl frames are
+512x864 true RGBA PNGs with zero RGB wherever alpha is zero. The sprite canvas
+center is x=256 and runtime scale is `1.25`.
 
 The measured walk extrema are:
 
@@ -257,6 +275,14 @@ The measured walk extrema are:
 `AnimationGeometry` therefore clamps the character center to **x=227.5** at
 the left edge and **x=1693.75** at the right edge of the 1920-wide viewport.
 Runtime uses these constants directly and does not scan textures.
+
+The walking-girl alpha union has inclusive bounds
+`(left=108, top=57, right=406, bottom=840)`. All twelve frames share baseline
+y=`840`; their calibrated torso alignment has zero generation drift. With the
+same x=`256` canvas center and `1.25` scale, the fully hidden left center is
+`0 - (406 - 256) * 1.25 = -187.5`. The runtime starts the girl there, targets
+exact stage center x=`960`, and uses these frozen constants rather than
+runtime alpha scanning.
 
 School choreography stores Avatar progress `c` over `[0,1]`, where 0 is the
 calibrated left center and 1 is the calibrated right center:
@@ -272,8 +298,8 @@ All six `School*.png` sources are JPEG containers despite their extensions.
 The reproducible preparation step preserves each source byte-for-byte and
 writes true RGB PNGs to `Frames/Backgrounds/school1.png` through
 `school6.png`. Runtime calculates aspect-cover independently from the selected
-texture; backgrounds use linear filtering and character sprites remain nearest
-filtered.
+texture. Backgrounds and `GirlCharacter` intentionally use linear filtering;
+the Avatar `Character` and its school overlays remain nearest filtered.
 
 | School | Source size | Scale | Displayed size | Fully offscreen-right center x |
 |---:|---:|---:|---:|---:|
@@ -286,7 +312,7 @@ filtered.
 
 ## Active runtime assets
 
-The release contains the original 33 opaque black-canvas frame PNGs:
+The release contains the original 33 opaque black-canvas Avatar frame PNGs:
 
 | Directory | Count | Files |
 |---|---:|---|
@@ -297,6 +323,12 @@ The release contains the original 33 opaque black-canvas frame PNGs:
 | `Frames/Clap` | 6 | `clap_00.png` through `clap_05.png` |
 | `Frames/CrossArm` | 3 | `cross_00.png` through `cross_02.png` |
 | `Frames/CrossArmRelease` | 6 | `release_00.png` through `release_05.png` |
+
+It also contains exactly twelve transparent walking-girl PNGs:
+
+| Directory | Count | Files |
+|---|---:|---|
+| `Frames/GirlWalk` | 12 | `girl_00.png`, `girl_01.png`, `girl_02.png`, `girl_03.png`, `girl_04.png`, `girl_05.png`, `girl_06.png`, `girl_07.png`, `girl_08.png`, `girl_09.png`, `girl_10.png`, `girl_11.png` |
 
 Every left-walk PNG is the exact encoded horizontal mirror of its matching
 right-walk PNG.
@@ -311,7 +343,7 @@ and near-black shoe/clothing pixels, stays fully opaque.
 
 ## Immutable source sheets
 
-Extraction is permitted to read, but never normalize or rewrite, these twelve
+Extraction is permitted to read, but never normalize or rewrite, these thirteen
 authoritative source files:
 
 | Source | Container/mode | Dimensions | SHA-256 |
@@ -322,6 +354,7 @@ authoritative source files:
 | `Clapping2.png` | JPEG/RGB | 1086x1448 | `FBB46FBEAD0D5815F4E23307240535C600C29D0DF650B493137D05E762319C00` |
 | `CrossArm3.png` | JPEG/RGB | 1086x1448 | `276413B76F13D4940FD8B746D3AEA13D27922A47EACD750DCCC6FF622A6A8192` |
 | `CrossArm4.png` | JPEG/RGB | 1086x1448 | `475614A7B2DB0B7469FA88E9B7B5F5C8548F8095B56DAD99F6270098E9174A3F` |
+| `WalkingGirlFrames.png` | PNG/RGB | 1942x809 | `524F6F3CA6F55B5062433766734BF304D0285E5994B54A9AD12915C4FBF4D881` |
 | `School1.png` | JPEG/RGB | 1908x824 | `2FED5C0AD5D5927BF22272634F2E879703436291962A46CBB5CB96C4434A986A` |
 | `School2.png` | JPEG/RGB | 1536x1024 | `81468B2FA3E392F0EDDBC6F4FA9C5A961597C99F83ACA7669EAAC9938CC00A4C` |
 | `School3.png` | JPEG/RGB | 1540x1021 | `D231C7EC01DC340313DF1F3E261F5EDDD138118F80DDA935E3599A1895212727` |
@@ -333,6 +366,24 @@ The files with JPEG containers retain their historical `.png` names. Godot
 `keep` import metadata keeps all source sheets, including `School1.png`
 through `School6.png`, out of
 runtime use.
+
+`WalkingGirlFrames.png` is exactly 2,120,344 bytes. Its only approved source
+band is y=`[0,516)`, split into these exact x intervals:
+`[0,158)`, `[160,317)`, `[320,480)`, `[483,642)`, `[645,805)`,
+`[808,967)`, `[970,1130)`, `[1133,1294)`, `[1297,1457)`,
+`[1460,1619)`, `[1621,1780)`, and `[1783,1942)`. Generate and then
+independently validate the frozen outputs with:
+
+```powershell
+python -B FrameExtraction\extract_walking_girl.py
+python -B FrameExtraction\validate_release.py
+```
+
+The extractor must leave the source SHA-256 unchanged before and after the
+run. Both `WalkingGirlFrames.png` and
+`FrameExtraction\extract_walking_girl.py` are validation/developer inputs
+only; neither is staged, selected for export, packaged, or present in pack
+metadata.
 
 Regenerate or verify all six runtime backgrounds and the shared character
 overlays:
@@ -393,7 +444,7 @@ python -B FrameExtraction\validate_release.py
 Success ends with:
 
 ```text
-ASSET_RELEASE_CHECK_PASS frames=33 school_overlays=33 backgrounds=6 sources=12 read_only=true export_resources=77 artifact_manifest=checked_if_present
+ASSET_RELEASE_CHECK_PASS frames=33 girl_frames=12 school_overlays=33 backgrounds=6 sources=13 character_textures=78 runtime_textures=86 read_only=true export_resources=89 stage_entries=134 girl_bounds=108,57,406,840 girl_offscreen_left=-187.5 artifact_manifest=checked_if_present
 ```
 
 The validator does not create, modify, or delete files. It verifies immutable
@@ -415,7 +466,14 @@ footwear uses unchanged source RGB from a separately seeded, tightly bounded
 per-shoe GrabCut path with ankle-proximity checks and calibrated reflection
 rejection. Lower support rectangles can bound or reject that segmentation but
 are never foreground seeds or unconditional output unions. Before export it
-validates configuration only. When
+also independently freezes the walking-girl source byte/hash/format contract,
+the twelve source x intervals and y=`[0,516)` band, all twelve output
+hashes/byte sizes/alpha bounds, the inclusive `(108,57,406,840)` union,
+true transparency, zero transparent RGB, nonempty alpha, distinct hashes,
+adjacent-frame differences, torso/baseline alignment, green-background
+rejection, exact config defaults/product rule, and fixed geometry/offscreen
+constants. It validates both the 134-entry stage manifest and the separately
+frozen release-tooling inventory before export. When
 `Build\TCFAnimation.exe` or
 `Build\TCFAnimation.pck` exists, it also reads the embedded/final PCK manifest
 in place without extracting files, rejects unexpected payload entries, and
@@ -448,7 +506,12 @@ order and exact configured duration boundary; partial-entry interruption with he
 background, smooth same-speed normalization to center, and no teleport; final
 automatic cross/hold; auto-release/re-entry; invalid and large deltas;
 snapshot geometry; and scripted input suppression.
-It additionally covers action-message schema tolerance and failure statuses,
+It additionally covers the walking-girl phases and 12-frame lifecycle,
+invalid coordinates/deltas, exact offscreen-left start, nominal frame
+increments, repeated-start idempotence, exact center/frame-11 visible hold,
+the `-187.5` geometry result, girl timing defaults and invalid products,
+physical G pressed/echo/dialogue behavior, the exact 20-entry legend and its
+G entry, action-message schema tolerance and failure statuses,
 500-scalar normalization, school endpoint message timing, explicit school
 cancellation, left/right/center/crossed celebration starts, non-teleporting
 distance-scaled travel, the configured celebration clap boundary, cross and
@@ -459,14 +522,16 @@ legend entries/layout bounds.
 
 ## Regenerate runtime frames
 
-Normal regeneration rewrites only the 33 active runtime PNGs. It does not
-write contact sheets, overlays, `.ai-org`, or other evidence artifacts:
+Normal character extraction rewrites only the 33 Avatar PNGs and twelve
+walking-girl PNGs at their frozen runtime paths. It does not write contact
+sheets, `.ai-org`, or other evidence artifacts:
 
 ```powershell
 python FrameExtraction\extract_directional_turns.py
 python FrameExtraction\extract_right_walk.py
 python FrameExtraction\extract_clap.py
 python FrameExtraction\extract_cross_arm.py
+python -B FrameExtraction\extract_walking_girl.py
 python -B FrameExtraction\prepare_school_assets.py
 python -B FrameExtraction\validate_release.py
 ```
@@ -485,15 +550,28 @@ release-readiness command.
 
 ## Export and runtime smoke test
 
+The synchronized final inventory is:
+
+| Contract | Count |
+|---|---:|
+| Immutable source contracts | 13 |
+| Runtime character textures | 78 |
+| Total runtime textures | 86 |
+| Selected export resources | 89 |
+| Release stage manifest/tooling entries | 134 |
+
 `export_presets.cfg` uses Godot selected resources. Its positive list is
 exactly `res://Main.tscn`, the 33 original frames, the 33 shared transparent
-counterparts, the six prepared school backgrounds, and
+counterparts, the twelve transparent walking-girl frames, the six prepared
+school backgrounds, and
 `res://AnimationConfig.json`, `res://ActionMessages.json`, and the transparent
-logo effect plus neon background textures (77 resources total). It
+logo effect plus neon background textures (89 resources total). It
 does not use broad include/exclude filters: both filter assignments must exist
 exactly once and be empty. Source sheets, extractors, `ControllerProbe`,
 `.ai-org`, `Build`, README files, obsolete root images, and all Waving files
-are excluded from the release resource list. The preset explicitly disables
+are excluded from the release resource list. The exclusions explicitly cover
+raw `WalkingGirlFrames.png` and
+`FrameExtraction\extract_walking_girl.py`/`extract_walking_girl`. The preset explicitly disables
 C# script content and debug-symbol export. Release and ExportRelease builds
 also disable compiler debug symbols, preventing a PDB or an absolute local PDB
 path from being emitted in the project assembly.
@@ -547,12 +625,12 @@ if ($smoke.ExitCode -ne 0) { throw "Runtime smoke failed with exit code $($smoke
 
 The release script authenticates Godot, its companion, and the release
 template before touching `Build`. It then guarded-cleans that generated
-directory and copies exactly the 120 entries in
+directory and copies exactly the 134 entries in
 `release-stage-manifest.txt` into a GUID-owned isolated stage. After proving
 that copied seed, it creates a fixed 994-byte UTF-8-without-BOM, CRLF
 `TCFAnimation.sln` inside the stage. The generated solution references only
 `TCFAnimation.csproj`; the repository solution and `ControllerProbe` never
-cross the staging boundary. The resulting 121-file pre-import inventory is
+cross the staging boundary. The resulting 135-file pre-import inventory is
 proved before Godot import, so import-generated UID/cache state remains
 stage-local and is never copied back.
 
@@ -568,16 +646,23 @@ partial generated output. The final executable path remains exactly
 The validator reads the final embedded PCK in place without extraction. It
 checks exact payload counts, bounded entry descriptors, a 4 MiB per-metadata
 limit, a 16 MiB aggregate metadata limit, all four engine metadata entries,
-all 74 import metadata entries, both runtime JSON resources, two one-byte
+all 86 import metadata entries, both runtime JSON resources, two one-byte
 scene-script placeholders, and denied development/unrelated tokens in both
 single-byte and UTF-16LE forms.
 
 The exported smoke test is read-only, rejects capture arguments, loads
 `Main.tscn`, resolves the background, character, and dialogue nodes, loads all
-66 character textures plus all six school backgrounds, checks every source
+78 character textures (66 Avatar/school plus 12 girl) plus all six school
+backgrounds, checks every source
 dimension and aspect-cover/offscreen geometry, checks the
 1920x1080 viewport and 512x864 character texture sizes, validates all eight
-action messages, the 19-entry hidden legend, the initial blank-screen state,
+action messages, the 20-entry hidden legend, the initial blank-screen state,
+the distinct hidden `GirlCharacter`, the twelve girl textures, the exact
+`-187.5` offscreen-left start, idempotent entrance, exact x=`960` arrival,
+every pre-completion nominal sample from t=`0` through t=`47/8` with frames
+`girl_00..girl_10` repeating and no `girl_11` texture before center, atomic
+frame-11 completion on the final 1/8-second step, the visible final-frame-11
+hold, and the intentional Girl linear/Avatar nearest filters,
 the inactive 2062×763 neon background and animation, its 75% scale and
 48-pixel top margin, the configured Avatar entrance/exit
 and neon animation timing, the configured celebration
@@ -587,7 +672,7 @@ only after printing:
 
 ```text
 ANIMATION_CONFIG_LOAD_PASS avatar_entry=8 avatar_exit_full_span=8 neon_intensity=0.7 neon_hue_cycle=8 neon_pulse=2.5 school_entry=8 school_clap=10 celebration_clap=30 logo_rain_spawn=10
-RUNTIME_SMOKE_PASS character_textures=66 school_backgrounds=6 dimensions=1908x824,1536x1024,1540x1021,1540x1021,1540x1021,1540x1021 dialogue_ui=true action_messages=8 legend_entries=19 initial_blank=true neon_background=true neon_animation_default=false neon_color_cycle_default=false neon_text_color=white neon_intensity=0.7 neon_scale=0.75 neon_top=48 neon_texture=2062x763 neon_hue_cycle_seconds=8 neon_pulse_seconds=2.5 avatar_entry_seconds=8 avatar_exit_full_span_seconds=8 celebration_seconds=30 fireworks_layer=true logo_rain_seconds=10 logo_texture=128x102 viewport_fit=1920x1080:CanvasItems:Keep
+RUNTIME_SMOKE_PASS character_textures=78 girl_entrance=true girl_textures=12 girl_cadence=0..10_repeat_terminal_11=true girl_walk_fps=8 girl_entry_seconds=6 school_backgrounds=6 dimensions=1908x824,1536x1024,1540x1021,1540x1021,1540x1021,1540x1021 dialogue_ui=true action_messages=8 legend_entries=20 initial_blank=true neon_background=true neon_animation_default=false neon_color_cycle_default=false neon_text_color=white neon_intensity=0.7 neon_scale=0.75 neon_top=48 neon_texture=2062x763 neon_hue_cycle_seconds=8 neon_pulse_seconds=2.5 avatar_entry_seconds=8 avatar_exit_full_span_seconds=8 celebration_seconds=30 fireworks_layer=true logo_rain_seconds=10 logo_texture=128x102 viewport_fit=1920x1080:CanvasItems:Keep
 ```
 
 Deterministic developer capture snapshots use
@@ -605,5 +690,25 @@ capture seed. Add `--capture-legend` to any base snapshot to show the legend,
 `--capture-logo-rain` to show deterministic logo rain,
 `--capture-neon-background` to show the neon TCF background, or
 `--capture-hide-bubble` to prove 0-style bubble dismissal. Capture mode
-still requires exactly one base selector: `--capture-frame`,
-`--capture-school`, or `--capture-celebration`.
+also supports `--capture-girl=start|mid|final`. Girl `start` is frozen fully
+offscreen left at x=`-187.5` on frame 0, `mid` is frozen at exactly half of
+the configured entry duration (x=`386.25`, frame 2 with the shipped config),
+and `final` is frozen at x=`960` holding frame 11. A girl selector by itself
+uses the black stage and can be combined with `--capture-neon-background`.
+It can also be combined with one `--capture-school` selector to prove
+simultaneous school/Avatar/girl compositing. To avoid ambiguous foreground
+combinations, `--capture-girl` is incompatible with `--capture-frame` and
+`--capture-celebration`. Without `--capture-girl`, capture mode still
+requires exactly one base selector: `--capture-frame`, `--capture-school`,
+or `--capture-celebration`.
+
+Every successful capture log includes
+`girl_snapshot`, `girl_phase`, `girl_x`, `girl_frame`, and `girl_visible`
+alongside the existing capture metadata. Example exported-runtime captures:
+
+```powershell
+Build\TCFAnimation.exe -- --capture-girl=start --capture-path=girl-start.png
+Build\TCFAnimation.exe -- --capture-girl=mid --capture-path=girl-mid.png
+Build\TCFAnimation.exe -- --capture-girl=final --capture-neon-background --capture-path=girl-final-neon.png
+Build\TCFAnimation.exe -- --capture-school=1:entry-end --capture-girl=final --capture-path=girl-final-school.png
+```

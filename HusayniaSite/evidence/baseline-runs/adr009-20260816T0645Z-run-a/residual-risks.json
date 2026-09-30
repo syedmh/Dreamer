@@ -1,0 +1,86 @@
+[
+  {
+    "riskId": "risk-sitemap-c39fe2b165c62839",
+    "area": "sitemap",
+    "description": "Sitemap unavailable: The request was canceled due to the configured HttpClient.Timeout of 30 seconds elapsing.",
+    "evidence": "https://www.husaynia.org/sitemap.xml",
+    "requiredFollowUp": "Re-run and reconcile against an authorized export."
+  },
+  {
+    "riskId": "risk-sitemap-6a34c54cb69d477d",
+    "area": "sitemap",
+    "description": "Sitemap unavailable: The request was canceled due to the configured HttpClient.Timeout of 30 seconds elapsing.",
+    "evidence": "https://www.husaynia.org/page-sitemap.xml",
+    "requiredFollowUp": "Re-run and reconcile against an authorized export."
+  },
+  {
+    "riskId": "risk-sitemap-53d4927c9c3a05ba",
+    "area": "sitemap",
+    "description": "Sitemap unavailable: The request was canceled due to the configured HttpClient.Timeout of 30 seconds elapsing.",
+    "evidence": "https://www.husaynia.org/post-sitemap.xml",
+    "requiredFollowUp": "Re-run and reconcile against an authorized export."
+  },
+  {
+    "riskId": "risk-sitemap-e1dae506c186fe98",
+    "area": "sitemap",
+    "description": "Sitemap unavailable: The request was canceled due to the configured HttpClient.Timeout of 30 seconds elapsing.",
+    "evidence": "https://www.husaynia.org/tribe_events-sitemap.xml",
+    "requiredFollowUp": "Re-run and reconcile against an authorized export."
+  },
+  {
+    "riskId": "risk-sitemap-899bc7b6f3c28aaa",
+    "area": "sitemap",
+    "description": "Sitemap unavailable: The request was canceled due to the configured HttpClient.Timeout of 30 seconds elapsing.",
+    "evidence": "https://www.husaynia.org/post-archive-sitemap.xml",
+    "requiredFollowUp": "Re-run and reconcile against an authorized export."
+  },
+  {
+    "riskId": "risk-http-993ff2c098796a38",
+    "area": "http",
+    "description": "Public GET failed: The request was canceled due to the configured HttpClient.Timeout of 30 seconds elapsing.",
+    "evidence": "https://www.husaynia.org/events/",
+    "requiredFollowUp": "Re-run capture and retain a successful response before parity approval."
+  },
+  {
+    "riskId": "risk-http-6743d9e4e794ec42",
+    "area": "http",
+    "description": "Public GET failed: The request was canceled due to the configured HttpClient.Timeout of 30 seconds elapsing.",
+    "evidence": "https://www.husaynia.org/events/?ical=1",
+    "requiredFollowUp": "Re-run capture and retain a successful response before parity approval."
+  },
+  {
+    "riskId": "risk-http-04b2d8ce9d8c04cb",
+    "area": "http",
+    "description": "Public GET failed: The request was canceled due to the configured HttpClient.Timeout of 30 seconds elapsing.",
+    "evidence": "https://www.husaynia.org/feed/",
+    "requiredFollowUp": "Re-run capture and retain a successful response before parity approval."
+  },
+  {
+    "riskId": "risk-http-6a34c54cb69d477d",
+    "area": "http",
+    "description": "Public GET failed: The request was canceled due to the configured HttpClient.Timeout of 30 seconds elapsing.",
+    "evidence": "https://www.husaynia.org/page-sitemap.xml",
+    "requiredFollowUp": "Re-run capture and retain a successful response before parity approval."
+  },
+  {
+    "riskId": "RISK-FORMS-NO-SUBMIT",
+    "area": "forms",
+    "description": "2 forms were observed but never submitted, by design.",
+    "evidence": "forms-widgets.json",
+    "requiredFollowUp": "Confirm field rules, anti-abuse, destinations, consent, and success/error states in an authorized non-production environment or export."
+  },
+  {
+    "riskId": "RISK-DYNAMIC-PROVIDERS",
+    "area": "dynamic-content",
+    "description": "23 volatile/third-party regions were normalized for reproducibility.",
+    "evidence": "forms-widgets.json",
+    "requiredFollowUp": "Create deterministic fixtures for loading, populated, empty, consent-denied, and upstream-error states."
+  },
+  {
+    "riskId": "RISK-QUERY-ROUTE-SCHEMA",
+    "area": "urls",
+    "description": "Contractually significant query endpoints are retained in http-inventory.json but cannot be represented by the frozen route schema path pattern.",
+    "evidence": "http-inventory.json",
+    "requiredFollowUp": "Later URL implementation must preserve these endpoints; resolve the frozen schema contradiction through the architecture change process before altering C1."
+  }
+]

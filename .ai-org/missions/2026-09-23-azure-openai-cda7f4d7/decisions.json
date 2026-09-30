@@ -1,0 +1,11 @@
+{
+  "scope": "TCFComic Azure OpenAI integration",
+  "provider": "azure_openai",
+  "endpoint": "https://sweepertestai.openai.azure.com",
+  "deployment": "User must supply actual deployment name; example is not evidence of deployment.",
+  "transport": "OpenAI SDK v1 path, explicit api-version=preview, api-key authentication, no inherited proxies or redirects",
+  "design": "Share existing image edit, response decoding and error classification; preserve existing provider behavior.",
+  "identity": "Azure endpoint and API contract participate in existing request identity; no database schema migration.",
+  "validation": "Offline SDK MockTransport, negative config/auth/conversion tests, nonperformance regression suite, independent gates.",
+  "excluded": ["Live Azure calls", "Resource deployment", "API key storage", "Git commits or pushes"]
+}

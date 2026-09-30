@@ -1,0 +1,86 @@
+{
+  "status": "PASS",
+  "tests": 12,
+  "python": "Python 3.13.15",
+  "index": "https://packagefeedproxy.microsoft.io/pypi/simple/",
+  "ambientPipConfigDisabled": true,
+  "artifacts": [
+    {
+      "name": "numpy-2.5.2-cp313-cp313-win_amd64.whl",
+      "length": 12460532,
+      "sha256": "85AACCB24182C25DF891AD0EC333585967E115269D5F1B17F2C9AE005BC96657"
+    },
+    {
+      "name": "opencv_python-5.0.0.93-cp37-abi3-win_amd64.whl",
+      "length": 44000345,
+      "sha256": "F90BA04B8F73BC5C3814037699739F0156F597338A98F05956C684E7C3CA10D2"
+    },
+    {
+      "name": "pillow-12.3.0-cp313-cp313-win_amd64.whl",
+      "length": 7239691,
+      "sha256": "1CCA606CD25738DF4ED873D5AD46BBDB3D83B5CBCA291F6B4FF13A4DF6B0BBE8"
+    }
+  ],
+  "results": [
+    {
+      "name": "static-lock-parse",
+      "passed": true,
+      "detail": "index=microsoft_proxy binary_only=true packages=3 hashes=3"
+    },
+    {
+      "name": "ambient-pip-disabled",
+      "passed": true,
+      "detail": "PIP_CONFIG_FILE=nul pip_overrides_removed=true"
+    },
+    {
+      "name": "proxy-download",
+      "passed": true,
+      "detail": "exit=0 explicit_proxy=true isolated_wheelhouse=true"
+    },
+    {
+      "name": "artifact-hash-set",
+      "passed": true,
+      "detail": "artifacts=3 filenames=exact hashes=exact cp313_win_amd64=true"
+    },
+    {
+      "name": "offline-dry-run",
+      "passed": true,
+      "detail": "exit=0 no_index=true find_links=true require_hashes=true"
+    },
+    {
+      "name": "offline-install",
+      "passed": true,
+      "detail": "exit=0 no_index=true find_links=true require_hashes=true target=mission_local"
+    },
+    {
+      "name": "offline-import",
+      "passed": true,
+      "detail": "numpy=2.5.2 cv2=5.0.0 Pillow=12.3.0"
+    },
+    {
+      "name": "tampered-hash",
+      "passed": true,
+      "detail": "exit=1 hash_mismatch=true artifacts_written=0"
+    },
+    {
+      "name": "readme-audit",
+      "passed": true,
+      "detail": "proxy=true ambient_disabled=true offline=true authenticated_stage_and_output=true"
+    },
+    {
+      "name": "release-validator",
+      "passed": true,
+      "detail": "exit=0 lock_and_release_markers=true"
+    },
+    {
+      "name": "protected-baseline",
+      "passed": true,
+      "detail": "checked=74 missing=0 changed=0"
+    },
+    {
+      "name": "final-release-contract",
+      "passed": true,
+      "detail": "exe=100203544 dll=71168 stages=0"
+    }
+  ]
+}

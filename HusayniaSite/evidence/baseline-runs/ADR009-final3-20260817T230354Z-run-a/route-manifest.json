@@ -1,0 +1,2378 @@
+{
+  "schemaVersion": "1.0.0",
+  "captureId": "husaynia-20260817T230407Z",
+  "capturedAtUtc": "2026-08-17T23:04:07.9739074+00:00",
+  "sourceBaseUrl": "https://www.husaynia.org/",
+  "routes": [
+    {
+      "routeId": "route-8a5edab282632443",
+      "legacyPath": "/",
+      "canonicalPath": "/",
+      "expectedStatus": 200,
+      "templateKey": "home",
+      "indexable": true,
+      "sitemap": false,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-c761b76fb5e50bae",
+      "legacyPath": "/duas-dua-e-tawassul/",
+      "canonicalPath": "/duas-dua-e-tawassul/",
+      "expectedStatus": 200,
+      "templateKey": "religious-content",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-600263a3fe5041ab",
+      "legacyPath": "/duas-dua-faraj/",
+      "canonicalPath": "/duas-dua-faraj/",
+      "expectedStatus": 200,
+      "templateKey": "religious-content",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-d0e8fdf3bdf7c220",
+      "legacyPath": "/duas-dua-kumayl/",
+      "canonicalPath": "/duas-dua-kumayl/",
+      "expectedStatus": 200,
+      "templateKey": "religious-content",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-503ea4a953e6a892",
+      "legacyPath": "/duas-dua-nudba/",
+      "canonicalPath": "/duas-dua-nudba/",
+      "expectedStatus": 200,
+      "templateKey": "religious-content",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-c62eca323f9cd527",
+      "legacyPath": "/duas-hadith-al-kisa/",
+      "canonicalPath": "/duas-hadith-al-kisa/",
+      "expectedStatus": 200,
+      "templateKey": "religious-content",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-dec15105c3af0f21",
+      "legacyPath": "/duas/",
+      "canonicalPath": "/duas/",
+      "expectedStatus": 200,
+      "templateKey": "religious-content",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-3377501c8230f865",
+      "legacyPath": "/event/10th-day-after-\u02BFashura\u02BE-2/",
+      "canonicalPath": "/event/10th-day-after-\u02BFashura\u02BE-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-2b6255bb75db5c6f",
+      "legacyPath": "/event/10th-day-after-\u02BFashura\u02BE/",
+      "canonicalPath": "/event/10th-day-after-\u02BFashura\u02BE/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-92bebc20ac7ebd0f",
+      "legacyPath": "/event/1st-night-of-laylat-al-qadr/",
+      "canonicalPath": "/event/1st-night-of-laylat-al-qadr/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-e99cec0f313367ec",
+      "legacyPath": "/event/20th-day-after-\u02BFashura\u02BE-2/",
+      "canonicalPath": "/event/20th-day-after-\u02BFashura\u02BE-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-39a637367d261d97",
+      "legacyPath": "/event/20th-day-after-\u02BFashura\u02BE/",
+      "canonicalPath": "/event/20th-day-after-\u02BFashura\u02BE/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-2f0cd17edf159029",
+      "legacyPath": "/event/2nd-night-of-laylat-al-qadr/",
+      "canonicalPath": "/event/2nd-night-of-laylat-al-qadr/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-57380932dad629e9",
+      "legacyPath": "/event/30th-day-after-\u02BFashura\u02BE-2/",
+      "canonicalPath": "/event/30th-day-after-\u02BFashura\u02BE-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-90ceb89979d9c087",
+      "legacyPath": "/event/30th-day-after-\u02BFashura\u02BE/",
+      "canonicalPath": "/event/30th-day-after-\u02BFashura\u02BE/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-57e7c0f1725479e0",
+      "legacyPath": "/event/3rd-night-of-laylat-al-qadr/",
+      "canonicalPath": "/event/3rd-night-of-laylat-al-qadr/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-812b4ec2993f6eba",
+      "legacyPath": "/event/abraha-attacked-the-ka\u02BFbah-in-the-year-of-the-elephant-2/",
+      "canonicalPath": "/event/abraha-attacked-the-ka\u02BFbah-in-the-year-of-the-elephant-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-aeb54fea18488285",
+      "legacyPath": "/event/abraha-attacked-the-ka\u02BFbah-in-the-year-of-the-elephant/",
+      "canonicalPath": "/event/abraha-attacked-the-ka\u02BFbah-in-the-year-of-the-elephant/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-3db7e4b73288fb13",
+      "legacyPath": "/event/arbaeen-2/",
+      "canonicalPath": "/event/arbaeen-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-e7865d7c3184cde8",
+      "legacyPath": "/event/arbaeen/",
+      "canonicalPath": "/event/arbaeen/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-e7a55555028b890b",
+      "legacyPath": "/event/arrival-of-husayn-ibn-ali-in-karbala-61-ah-2/",
+      "canonicalPath": "/event/arrival-of-husayn-ibn-ali-in-karbala-61-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-d54edd65d4ed518e",
+      "legacyPath": "/event/ashura-2/",
+      "canonicalPath": "/event/ashura-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-ec172d0c9257ce0e",
+      "legacyPath": "/event/ashura/",
+      "canonicalPath": "/event/ashura/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-5184a3907674467a",
+      "legacyPath": "/event/birth-of-abbas-ibn-ali-36-ah/",
+      "canonicalPath": "/event/birth-of-abbas-ibn-ali-36-ah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-dd8005424615da3d",
+      "legacyPath": "/event/birth-of-abbas-ibn-ali/",
+      "canonicalPath": "/event/birth-of-abbas-ibn-ali/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-c719336a76230299",
+      "legacyPath": "/event/birth-of-abu-talib/",
+      "canonicalPath": "/event/birth-of-abu-talib/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-eda09b561f8bf682",
+      "legacyPath": "/event/birth-of-ali-al-akbar-ibn-husayn-2/",
+      "canonicalPath": "/event/birth-of-ali-al-akbar-ibn-husayn-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-59843cf27bfa1c37",
+      "legacyPath": "/event/birth-of-ali-al-asghar-ibn-husayn/",
+      "canonicalPath": "/event/birth-of-ali-al-asghar-ibn-husayn/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-7472f8d54bb359cd",
+      "legacyPath": "/event/birth-of-ali-al-hadi-212-ah/",
+      "canonicalPath": "/event/birth-of-ali-al-hadi-212-ah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-5a561809093010cd",
+      "legacyPath": "/event/birth-of-ali-ar-ridha-148-ah/",
+      "canonicalPath": "/event/birth-of-ali-ar-ridha-148-ah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-f3fa441c62c9ba53",
+      "legacyPath": "/event/birth-of-ali-ibn-abi-talib-23-bh/",
+      "canonicalPath": "/event/birth-of-ali-ibn-abi-talib-23-bh/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-a5260639e29d5175",
+      "legacyPath": "/event/birth-of-ali-ibn-husayn-zayn-al-abidin-37-ah/",
+      "canonicalPath": "/event/birth-of-ali-ibn-husayn-zayn-al-abidin-37-ah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-2fb75ab848b297ef",
+      "legacyPath": "/event/birth-of-ali-ibn-husayn-zayn-al-abidin/",
+      "canonicalPath": "/event/birth-of-ali-ibn-husayn-zayn-al-abidin/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-bc769e143a80a3d4",
+      "legacyPath": "/event/birth-of-fatimah-bint-muhammad-8-bh/",
+      "canonicalPath": "/event/birth-of-fatimah-bint-muhammad-8-bh/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-83a7af7f913d3478",
+      "legacyPath": "/event/birth-of-fatimah-bint-musa/",
+      "canonicalPath": "/event/birth-of-fatimah-bint-musa/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-0413812574b6b24d",
+      "legacyPath": "/event/birth-of-hasan-al-askari-232-ah-2/",
+      "canonicalPath": "/event/birth-of-hasan-al-askari-232-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-4143ceb46c6861ad",
+      "legacyPath": "/event/birth-of-hasan-ibn-ali/",
+      "canonicalPath": "/event/birth-of-hasan-ibn-ali/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-5e3c2840d7872f93",
+      "legacyPath": "/event/birth-of-husayn-ibn-ali-4-a-h/",
+      "canonicalPath": "/event/birth-of-husayn-ibn-ali-4-a-h/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-13272fde8839bff8",
+      "legacyPath": "/event/birth-of-imam-musa-al-kadhim-128-ah-2/",
+      "canonicalPath": "/event/birth-of-imam-musa-al-kadhim-128-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-211979f2b6c4f8b2",
+      "legacyPath": "/event/birth-of-imam-musa-al-kadhim-128-ah/",
+      "canonicalPath": "/event/birth-of-imam-musa-al-kadhim-128-ah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-6d13398a1fe8402c",
+      "legacyPath": "/event/birth-of-jafar-al-sadiq-83-ah/",
+      "canonicalPath": "/event/birth-of-jafar-al-sadiq-83-ah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-b35e6805f70ddeab",
+      "legacyPath": "/event/birth-of-muhammad-53-bh/",
+      "canonicalPath": "/event/birth-of-muhammad-53-bh/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-87a840482f5a101e",
+      "legacyPath": "/event/birth-of-muhammad-al-baqir-57-ah/",
+      "canonicalPath": "/event/birth-of-muhammad-al-baqir-57-ah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-97c98d760c055b7e",
+      "legacyPath": "/event/birth-of-muhammad-al-mahdi-2/",
+      "canonicalPath": "/event/birth-of-muhammad-al-mahdi-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-b45b80d51dcf491f",
+      "legacyPath": "/event/birth-of-muhammad-al-taqi-195-ah-2/",
+      "canonicalPath": "/event/birth-of-muhammad-al-taqi-195-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-a4b574386fb395f6",
+      "legacyPath": "/event/birth-of-qasim-ibn-hasan-2/",
+      "canonicalPath": "/event/birth-of-qasim-ibn-hasan-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-e3d60f29d316169a",
+      "legacyPath": "/event/birth-of-ruqayyah-bint-husayn-2/",
+      "canonicalPath": "/event/birth-of-ruqayyah-bint-husayn-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-991cb263e6a79dcd",
+      "legacyPath": "/event/birth-of-salman-the-persian-2/",
+      "canonicalPath": "/event/birth-of-salman-the-persian-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-2e6ee27b4372406a",
+      "legacyPath": "/event/birth-of-salman-the-persian/",
+      "canonicalPath": "/event/birth-of-salman-the-persian/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-a2b657cf3308bb36",
+      "legacyPath": "/event/birth-of-sukaynah-bint-husayn-2/",
+      "canonicalPath": "/event/birth-of-sukaynah-bint-husayn-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-f61d1c5f9fbcc2d2",
+      "legacyPath": "/event/birth-of-umm-kulthum-bint-ali/",
+      "canonicalPath": "/event/birth-of-umm-kulthum-bint-ali/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-2f53889fa63152ff",
+      "legacyPath": "/event/birth-of-zaynab-bint-ali-6-a-h-2/",
+      "canonicalPath": "/event/birth-of-zaynab-bint-ali-6-a-h-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-463c148f883d1bee",
+      "legacyPath": "/event/burial-of-the-martyrs-of-karbala-by-bani-asad-2/",
+      "canonicalPath": "/event/burial-of-the-martyrs-of-karbala-by-bani-asad-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-c743d7da7e9c8b17",
+      "legacyPath": "/event/burial-of-the-martyrs-of-karbala-by-bani-asad/",
+      "canonicalPath": "/event/burial-of-the-martyrs-of-karbala-by-bani-asad/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-97eb283188baf6b6",
+      "legacyPath": "/event/changing-of-the-qibla-2/",
+      "canonicalPath": "/event/changing-of-the-qibla-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-cb0e241998ab95f0",
+      "legacyPath": "/event/changing-of-the-qibla/",
+      "canonicalPath": "/event/changing-of-the-qibla/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-4bf189d45dbe7341",
+      "legacyPath": "/event/dahwul-ardh-2/",
+      "canonicalPath": "/event/dahwul-ardh-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-c814b10efee13368",
+      "legacyPath": "/event/day-of-arafah/",
+      "canonicalPath": "/event/day-of-arafah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-073e2b378354ed02",
+      "legacyPath": "/event/day-of-ashura-2/",
+      "canonicalPath": "/event/day-of-ashura-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-00cdcefbda152c86",
+      "legacyPath": "/event/day-of-ashura/",
+      "canonicalPath": "/event/day-of-ashura/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-33e068b7dd943d2f",
+      "legacyPath": "/event/day-of-sorrow-2/",
+      "canonicalPath": "/event/day-of-sorrow-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-7b2836a1cdd16681",
+      "legacyPath": "/event/death-of-abraham-2/",
+      "canonicalPath": "/event/death-of-abraham-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-e090d23a27433b35",
+      "legacyPath": "/event/death-of-khadijah-bint-khuwaylid-2/",
+      "canonicalPath": "/event/death-of-khadijah-bint-khuwaylid-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-a3dbf15e4e195535",
+      "legacyPath": "/event/death-of-umm-ul-banin-mother-of-abbas-ibn-ali/",
+      "canonicalPath": "/event/death-of-umm-ul-banin-mother-of-abbas-ibn-ali/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-83ff3dc5c7970639",
+      "legacyPath": "/event/death-of-yazid/",
+      "canonicalPath": "/event/death-of-yazid/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-7e194c3ee7dd7a1f",
+      "legacyPath": "/event/descending-of-the-gospel-2/",
+      "canonicalPath": "/event/descending-of-the-gospel-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-39512cb6944b24a5",
+      "legacyPath": "/event/descending-of-the-psalms-2/",
+      "canonicalPath": "/event/descending-of-the-psalms-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-07e112a133d06bba",
+      "legacyPath": "/event/descending-of-the-torah-2/",
+      "canonicalPath": "/event/descending-of-the-torah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-ee118758d0ed32da",
+      "legacyPath": "/event/eid-al-adha/",
+      "canonicalPath": "/event/eid-al-adha/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-a6415e74da0c3dc7",
+      "legacyPath": "/event/eid-al-fitr/",
+      "canonicalPath": "/event/eid-al-fitr/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-2ebe3a0b3ace5032",
+      "legacyPath": "/event/eid-al-ghadeer-2/",
+      "canonicalPath": "/event/eid-al-ghadeer-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-e2bf377dca18cde3",
+      "legacyPath": "/event/eid-al-mubahalah-2/",
+      "canonicalPath": "/event/eid-al-mubahalah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-54cf910971e33028",
+      "legacyPath": "/event/eid-e-zahra-2/",
+      "canonicalPath": "/event/eid-e-zahra-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-b8a0cf087e24dcc3",
+      "legacyPath": "/event/eid-e-zahra/",
+      "canonicalPath": "/event/eid-e-zahra/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-4ace32e85d1b2f85",
+      "legacyPath": "/event/eve-of-ashura-2/",
+      "canonicalPath": "/event/eve-of-ashura-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-fd36b4f5caf8ad7b",
+      "legacyPath": "/event/eve-of-ashura/",
+      "canonicalPath": "/event/eve-of-ashura/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-9e7ec2d471125393",
+      "legacyPath": "/event/fatimah-went-to-alis-house-after-their-marriage-2/",
+      "canonicalPath": "/event/fatimah-went-to-alis-house-after-their-marriage-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-a84a9851a7f4772b",
+      "legacyPath": "/event/first-mosque-quba-mosque-was-established-1-ah/",
+      "canonicalPath": "/event/first-mosque-quba-mosque-was-established-1-ah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-b84714f321b257b3",
+      "legacyPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-10/",
+      "canonicalPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-10/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-90e73c599a8835c4",
+      "legacyPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-11/",
+      "canonicalPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-11/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-e60786deb825960d",
+      "legacyPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-12/",
+      "canonicalPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-12/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-05d80e258ef6eb7a",
+      "legacyPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-13/",
+      "canonicalPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-13/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-dea133fcb3e765cc",
+      "legacyPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-14/",
+      "canonicalPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-14/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-fba5fe86ad247bab",
+      "legacyPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-15/",
+      "canonicalPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-15/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-2e812aef275cb474",
+      "legacyPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-16/",
+      "canonicalPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-16/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-8f75e783cd06b926",
+      "legacyPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-17/",
+      "canonicalPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-17/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-b832bb8ce128722c",
+      "legacyPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-18/",
+      "canonicalPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-18/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-241dbc43fc483744",
+      "legacyPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-19/",
+      "canonicalPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-19/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-1ac4b911428a598f",
+      "legacyPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-20/",
+      "canonicalPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-20/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-b2d54a33775821b2",
+      "legacyPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-21/",
+      "canonicalPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-21/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-529871b3fbc6cac1",
+      "legacyPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-22/",
+      "canonicalPath": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-22/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-009976492f5cc588",
+      "legacyPath": "/event/hijrah-2/",
+      "canonicalPath": "/event/hijrah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-89575ffdd730cd7d",
+      "legacyPath": "/event/hijrah/",
+      "canonicalPath": "/event/hijrah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-20d968f081d7d81f",
+      "legacyPath": "/event/husayn-ibn-ali-leaves-makkah-for-karbala-60-ah-2/",
+      "canonicalPath": "/event/husayn-ibn-ali-leaves-makkah-for-karbala-60-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-5eafb453dff5c27a",
+      "legacyPath": "/event/husayn-ibn-ali-started-his-journey-to-karbala-from-madinah-in-60-ah-2/",
+      "canonicalPath": "/event/husayn-ibn-ali-started-his-journey-to-karbala-from-madinah-in-60-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-2eef6dfc5b0fee1c",
+      "legacyPath": "/event/jumuatul-wida/",
+      "canonicalPath": "/event/jumuatul-wida/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-06bc14828e8a7a47",
+      "legacyPath": "/event/koonda-2/",
+      "canonicalPath": "/event/koonda-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-714a1ea2bcd04930",
+      "legacyPath": "/event/laylat-al-baraat-2/",
+      "canonicalPath": "/event/laylat-al-baraat-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-6e1e4f1d51f440c7",
+      "legacyPath": "/event/majlis-e-aza-muharram-2026/",
+      "canonicalPath": "/event/majlis-e-aza-muharram-2026/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-3aa51a44c4d4f5ab",
+      "legacyPath": "/event/major-occultation-of-muhammad-al-mahdi-begins-2/",
+      "canonicalPath": "/event/major-occultation-of-muhammad-al-mahdi-begins-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-e46628ba2c294814",
+      "legacyPath": "/event/marriage-of-fatimah-bint-muhammad-to-ali-2-bh-2/",
+      "canonicalPath": "/event/marriage-of-fatimah-bint-muhammad-to-ali-2-bh-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-a0783d646f137c34",
+      "legacyPath": "/event/marriage-of-khadijah-bint-khuwaylid-to-muhammad-2/",
+      "canonicalPath": "/event/marriage-of-khadijah-bint-khuwaylid-to-muhammad-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-a6011fa7fa88ddf9",
+      "legacyPath": "/event/martyrdom-of-abu-talib-2/",
+      "canonicalPath": "/event/martyrdom-of-abu-talib-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-9dc05bcbfd87ceec",
+      "legacyPath": "/event/martyrdom-of-ali-al-hadi/",
+      "canonicalPath": "/event/martyrdom-of-ali-al-hadi/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-5cdafb94170e1dbe",
+      "legacyPath": "/event/martyrdom-of-ali-ar-ridha-203-ah-2/",
+      "canonicalPath": "/event/martyrdom-of-ali-ar-ridha-203-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-ab02d168b6eb7389",
+      "legacyPath": "/event/martyrdom-of-ali-ar-ridha-203-ah/",
+      "canonicalPath": "/event/martyrdom-of-ali-ar-ridha-203-ah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-62b8cafcbe323b02",
+      "legacyPath": "/event/martyrdom-of-ali-ibn-husayn-zayn-al-abidin-95-ah-2/",
+      "canonicalPath": "/event/martyrdom-of-ali-ibn-husayn-zayn-al-abidin-95-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-55ef0cedfa963565",
+      "legacyPath": "/event/martyrdom-of-ali-ibn-husayn-zayn-al-abidin-95-ah/",
+      "canonicalPath": "/event/martyrdom-of-ali-ibn-husayn-zayn-al-abidin-95-ah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-19b2e353274c9ca8",
+      "legacyPath": "/event/martyrdom-of-fatimah-bint-muhammad-11-ah-2/",
+      "canonicalPath": "/event/martyrdom-of-fatimah-bint-muhammad-11-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-73c359b3dc7fd98d",
+      "legacyPath": "/event/martyrdom-of-fatimah-bint-muhammad-11-ah/",
+      "canonicalPath": "/event/martyrdom-of-fatimah-bint-muhammad-11-ah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-bafadf0416fb379e",
+      "legacyPath": "/event/martyrdom-of-fatimah-bint-musa-2/",
+      "canonicalPath": "/event/martyrdom-of-fatimah-bint-musa-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-a26241d2f871a0b3",
+      "legacyPath": "/event/martyrdom-of-fatimah-bint-musa/",
+      "canonicalPath": "/event/martyrdom-of-fatimah-bint-musa/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-d0b17ada401eece5",
+      "legacyPath": "/event/martyrdom-of-hasan-al-askari-260-ah-2/",
+      "canonicalPath": "/event/martyrdom-of-hasan-al-askari-260-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-a7d3efdbabf532c2",
+      "legacyPath": "/event/martyrdom-of-hasan-al-askari-260-ah/",
+      "canonicalPath": "/event/martyrdom-of-hasan-al-askari-260-ah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-5239edde34d54436",
+      "legacyPath": "/event/martyrdom-of-hasan-ibn-ali-50-ah-2/",
+      "canonicalPath": "/event/martyrdom-of-hasan-ibn-ali-50-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-49cd30d183457d4c",
+      "legacyPath": "/event/martyrdom-of-hasan-ibn-ali-50-ah/",
+      "canonicalPath": "/event/martyrdom-of-hasan-ibn-ali-50-ah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-f90c2b393de30a86",
+      "legacyPath": "/event/martyrdom-of-jafar-al-sadiq-2/",
+      "canonicalPath": "/event/martyrdom-of-jafar-al-sadiq-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-ad72dda82f43d355",
+      "legacyPath": "/event/martyrdom-of-maytham-al-tammar-60-ah-2/",
+      "canonicalPath": "/event/martyrdom-of-maytham-al-tammar-60-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-fb10ab10e040f504",
+      "legacyPath": "/event/martyrdom-of-muhammad-11-ah-2/",
+      "canonicalPath": "/event/martyrdom-of-muhammad-11-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-99e0318bc5a9a9bb",
+      "legacyPath": "/event/martyrdom-of-muhammad-11-ah/",
+      "canonicalPath": "/event/martyrdom-of-muhammad-11-ah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-45afdc36baa284b2",
+      "legacyPath": "/event/martyrdom-of-muhammad-al-baqir-114-ah-2/",
+      "canonicalPath": "/event/martyrdom-of-muhammad-al-baqir-114-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-4c5b56f114a832fe",
+      "legacyPath": "/event/martyrdom-of-muhammad-al-taqi-220-ah-2/",
+      "canonicalPath": "/event/martyrdom-of-muhammad-al-taqi-220-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-2e2ae63d9b3ad80b",
+      "legacyPath": "/event/martyrdom-of-mukhtar-ibn-abi-ubayd-al-thaqafi-2/",
+      "canonicalPath": "/event/martyrdom-of-mukhtar-ibn-abi-ubayd-al-thaqafi-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-3e579db64b0da9dd",
+      "legacyPath": "/event/martyrdom-of-musa-al-kadhim-2/",
+      "canonicalPath": "/event/martyrdom-of-musa-al-kadhim-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-c490b8e3b1e4790d",
+      "legacyPath": "/event/martyrdom-of-muslim-ibn-aqeel-hani-ibn-urwa-in-kufa-60-ah-2/",
+      "canonicalPath": "/event/martyrdom-of-muslim-ibn-aqeel-hani-ibn-urwa-in-kufa-60-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-0409b22eeeb5af29",
+      "legacyPath": "/event/martyrdom-of-ruqayyah-bint-husayn-2/",
+      "canonicalPath": "/event/martyrdom-of-ruqayyah-bint-husayn-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-aebaad4b17db4a14",
+      "legacyPath": "/event/martyrdom-of-ruqayyah-bint-husayn/",
+      "canonicalPath": "/event/martyrdom-of-ruqayyah-bint-husayn/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-ed8e9d700c6b9064",
+      "legacyPath": "/event/martyrdom-of-the-children-of-muslim-ibn-aqeel-60-ah-2/",
+      "canonicalPath": "/event/martyrdom-of-the-children-of-muslim-ibn-aqeel-60-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-7ff0daba2ebcef57",
+      "legacyPath": "/event/martyrdom-of-zaynab-bint-ali-2/",
+      "canonicalPath": "/event/martyrdom-of-zaynab-bint-ali-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-245af6a3efb91ca2",
+      "legacyPath": "/event/mi\u02BBraj-day-of-mab\u02BBath-2/",
+      "canonicalPath": "/event/mi\u02BBraj-day-of-mab\u02BBath-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-0d278a2070a99590",
+      "legacyPath": "/event/mourning-of-muharram-starts-2/",
+      "canonicalPath": "/event/mourning-of-muharram-starts-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-7519642344ad0db5",
+      "legacyPath": "/event/prisoners-of-karbala-reach-yazids-palace-in-syria-2/",
+      "canonicalPath": "/event/prisoners-of-karbala-reach-yazids-palace-in-syria-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-7fcd1d29d7808cb0",
+      "legacyPath": "/event/prisoners-of-karbala-reach-yazids-palace-in-syria/",
+      "canonicalPath": "/event/prisoners-of-karbala-reach-yazids-palace-in-syria/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-9bb1a4d94d6c5ca0",
+      "legacyPath": "/event/renunciation-of-adam-accepted-2/",
+      "canonicalPath": "/event/renunciation-of-adam-accepted-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-74562a609a9ead96",
+      "legacyPath": "/event/shab-e-barat-2/",
+      "canonicalPath": "/event/shab-e-barat-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-04bb7f6b710466b1",
+      "legacyPath": "/event/stored-water-in-the-tents-of-the-camp-of-husayn-ibn-ali-runs-out-2/",
+      "canonicalPath": "/event/stored-water-in-the-tents-of-the-camp-of-husayn-ibn-ali-runs-out-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-d7452eb0d9787e22",
+      "legacyPath": "/event/stored-water-in-the-tents-of-the-camp-of-husayn-ibn-ali-runs-out/",
+      "canonicalPath": "/event/stored-water-in-the-tents-of-the-camp-of-husayn-ibn-ali-runs-out/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-7063e64baf67d41f",
+      "legacyPath": "/event/treaty-of-hudaybiyyah-was-executed-6-ah-2/",
+      "canonicalPath": "/event/treaty-of-hudaybiyyah-was-executed-6-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-f1f13256b36c88ca",
+      "legacyPath": "/event/victorious-conquest-of-mecca-2/",
+      "canonicalPath": "/event/victorious-conquest-of-mecca-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-151d00a72f0c211b",
+      "legacyPath": "/event/water-supply-to-the-camp-of-husayn-ibn-ali-was-stopped-2/",
+      "canonicalPath": "/event/water-supply-to-the-camp-of-husayn-ibn-ali-was-stopped-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-64ab5c8f8ce60b7a",
+      "legacyPath": "/event/\u2694\uFE0F-battle-of-badr/",
+      "canonicalPath": "/event/\u2694\uFE0F-battle-of-badr/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-43cafb9d91e7f836",
+      "legacyPath": "/event/\u2694\uFE0F-battle-of-siffin-37-ah-2/",
+      "canonicalPath": "/event/\u2694\uFE0F-battle-of-siffin-37-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-b7a3045eff61c6f7",
+      "legacyPath": "/event/\u2694\uFE0F-battle-of-siffin-37-ah/",
+      "canonicalPath": "/event/\u2694\uFE0F-battle-of-siffin-37-ah/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-566420bf81d9571f",
+      "legacyPath": "/event/\u2694\uFE0F-battle-of-the-camel-3/",
+      "canonicalPath": "/event/\u2694\uFE0F-battle-of-the-camel-3/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-595ed33a33791fbb",
+      "legacyPath": "/event/\u2694\uFE0F-battle-of-the-trench/",
+      "canonicalPath": "/event/\u2694\uFE0F-battle-of-the-trench/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-21f95911a16a592d",
+      "legacyPath": "/event/\u2694\uFE0F-martyrdom-of-hamzah-in-the-battle-of-uhud-3-ah-2/",
+      "canonicalPath": "/event/\u2694\uFE0F-martyrdom-of-hamzah-in-the-battle-of-uhud-3-ah-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-857049a09c3474f3",
+      "legacyPath": "/event/\u2694\uFE0F-victory-to-ali-in-the-battle-of-nahrawan-2/",
+      "canonicalPath": "/event/\u2694\uFE0F-victory-to-ali-in-the-battle-of-nahrawan-2/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-6575015109dcb44f",
+      "legacyPath": "/event/\u2694\uFE0F-victory-to-ali-in-the-battle-of-nahrawan/",
+      "canonicalPath": "/event/\u2694\uFE0F-victory-to-ali-in-the-battle-of-nahrawan/",
+      "expectedStatus": 200,
+      "templateKey": "event-detail",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-0cb1a94fa1ca5c2d",
+      "legacyPath": "/events/",
+      "canonicalPath": "/events/",
+      "expectedStatus": 200,
+      "templateKey": "content-page",
+      "indexable": true,
+      "sitemap": false,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-fc39fd6bcca9f87b",
+      "legacyPath": "/feed/",
+      "canonicalPath": "/feed/",
+      "expectedStatus": 200,
+      "templateKey": "content-page",
+      "indexable": true,
+      "sitemap": false,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-93e52fac721656ee",
+      "legacyPath": "/monday-rites/",
+      "canonicalPath": "/monday-rites/",
+      "expectedStatus": 200,
+      "templateKey": "religious-content",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-b82370ba2acca69a",
+      "legacyPath": "/page-sitemap.xml",
+      "canonicalPath": "/page-sitemap.xml",
+      "expectedStatus": 200,
+      "templateKey": "machine-feed",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-0e424091fd258930",
+      "legacyPath": "/post-archive-sitemap.xml",
+      "canonicalPath": "/post-archive-sitemap.xml",
+      "expectedStatus": 200,
+      "templateKey": "machine-feed",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-6eb5b70f5c28f406",
+      "legacyPath": "/post-sitemap.xml",
+      "canonicalPath": "/post-sitemap.xml",
+      "expectedStatus": 200,
+      "templateKey": "machine-feed",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-adada1317532a28b",
+      "legacyPath": "/robots.txt",
+      "canonicalPath": "/robots.txt",
+      "expectedStatus": 200,
+      "templateKey": "content-page",
+      "indexable": true,
+      "sitemap": false,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-7efd2a819481844e",
+      "legacyPath": "/sitemap.xml",
+      "canonicalPath": "/sitemap.xml",
+      "expectedStatus": 200,
+      "templateKey": "machine-feed",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-25f87c25ec3308eb",
+      "legacyPath": "/tribe_events-sitemap.xml",
+      "canonicalPath": "/tribe_events-sitemap.xml",
+      "expectedStatus": 200,
+      "templateKey": "machine-feed",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    },
+    {
+      "routeId": "route-f93d128db0e1721e",
+      "legacyPath": "/ziarat-e-ashura/",
+      "canonicalPath": "/ziarat-e-ashura/",
+      "expectedStatus": 200,
+      "templateKey": "religious-content",
+      "indexable": true,
+      "sitemap": true,
+      "assetKeys": [],
+      "dynamicRegionKeys": [],
+      "evidenceRefs": [
+        "http-inventory.json",
+        "capture-summary.json"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.husaynia.org/migration/import-manifest.schema.json",
+  "title": "Husaynia migration import manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "source",
+    "sourceVersion",
+    "capturedAtUtc",
+    "rightsProfile",
+    "candidates"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capturedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "rightsProfile": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["dry-run", "apply"],
+      "default": "dry-run"
+    },
+    "planId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/candidate"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "apply"
+          }
+        },
+        "required": ["mode"]
+      },
+      "then": {
+        "required": ["planId"]
+      },
+      "else": {
+        "not": {
+          "required": ["planId"]
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceKey",
+        "sourceVersion",
+        "sourceChecksum",
+        "kind",
+        "targetKey",
+        "payloadRef",
+        "mediaRefs",
+        "dependencyKeys",
+        "decision"
+      ],
+      "properties": {
+        "sourceKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceChecksum": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{64}$"
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceUri": {
+          "type": "string",
+          "format": "uri"
+        },
+        "targetKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "canonicalPath": {
+          "type": "string",
+          "pattern": "^/(?!/)(?:[^?#]*)$"
+        },
+        "payloadRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mediaRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "dependencyKeys": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "expectedTargetChecksum": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{64}$"
+        },
+        "decision": {
+          "type": "string",
+          "enum": ["create", "update", "skip", "conflict", "orphan", "reject"]
+        },
+        "conflictReason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "$comment": "The idempotency key is sourceKey + sourceVersion. A target changed since planning becomes conflict and is never silently overwritten."
+    }
+  }
+}

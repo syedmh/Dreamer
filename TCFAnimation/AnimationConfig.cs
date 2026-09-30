@@ -9,6 +9,8 @@ public sealed record AnimationConfig
 {
     public double TurnFps { get; init; }
     public double WalkFps { get; init; }
+    public double GirlWalkFps { get; init; }
+    public double GirlEntrySeconds { get; init; }
     public double ClapFps { get; init; }
     public double CrossArmFps { get; init; }
     public double CrossArmReleaseFps { get; init; }
@@ -33,6 +35,8 @@ public sealed record AnimationConfig
     {
         TurnFps = 8.0,
         WalkFps = 8.0,
+        GirlWalkFps = 8.0,
+        GirlEntrySeconds = 6.0,
         ClapFps = 8.0,
         CrossArmFps = 8.0,
         CrossArmReleaseFps = 8.0,
@@ -96,6 +100,8 @@ public sealed record AnimationConfig
             {
                 (nameof(TurnFps), TurnFps),
                 (nameof(WalkFps), WalkFps),
+                (nameof(GirlWalkFps), GirlWalkFps),
+                (nameof(GirlEntrySeconds), GirlEntrySeconds),
                 (nameof(ClapFps), ClapFps),
                 (nameof(CrossArmFps), CrossArmFps),
                 (nameof(CrossArmReleaseFps), CrossArmReleaseFps),
@@ -134,6 +140,17 @@ public sealed record AnimationConfig
                 throw new InvalidDataException(
                     $"{name} must be a finite positive number.");
             }
+        }
+
+        if (
+            GirlEntrySeconds * GirlWalkFps
+            < GirlEntranceStateMachine.FrameCount
+        )
+        {
+            throw new InvalidDataException(
+                $"{nameof(GirlEntrySeconds)} * {nameof(GirlWalkFps)} "
+                + $"must be at least {GirlEntranceStateMachine.FrameCount} "
+                + "so every girl walk frame is reachable.");
         }
     }
 }

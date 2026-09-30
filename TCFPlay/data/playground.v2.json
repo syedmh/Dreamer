@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 2,
+  "stage": {
+    "width": 1920,
+    "height": 1080,
+    "maxBackingWidth": 3840,
+    "maxBackingHeight": 2160
+  },
+  "characters": {
+    "boy": {
+      "name": "Boy",
+      "renderHeight": 500,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      },
+      "frameAnchors": [
+        { "x": 0.597505, "y": 0.998008 },
+        { "x": 0.450312, "y": 0.998008 },
+        { "x": 0.328575, "y": 0.998008 },
+        { "x": 0.588855, "y": 0.998008 },
+        { "x": 0.457281, "y": 0.996016 },
+        { "x": 0.383248, "y": 0.996016 },
+        { "x": 0.619445, "y": 0.99004 },
+        { "x": 0.469633, "y": 0.986056 },
+        { "x": 0.40172, "y": 0.986056 }
+      ],
+      "frameScales": [
+        1.006045,
+        1.006045,
+        1.006045,
+        0.999935,
+        1.004,
+        1.001963,
+        0.997915,
+        0.999935,
+        0.999935
+      ],
+      "frames": [
+        "./assets/boy-turn/turn_01.png",
+        "./assets/boy-turn/turn_02.png",
+        "./assets/boy-turn/turn_03.png",
+        "./assets/boy-turn/turn_04.png",
+        "./assets/boy-turn/turn_05.png",
+        "./assets/boy-turn/turn_06.png",
+        "./assets/boy-turn/turn_07.png",
+        "./assets/boy-turn/turn_08.png",
+        "./assets/boy-turn/turn_09.png",
+        "./assets/boy-walk/walk_01.png",
+        "./assets/boy-walk/walk_02.png",
+        "./assets/boy-walk/walk_03.png",
+        "./assets/boy-walk/walk_04.png",
+        "./assets/boy-walk/walk_05.png",
+        "./assets/boy-walk/walk_06.png"
+      ],
+      "animations": {
+        "front": {
+          "frames": [0],
+          "fps": 1
+        },
+        "turnRight": {
+          "frames": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+          "fps": 6
+        }
+      }
+    }
+  },
+  "scenes": [
+    {
+      "id": "boy-turn-right",
+      "title": "Boy turns right",
+      "key": "Digit1",
+      "prompt": "Start middle of screen front facing then turn right"
+    }
+  ]
+}

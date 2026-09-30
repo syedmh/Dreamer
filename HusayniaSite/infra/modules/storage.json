@@ -1,0 +1,273 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.46.1.21595",
+      "templateHash": "4345715232587964678"
+    }
+  },
+  "parameters": {
+    "deployResources": {
+      "type": "bool"
+    },
+    "location": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "object"
+    },
+    "storageAccountName": {
+      "type": "string"
+    },
+    "storageSkuName": {
+      "type": "string"
+    },
+    "storageAccessTier": {
+      "type": "string"
+    },
+    "publicNetworkAccess": {
+      "type": "string"
+    },
+    "allowedIpRules": {
+      "type": "array"
+    },
+    "storageResourceLockEnabled": {
+      "type": "bool"
+    },
+    "mediaVersionRetentionDays": {
+      "type": "int"
+    },
+    "operationalEvidenceRetentionDays": {
+      "type": "int"
+    },
+    "logAnalyticsWorkspaceResourceId": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-05-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "[parameters('storageSkuName')]"
+      },
+      "properties": {
+        "accessTier": "[parameters('storageAccessTier')]",
+        "allowBlobPublicAccess": false,
+        "allowSharedKeyAccess": false,
+        "minimumTlsVersion": "TLS1_2",
+        "supportsHttpsTrafficOnly": true,
+        "publicNetworkAccess": "[parameters('publicNetworkAccess')]",
+        "networkAcls": {
+          "copy": [
+            {
+              "name": "ipRules",
+              "count": "[length(parameters('allowedIpRules'))]",
+              "input": {
+                "value": "[parameters('allowedIpRules')[copyIndex('ipRules')].value]",
+                "action": "Allow"
+              }
+            }
+          ],
+          "bypass": "None",
+          "defaultAction": "Deny",
+          "virtualNetworkRules": []
+        },
+        "encryption": {
+          "services": {
+            "blob": {
+              "enabled": true,
+              "keyType": "Account"
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        }
+      }
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Storage/storageAccounts/blobServices",
+      "apiVersion": "2023-05-01",
+      "name": "[format('{0}/{1}', parameters('storageAccountName'), 'default')]",
+      "properties": {
+        "deleteRetentionPolicy": {
+          "enabled": true,
+          "days": 30
+        },
+        "containerDeleteRetentionPolicy": {
+          "enabled": true,
+          "days": 30
+        },
+        "isVersioningEnabled": true
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2023-05-01",
+      "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', 'media')]",
+      "properties": {
+        "publicAccess": "None"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2023-05-01",
+      "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', 'import-evidence')]",
+      "properties": {
+        "publicAccess": "None"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2023-05-01",
+      "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', 'reports')]",
+      "properties": {
+        "publicAccess": "None"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Insights/diagnosticSettings",
+      "apiVersion": "2021-05-01-preview",
+      "scope": "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
+      "name": "storage-to-log-analytics",
+      "properties": {
+        "workspaceId": "[parameters('logAnalyticsWorkspaceResourceId')]",
+        "logs": [
+          {
+            "category": "StorageRead",
+            "enabled": true
+          },
+          {
+            "category": "StorageWrite",
+            "enabled": true
+          },
+          {
+            "category": "StorageDelete",
+            "enabled": true
+          }
+        ],
+        "metrics": [
+          {
+            "category": "Transaction",
+            "enabled": true
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Storage/storageAccounts/managementPolicies",
+      "apiVersion": "2023-05-01",
+      "name": "[format('{0}/{1}', parameters('storageAccountName'), 'default')]",
+      "properties": {
+        "policy": {
+          "rules": [
+            {
+              "name": "mediaVersionLifecycle",
+              "enabled": true,
+              "type": "Lifecycle",
+              "definition": {
+                "filters": {
+                  "blobTypes": [
+                    "blockBlob"
+                  ],
+                  "prefixMatch": [
+                    "media/"
+                  ]
+                },
+                "actions": {
+                  "version": {
+                    "delete": {
+                      "daysAfterCreationGreaterThan": "[parameters('mediaVersionRetentionDays')]"
+                    }
+                  },
+                  "snapshot": {
+                    "delete": {
+                      "daysAfterCreationGreaterThan": "[parameters('mediaVersionRetentionDays')]"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "operationalEvidenceLifecycle",
+              "enabled": true,
+              "type": "Lifecycle",
+              "definition": {
+                "filters": {
+                  "blobTypes": [
+                    "blockBlob"
+                  ],
+                  "prefixMatch": [
+                    "import-evidence/",
+                    "reports/"
+                  ]
+                },
+                "actions": {
+                  "baseBlob": {
+                    "delete": {
+                      "daysAfterModificationGreaterThan": "[parameters('operationalEvidenceRetentionDays')]"
+                    }
+                  },
+                  "version": {
+                    "delete": {
+                      "daysAfterCreationGreaterThan": "[parameters('operationalEvidenceRetentionDays')]"
+                    }
+                  },
+                  "snapshot": {
+                    "delete": {
+                      "daysAfterCreationGreaterThan": "[parameters('operationalEvidenceRetentionDays')]"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+      ]
+    },
+    {
+      "condition": "[and(parameters('deployResources'), parameters('storageResourceLockEnabled'))]",
+      "type": "Microsoft.Authorization/locks",
+      "apiVersion": "2020-05-01",
+      "scope": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
+      "name": "media-protection",
+      "properties": {
+        "level": "CanNotDelete",
+        "notes": "Protect media lifecycle resources after an authorized deployment."
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+      ]
+    }
+  ]
+}

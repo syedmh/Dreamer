@@ -1,0 +1,3068 @@
+[
+  {
+    "url": "https://www.husaynia.org/",
+    "path": "/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 515099,
+    "sha256": "f325c3a6c1fe351f342e72bf14c82526abac7ba622f6f1260a81812df4c944c7",
+    "savedAs": "raw/html/home.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:50 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 20:43:16 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/announcements/",
+    "path": "/announcements/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/announcements/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 361195,
+    "sha256": "311c74d7872d355e4ce6b2d0099ae272fb7aec6982d1d360948d0f980bbf357f",
+    "savedAs": "raw/html/announcements.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:50 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:01:58 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/build-husaynia/",
+    "path": "/build-husaynia/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/build-husaynia/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 264594,
+    "sha256": "fb753566ade7f7f85dab58c2e86fa241ed6f8fe07d7bbdf7769c48a7244bfd2d",
+    "savedAs": "raw/html/build-husaynia.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:53 GMT",
+      "Content-Type": "text/html; charset=UTF-8"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/contact-us/",
+    "path": "/contact-us/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/contact-us/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 217704,
+    "sha256": "a7e7fcfa18f50c011308880332c413d13bbe2b90f2054bc734d911baa2259d97",
+    "savedAs": "raw/html/contact-us.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:53 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:03:52 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/donate-construction/",
+    "path": "/donate-construction/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/donate-construction/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 202407,
+    "sha256": "006280a8969e999f938497cac78402c985b55a17d157bd1d97b042219f61df57",
+    "savedAs": "raw/html/donate-construction.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:52 GMT",
+      "Content-Type": "text/html; charset=UTF-8"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/donate-eid/",
+    "path": "/donate-eid/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/donate-eid/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 201575,
+    "sha256": "04de88f3ce544a850ed300b6e08385c5996bd6f5b8a59c8fac56809ee8e43688",
+    "savedAs": "raw/html/donate-eid.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:52 GMT",
+      "Content-Type": "text/html; charset=UTF-8"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/donate-humanitarian-aid/",
+    "path": "/donate-humanitarian-aid/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/donate-humanitarian-aid/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 202803,
+    "sha256": "91324de19b03401d82d89d23105649e99563e839c03872b62e786bdcd20d94e5",
+    "savedAs": "raw/html/donate-humanitarian-aid.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:53 GMT",
+      "Content-Type": "text/html; charset=UTF-8"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/donate-khums/",
+    "path": "/donate-khums/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/donate-khums/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 202418,
+    "sha256": "071047f4524afcb7028d7eb36708007b79761037226469e5e9a60ad1cd93d90b",
+    "savedAs": "raw/html/donate-khums.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:53 GMT",
+      "Content-Type": "text/html; charset=UTF-8"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/donate-majalis/",
+    "path": "/donate-majalis/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/donate-majalis/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 201736,
+    "sha256": "aef8cca384cb17bb06df2c816e1546fc23caad4b7b68a5a153f5065a59cddeee",
+    "savedAs": "raw/html/donate-majalis.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:56 GMT",
+      "Content-Type": "text/html; charset=UTF-8"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/donate-operational-expenses/",
+    "path": "/donate-operational-expenses/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/donate-operational-expenses/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 202060,
+    "sha256": "b696f9ffee92a8f640b0c2cbf8b5af0fd905329ee277057649b64a2c511f361c",
+    "savedAs": "raw/html/donate-operational-expenses.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:56 GMT",
+      "Content-Type": "text/html; charset=UTF-8"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/donate-sadaqah/",
+    "path": "/donate-sadaqah/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/donate-sadaqah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 202620,
+    "sha256": "95633bba28431b16b70a01adb57f5ea25a5e88a5d8881f75f453c338ca8505fd",
+    "savedAs": "raw/html/donate-sadaqah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:56 GMT",
+      "Content-Type": "text/html; charset=UTF-8"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/donate/",
+    "path": "/donate/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/donate/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 251584,
+    "sha256": "02af21b2594beb01d18d459fff7ed30abd873220b3f19462b8c380cb0c2cc830",
+    "savedAs": "raw/html/donate.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:57 GMT",
+      "Content-Type": "text/html; charset=UTF-8"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/duas-dua-e-tawassul/",
+    "path": "/duas-dua-e-tawassul/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/duas-dua-e-tawassul/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 273034,
+    "sha256": "dfc358e07199a2f703d6fe823b61be9f15d03a9de814f9d288bbcd76671fe5e7",
+    "savedAs": "raw/html/duas-dua-e-tawassul.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:53 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 20:44:15 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/duas-dua-faraj/",
+    "path": "/duas-dua-faraj/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/duas-dua-faraj/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 226555,
+    "sha256": "d8804f099df110fa851588faaa8762a81964b371b80b089d43c3246089a204a9",
+    "savedAs": "raw/html/duas-dua-faraj.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:58 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:03:57 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/duas-dua-kumayl/",
+    "path": "/duas-dua-kumayl/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/duas-dua-kumayl/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 324283,
+    "sha256": "c130bee55fd84e49a67e5af272fce0f9d77b2c6687fe6a6971bb6d3094deb490",
+    "savedAs": "raw/html/duas-dua-kumayl.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:58 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:03:57 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/duas-dua-nudba/",
+    "path": "/duas-dua-nudba/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/duas-dua-nudba/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 322911,
+    "sha256": "f6d77ba6463df4f6e00789dc42acd09162a00eccca25371d5fdce2c8a52a5dad",
+    "savedAs": "raw/html/duas-dua-nudba.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:56 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 20:44:35 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/duas-hadith-al-kisa/",
+    "path": "/duas-hadith-al-kisa/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/duas-hadith-al-kisa/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 274281,
+    "sha256": "85dbb29c424d2cae3b9c16f95f7cfa9b51f7aa45170c035e9c01fb492d0f7e8e",
+    "savedAs": "raw/html/duas-hadith-al-kisa.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:00 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:00 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/duas/",
+    "path": "/duas/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/duas/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220668,
+    "sha256": "c17440fde2259c54dd7f173fee16c3b1abdb12c6e55ab5b8f3d115a2c31a7bf4",
+    "savedAs": "raw/html/duas.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:57 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 20:42:34 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/%E2%9A%94%EF%B8%8F-battle-of-badr/",
+    "path": "/event/\u2694\uFE0F-battle-of-badr/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/%E2%9A%94%EF%B8%8F-battle-of-badr/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221481,
+    "sha256": "7924669778acbdea01acdf61564431b4246ac01d3761608c15b009aee4c7be95",
+    "savedAs": "raw/html/event_\u2694\uFE0F-battle-of-badr.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:00 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:00 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/%E2%9A%94%EF%B8%8F-battle-of-siffin-37-ah-2/",
+    "path": "/event/\u2694\uFE0F-battle-of-siffin-37-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/%E2%9A%94%EF%B8%8F-battle-of-siffin-37-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222000,
+    "sha256": "504ec0ca1bc03e817fed2815a8661ac78f2a255efe887e39aa81ddab5adcbd65",
+    "savedAs": "raw/html/event_\u2694\uFE0F-battle-of-siffin-37-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:00 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:00 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/%E2%9A%94%EF%B8%8F-battle-of-siffin-37-ah/",
+    "path": "/event/\u2694\uFE0F-battle-of-siffin-37-ah/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/%E2%9A%94%EF%B8%8F-battle-of-siffin-37-ah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221221,
+    "sha256": "685f3397d50cacd973b382df6bd236b0b0525875aa79a0d62a3ec834f0f7c627",
+    "savedAs": "raw/html/event_\u2694\uFE0F-battle-of-siffin-37-ah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:57 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 20:07:25 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/%E2%9A%94%EF%B8%8F-battle-of-the-camel-3/",
+    "path": "/event/\u2694\uFE0F-battle-of-the-camel-3/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/%E2%9A%94%EF%B8%8F-battle-of-the-camel-3/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221409,
+    "sha256": "e87041b5866a9fc71bbc0a4c973f8f4e1e393a76e41feeee2514b54b77c16937",
+    "savedAs": "raw/html/event_\u2694\uFE0F-battle-of-the-camel-3.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:00 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:00 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/%E2%9A%94%EF%B8%8F-battle-of-the-trench/",
+    "path": "/event/\u2694\uFE0F-battle-of-the-trench/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/%E2%9A%94%EF%B8%8F-battle-of-the-trench/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221399,
+    "sha256": "e12fea093128e0521e03f950314f5e90060786b84bad8cc4b8b774b5d10248ae",
+    "savedAs": "raw/html/event_\u2694\uFE0F-battle-of-the-trench.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:01 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:00 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/%E2%9A%94%EF%B8%8F-martyrdom-of-hamzah-in-the-battle-of-uhud-3-ah-2/",
+    "path": "/event/\u2694\uFE0F-martyrdom-of-hamzah-in-the-battle-of-uhud-3-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/%E2%9A%94%EF%B8%8F-martyrdom-of-hamzah-in-the-battle-of-uhud-3-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222684,
+    "sha256": "e4e53c8fff275a5a14e7b276a56acf3f099aa4f3d38682abca0b33701dd3adab",
+    "savedAs": "raw/html/event_\u2694\uFE0F-martyrdom-of-hamzah-in-the-battle-of-uhud-3-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:00 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:00 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/%E2%9A%94%EF%B8%8F-victory-to-ali-in-the-battle-of-nahrawan-2/",
+    "path": "/event/\u2694\uFE0F-victory-to-ali-in-the-battle-of-nahrawan-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/%E2%9A%94%EF%B8%8F-victory-to-ali-in-the-battle-of-nahrawan-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222814,
+    "sha256": "49c7e81f44bc9ef00c428ab0190c21666dc31879d837b7b33a729e6913d2abdb",
+    "savedAs": "raw/html/event_\u2694\uFE0F-victory-to-ali-in-the-battle-of-nahrawan-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:05 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:04 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/%E2%9A%94%EF%B8%8F-victory-to-ali-in-the-battle-of-nahrawan/",
+    "path": "/event/\u2694\uFE0F-victory-to-ali-in-the-battle-of-nahrawan/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/%E2%9A%94%EF%B8%8F-victory-to-ali-in-the-battle-of-nahrawan/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222022,
+    "sha256": "f847419e2ae136af0e71b1780fe74916d4d661c71344672626a871aaf9d736d2",
+    "savedAs": "raw/html/event_\u2694\uFE0F-victory-to-ali-in-the-battle-of-nahrawan.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:00 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 20:07:35 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/10th-day-after-%CA%BFashura%CA%BE-2/",
+    "path": "/event/10th-day-after-\u02BFashura\u02BE-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/10th-day-after-%CA%BFashura%CA%BE-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220961,
+    "sha256": "1a4ba16cee33d112619f9daad150a50fdc817ddd953c1f488a2f99825524310a",
+    "savedAs": "raw/html/event_10th-day-after-\u02BFashura\u02BE-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:05 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:05 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/10th-day-after-%CA%BFashura%CA%BE/",
+    "path": "/event/10th-day-after-\u02BFashura\u02BE/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/10th-day-after-%CA%BFashura%CA%BE/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221702,
+    "sha256": "e088a0e5fedff7081f1c0398f54db40eda04305d3df23cf0134f0c3caee2fb9e",
+    "savedAs": "raw/html/event_10th-day-after-\u02BFashura\u02BE.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:05 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:05 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/1st-night-of-laylat-al-qadr/",
+    "path": "/event/1st-night-of-laylat-al-qadr/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/1st-night-of-laylat-al-qadr/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221681,
+    "sha256": "ae0aed249a85d81cd813a0fd247b6959c7f494bf9372d07dd6d77b99fad5eb60",
+    "savedAs": "raw/html/event_1st-night-of-laylat-al-qadr.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:06 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:05 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/20th-day-after-%CA%BFashura%CA%BE-2/",
+    "path": "/event/20th-day-after-\u02BFashura\u02BE-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/20th-day-after-%CA%BFashura%CA%BE-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220996,
+    "sha256": "a29124a509c8c59d9330b12ea803cfe248f8bb4d8f8aaa88dccd70da0a7fbdbf",
+    "savedAs": "raw/html/event_20th-day-after-\u02BFashura\u02BE-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:01 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 20:07:49 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/20th-day-after-%CA%BFashura%CA%BE/",
+    "path": "/event/20th-day-after-\u02BFashura\u02BE/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/20th-day-after-%CA%BFashura%CA%BE/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221762,
+    "sha256": "bf8e6eef5711c14984c33d2e65dc0f75cd090c56507ceec23b064c7ad03fbeaf",
+    "savedAs": "raw/html/event_20th-day-after-\u02BFashura\u02BE.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:05 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:05 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/2nd-night-of-laylat-al-qadr/",
+    "path": "/event/2nd-night-of-laylat-al-qadr/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/2nd-night-of-laylat-al-qadr/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221711,
+    "sha256": "d92d0b32f079fc7e5180d71475bd98a85274e5d3a003e09b36445236f04dee5c",
+    "savedAs": "raw/html/event_2nd-night-of-laylat-al-qadr.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:06 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:06 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/30th-day-after-%CA%BFashura%CA%BE-2/",
+    "path": "/event/30th-day-after-\u02BFashura\u02BE-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/30th-day-after-%CA%BFashura%CA%BE-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220983,
+    "sha256": "c25092aacd76e9edef13f7644780067fee557b1b0527c977d3de08771a332102",
+    "savedAs": "raw/html/event_30th-day-after-\u02BFashura\u02BE-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:09 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:09 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/30th-day-after-%CA%BFashura%CA%BE/",
+    "path": "/event/30th-day-after-\u02BFashura\u02BE/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/30th-day-after-%CA%BFashura%CA%BE/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221747,
+    "sha256": "5b1a0025e27ad18f10f100c178b2ceb3cfa03fb48f97b8d953034906dc484d90",
+    "savedAs": "raw/html/event_30th-day-after-\u02BFashura\u02BE.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:10 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:10 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/3rd-night-of-laylat-al-qadr/",
+    "path": "/event/3rd-night-of-laylat-al-qadr/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/3rd-night-of-laylat-al-qadr/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221671,
+    "sha256": "246d8f14854e96e8588a67ad47e434266e260b7a5b103c30d7313a2e9bde1e3d",
+    "savedAs": "raw/html/event_3rd-night-of-laylat-al-qadr.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:10 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:10 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/abraha-attacked-the-ka%CA%BFbah-in-the-year-of-the-elephant-2/",
+    "path": "/event/abraha-attacked-the-ka\u02BFbah-in-the-year-of-the-elephant-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/abraha-attacked-the-ka%CA%BFbah-in-the-year-of-the-elephant-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222958,
+    "sha256": "2e4e27aa0fbb33f062b7749699d5b98e3a035950db26b8586c73939b177d0c9a",
+    "savedAs": "raw/html/event_abraha-attacked-the-ka\u02BFbah-in-the-year-of-the-elephant-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:10 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:10 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/abraha-attacked-the-ka%CA%BFbah-in-the-year-of-the-elephant/",
+    "path": "/event/abraha-attacked-the-ka\u02BFbah-in-the-year-of-the-elephant/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/abraha-attacked-the-ka%CA%BFbah-in-the-year-of-the-elephant/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222110,
+    "sha256": "b36e4a6d58b93834811ea830146150e10a253dfddc13838e5ce0c1cd3a687310",
+    "savedAs": "raw/html/event_abraha-attacked-the-ka\u02BFbah-in-the-year-of-the-elephant.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:10 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:10 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/arbaeen-2/",
+    "path": "/event/arbaeen-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/arbaeen-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220734,
+    "sha256": "bafc3a230228cbd1e93fdd6af063e886e04c365159c748089704a18d467f906e",
+    "savedAs": "raw/html/event_arbaeen-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:10 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:10 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/arbaeen/",
+    "path": "/event/arbaeen/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/arbaeen/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 219881,
+    "sha256": "c44a9f06a385b402e57b2515b9b2372b1d09374fb6105bcd301d1b3382ee5f7d",
+    "savedAs": "raw/html/event_arbaeen.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:13 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:13 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/arrival-of-husayn-ibn-ali-in-karbala-61-ah-2/",
+    "path": "/event/arrival-of-husayn-ibn-ali-in-karbala-61-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/arrival-of-husayn-ibn-ali-in-karbala-61-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222213,
+    "sha256": "17c84df33a1897f69af0ad4d4b1ed746c2ec24db99b55f071125c0c391b850e9",
+    "savedAs": "raw/html/event_arrival-of-husayn-ibn-ali-in-karbala-61-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:13 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:13 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/ashura-2/",
+    "path": "/event/ashura-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/ashura-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 225637,
+    "sha256": "c31cbfd3aaaeb7581651af4f1b063ea523482335543360ee64e5c98319f05ee0",
+    "savedAs": "raw/html/event_ashura-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:13 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:13 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/ashura/",
+    "path": "/event/ashura/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/ashura/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 224739,
+    "sha256": "ac57e4dfea0eb7fbdd1c214490446894b37fdff0681555d7c8c6dfd0e9b36077",
+    "savedAs": "raw/html/event_ashura.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:13 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:13 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-abbas-ibn-ali-36-ah/",
+    "path": "/event/birth-of-abbas-ibn-ali-36-ah/",
+    "status": 404,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-abbas-ibn-ali-36-ah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 199726,
+    "sha256": "d5c9ecc15b7b5ecc1b3cb877f201f8950eb8a74a1f19995525300742359d8c70",
+    "savedAs": "raw/html/event_birth-of-abbas-ibn-ali-36-ah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:13 GMT",
+      "Cache-Control": "must-revalidate, no-cache, max-age=0",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Expires": "Wed, 11 Jan 1984 05:00:00 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-abbas-ibn-ali/",
+    "path": "/event/birth-of-abbas-ibn-ali/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-abbas-ibn-ali/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221388,
+    "sha256": "0743767580fb998be3c1a0347c0ee0847d4286d462352bb648013693c8a5e5c6",
+    "savedAs": "raw/html/event_birth-of-abbas-ibn-ali.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:14 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:14 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-abu-talib/",
+    "path": "/event/birth-of-abu-talib/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-abu-talib/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221385,
+    "sha256": "d896f991bbadeb953d650a98a92825010ea2ed9a3b795f75510e8ee62a0fbcfa",
+    "savedAs": "raw/html/event_birth-of-abu-talib.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:17 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:17 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-ali-al-akbar-ibn-husayn-2/",
+    "path": "/event/birth-of-ali-al-akbar-ibn-husayn-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-ali-al-akbar-ibn-husayn-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221402,
+    "sha256": "8e38c7807282bc72cf2c8b9d7d93005181d766c562fd0766ae2c454b333c3317",
+    "savedAs": "raw/html/event_birth-of-ali-al-akbar-ibn-husayn-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:17 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:17 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-ali-al-asghar-ibn-husayn/",
+    "path": "/event/birth-of-ali-al-asghar-ibn-husayn/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-ali-al-asghar-ibn-husayn/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222403,
+    "sha256": "b039fc5a28d2735b3c8675b05918ca3dc759a745df5b8ce2c68b6af57accdd69",
+    "savedAs": "raw/html/event_birth-of-ali-al-asghar-ibn-husayn.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:17 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:17 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-ali-al-hadi-212-ah/",
+    "path": "/event/birth-of-ali-al-hadi-212-ah/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-ali-al-hadi-212-ah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221543,
+    "sha256": "7e4561020e7ff77a8ad195a01838f69e77bf020dfb82914df15fb8aed8ed2924",
+    "savedAs": "raw/html/event_birth-of-ali-al-hadi-212-ah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:17 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:17 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-ali-ar-ridha-148-ah/",
+    "path": "/event/birth-of-ali-ar-ridha-148-ah/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-ali-ar-ridha-148-ah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222016,
+    "sha256": "95941f97a096fffccf6be3c2db09c30eec0d1dc4b71273c75c3a7ab44cf72fd0",
+    "savedAs": "raw/html/event_birth-of-ali-ar-ridha-148-ah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:17 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:17 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-ali-ibn-abi-talib-23-bh/",
+    "path": "/event/birth-of-ali-ibn-abi-talib-23-bh/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-ali-ibn-abi-talib-23-bh/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221517,
+    "sha256": "ab1f5ece1e78018defda226f0e0384d3cc96a686288a5bde8fbf44043700b316",
+    "savedAs": "raw/html/event_birth-of-ali-ibn-abi-talib-23-bh.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:17 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:17 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-ali-ibn-husayn-zayn-al-abidin-37-ah/",
+    "path": "/event/birth-of-ali-ibn-husayn-zayn-al-abidin-37-ah/",
+    "status": 404,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-ali-ibn-husayn-zayn-al-abidin-37-ah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 199806,
+    "sha256": "f0578989d379497d1dafdbfa4089450da1603bc974a423a8dc5d86073e4a036c",
+    "savedAs": "raw/html/event_birth-of-ali-ibn-husayn-zayn-al-abidin-37-ah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:21 GMT",
+      "Cache-Control": "must-revalidate, no-cache, max-age=0",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Expires": "Wed, 11 Jan 1984 05:00:00 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-ali-ibn-husayn-zayn-al-abidin/",
+    "path": "/event/birth-of-ali-ibn-husayn-zayn-al-abidin/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-ali-ibn-husayn-zayn-al-abidin/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221632,
+    "sha256": "ec25da6275166190adaffb4ec37b6867a4a7fdc1fb0260ac8e74692cd642735d",
+    "savedAs": "raw/html/event_birth-of-ali-ibn-husayn-zayn-al-abidin.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:21 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:21 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-fatimah-bint-muhammad-8-bh/",
+    "path": "/event/birth-of-fatimah-bint-muhammad-8-bh/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-fatimah-bint-muhammad-8-bh/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221660,
+    "sha256": "e3757677023cb256566aeb579ec8b43f759db35cafb9eb4b9b35c95b3d0ee23f",
+    "savedAs": "raw/html/event_birth-of-fatimah-bint-muhammad-8-bh.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:21 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:21 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-fatimah-bint-musa/",
+    "path": "/event/birth-of-fatimah-bint-musa/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-fatimah-bint-musa/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221930,
+    "sha256": "c91888d71b0d285719d80c4daa42ae66b95a53efd717bf95c10c7b24ea92e836",
+    "savedAs": "raw/html/event_birth-of-fatimah-bint-musa.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:21 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:21 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-hasan-al-askari-232-ah-2/",
+    "path": "/event/birth-of-hasan-al-askari-232-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-hasan-al-askari-232-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221882,
+    "sha256": "8d660325de09e1af96b6f6f4c687191f86e8310a39358e312b864e56c4452f4b",
+    "savedAs": "raw/html/event_birth-of-hasan-al-askari-232-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:21 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:21 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-hasan-ibn-ali/",
+    "path": "/event/birth-of-hasan-ibn-ali/",
+    "status": 404,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-hasan-ibn-ali/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 199696,
+    "sha256": "7dccdaa12cbff5c94d77fc34cb4311e7c4d7147ef1da4be5c76981929707cadd",
+    "savedAs": "raw/html/event_birth-of-hasan-ibn-ali.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:21 GMT",
+      "Cache-Control": "must-revalidate, no-cache, max-age=0",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Expires": "Wed, 11 Jan 1984 05:00:00 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-husayn-ibn-ali-4-a-h/",
+    "path": "/event/birth-of-husayn-ibn-ali-4-a-h/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-husayn-ibn-ali-4-a-h/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221611,
+    "sha256": "0f362ec254360be8aed6a096d0b686475a32454f47cfe19555585b9cd33b90bd",
+    "savedAs": "raw/html/event_birth-of-husayn-ibn-ali-4-a-h.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:25 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:25 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-imam-musa-al-kadhim-128-ah-2/",
+    "path": "/event/birth-of-imam-musa-al-kadhim-128-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-imam-musa-al-kadhim-128-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221216,
+    "sha256": "dba41666123015992c1da617f6e5825f23ffab80ff502c9eb9cdb6be25f1b245",
+    "savedAs": "raw/html/event_birth-of-imam-musa-al-kadhim-128-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:25 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:25 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-imam-musa-al-kadhim-128-ah/",
+    "path": "/event/birth-of-imam-musa-al-kadhim-128-ah/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-imam-musa-al-kadhim-128-ah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221977,
+    "sha256": "0249759f61e5cb8e58c08fd18d03bc305a75d8076eaf063ed0e8bff47bebe6b1",
+    "savedAs": "raw/html/event_birth-of-imam-musa-al-kadhim-128-ah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:21 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:03:02 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-jafar-al-sadiq-83-ah/",
+    "path": "/event/birth-of-jafar-al-sadiq-83-ah/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-jafar-al-sadiq-83-ah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221701,
+    "sha256": "a226d7db21ba086a75aecab900148daffc8567b840fab7481d0085073aa63d81",
+    "savedAs": "raw/html/event_birth-of-jafar-al-sadiq-83-ah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:25 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:25 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-muhammad-53-bh/",
+    "path": "/event/birth-of-muhammad-53-bh/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-muhammad-53-bh/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221233,
+    "sha256": "aa9f8b88392ce7bd6359a22564dcbe42d2c1913716d9fb06e0edd8dbaa2d8f6d",
+    "savedAs": "raw/html/event_birth-of-muhammad-53-bh.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:25 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:25 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-muhammad-al-baqir-57-ah/",
+    "path": "/event/birth-of-muhammad-al-baqir-57-ah/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-muhammad-al-baqir-57-ah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221738,
+    "sha256": "9a723e7faf7d963cc30b7aa9cba21c65a879be8afbc4a87db7ab109507236530",
+    "savedAs": "raw/html/event_birth-of-muhammad-al-baqir-57-ah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:25 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:25 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-muhammad-al-mahdi-2/",
+    "path": "/event/birth-of-muhammad-al-mahdi-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-muhammad-al-mahdi-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222030,
+    "sha256": "48b3ca6974246d8ec9abadd05c3e92757e7b1f1642b565175de25fbfc0b16aa5",
+    "savedAs": "raw/html/event_birth-of-muhammad-al-mahdi-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:25 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:25 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-muhammad-al-taqi-195-ah-2/",
+    "path": "/event/birth-of-muhammad-al-taqi-195-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-muhammad-al-taqi-195-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221354,
+    "sha256": "6284dd9a3a7a02158b906c6104ad2d36b60795ec3850c124d9c1addce6610aa8",
+    "savedAs": "raw/html/event_birth-of-muhammad-al-taqi-195-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:29 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:29 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-qasim-ibn-hasan-2/",
+    "path": "/event/birth-of-qasim-ibn-hasan-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-qasim-ibn-hasan-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221211,
+    "sha256": "e5742a86b2578bebae0d74ae96e5b8b6f93f42ecce79349feda4c05da7638b33",
+    "savedAs": "raw/html/event_birth-of-qasim-ibn-hasan-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:29 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:29 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-ruqayyah-bint-husayn-2/",
+    "path": "/event/birth-of-ruqayyah-bint-husayn-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-ruqayyah-bint-husayn-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222424,
+    "sha256": "0e84eda5b5ddef3fb82c9669737c397b6565bcf9a227aea1e0f25ca9e53f8774",
+    "savedAs": "raw/html/event_birth-of-ruqayyah-bint-husayn-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:29 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:29 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-salman-the-persian-2/",
+    "path": "/event/birth-of-salman-the-persian-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-salman-the-persian-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221881,
+    "sha256": "e259375c219d8354b8ec027acd8984611cbc53bbfcc13ca4e58879e1b651ba01",
+    "savedAs": "raw/html/event_birth-of-salman-the-persian-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:29 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:29 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-salman-the-persian/",
+    "path": "/event/birth-of-salman-the-persian/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-salman-the-persian/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221076,
+    "sha256": "b319cc6f321d2fe9547af656d271fb32142e175caae92251d090a22a96588f16",
+    "savedAs": "raw/html/event_birth-of-salman-the-persian.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:30 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:29 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-sukaynah-bint-husayn-2/",
+    "path": "/event/birth-of-sukaynah-bint-husayn-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-sukaynah-bint-husayn-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222364,
+    "sha256": "108fb34fe0e87c913ee1aaed5b3fba4a2830ae0ea1ea31f23594eaeb0b571d0e",
+    "savedAs": "raw/html/event_birth-of-sukaynah-bint-husayn-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:30 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:30 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-umm-kulthum-bint-ali/",
+    "path": "/event/birth-of-umm-kulthum-bint-ali/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-umm-kulthum-bint-ali/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221186,
+    "sha256": "364c3f72457450518c80ede1b37d5f7e37729abc40d19208d9518126aa6e6a73",
+    "savedAs": "raw/html/event_birth-of-umm-kulthum-bint-ali.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:33 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:33 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/birth-of-zaynab-bint-ali-6-a-h-2/",
+    "path": "/event/birth-of-zaynab-bint-ali-6-a-h-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/birth-of-zaynab-bint-ali-6-a-h-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221745,
+    "sha256": "a6ab3e88bfccb50af24bf83ba01e68a574245c2624ea6a2d88a4000baf4db55a",
+    "savedAs": "raw/html/event_birth-of-zaynab-bint-ali-6-a-h-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:33 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:33 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/burial-of-the-martyrs-of-karbala-by-bani-asad-2/",
+    "path": "/event/burial-of-the-martyrs-of-karbala-by-bani-asad-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/burial-of-the-martyrs-of-karbala-by-bani-asad-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222514,
+    "sha256": "8c13750e65d7862614536064b484937582a5b0e696d82720f3eef5e83e095ebc",
+    "savedAs": "raw/html/event_burial-of-the-martyrs-of-karbala-by-bani-asad-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:34 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:34 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/burial-of-the-martyrs-of-karbala-by-bani-asad/",
+    "path": "/event/burial-of-the-martyrs-of-karbala-by-bani-asad/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/burial-of-the-martyrs-of-karbala-by-bani-asad/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221680,
+    "sha256": "611d812b60a1922aef3fa3518b0d0f37e2de7ee97f7a5aa42746711630457c9d",
+    "savedAs": "raw/html/event_burial-of-the-martyrs-of-karbala-by-bani-asad.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:33 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:33 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/changing-of-the-qibla-2/",
+    "path": "/event/changing-of-the-qibla-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/changing-of-the-qibla-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221201,
+    "sha256": "fcb91d8b5276542af2ae0778375b410f7dedbcefc8911387f08ba6024bd3b5bb",
+    "savedAs": "raw/html/event_changing-of-the-qibla-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:34 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:34 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/changing-of-the-qibla/",
+    "path": "/event/changing-of-the-qibla/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/changing-of-the-qibla/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220377,
+    "sha256": "53f8e183f5552469d6f79b375062fe05a904570d8e35140d1f7166a1fe781447",
+    "savedAs": "raw/html/event_changing-of-the-qibla.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:34 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:34 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/dahwul-ardh-2/",
+    "path": "/event/dahwul-ardh-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/dahwul-ardh-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 218596,
+    "sha256": "78d85d9f60911a10cfccd6e34131bc7ad17e9db450fa860e266a19fdbb8c360d",
+    "savedAs": "raw/html/event_dahwul-ardh-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:38 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:38 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/day-of-arafah/",
+    "path": "/event/day-of-arafah/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/day-of-arafah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220896,
+    "sha256": "f2dfac9d5391db8ca713a2fe3d1a7b2cb5d94f1b7fe5c5c7b5e8ace170564290",
+    "savedAs": "raw/html/event_day-of-arafah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:38 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:38 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/day-of-ashura-2/",
+    "path": "/event/day-of-ashura-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/day-of-ashura-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220879,
+    "sha256": "5bf4a2d5c2177426577d210c621c4aa3f7bad9712dab780f85f17a34b0b6706e",
+    "savedAs": "raw/html/event_day-of-ashura-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:34 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 20:57:27 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/day-of-ashura/",
+    "path": "/event/day-of-ashura/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/day-of-ashura/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220085,
+    "sha256": "cfcc5b21c982b20dc66e992ea54e35e7514c2150cf5c87378aed7383bf5a1fde",
+    "savedAs": "raw/html/event_day-of-ashura.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:38 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:38 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/day-of-sorrow-2/",
+    "path": "/event/day-of-sorrow-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/day-of-sorrow-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220832,
+    "sha256": "2a5dfedd57c1eddd3ddbe7df2ff1c7ad0006445bffecc831fdc676d16976ef45",
+    "savedAs": "raw/html/event_day-of-sorrow-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:38 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:38 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/death-of-abraham-2/",
+    "path": "/event/death-of-abraham-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/death-of-abraham-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220977,
+    "sha256": "cbe35f8f853f0959773b34bff3f23eac8a4a89f556d1607c136bccf9f172b1b7",
+    "savedAs": "raw/html/event_death-of-abraham-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:38 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:38 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/death-of-khadijah-bint-khuwaylid-2/",
+    "path": "/event/death-of-khadijah-bint-khuwaylid-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/death-of-khadijah-bint-khuwaylid-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222347,
+    "sha256": "293d13b68cc870938b292d49e6a7e55d66e6f6215fb997bd5f42a39f1af8ca83",
+    "savedAs": "raw/html/event_death-of-khadijah-bint-khuwaylid-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:39 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:38 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/death-of-umm-ul-banin-mother-of-abbas-ibn-ali/",
+    "path": "/event/death-of-umm-ul-banin-mother-of-abbas-ibn-ali/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/death-of-umm-ul-banin-mother-of-abbas-ibn-ali/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222416,
+    "sha256": "c8a545263c8f5c99f1f5d01366764040e033334328f10d6de7a9ad6a913675be",
+    "savedAs": "raw/html/event_death-of-umm-ul-banin-mother-of-abbas-ibn-ali.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:42 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:42 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/death-of-yazid/",
+    "path": "/event/death-of-yazid/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/death-of-yazid/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220646,
+    "sha256": "eb100f2348bbcac03981484792ea58894b390bd9ef85f8850e8a94a4fdcb6b46",
+    "savedAs": "raw/html/event_death-of-yazid.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:42 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:42 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/descending-of-the-gospel-2/",
+    "path": "/event/descending-of-the-gospel-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/descending-of-the-gospel-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221051,
+    "sha256": "14726261a702a4542fef25eaf5cb7e33a34c6ead5dd66ac396b11292d18e9150",
+    "savedAs": "raw/html/event_descending-of-the-gospel-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:42 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:42 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/descending-of-the-psalms-2/",
+    "path": "/event/descending-of-the-psalms-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/descending-of-the-psalms-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221984,
+    "sha256": "8fb0f919d1f234deabed2b38f549bb7512ffd33e9cd6d4f4d3999d03512fc441",
+    "savedAs": "raw/html/event_descending-of-the-psalms-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:43 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:43 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/descending-of-the-torah-2/",
+    "path": "/event/descending-of-the-torah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/descending-of-the-torah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220899,
+    "sha256": "7f8b01cee4847681b5d461ec6569d15c67252b709421637d37ac0ab148841faa",
+    "savedAs": "raw/html/event_descending-of-the-torah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:43 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:43 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/eid-al-adha/",
+    "path": "/event/eid-al-adha/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/eid-al-adha/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221708,
+    "sha256": "9f7bfef3466278c9ad8cba7ac230c691ee4af41e80bb4ce5d3e1796f1df8b239",
+    "savedAs": "raw/html/event_eid-al-adha.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:43 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:43 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/eid-al-fitr/",
+    "path": "/event/eid-al-fitr/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/eid-al-fitr/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221602,
+    "sha256": "e1bcbf760ed6689319dcdef1a652b59089f896d86a2372282205602c58d727d1",
+    "savedAs": "raw/html/event_eid-al-fitr.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:43 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 20:52:01 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/eid-al-ghadeer-2/",
+    "path": "/event/eid-al-ghadeer-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/eid-al-ghadeer-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220882,
+    "sha256": "605571aef4a0f3946017b0eb93c4b1c0a085f8c84d2e3ba9f4b557b01c55ec9a",
+    "savedAs": "raw/html/event_eid-al-ghadeer-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:47 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:47 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/eid-al-mubahalah-2/",
+    "path": "/event/eid-al-mubahalah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/eid-al-mubahalah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221660,
+    "sha256": "3121e592c57e762bbf2e0af3f402a3f4b0e68a736ff36ee4f7a8e8eb618015a7",
+    "savedAs": "raw/html/event_eid-al-mubahalah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:48 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:48 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/eid-e-zahra-2/",
+    "path": "/event/eid-e-zahra-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/eid-e-zahra-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221561,
+    "sha256": "6f6d659a11fac27f634c070eefdc02a1b70e4ea9f274228363e8d38d80c71c5f",
+    "savedAs": "raw/html/event_eid-e-zahra-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:48 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:48 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/eid-e-zahra/",
+    "path": "/event/eid-e-zahra/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/eid-e-zahra/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221546,
+    "sha256": "01c07cd9796400a030037fa01f080327954e2eae916bcd441fcc0cbce78441e3",
+    "savedAs": "raw/html/event_eid-e-zahra.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:48 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:48 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/eve-of-ashura-2/",
+    "path": "/event/eve-of-ashura-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/eve-of-ashura-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220997,
+    "sha256": "77d8aa0cbf9c9affb3149095616e111955cda8dfdce94f4af6fb43541d4b8e70",
+    "savedAs": "raw/html/event_eve-of-ashura-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:48 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:48 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/eve-of-ashura/",
+    "path": "/event/eve-of-ashura/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/eve-of-ashura/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220198,
+    "sha256": "e16e3f7a859f43b253b4e2fab34a2c08e86f9cfc4574c5a76bb53e89cf819940",
+    "savedAs": "raw/html/event_eve-of-ashura.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:48 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:48 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/fatimah-went-to-alis-house-after-their-marriage-2/",
+    "path": "/event/fatimah-went-to-alis-house-after-their-marriage-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/fatimah-went-to-alis-house-after-their-marriage-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222323,
+    "sha256": "b3d9700038f57a4c3d2ae0c0620a409a2cbd76d02dd741a303eec8f768932cff",
+    "savedAs": "raw/html/event_fatimah-went-to-alis-house-after-their-marriage-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:52 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:52 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/first-mosque-quba-mosque-was-established-1-ah/",
+    "path": "/event/first-mosque-quba-mosque-was-established-1-ah/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/first-mosque-quba-mosque-was-established-1-ah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222625,
+    "sha256": "2ecfe1c5b59b9b368e6e061275751c941bc20eb505c1497ad1e3b03b98d3f321",
+    "savedAs": "raw/html/event_first-mosque-quba-mosque-was-established-1-ah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:52 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:52 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-10/",
+    "path": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-10/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-10/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 223963,
+    "sha256": "40b5b37b0d601c9c316f412b5bc817ce1e955a53483891e0710d858e9183c56a",
+    "savedAs": "raw/html/event_global-donation-drive-help-build-mosque-\uD83D\uDD4C-10.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:52 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:52 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-11/",
+    "path": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-11/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-11/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 224064,
+    "sha256": "fea832a25ba76db82bd75e6a3e2a9ec101daeab1d78461d7708d1ae8c3432c57",
+    "savedAs": "raw/html/event_global-donation-drive-help-build-mosque-\uD83D\uDD4C-11.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:53 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:53 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-12/",
+    "path": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-12/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-12/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 224062,
+    "sha256": "13e25a17d954fe00774259410d07f5afcd11cad36d14f236f6a19304e15bbe23",
+    "savedAs": "raw/html/event_global-donation-drive-help-build-mosque-\uD83D\uDD4C-12.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:53 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:53 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-13/",
+    "path": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-13/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-13/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 224072,
+    "sha256": "6ceb7062b16120557570d6a291f95aa03e0b8f45decd81d843bacf21f3beadaa",
+    "savedAs": "raw/html/event_global-donation-drive-help-build-mosque-\uD83D\uDD4C-13.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:53 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:53 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-14/",
+    "path": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-14/",
+    "status": 404,
+    "finalUrl": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-14/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 199861,
+    "sha256": "7eaa04bef93ce4c21d081d053d3bb33f5827237d8a52dc8fc2f98059da22f25e",
+    "savedAs": "raw/html/event_global-donation-drive-help-build-mosque-\uD83D\uDD4C-14.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:56 GMT",
+      "Cache-Control": "must-revalidate, no-cache, max-age=0",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Expires": "Wed, 11 Jan 1984 05:00:00 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-15/",
+    "path": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-15/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-15/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 224052,
+    "sha256": "ff693769efb6c73283cc4acd3e82cee45a068397b74b1b6c0b50571248cb3587",
+    "savedAs": "raw/html/event_global-donation-drive-help-build-mosque-\uD83D\uDD4C-15.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:56 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:56 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-16/",
+    "path": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-16/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-16/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 224078,
+    "sha256": "74b0884a477016202037b662f2d738693f8be19c97b46d98845f40a4fc390c27",
+    "savedAs": "raw/html/event_global-donation-drive-help-build-mosque-\uD83D\uDD4C-16.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:53 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 20:04:24 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-17/",
+    "path": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-17/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-17/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 224039,
+    "sha256": "f90b7672b3354b0e781378c281e54c0ebb0bd216aa6b2ad03793da2be3ee16f9",
+    "savedAs": "raw/html/event_global-donation-drive-help-build-mosque-\uD83D\uDD4C-17.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:57 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:57 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-18/",
+    "path": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-18/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-18/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 224041,
+    "sha256": "11c2094c2c4682fbf9933b8f239288080aaab26193bc1ec71cddbb225a9e03fc",
+    "savedAs": "raw/html/event_global-donation-drive-help-build-mosque-\uD83D\uDD4C-18.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:57 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:57 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-19/",
+    "path": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-19/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-19/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 224093,
+    "sha256": "3c03ab21506375c5f7442ca3559aadb41ef2b7e7af85c87930ed91c99622e9f3",
+    "savedAs": "raw/html/event_global-donation-drive-help-build-mosque-\uD83D\uDD4C-19.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:57 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:56 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-20/",
+    "path": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-20/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-20/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 224071,
+    "sha256": "a4e47579adcef1caae975b052add3b82eaaffd7fb0f5f771b8ffd1c0c371c948",
+    "savedAs": "raw/html/event_global-donation-drive-help-build-mosque-\uD83D\uDD4C-20.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:04:57 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:57 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-21/",
+    "path": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-21/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-21/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 224062,
+    "sha256": "a5a19599db034177d579f7c9e2118acd924ac874a973740457cc2840834f050e",
+    "savedAs": "raw/html/event_global-donation-drive-help-build-mosque-\uD83D\uDD4C-21.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:00 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:00 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-22/",
+    "path": "/event/global-donation-drive-help-build-mosque-\uD83D\uDD4C-22/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/global-donation-drive-help-build-mosque-%F0%9F%95%8C-22/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 223985,
+    "sha256": "a56494b71486991a9628e8fe7e8b41748735b2879c8b9d529d0b1d1fffb342c0",
+    "savedAs": "raw/html/event_global-donation-drive-help-build-mosque-\uD83D\uDD4C-22.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:00 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:04:59 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/hijrah-2/",
+    "path": "/event/hijrah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/hijrah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220935,
+    "sha256": "7db0e0c5c00c841cb5ab4a32e5ffab60df9076afd10ce2b18da3ba1d66ccebf8",
+    "savedAs": "raw/html/event_hijrah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:00 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:00 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/hijrah/",
+    "path": "/event/hijrah/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/hijrah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220111,
+    "sha256": "fa27d35b5d46396d17ea0c13b379c034694a2b7180b9f774074a2e4eacebbd82",
+    "savedAs": "raw/html/event_hijrah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:01 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:01 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/husayn-ibn-ali-leaves-makkah-for-karbala-60-ah-2/",
+    "path": "/event/husayn-ibn-ali-leaves-makkah-for-karbala-60-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/husayn-ibn-ali-leaves-makkah-for-karbala-60-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222346,
+    "sha256": "ff9cd4b036f30f899a6ab06dc5819342b9c9991fea2412b38834f4c11e87fec2",
+    "savedAs": "raw/html/event_husayn-ibn-ali-leaves-makkah-for-karbala-60-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:01 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:01 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/husayn-ibn-ali-started-his-journey-to-karbala-from-madinah-in-60-ah-2/",
+    "path": "/event/husayn-ibn-ali-started-his-journey-to-karbala-from-madinah-in-60-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/husayn-ibn-ali-started-his-journey-to-karbala-from-madinah-in-60-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 223277,
+    "sha256": "ed0519f746f1eb136350c979305f6153dd2a6a75952591fca5809c11846fe8cc",
+    "savedAs": "raw/html/event_husayn-ibn-ali-started-his-journey-to-karbala-from-madinah-in-60-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:03 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:03 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/jumuatul-wida/",
+    "path": "/event/jumuatul-wida/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/jumuatul-wida/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220355,
+    "sha256": "a0bdae6e73c9d8193b314a7daf9f9500c93c374fc44370bf3f6dcdb1da20df4b",
+    "savedAs": "raw/html/event_jumuatul-wida.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:06 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:06 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/koonda-2/",
+    "path": "/event/koonda-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/koonda-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220591,
+    "sha256": "ac97f9c35067f29e3c3f31bd41fb1aa6cc45043b14cf4d9d0b36ddeec6ad1c12",
+    "savedAs": "raw/html/event_koonda-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:06 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:06 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/laylat-al-baraat-2/",
+    "path": "/event/laylat-al-baraat-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/laylat-al-baraat-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220674,
+    "sha256": "c2f9c70d30594216daa07f035b3501e9d878d550d3944af601719c6063f419b0",
+    "savedAs": "raw/html/event_laylat-al-baraat-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:07 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:07 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/majlis-e-aza-muharram-2026/",
+    "path": "/event/majlis-e-aza-muharram-2026/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/majlis-e-aza-muharram-2026/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222408,
+    "sha256": "d02d64f36853b44507f9e6a99e9b3a75cdc027cab47c52fb8b36bfa87f2313cb",
+    "savedAs": "raw/html/event_majlis-e-aza-muharram-2026.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:07 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:07 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/major-occultation-of-muhammad-al-mahdi-begins-2/",
+    "path": "/event/major-occultation-of-muhammad-al-mahdi-begins-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/major-occultation-of-muhammad-al-mahdi-begins-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222848,
+    "sha256": "41c5716300dc0c2f926d84fec54576e313551b38b05c7f205c364d3df437466b",
+    "savedAs": "raw/html/event_major-occultation-of-muhammad-al-mahdi-begins-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:07 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:07 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/marriage-of-fatimah-bint-muhammad-to-ali-2-bh-2/",
+    "path": "/event/marriage-of-fatimah-bint-muhammad-to-ali-2-bh-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/marriage-of-fatimah-bint-muhammad-to-ali-2-bh-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222212,
+    "sha256": "2853783207eeb26643c5de8f132ff93a99ad39df4b856527119039cfedbf98f5",
+    "savedAs": "raw/html/event_marriage-of-fatimah-bint-muhammad-to-ali-2-bh-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:08 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:07 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/marriage-of-khadijah-bint-khuwaylid-to-muhammad-2/",
+    "path": "/event/marriage-of-khadijah-bint-khuwaylid-to-muhammad-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/marriage-of-khadijah-bint-khuwaylid-to-muhammad-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222900,
+    "sha256": "fe58b758d4b1177e51cbe040ef9d7687657dab466f4bf5c2e326837a86c5ea84",
+    "savedAs": "raw/html/event_marriage-of-khadijah-bint-khuwaylid-to-muhammad-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:10 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:10 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-abu-talib-2/",
+    "path": "/event/martyrdom-of-abu-talib-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-abu-talib-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221902,
+    "sha256": "5d9c104ab9365843c1003bf3a9e862aab927c4d01ac26213c08e6f50b6ae6796",
+    "savedAs": "raw/html/event_martyrdom-of-abu-talib-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:13 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:13 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-ali-al-hadi/",
+    "path": "/event/martyrdom-of-ali-al-hadi/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-ali-al-hadi/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221360,
+    "sha256": "256484890f7343e6fa67adffa1412ee432730452196953d56a6b4d3b719c5d13",
+    "savedAs": "raw/html/event_martyrdom-of-ali-al-hadi.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:13 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:13 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-ali-ar-ridha-203-ah-2/",
+    "path": "/event/martyrdom-of-ali-ar-ridha-203-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-ali-ar-ridha-203-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222196,
+    "sha256": "fdc5d5be73614c5834db4e7ca99e398d9d38402caeb46f9c5d4540c38773f80e",
+    "savedAs": "raw/html/event_martyrdom-of-ali-ar-ridha-203-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:14 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:14 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-ali-ar-ridha-203-ah/",
+    "path": "/event/martyrdom-of-ali-ar-ridha-203-ah/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-ali-ar-ridha-203-ah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221348,
+    "sha256": "c0c5a5b71eb90fac102b3fcfb1059aba19d2bf65a249a3d9344e08262cc0ebe6",
+    "savedAs": "raw/html/event_martyrdom-of-ali-ar-ridha-203-ah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:13 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:12 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-ali-ibn-husayn-zayn-al-abidin-95-ah-2/",
+    "path": "/event/martyrdom-of-ali-ibn-husayn-zayn-al-abidin-95-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-ali-ibn-husayn-zayn-al-abidin-95-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222067,
+    "sha256": "9f4d44c3f48b9158f9805d2c56824180b57e71292eab959b64aa81e087d18872",
+    "savedAs": "raw/html/event_martyrdom-of-ali-ibn-husayn-zayn-al-abidin-95-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:15 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:14 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-ali-ibn-husayn-zayn-al-abidin-95-ah/",
+    "path": "/event/martyrdom-of-ali-ibn-husayn-zayn-al-abidin-95-ah/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-ali-ibn-husayn-zayn-al-abidin-95-ah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221230,
+    "sha256": "89375519a9df7c168609ee405f57636907457cfbfce954aeb13060545ac8a95f",
+    "savedAs": "raw/html/event_martyrdom-of-ali-ibn-husayn-zayn-al-abidin-95-ah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:31 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:30 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-fatimah-bint-muhammad-11-ah-2/",
+    "path": "/event/martyrdom-of-fatimah-bint-muhammad-11-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-fatimah-bint-muhammad-11-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221892,
+    "sha256": "26e3c4a1a27dc12fb26586734ea42b1de93326ee307f9d04d3bb907ce0fbaf8b",
+    "savedAs": "raw/html/event_martyrdom-of-fatimah-bint-muhammad-11-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:30 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:29 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-fatimah-bint-muhammad-11-ah/",
+    "path": "/event/martyrdom-of-fatimah-bint-muhammad-11-ah/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-fatimah-bint-muhammad-11-ah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221910,
+    "sha256": "e5521022c23ec14f0512fdb95bd324013e67f802e9f84d88f68fedcc96ecaf9d",
+    "savedAs": "raw/html/event_martyrdom-of-fatimah-bint-muhammad-11-ah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:31 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:30 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-fatimah-bint-musa-2/",
+    "path": "/event/martyrdom-of-fatimah-bint-musa-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-fatimah-bint-musa-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222034,
+    "sha256": "46764af5c905d2b78b399370a8f7ad7dc23e3820c4d3626ec3935cf41ccc6ff0",
+    "savedAs": "raw/html/event_martyrdom-of-fatimah-bint-musa-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:31 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:31 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-fatimah-bint-musa/",
+    "path": "/event/martyrdom-of-fatimah-bint-musa/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-fatimah-bint-musa/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221208,
+    "sha256": "2b2360b399463a5eb512e981e7a34a9295dd1efb9dd6201eec75b4cd0f16b57b",
+    "savedAs": "raw/html/event_martyrdom-of-fatimah-bint-musa.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:32 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:31 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-hasan-al-askari-260-ah-2/",
+    "path": "/event/martyrdom-of-hasan-al-askari-260-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-hasan-al-askari-260-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222083,
+    "sha256": "63a107cd5074a0850d8caf7d5036583bada361d483080a92b49c26c7a25b85b5",
+    "savedAs": "raw/html/event_martyrdom-of-hasan-al-askari-260-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:33 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:33 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-hasan-al-askari-260-ah/",
+    "path": "/event/martyrdom-of-hasan-al-askari-260-ah/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-hasan-al-askari-260-ah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221954,
+    "sha256": "8e3708a3f1c312590f01c48215c05814aa91ec5a6c08548e517f520385f709a8",
+    "savedAs": "raw/html/event_martyrdom-of-hasan-al-askari-260-ah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:55 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:55 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-hasan-ibn-ali-50-ah-2/",
+    "path": "/event/martyrdom-of-hasan-ibn-ali-50-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-hasan-ibn-ali-50-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221762,
+    "sha256": "e7ac52c290dcc5eaa4632871abd1849d03cdb5e3679dd63bbf298ab3fe0d517f",
+    "savedAs": "raw/html/event_martyrdom-of-hasan-ibn-ali-50-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:54 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:53 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-hasan-ibn-ali-50-ah/",
+    "path": "/event/martyrdom-of-hasan-ibn-ali-50-ah/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-hasan-ibn-ali-50-ah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220934,
+    "sha256": "1f7c4888522a4da684e66dce5bcf4896a749c41c612a85717d87ca18af6e57f2",
+    "savedAs": "raw/html/event_martyrdom-of-hasan-ibn-ali-50-ah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:55 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:54 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-jafar-al-sadiq-2/",
+    "path": "/event/martyrdom-of-jafar-al-sadiq-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-jafar-al-sadiq-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221594,
+    "sha256": "7669e536119e4dda8e97289c337be8dab01d0e38fe18edc4ad6524e412fe3e8b",
+    "savedAs": "raw/html/event_martyrdom-of-jafar-al-sadiq-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:56 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:56 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-maytham-al-tammar-60-ah-2/",
+    "path": "/event/martyrdom-of-maytham-al-tammar-60-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-maytham-al-tammar-60-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221529,
+    "sha256": "4319a621edfdd4a0d240afb10dc8714fae52216ec83d3615024d1f2012b688e6",
+    "savedAs": "raw/html/event_martyrdom-of-maytham-al-tammar-60-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:57 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:56 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-muhammad-11-ah-2/",
+    "path": "/event/martyrdom-of-muhammad-11-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-muhammad-11-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221662,
+    "sha256": "4fc5d41408a0a0673c39b4ae6c7095433efaa47ee871f265915857bccb5de896",
+    "savedAs": "raw/html/event_martyrdom-of-muhammad-11-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:05:57 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:05:57 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-muhammad-11-ah/",
+    "path": "/event/martyrdom-of-muhammad-11-ah/",
+    "status": 404,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-muhammad-11-ah/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 199721,
+    "sha256": "0394f870b7301da8e3104d21cae53f0821f414d97aa1d142907d6208d48df10d",
+    "savedAs": "raw/html/event_martyrdom-of-muhammad-11-ah.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:06:15 GMT",
+      "Cache-Control": "must-revalidate, no-cache, max-age=0",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Expires": "Wed, 11 Jan 1984 05:00:00 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-muhammad-al-baqir-114-ah-2/",
+    "path": "/event/martyrdom-of-muhammad-al-baqir-114-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-muhammad-al-baqir-114-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222088,
+    "sha256": "7d03bb66c1bfbc3e4ce4c130ccde2a18f43b088768456a20cea220baaa697606",
+    "savedAs": "raw/html/event_martyrdom-of-muhammad-al-baqir-114-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:06:19 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:06:19 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-muhammad-al-taqi-220-ah-2/",
+    "path": "/event/martyrdom-of-muhammad-al-taqi-220-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-muhammad-al-taqi-220-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221647,
+    "sha256": "2c2b17b0d4cdfd5863f7319ebdafede65b0760ce074095ea274e3ed02d2891db",
+    "savedAs": "raw/html/event_martyrdom-of-muhammad-al-taqi-220-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:06:17 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:06:17 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-mukhtar-ibn-abi-ubayd-al-thaqafi-2/",
+    "path": "/event/martyrdom-of-mukhtar-ibn-abi-ubayd-al-thaqafi-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-mukhtar-ibn-abi-ubayd-al-thaqafi-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222679,
+    "sha256": "3359dfd46b77d5ab50e9447a644447b3c00f169ab3af96e1e8713456b0236f62",
+    "savedAs": "raw/html/event_martyrdom-of-mukhtar-ibn-abi-ubayd-al-thaqafi-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:06:15 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:06:14 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-musa-al-kadhim-2/",
+    "path": "/event/martyrdom-of-musa-al-kadhim-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-musa-al-kadhim-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221647,
+    "sha256": "c79ae05e62dc15c907e400d81302ccdaa39e831ee8bf062f6c93bf58667061ac",
+    "savedAs": "raw/html/event_martyrdom-of-musa-al-kadhim-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:06:20 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:06:19 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-muslim-ibn-aqeel-hani-ibn-urwa-in-kufa-60-ah-2/",
+    "path": "/event/martyrdom-of-muslim-ibn-aqeel-hani-ibn-urwa-in-kufa-60-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-muslim-ibn-aqeel-hani-ibn-urwa-in-kufa-60-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222789,
+    "sha256": "79783b9048ef46157239993139cff29c32f9141cd8e82899cc66ccf63e7a862b",
+    "savedAs": "raw/html/event_martyrdom-of-muslim-ibn-aqeel-hani-ibn-urwa-in-kufa-60-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:06:18 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:06:17 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-ruqayyah-bint-husayn-2/",
+    "path": "/event/martyrdom-of-ruqayyah-bint-husayn-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-ruqayyah-bint-husayn-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222574,
+    "sha256": "107ab37ecdc337f3f6171ad313924c5fd355b04ef4fc12dffff7195677741362",
+    "savedAs": "raw/html/event_martyrdom-of-ruqayyah-bint-husayn-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:06:38 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:06:37 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-ruqayyah-bint-husayn/",
+    "path": "/event/martyrdom-of-ruqayyah-bint-husayn/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-ruqayyah-bint-husayn/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221748,
+    "sha256": "59e4fbb1513fbe2b6f3248c0cd2a092cd0d44733c17de25997921849c6d9f96f",
+    "savedAs": "raw/html/event_martyrdom-of-ruqayyah-bint-husayn.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:06:38 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:06:38 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-the-children-of-muslim-ibn-aqeel-60-ah-2/",
+    "path": "/event/martyrdom-of-the-children-of-muslim-ibn-aqeel-60-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-the-children-of-muslim-ibn-aqeel-60-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222468,
+    "sha256": "861842d8d4a3eb926bed191e25884ee732c5bba869d81cf4b577b96837113871",
+    "savedAs": "raw/html/event_martyrdom-of-the-children-of-muslim-ibn-aqeel-60-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:06:41 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:06:41 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/martyrdom-of-zaynab-bint-ali-2/",
+    "path": "/event/martyrdom-of-zaynab-bint-ali-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/martyrdom-of-zaynab-bint-ali-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221584,
+    "sha256": "a5387f0c072d4f7e0d241a9a840bef9cca4a21fca84b76f439a880fe1e1af9b0",
+    "savedAs": "raw/html/event_martyrdom-of-zaynab-bint-ali-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:06:42 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:06:41 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/mi%CA%BBraj-day-of-mab%CA%BBath-2/",
+    "path": "/event/mi\u02BBraj-day-of-mab\u02BBath-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/mi%CA%BBraj-day-of-mab%CA%BBath-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222185,
+    "sha256": "076aa9678cd5908feb50136176698626dc315269815720651c6b594ff394b6ed",
+    "savedAs": "raw/html/event_mi\u02BBraj-day-of-mab\u02BBath-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:06:42 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:06:42 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/mourning-of-muharram-starts-2/",
+    "path": "/event/mourning-of-muharram-starts-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/mourning-of-muharram-starts-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222016,
+    "sha256": "988d25c05f8f6e1d1a2fed04f5edc3c6aa38d0769d4378aca29aeed0e292282e",
+    "savedAs": "raw/html/event_mourning-of-muharram-starts-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:06:42 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:06:42 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/prisoners-of-karbala-reach-yazids-palace-in-syria-2/",
+    "path": "/event/prisoners-of-karbala-reach-yazids-palace-in-syria-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/prisoners-of-karbala-reach-yazids-palace-in-syria-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222809,
+    "sha256": "c6675ab1d2448565d3d1e2cb4daa2a676785b3fdb5b5a3cf405bd60c79aac9b3",
+    "savedAs": "raw/html/event_prisoners-of-karbala-reach-yazids-palace-in-syria-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:01 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:07:00 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/prisoners-of-karbala-reach-yazids-palace-in-syria/",
+    "path": "/event/prisoners-of-karbala-reach-yazids-palace-in-syria/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/prisoners-of-karbala-reach-yazids-palace-in-syria/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221979,
+    "sha256": "5ed8d6db948c64c2f07c00c65e4a789d399ea9214cfff6637622ecd05ffc1759",
+    "savedAs": "raw/html/event_prisoners-of-karbala-reach-yazids-palace-in-syria.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:06:38 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 19:44:18 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/renunciation-of-adam-accepted-2/",
+    "path": "/event/renunciation-of-adam-accepted-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/renunciation-of-adam-accepted-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221109,
+    "sha256": "2206ba6738a718c657bfd3a06680514c8522d2d464802501c2464daebf084c86",
+    "savedAs": "raw/html/event_renunciation-of-adam-accepted-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:06:59 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:06:59 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/shab-e-barat-2/",
+    "path": "/event/shab-e-barat-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/shab-e-barat-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221285,
+    "sha256": "a3514a7f0fa4d709650e4281c0258dc1d6b8c01d2113f5bc9c186962c95ecb7b",
+    "savedAs": "raw/html/event_shab-e-barat-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:01 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:07:00 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/stored-water-in-the-tents-of-the-camp-of-husayn-ibn-ali-runs-out-2/",
+    "path": "/event/stored-water-in-the-tents-of-the-camp-of-husayn-ibn-ali-runs-out-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/stored-water-in-the-tents-of-the-camp-of-husayn-ibn-ali-runs-out-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222967,
+    "sha256": "d2baa98423df2e8a4c5f1ef8d53a56e4bf261313ee5e4930c27e803554ded408",
+    "savedAs": "raw/html/event_stored-water-in-the-tents-of-the-camp-of-husayn-ibn-ali-runs-out-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:01 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:07:00 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/stored-water-in-the-tents-of-the-camp-of-husayn-ibn-ali-runs-out/",
+    "path": "/event/stored-water-in-the-tents-of-the-camp-of-husayn-ibn-ali-runs-out/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/stored-water-in-the-tents-of-the-camp-of-husayn-ibn-ali-runs-out/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222131,
+    "sha256": "1958146d8e7ef858bf8ad9e3c97336d0d5469002bb98dc8b25301b544ad90431",
+    "savedAs": "raw/html/event_stored-water-in-the-tents-of-the-camp-of-husayn-ibn-ali-runs-out.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:04 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:07:03 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/treaty-of-hudaybiyyah-was-executed-6-ah-2/",
+    "path": "/event/treaty-of-hudaybiyyah-was-executed-6-ah-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/treaty-of-hudaybiyyah-was-executed-6-ah-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221852,
+    "sha256": "271945c9b91a8e2573cdbc770979b4f55e00bbd4c63d15450713ff7a27f1e8a6",
+    "savedAs": "raw/html/event_treaty-of-hudaybiyyah-was-executed-6-ah-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:06:45 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 19:54:22 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/victorious-conquest-of-mecca-2/",
+    "path": "/event/victorious-conquest-of-mecca-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/victorious-conquest-of-mecca-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 221748,
+    "sha256": "5c55b542865f04e7293beb587fc905b834f53d1330e9fd782ceebfa748c83d67",
+    "savedAs": "raw/html/event_victorious-conquest-of-mecca-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:05 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:07:04 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/event/water-supply-to-the-camp-of-husayn-ibn-ali-was-stopped-2/",
+    "path": "/event/water-supply-to-the-camp-of-husayn-ibn-ali-was-stopped-2/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/event/water-supply-to-the-camp-of-husayn-ibn-ali-was-stopped-2/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 222609,
+    "sha256": "be25c39232a24273d48beec83f0e4425147b8bf22e742808a6f3f569d9361872",
+    "savedAs": "raw/html/event_water-supply-to-the-camp-of-husayn-ibn-ali-was-stopped-2.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:22 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:07:21 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/events/",
+    "path": "/events/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/islamic-calendar/",
+    "redirects": [
+      {
+        "url": "https://www.husaynia.org/events/",
+        "status": 301,
+        "location": "https://www.husaynia.org/islamic-calendar/"
+      }
+    ],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 404187,
+    "sha256": "250ba62eab802a5616a0a348d90959009d8a2ea60cd164d99ea1e10f784341e5",
+    "savedAs": "raw/html/events.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:42 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:07:40 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/events/?ical=1",
+    "path": "/events/?ical=1",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/islamic-calendar/",
+    "redirects": [
+      {
+        "url": "https://www.husaynia.org/events/?ical=[REDACTED]",
+        "status": 301,
+        "location": "https://www.husaynia.org/islamic-calendar/"
+      }
+    ],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 404187,
+    "sha256": "63d34f3a943d292ef0ea52db7175235a996b8a29bfd6d338daf16617f3b68371",
+    "savedAs": "raw/html/events__ical=1.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:42 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:07:40 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/feed/",
+    "path": "/feed/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/feed/",
+    "redirects": [],
+    "contentType": "application/rss\u002Bxml; charset=UTF-8",
+    "contentLength": 592682,
+    "sha256": "67cf5b5941cdacd70775988f067ace38bb4ee12b9af86507da37cda2d678c11d",
+    "savedAs": "raw/endpoints/feed.xml",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:08:04 GMT",
+      "ETag": "\u00222c81a2ebada2b1a5b6e7e8a6489cf818-gzip\u0022",
+      "Content-Type": "application/rss\u002Bxml; charset=UTF-8",
+      "Last-Modified": "Thu, 13 Aug 2026 17:38:08 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/fundraiser/",
+    "path": "/fundraiser/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/fundraiser/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 202273,
+    "sha256": "78000e2fbc3211cf02ff98447f6145fc9fb95b2b44018c078cc47a3eab985b6e",
+    "savedAs": "raw/html/fundraiser.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:26 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:07:25 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/islamic-calendar/",
+    "path": "/islamic-calendar/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/islamic-calendar/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 404195,
+    "sha256": "9a15057ae017ae01f27e7388b040536d9e9bbc9191478816aebd85fa0c841a8d",
+    "savedAs": "raw/html/islamic-calendar.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:08:02 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:08:02 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/monday-rites/",
+    "path": "/monday-rites/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/monday-rites/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 343553,
+    "sha256": "5b990769e94962dcad81ee2b88d2adc4dded975a9964ed9fc5f0c25558298bb5",
+    "savedAs": "raw/html/monday-rites.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:48 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:07:48 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/overview/",
+    "path": "/overview/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/overview/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 220278,
+    "sha256": "ecb6ad25995e590a8659909a1fc56ae8aba6f3fcf67abe73cea36c6c853450bb",
+    "savedAs": "raw/html/overview.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:27 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 20:44:08 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/page-sitemap.xml",
+    "path": "/page-sitemap.xml",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/page-sitemap.xml",
+    "redirects": [],
+    "contentType": "text/xml; charset=UTF-8",
+    "contentLength": 15694,
+    "sha256": "836e9cbfb31513a3c87a8072b76b9d74ad953fc2a001f6254a2889e393999217",
+    "savedAs": "raw/endpoints/page-sitemap.xml.xml",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:48 GMT",
+      "Content-Type": "text/xml; charset=UTF-8"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/photos/",
+    "path": "/photos/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/photos/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 296498,
+    "sha256": "98ac947bf7ade058a33a1024ac6f95f67927c7bfa5a42649260d9a440ee542a3",
+    "savedAs": "raw/html/photos.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:28 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 20:43:58 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/pledge-construction/",
+    "path": "/pledge-construction/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/pledge-construction/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 206615,
+    "sha256": "d0b467175c622de1937cfb1f8c041ffb0a8fbd73fa3fba91dee96339f5117fae",
+    "savedAs": "raw/html/pledge-construction.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:47 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:07:47 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/post-archive-sitemap.xml",
+    "path": "/post-archive-sitemap.xml",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/post-archive-sitemap.xml",
+    "redirects": [],
+    "contentType": "text/xml; charset=UTF-8",
+    "contentLength": 677,
+    "sha256": "49a776cefb01035fb6efbf5ec3802fbed8c64579c6054a960b3cbc80a4bd8c2b",
+    "savedAs": "raw/endpoints/post-archive-sitemap.xml.xml",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:50 GMT",
+      "Content-Type": "text/xml; charset=UTF-8"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/post-sitemap.xml",
+    "path": "/post-sitemap.xml",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/post-sitemap.xml",
+    "redirects": [],
+    "contentType": "text/xml; charset=UTF-8",
+    "contentLength": 2253,
+    "sha256": "6218025c1b09794db8c6a704c998ab175e94b44b00f927dfc7e67e75fc710aaa",
+    "savedAs": "raw/endpoints/post-sitemap.xml.xml",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:48 GMT",
+      "Content-Type": "text/xml; charset=UTF-8"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/prayer-timings/",
+    "path": "/prayer-timings/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/prayer-timings/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 206224,
+    "sha256": "e8ac635ad9f73d44aae55c586ffb6edcf9e933b858c8009a3122da928ab6987c",
+    "savedAs": "raw/html/prayer-timings.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:59 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:07:59 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/privacy-policy/",
+    "path": "/privacy-policy/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/privacy-policy/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 210999,
+    "sha256": "75969f8a02c93bcc51c3a1f26366a4323872d5268997529e2c22f0413fb2d6aa",
+    "savedAs": "raw/html/privacy-policy.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:42 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 19:44:18 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/programs/",
+    "path": "/programs/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/programs/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 230987,
+    "sha256": "3bc079c5a8304effd694dd8c9fde6554094a8f8998ce157dc82b10969d7c4312",
+    "savedAs": "raw/html/programs.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:59 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 21:07:59 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/robots.txt",
+    "path": "/robots.txt",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/robots.txt",
+    "redirects": [],
+    "contentType": "text/plain; charset=utf-8",
+    "contentLength": 161,
+    "sha256": "c33ad6ad65e49a2aa4131ff546147511fcf01f9204bd61614534569f428afc88",
+    "savedAs": "raw/endpoints/robots.txt.bin",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:46 GMT",
+      "Accept-Ranges": "bytes",
+      "Cache-Control": "max-age=31536000",
+      "Content-Type": "text/plain; charset=utf-8",
+      "Last-Modified": "Tue, 18 Aug 2026 20:02:19 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/sitemap.xml",
+    "path": "/sitemap.xml",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/sitemap.xml",
+    "redirects": [],
+    "contentType": "text/xml; charset=UTF-8",
+    "contentLength": 967,
+    "sha256": "6665ade160528462e12b125f4c5fe76b17ccc7018a08ba1c397e9f066e38b953",
+    "savedAs": "raw/endpoints/sitemap.xml.xml",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:47 GMT",
+      "Content-Type": "text/xml; charset=UTF-8"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/terms-of-use/",
+    "path": "/terms-of-use/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/terms-of-use/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 208441,
+    "sha256": "f68b911524799c793af6f76b1bf3bd6f422cf3f889d702211eae823c2c11efe3",
+    "savedAs": "raw/html/terms-of-use.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:48 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 20:42:36 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/tribe_events-sitemap.xml",
+    "path": "/tribe_events-sitemap.xml",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/tribe_events-sitemap.xml",
+    "redirects": [],
+    "contentType": "text/xml; charset=UTF-8",
+    "contentLength": 35885,
+    "sha256": "8be5f4b1df721433064ef0759c0ab1a2d440bbcf5976e0df467519106c373d81",
+    "savedAs": "raw/endpoints/tribe_events-sitemap.xml.xml",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:03:49 GMT",
+      "Content-Type": "text/xml; charset=UTF-8"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/videos/",
+    "path": "/videos/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/videos/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 307208,
+    "sha256": "cfb73c60e5126a722edb3a33b3b65877802bd45e312324a395d73976c55e0aaa",
+    "savedAs": "raw/html/videos.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:49 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 20:42:17 GMT"
+    }
+  },
+  {
+    "url": "https://www.husaynia.org/ziarat-e-ashura/",
+    "path": "/ziarat-e-ashura/",
+    "status": 200,
+    "finalUrl": "https://www.husaynia.org/ziarat-e-ashura/",
+    "redirects": [],
+    "contentType": "text/html; charset=UTF-8",
+    "contentLength": 324739,
+    "sha256": "e38c5a292382b1858ad99f0406bb30412b9e3742140c06af53ed4955e39a24e7",
+    "savedAs": "raw/html/ziarat-e-ashura.html",
+    "error": null,
+    "headers": {
+      "Date": "Tue, 18 Aug 2026 21:07:49 GMT",
+      "Content-Type": "text/html; charset=UTF-8",
+      "Last-Modified": "Tue, 18 Aug 2026 20:42:47 GMT"
+    }
+  }
+]

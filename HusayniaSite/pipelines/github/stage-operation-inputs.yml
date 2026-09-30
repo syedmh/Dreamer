@@ -1,0 +1,119 @@
+{
+  "name": "T21 disabled attested stage operation inputs",
+  "on": {
+    "workflow_call": {
+      "inputs": {
+        "stage": { "required": true, "type": "string" },
+        "expectedAppSha256": { "required": true, "type": "string" },
+        "sourceReleaseRunId": { "required": true, "type": "string" },
+        "ctoApprovalReference": { "required": false, "type": "string", "default": "" }
+      }
+    }
+  },
+  "permissions": {},
+  "jobs": {
+    "prepare": {
+      "if": "${{ inputs.stage == 'Development' || inputs.stage == 'Staging' || inputs.stage == 'Production' }}",
+      "permissions": {
+        "actions": "read",
+        "attestations": "write",
+        "contents": "read",
+        "id-token": "write"
+      },
+      "runs-on": "ubuntu-24.04",
+      "environment": {
+        "name": "${{ inputs.stage == 'Production' && 'Husaynia-Production' || format('Husaynia-{0}-Operations', inputs.stage) }}"
+      },
+      "env": {
+        "HUSAYNIA_REPOSITORY_ROOT": "${{ github.workspace }}/HusayniaSite"
+      },
+      "defaults": {
+        "run": {
+          "shell": "pwsh",
+          "working-directory": "HusayniaSite"
+        }
+      },
+      "outputs": {
+        "artifactName": "${{ steps.producer.outputs.artifact-name }}"
+      },
+      "steps": [
+        {
+          "name": "Checkout exact caller source for producer manifest writer",
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "${{ github.sha }}",
+            "persist-credentials": false,
+            "fetch-depth": 1
+          }
+        },
+        {
+          "name": "Validate canonical Husaynia checkout root",
+          "run": "$workspace = (Resolve-Path -LiteralPath $env:GITHUB_WORKSPACE).Path; $root = (Resolve-Path -LiteralPath $env:HUSAYNIA_REPOSITORY_ROOT).Path; $expected = Join-Path $workspace 'HusayniaSite'; if ($root -cne $expected -or -not $root.StartsWith($workspace + [IO.Path]::DirectorySeparatorChar, [StringComparison]::Ordinal) -or -not (Test-Path -LiteralPath (Join-Path $root 'HusayniaSite.sln') -PathType Leaf) -or -not (Test-Path -LiteralPath (Join-Path $root 'eng') -PathType Container) -or -not (Test-Path -LiteralPath (Join-Path $root 'pipelines') -PathType Container)) { throw 'T21 canonical Dreamer/HusayniaSite checkout root validation failed.' }"
+        },
+        {
+          "name": "Resolve completed release C6 provenance",
+          "env": {
+            "GITHUB_TOKEN": "${{ github.token }}",
+            "T21_STAGE": "${{ inputs.stage }}",
+            "T21_EXPECTED_APP_SHA256": "${{ inputs.expectedAppSha256 }}",
+            "T21_SOURCE_RELEASE_RUN_ID": "${{ inputs.sourceReleaseRunId }}",
+            "T21_TRUSTED_BUNDLE_SHA256": "${{ vars.T21_TRUSTED_BUNDLE_SHA256 }}",
+            "T21_STAGE_TARGET_METADATA_JSON": "${{ vars.T21_STAGE_TARGET_METADATA_JSON }}",
+            "T21_CTO_APPROVAL_REFERENCE": "${{ inputs.ctoApprovalReference }}"
+          },
+          "run": "$policy = Get-Content -LiteralPath (Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'pipelines/config/promotion-policy.json') -Raw | ConvertFrom-Json; $caller = @($policy.t21ProvenanceContract.callerMatrix | Where-Object { [string]$_.stage -ceq $env:T21_STAGE -and [string]$_.workflowRef -ceq $env:GITHUB_WORKFLOW_REF }); $approvalValid = if ($env:T21_STAGE -ceq 'Production') { $env:T21_CTO_APPROVAL_REFERENCE -match '^[A-Za-z0-9][A-Za-z0-9._:/#-]{0,127}$' } else { [string]::IsNullOrWhiteSpace($env:T21_CTO_APPROVAL_REFERENCE) }; if ($caller.Count -ne 1 -or $env:T21_SOURCE_RELEASE_RUN_ID -notmatch '^[1-9][0-9]*$' -or $env:T21_EXPECTED_APP_SHA256 -notmatch '^[a-f0-9]{64}$' -or $env:T21_TRUSTED_BUNDLE_SHA256 -notmatch '^[a-f0-9]{64}$' -or [string]::IsNullOrWhiteSpace($env:T21_STAGE_TARGET_METADATA_JSON) -or -not $approvalValid) { throw 'T21 prepared-input release, caller, stage, target, or approval request is malformed.' }; & (Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'eng/promotion/Resolve-GitHubArtifactProvenance.ps1') -ExpectedRole release-c6 -RunId $env:T21_SOURCE_RELEASE_RUN_ID -ConsumerRunId $env:GITHUB_RUN_ID -Stage $env:T21_STAGE -ApplicationSha256 $env:T21_EXPECTED_APP_SHA256 -BundleSha256 $env:T21_TRUSTED_BUNDLE_SHA256 -OutputRoot (Join-Path $env:RUNNER_TEMP 'release') -PolicyPath (Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'pipelines/config/promotion-policy.json'); if ($LASTEXITCODE -ne 0) { throw 'T21 prepared-input completed release provenance resolution failed.' }; [IO.File]::WriteAllText((Join-Path $env:RUNNER_TEMP 'stage-target.json'), $env:T21_STAGE_TARGET_METADATA_JSON, [Text.UTF8Encoding]::new($false))"
+        },
+        {
+          "name": "Generate inert role-derived prepared input reports and bundle",
+          "env": {
+            "T21_STAGE": "${{ inputs.stage }}",
+            "T21_EXPECTED_APP_SHA256": "${{ inputs.expectedAppSha256 }}",
+            "T21_CTO_APPROVAL_REFERENCE": "${{ inputs.ctoApprovalReference }}",
+            "T21_HEALTH_ENDPOINT": "${{ vars.T21_HEALTH_ENDPOINT }}",
+            "T21_READONLY_PROBE_HOST": "${{ vars.T21_READONLY_PROBE_HOST }}",
+            "T21_BACKUP_RECORD_ENDPOINT": "${{ vars.T21_BACKUP_RECORD_ENDPOINT }}",
+            "T21_RESTORE_VALIDATION_ENDPOINT": "${{ vars.T21_RESTORE_VALIDATION_ENDPOINT }}",
+            "T21_ROLLBACK_REFERENCE_ENDPOINT": "${{ vars.T21_ROLLBACK_REFERENCE_ENDPOINT }}",
+            "T21_PERFORMANCE_ENDPOINT": "${{ vars.T21_PERFORMANCE_ENDPOINT }}",
+            "T21_PERFORMANCE_SAMPLE_COUNT": "${{ vars.T21_PERFORMANCE_SAMPLE_COUNT }}",
+            "T21_PERFORMANCE_MAX_P95_MILLISECONDS": "${{ vars.T21_PERFORMANCE_MAX_P95_MILLISECONDS }}",
+            "T21_SANDBOX_ENDPOINTS_JSON": "${{ vars.T21_SANDBOX_ENDPOINTS_JSON }}",
+            "T21_ACCESSIBILITY_PROJECT_PATH": "${{ vars.T21_ACCESSIBILITY_PROJECT_PATH }}",
+            "T21_VISUAL_PROJECT_PATH": "${{ vars.T21_VISUAL_PROJECT_PATH }}",
+            "T21_VISUAL_BASELINE_MANIFEST_PATH": "${{ vars.T21_VISUAL_BASELINE_MANIFEST_PATH }}",
+            "T21_STAGE_READONLY_PROBE_TOKEN": "${{ secrets.T21_STAGE_READONLY_PROBE_TOKEN }}"
+          },
+          "run": "$output = Join-Path $env:RUNNER_TEMP 'stage-operation-inputs'; New-Item -ItemType Directory -Path $output -Force | Out-Null; $targetPath = Join-Path $env:RUNNER_TEMP 'stage-target.json'; $target = Get-Content -LiteralPath $targetPath -Raw | ConvertFrom-Json; $policyPath = Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'pipelines/config/promotion-policy.json'; $policy = Get-Content -LiteralPath $policyPath -Raw | ConvertFrom-Json; $stagePolicy = @($policy.stages | Where-Object { [string]$_.name -ceq $env:T21_STAGE }); if ($stagePolicy.Count -ne 1) { throw 'T21 prepared-input stage policy is not unique.' }; $reportTypes = @($stagePolicy[0].requiredEvidence | ForEach-Object { [IO.Path]::GetFileNameWithoutExtension([string]$_) } | Where-Object { $_ -notin @('configuration','migration-preflight','migration-apply','change-record') }); $reportTypes = @(@($reportTypes | Where-Object { $_ -ceq 'backup' }) + @($reportTypes | Where-Object { $_ -cne 'backup' })); $backupReportPath = if ($reportTypes -contains 'backup') { Join-Path $output 'source-backup.json' } else { '' }; foreach ($type in $reportTypes) { & (Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'eng/promotion/New-StageOperationReport.ps1') -Stage $env:T21_STAGE -EvidenceType $type -ExpectedAppSha256 $env:T21_EXPECTED_APP_SHA256 -ReleaseVerifiedProvenancePath (Join-Path $env:RUNNER_TEMP 'release/verified-provenance.json') -StageTargetMetadataPath $targetPath -HealthEndpoint $env:T21_HEALTH_ENDPOINT -ReadOnlyProbeHost $env:T21_READONLY_PROBE_HOST -BackupRecordEndpoint $env:T21_BACKUP_RECORD_ENDPOINT -RestoreValidationEndpoint $env:T21_RESTORE_VALIDATION_ENDPOINT -PerformanceEndpoint $env:T21_PERFORMANCE_ENDPOINT -PerformanceSampleCount ([int]$env:T21_PERFORMANCE_SAMPLE_COUNT) -PerformanceMaxP95Milliseconds ([int]$env:T21_PERFORMANCE_MAX_P95_MILLISECONDS) -RollbackReferenceEndpoint $env:T21_ROLLBACK_REFERENCE_ENDPOINT -SandboxEndpointsJson $env:T21_SANDBOX_ENDPOINTS_JSON -AccessibilityProjectPath $env:T21_ACCESSIBILITY_PROJECT_PATH -VisualProjectPath $env:T21_VISUAL_PROJECT_PATH -VisualBaselineManifestPath $env:T21_VISUAL_BASELINE_MANIFEST_PATH -BackupReportPath $backupReportPath -OutputPath (Join-Path $output \"source-$type.json\") -PolicyPath $policyPath; if ($LASTEXITCODE -ne 0) { throw \"T21 prepared-input source report failed: $type\" } }; & (Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'eng/promotion/New-StageOperationInputBundle.ps1') -Stage $env:T21_STAGE -ExpectedAppSha256 $env:T21_EXPECTED_APP_SHA256 -ReleaseVerifiedProvenancePath (Join-Path $env:RUNNER_TEMP 'release/verified-provenance.json') -StageTargetMetadataPath $targetPath -DataIsolationKey $target.dataIsolationKey -ProviderModesJson ($target.providerModes | ConvertTo-Json -Compress) -HealthEndpoint $env:T21_HEALTH_ENDPOINT -CtoApprovalReference $env:T21_CTO_APPROVAL_REFERENCE -OutputRoot $output -PolicyPath $policyPath; if ($LASTEXITCODE -ne 0) { throw 'T21 prepared-input v2.1 bundle validation failed.' }"
+        },
+        {
+          "name": "Create canonical stage-input producer manifest",
+          "id": "producer",
+          "env": {
+            "T21_STAGE": "${{ inputs.stage }}",
+            "T21_EXPECTED_APP_SHA256": "${{ inputs.expectedAppSha256 }}",
+            "T21_TRUSTED_BUNDLE_SHA256": "${{ vars.T21_TRUSTED_BUNDLE_SHA256 }}",
+            "T21_STAGE_INPUTS_WORKFLOW_REF": "${{ vars.T21_STAGE_INPUTS_WORKFLOW_REF }}"
+          },
+          "run": "$release = Get-Content -LiteralPath (Join-Path $env:RUNNER_TEMP 'release/verified-provenance.json') -Raw | ConvertFrom-Json -DateKind String; $releaseRoot = Join-Path (Join-Path $env:RUNNER_TEMP 'release/artifact') ([string]$release.artifact.name); $releaseManifest = Join-Path $releaseRoot 'release/release-manifest.json'; $root = Join-Path $env:RUNNER_TEMP 'stage-operation-inputs'; & (Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'eng/promotion/New-T21ProducerManifest.ps1') -ArtifactRoot $root -ProducerRole stage-operation-inputs -Stage $env:T21_STAGE -ApplicationSha256 $env:T21_EXPECTED_APP_SHA256 -BundleSha256 $env:T21_TRUSTED_BUNDLE_SHA256 -ReleaseManifestSha256 (Get-FileHash -LiteralPath $releaseManifest -Algorithm SHA256).Hash.ToLowerInvariant() -ReleaseCommitSha $release.run.commitSha -ReleaseRunId $release.run.runId -ReleaseRunAttempt $release.run.runAttempt -ProducerRunId $env:GITHUB_RUN_ID -ProducerRunAttempt $env:GITHUB_RUN_ATTEMPT -ProducerCommitSha $env:GITHUB_SHA -TopLevelCallerWorkflowRef $env:GITHUB_WORKFLOW_REF -ProducerWorkflowRef $env:T21_STAGE_INPUTS_WORKFLOW_REF -PolicyPath (Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'pipelines/config/promotion-policy.json'); if ($LASTEXITCODE -ne 0) { throw 'T21 canonical stage-input producer manifest creation failed.' }; \"artifact-name=stage-operation-inputs-$($env:T21_STAGE.ToLowerInvariant())-$env:T21_EXPECTED_APP_SHA256\" | Add-Content -LiteralPath $env:GITHUB_OUTPUT -Encoding utf8"
+        },
+        {
+          "name": "Upload canonical stage-input producer artifact",
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "${{ steps.producer.outputs.artifact-name }}",
+            "path": "${{ runner.temp }}/stage-operation-inputs",
+            "if-no-files-found": "error",
+            "overwrite": false
+          }
+        },
+        {
+          "name": "Attest canonical stage-input producer manifest",
+          "uses": "actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be",
+          "with": {
+            "subject-path": "${{ runner.temp }}/stage-operation-inputs/t21-producer-manifest.json"
+          }
+        }
+      ]
+    }
+  }
+}

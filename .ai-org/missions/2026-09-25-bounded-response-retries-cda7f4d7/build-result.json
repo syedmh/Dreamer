@@ -1,0 +1,16 @@
+{
+  "development": "Implemented opt-in bounded Azure HTTP-response retries and process/watch --retry-failed-variants.",
+  "activeConfiguration": {"max_attempts": 4, "initial_delay_seconds": 10, "max_delay_seconds": 120, "requests_per_minute": 2},
+  "preserved": ["Current prompt text", "Successful variants", "Historical attempt rows and lifetime count", "Source images", "Existing database format"],
+  "recovery": "Explicit recovery validates recorded response/provenance and exact source version, preserves immutable transition audits, and adopts current request settings transactionally.",
+  "buildEvidence": [
+    "python -m compileall -q .\\src\\tcfcomic: exit 0",
+    "CLI root/process/watch help: exit 0",
+    "Read-only active configuration validation: exit 0",
+    "python -m pip wheel --no-deps --no-build-isolation --no-index: Successfully built tcfcomic"
+  ],
+  "verificationScope": "Development and build only. Runtime behavior has not been tested.",
+  "paused": ["Tests", "Code review", "Security review", "QA", "Final judgment"],
+  "liveExecution": "No image submissions, authentication, queue reset or historical job recovery performed.",
+  "handoffCommand": "python -m tcfcomic process --config .\\config.azure.interactive.yaml --retry-failed-variants .\\incoming\\DSC_5326.JPG"
+}

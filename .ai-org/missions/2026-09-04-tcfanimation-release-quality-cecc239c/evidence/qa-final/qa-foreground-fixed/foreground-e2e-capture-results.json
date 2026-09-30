@@ -1,0 +1,2351 @@
+{
+  "executable": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\TCFAnimation\\Build\\TCFAnimation.exe",
+  "exeBytes": 100185624,
+  "exeSha256": "6C1EEA789E89897BECFCD6A90A5ABDB4B591E162EF1C1E780FDAD82E3B83C96F",
+  "interaction": "Win32 SendInput into verified foreground HWND; clipboard CF_UNICODETEXT paste",
+  "screenshots": [
+    {
+      "name": "directional-idle",
+      "pid": 5716,
+      "hwnd": 21763778,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "6E10453316B414305710DE84E0423BFA4586E0267C926582FF31E3342B77CDE4",
+      "foregroundPid": 5716,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\directional-idle.png"
+    },
+    {
+      "name": "directional-left-turn",
+      "pid": 5716,
+      "hwnd": 21763778,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "A95BD24688BD5FDC3511C0BA5671675692F07334A276E38050F38D2788DCC5F1",
+      "foregroundPid": 5716,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\directional-left-turn.png"
+    },
+    {
+      "name": "directional-left-walk",
+      "pid": 5716,
+      "hwnd": 21763778,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "4E2A036669F2E2BE654B5356F66206D54DCD7F12396D4F592C5DDEF51C2CDA39",
+      "foregroundPid": 5716,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\directional-left-walk.png"
+    },
+    {
+      "name": "directional-left-edge",
+      "pid": 5716,
+      "hwnd": 21763778,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "2377AE47EAA5E7258A605FB667D8838263E4F9E468765A6B92BE2DC10214FB76",
+      "foregroundPid": 5716,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\directional-left-edge.png"
+    },
+    {
+      "name": "directional-left-return",
+      "pid": 5716,
+      "hwnd": 21763778,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "2377AE47EAA5E7258A605FB667D8838263E4F9E468765A6B92BE2DC10214FB76",
+      "foregroundPid": 5716,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\directional-left-return.png"
+    },
+    {
+      "name": "directional-right-walk-before-reversal",
+      "pid": 5716,
+      "hwnd": 21763778,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "63F88E941F69CAC610A3C50635DBB70DD66C30FF06CACEF19B298D84352184B2",
+      "foregroundPid": 5716,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\directional-right-walk-before-reversal.png"
+    },
+    {
+      "name": "directional-reversal",
+      "pid": 5716,
+      "hwnd": 21763778,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "CE4D2157493EB91ED33D6E074D591EDE8196369883564663C4220AC143477121",
+      "foregroundPid": 5716,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\directional-reversal.png"
+    },
+    {
+      "name": "directional-both-held-neutral",
+      "pid": 5716,
+      "hwnd": 21763778,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "CE4D2157493EB91ED33D6E074D591EDE8196369883564663C4220AC143477121",
+      "foregroundPid": 5716,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\directional-both-held-neutral.png"
+    },
+    {
+      "name": "directional-right-edge",
+      "pid": 5716,
+      "hwnd": 21763778,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "8584E97659798DCDE674BB6C1C66A536C54803AE8EEDC6EA316DCCAF39D85FB6",
+      "foregroundPid": 5716,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\directional-right-edge.png"
+    },
+    {
+      "name": "directional-right-return",
+      "pid": 5716,
+      "hwnd": 21763778,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "8584E97659798DCDE674BB6C1C66A536C54803AE8EEDC6EA316DCCAF39D85FB6",
+      "foregroundPid": 5716,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\directional-right-return.png"
+    },
+    {
+      "name": "speed-min",
+      "pid": 64980,
+      "hwnd": 2758514,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "6E10453316B414305710DE84E0423BFA4586E0267C926582FF31E3342B77CDE4",
+      "foregroundPid": 64980,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\speed-min.png"
+    },
+    {
+      "name": "speed-min-walk",
+      "pid": 64980,
+      "hwnd": 2758514,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "8CDD3FAD75C17307D67E2B4A8F566BDDDFCE672044FEB84388CDCE286C4D8021",
+      "foregroundPid": 64980,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\speed-min-walk.png"
+    },
+    {
+      "name": "speed-max",
+      "pid": 64980,
+      "hwnd": 2758514,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "9515C49371E18EBB1CC1D79510603193D2286A34BC8580833082F9430DC74D48",
+      "foregroundPid": 64980,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\speed-max.png"
+    },
+    {
+      "name": "speed-max-walk",
+      "pid": 64980,
+      "hwnd": 2758514,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "07CD82D207E9B9EC0ED4FDC6BE496BE1E6052961753CE2DD5EE282934C0BAD98",
+      "foregroundPid": 64980,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\speed-max-walk.png"
+    },
+    {
+      "name": "w-noop-before",
+      "pid": 64980,
+      "hwnd": 2758514,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "2377AE47EAA5E7258A605FB667D8838263E4F9E468765A6B92BE2DC10214FB76",
+      "foregroundPid": 64980,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\w-noop-before.png"
+    },
+    {
+      "name": "w-noop-after",
+      "pid": 64980,
+      "hwnd": 2758514,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "2377AE47EAA5E7258A605FB667D8838263E4F9E468765A6B92BE2DC10214FB76",
+      "foregroundPid": 64980,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\w-noop-after.png"
+    },
+    {
+      "name": "clap-sample-000",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "9A70B58DE086A5B39D52F3DE4BE320897464996A784E9EBBD843944A1D3BB5D5",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-000.png"
+    },
+    {
+      "name": "clap-sample-001",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "5E4A03B8B4037608BF55BE3427FFA0D188FC26BC9CDCA124DB2201B7AC67FD00",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-001.png"
+    },
+    {
+      "name": "clap-sample-002",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "D3CFBBE473A6F792140F4E9189E33C9439F361FD5EE6E03329EAAEB32001925D",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-002.png"
+    },
+    {
+      "name": "clap-sample-003",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "4F2280B8A8F357F1E769B9C51D62466E0C3AFD408ABD013CC69ACA44F99163ED",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-003.png"
+    },
+    {
+      "name": "clap-sample-004",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "89E01CAA6E2EE0AEA602CE2F95B226BC93BF11E98017896BB12B60AF85821370",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-004.png"
+    },
+    {
+      "name": "clap-sample-005",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "4F2280B8A8F357F1E769B9C51D62466E0C3AFD408ABD013CC69ACA44F99163ED",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-005.png"
+    },
+    {
+      "name": "clap-sample-006",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "D3CFBBE473A6F792140F4E9189E33C9439F361FD5EE6E03329EAAEB32001925D",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-006.png"
+    },
+    {
+      "name": "clap-sample-007",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "5E4A03B8B4037608BF55BE3427FFA0D188FC26BC9CDCA124DB2201B7AC67FD00",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-007.png"
+    },
+    {
+      "name": "clap-sample-008",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "D3CFBBE473A6F792140F4E9189E33C9439F361FD5EE6E03329EAAEB32001925D",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-008.png"
+    },
+    {
+      "name": "clap-sample-009",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "4F2280B8A8F357F1E769B9C51D62466E0C3AFD408ABD013CC69ACA44F99163ED",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-009.png"
+    },
+    {
+      "name": "clap-sample-010",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "89E01CAA6E2EE0AEA602CE2F95B226BC93BF11E98017896BB12B60AF85821370",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-010.png"
+    },
+    {
+      "name": "clap-sample-011",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "4F2280B8A8F357F1E769B9C51D62466E0C3AFD408ABD013CC69ACA44F99163ED",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-011.png"
+    },
+    {
+      "name": "clap-sample-012",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "D3CFBBE473A6F792140F4E9189E33C9439F361FD5EE6E03329EAAEB32001925D",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-012.png"
+    },
+    {
+      "name": "clap-sample-013",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "5E4A03B8B4037608BF55BE3427FFA0D188FC26BC9CDCA124DB2201B7AC67FD00",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-013.png"
+    },
+    {
+      "name": "clap-sample-014",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "9A70B58DE086A5B39D52F3DE4BE320897464996A784E9EBBD843944A1D3BB5D5",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-014.png"
+    },
+    {
+      "name": "clap-sample-015",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "6E10453316B414305710DE84E0423BFA4586E0267C926582FF31E3342B77CDE4",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-015.png"
+    },
+    {
+      "name": "clap-sample-016",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "6E10453316B414305710DE84E0423BFA4586E0267C926582FF31E3342B77CDE4",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-016.png"
+    },
+    {
+      "name": "clap-sample-017",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "6E10453316B414305710DE84E0423BFA4586E0267C926582FF31E3342B77CDE4",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-sample-017.png"
+    },
+    {
+      "name": "clap-return-front",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "6E10453316B414305710DE84E0423BFA4586E0267C926582FF31E3342B77CDE4",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-return-front.png"
+    },
+    {
+      "name": "clap-before-interrupt",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "89E01CAA6E2EE0AEA602CE2F95B226BC93BF11E98017896BB12B60AF85821370",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-before-interrupt.png"
+    },
+    {
+      "name": "clap-direction-interrupted",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "06CDB64A337076F6994CFA75BEB74286CC5F05B9C9B10E960CFA18CE141658AA",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-direction-interrupted.png"
+    },
+    {
+      "name": "clap-c-ignored-moving",
+      "pid": 63228,
+      "hwnd": 57085614,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "8BB2EE1A1905761B228DD79ED5ACEBA2ABAEFDDC12B20F76FA91E18FE0141613",
+      "foregroundPid": 63228,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\clap-c-ignored-moving.png"
+    },
+    {
+      "name": "cross-entry-00",
+      "pid": 61444,
+      "hwnd": 6625130,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "0A21C9337905F9DC00092239B6F25FDFD6C3E0983CB2B9C41D6C6B1CFE32015D",
+      "foregroundPid": 61444,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\cross-entry-00.png"
+    },
+    {
+      "name": "cross-entry-01",
+      "pid": 61444,
+      "hwnd": 6625130,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "79E1E3C6E91CF8B4F149DB3C9E06864DA055880EA42FDF482760606D09088CC0",
+      "foregroundPid": 61444,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\cross-entry-01.png"
+    },
+    {
+      "name": "cross-entry-02",
+      "pid": 61444,
+      "hwnd": 6625130,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "E0E7BD8EB63D413783202680A90EEC6DF9D385EF05A441A039A56D431A4C8CBE",
+      "foregroundPid": 61444,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\cross-entry-02.png"
+    },
+    {
+      "name": "cross-held",
+      "pid": 61444,
+      "hwnd": 6625130,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "E0E7BD8EB63D413783202680A90EEC6DF9D385EF05A441A039A56D431A4C8CBE",
+      "foregroundPid": 61444,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\cross-held.png"
+    },
+    {
+      "name": "cross-held-inputs-blocked",
+      "pid": 61444,
+      "hwnd": 6625130,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "E0E7BD8EB63D413783202680A90EEC6DF9D385EF05A441A039A56D431A4C8CBE",
+      "foregroundPid": 61444,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\cross-held-inputs-blocked.png"
+    },
+    {
+      "name": "cross-release-00",
+      "pid": 61444,
+      "hwnd": 6625130,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "2BEE5277C806361770F599DE9C4D56D97B62696EFB95EE651643FF75AA328B79",
+      "foregroundPid": 61444,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\cross-release-00.png"
+    },
+    {
+      "name": "cross-release-01",
+      "pid": 61444,
+      "hwnd": 6625130,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "539CD43204E0FB5E39FFC5AC573C6995B6D6A8D7A2B3150C5F23B6E95435E05A",
+      "foregroundPid": 61444,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\cross-release-01.png"
+    },
+    {
+      "name": "cross-release-02",
+      "pid": 61444,
+      "hwnd": 6625130,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "8A8DD3B2939923F8DF0935A46D201F6D79B033F9D460441209A72E9E5ED9C89D",
+      "foregroundPid": 61444,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\cross-release-02.png"
+    },
+    {
+      "name": "cross-release-03",
+      "pid": 61444,
+      "hwnd": 6625130,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "7A9586F62B607C1AF20D72D07A8D3853717088F45471E5CB518C272F736236DB",
+      "foregroundPid": 61444,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\cross-release-03.png"
+    },
+    {
+      "name": "cross-release-04",
+      "pid": 61444,
+      "hwnd": 6625130,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "C6CDDF596FE447AE1EE071A39C0DDF63F640C0C8DB119A78304B47D2328960F9",
+      "foregroundPid": 61444,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\cross-release-04.png"
+    },
+    {
+      "name": "cross-release-05",
+      "pid": 61444,
+      "hwnd": 6625130,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "7B5CCC811C072F1F6D261DEEDBDAA27ACE4F8D6348F03226B2299E4A5B4F58DE",
+      "foregroundPid": 61444,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\cross-release-05.png"
+    },
+    {
+      "name": "cross-release-arrow-still-held",
+      "pid": 61444,
+      "hwnd": 6625130,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "6E10453316B414305710DE84E0423BFA4586E0267C926582FF31E3342B77CDE4",
+      "foregroundPid": 61444,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\cross-release-arrow-still-held.png"
+    },
+    {
+      "name": "cross-arrow-repress-moves",
+      "pid": 61444,
+      "hwnd": 6625130,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "0EA6DC0F0750A9C3A710C0049D3D9F28F8AF13E778E85AE7521392FB52A05017",
+      "foregroundPid": 61444,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\cross-arrow-repress-moves.png"
+    },
+    {
+      "name": "dialogue-empty-input",
+      "pid": 55356,
+      "hwnd": 16780876,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "134B057EA0EEB7AD88F7B77D060F6E2A46406D27177D95623BEC7984B15A4B60",
+      "foregroundPid": 55356,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-empty-input.png"
+    },
+    {
+      "name": "dialogue-exact-input",
+      "pid": 55356,
+      "hwnd": 16780876,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "079B989E2232B09CED232263B3302B934B30FF281F772192BBDCB344C7CFB6DA",
+      "foregroundPid": 55356,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-exact-input.png"
+    },
+    {
+      "name": "dialogue-controls-before",
+      "pid": 55356,
+      "hwnd": 16780876,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "0919E1866E8B2894B8A02E31A182598459DF84E92849CCFE141D0E7FD95268C4",
+      "foregroundPid": 55356,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-controls-before.png"
+    },
+    {
+      "name": "dialogue-controls-after",
+      "pid": 55356,
+      "hwnd": 16780876,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "7F76D55B923DF7D6770073C3746A4A5A298EFF61B38FA6EB1CBC60A46497FD8E",
+      "foregroundPid": 55356,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-controls-after.png"
+    },
+    {
+      "name": "dialogue-exact-submitted",
+      "pid": 55356,
+      "hwnd": 16780876,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "18B035B3BC5BD8BF63B55BF25BF322DF340D3A4F05E1DE90FE6C7501AADCF899",
+      "foregroundPid": 55356,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-exact-submitted.png"
+    },
+    {
+      "name": "dialogue-whitespace-submitted",
+      "pid": 55356,
+      "hwnd": 16780876,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "18B035B3BC5BD8BF63B55BF25BF322DF340D3A4F05E1DE90FE6C7501AADCF899",
+      "foregroundPid": 55356,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-whitespace-submitted.png"
+    },
+    {
+      "name": "dialogue-cancelled",
+      "pid": 55356,
+      "hwnd": 16780876,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "18B035B3BC5BD8BF63B55BF25BF322DF340D3A4F05E1DE90FE6C7501AADCF899",
+      "foregroundPid": 55356,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-cancelled.png"
+    },
+    {
+      "name": "dialogue-hidden-p",
+      "pid": 55356,
+      "hwnd": 16780876,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "6E10453316B414305710DE84E0423BFA4586E0267C926582FF31E3342B77CDE4",
+      "foregroundPid": 55356,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-hidden-p.png"
+    },
+    {
+      "name": "dialogue-alt-enter-closed-windowed",
+      "pid": 10616,
+      "hwnd": 3348338,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "6E10453316B414305710DE84E0423BFA4586E0267C926582FF31E3342B77CDE4",
+      "foregroundPid": 10616,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-alt-enter-closed-windowed.png"
+    },
+    {
+      "name": "dialogue-alt-enter-closed-fullscreen",
+      "pid": 10616,
+      "hwnd": 3348338,
+      "clientRect": [
+        0,
+        0,
+        1922,
+        1200
+      ],
+      "width": 1922,
+      "height": 1200,
+      "sha256": "02233BC58A574B082DAB0F352A5B55E6C5CA1D0330E7E653F50764EF0AD56EBB",
+      "foregroundPid": 10616,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-alt-enter-closed-fullscreen.png"
+    },
+    {
+      "name": "dialogue-alt-enter-closed-back-windowed",
+      "pid": 10616,
+      "hwnd": 3348338,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "6E10453316B414305710DE84E0423BFA4586E0267C926582FF31E3342B77CDE4",
+      "foregroundPid": 10616,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-alt-enter-closed-back-windowed.png"
+    },
+    {
+      "name": "dialogue-f11-open-fullscreen",
+      "pid": 10616,
+      "hwnd": 3348338,
+      "clientRect": [
+        0,
+        0,
+        1922,
+        1200
+      ],
+      "width": 1922,
+      "height": 1200,
+      "sha256": "0559F1255CEBA9D16C40BA6DD780C44063DA5C89E5875B3C1BD05912E564D2A7",
+      "foregroundPid": 10616,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-f11-open-fullscreen.png"
+    },
+    {
+      "name": "dialogue-alt-enter-open-windowed",
+      "pid": 10616,
+      "hwnd": 3348338,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "5814060ACE77D8D1AED904CA461C8E6BF621A23158BB3B3A3B18BAD5D0FB964E",
+      "foregroundPid": 10616,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-alt-enter-open-windowed.png"
+    },
+    {
+      "name": "dialogue-alt-enter-open-fullscreen",
+      "pid": 10616,
+      "hwnd": 3348338,
+      "clientRect": [
+        0,
+        0,
+        1922,
+        1200
+      ],
+      "width": 1922,
+      "height": 1200,
+      "sha256": "0559F1255CEBA9D16C40BA6DD780C44063DA5C89E5875B3C1BD05912E564D2A7",
+      "foregroundPid": 10616,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-alt-enter-open-fullscreen.png"
+    },
+    {
+      "name": "dialogue-before-first-escape-fullscreen",
+      "pid": 10616,
+      "hwnd": 3348338,
+      "clientRect": [
+        0,
+        0,
+        1922,
+        1200
+      ],
+      "width": 1922,
+      "height": 1200,
+      "sha256": "0559F1255CEBA9D16C40BA6DD780C44063DA5C89E5875B3C1BD05912E564D2A7",
+      "foregroundPid": 10616,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-before-first-escape-fullscreen.png"
+    },
+    {
+      "name": "dialogue-first-escape-cancel-only",
+      "pid": 10616,
+      "hwnd": 3348338,
+      "clientRect": [
+        0,
+        0,
+        1922,
+        1200
+      ],
+      "width": 1922,
+      "height": 1200,
+      "sha256": "02233BC58A574B082DAB0F352A5B55E6C5CA1D0330E7E653F50764EF0AD56EBB",
+      "foregroundPid": 10616,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-first-escape-cancel-only.png"
+    },
+    {
+      "name": "dialogue-second-escape-exits-fullscreen",
+      "pid": 10616,
+      "hwnd": 3348338,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "6E10453316B414305710DE84E0423BFA4586E0267C926582FF31E3342B77CDE4",
+      "foregroundPid": 10616,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-second-escape-exits-fullscreen.png"
+    },
+    {
+      "name": "dialogue-500-input",
+      "pid": 62696,
+      "hwnd": 30805682,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "3F1D44D52B93CFF23BA6BD2831636C13FD54B6467A1566B3EC6E29524A84BB4D",
+      "foregroundPid": 62696,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-500-input.png"
+    },
+    {
+      "name": "dialogue-500-submitted",
+      "pid": 62696,
+      "hwnd": 30805682,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "3AE652EF798F165925E8963AD9CFECE076124F16C8109EABB8AACD7A5B489687",
+      "foregroundPid": 62696,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-500-submitted.png"
+    },
+    {
+      "name": "dialogue-501-input",
+      "pid": 62696,
+      "hwnd": 30805682,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "3F1D44D52B93CFF23BA6BD2831636C13FD54B6467A1566B3EC6E29524A84BB4D",
+      "foregroundPid": 62696,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-501-input.png"
+    },
+    {
+      "name": "dialogue-501-submitted",
+      "pid": 62696,
+      "hwnd": 30805682,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "3AE652EF798F165925E8963AD9CFECE076124F16C8109EABB8AACD7A5B489687",
+      "foregroundPid": 62696,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-501-submitted.png"
+    },
+    {
+      "name": "dialogue-left-edge-windowed",
+      "pid": 50288,
+      "hwnd": 78713960,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "D3FB1766430DAB12756A541DDAB4A3E08AE79CD8A0DEC1F7BD7B13D3525C571C",
+      "foregroundPid": 50288,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-left-edge-windowed.png"
+    },
+    {
+      "name": "dialogue-left-edge-fullscreen",
+      "pid": 50288,
+      "hwnd": 78713960,
+      "clientRect": [
+        0,
+        0,
+        1922,
+        1200
+      ],
+      "width": 1922,
+      "height": 1200,
+      "sha256": "A73E26152936962180E24DED178D606DD3AFEDBC3C4D57AA4AD3ADB420867E58",
+      "foregroundPid": 50288,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-left-edge-fullscreen.png"
+    },
+    {
+      "name": "dialogue-right-edge-windowed",
+      "pid": 50288,
+      "hwnd": 78713960,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "29D33091C8318C3709D0A08E4F7C140171A8E47CF80C8E15C5F94D89D8AAB581",
+      "foregroundPid": 50288,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-right-edge-windowed.png"
+    },
+    {
+      "name": "dialogue-right-edge-fullscreen",
+      "pid": 50288,
+      "hwnd": 78713960,
+      "clientRect": [
+        0,
+        0,
+        1922,
+        1200
+      ],
+      "width": 1922,
+      "height": 1200,
+      "sha256": "E3E5D6DDE9F38E48620FD6A5E5C55F3A6F4C68075804CDAF50CB25A7A0913BE9",
+      "foregroundPid": 50288,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-right-edge-fullscreen.png"
+    },
+    {
+      "name": "dialogue-right-edge-back-windowed",
+      "pid": 50288,
+      "hwnd": 78713960,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "29D33091C8318C3709D0A08E4F7C140171A8E47CF80C8E15C5F94D89D8AAB581",
+      "foregroundPid": 50288,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\dialogue-right-edge-back-windowed.png"
+    },
+    {
+      "name": "viewport-1000x800-center",
+      "pid": 63644,
+      "hwnd": 13373232,
+      "clientRect": [
+        460,
+        170,
+        1460,
+        970
+      ],
+      "width": 1000,
+      "height": 800,
+      "sha256": "0146844EEE6B7FCAC2B53D18849A48CFE87F02E8793BD79BA506874A56E82BDA",
+      "foregroundPid": 63644,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\viewport-1000x800-center.png"
+    },
+    {
+      "name": "viewport-1000x800-right-dialogue",
+      "pid": 63644,
+      "hwnd": 13373232,
+      "clientRect": [
+        460,
+        170,
+        1460,
+        970
+      ],
+      "width": 1000,
+      "height": 800,
+      "sha256": "CA59811D881AB812C7F9D644D092FB056D431A0C70E6DF319EBDA651188FFAA8",
+      "foregroundPid": 63644,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\viewport-1000x800-right-dialogue.png"
+    },
+    {
+      "name": "viewport-1280x720-center",
+      "pid": 11404,
+      "hwnd": 23008962,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "6E10453316B414305710DE84E0423BFA4586E0267C926582FF31E3342B77CDE4",
+      "foregroundPid": 11404,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\viewport-1280x720-center.png"
+    },
+    {
+      "name": "viewport-1280x720-right-dialogue",
+      "pid": 11404,
+      "hwnd": 23008962,
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "61B083B7C7E9EDD8B2F94910CBCA249F52F9F3F19D4D6DE4834FFE40653C744E",
+      "foregroundPid": 11404,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\viewport-1280x720-right-dialogue.png"
+    },
+    {
+      "name": "viewport-1536x864-center",
+      "pid": 65540,
+      "hwnd": 79172712,
+      "clientRect": [
+        192,
+        138,
+        1728,
+        1002
+      ],
+      "width": 1536,
+      "height": 864,
+      "sha256": "3AFF351FBFA2DAC9B339A05938A9C9B0559FAF43777580305D2542C6F5B51025",
+      "foregroundPid": 65540,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\viewport-1536x864-center.png"
+    },
+    {
+      "name": "viewport-1536x864-right-dialogue",
+      "pid": 65540,
+      "hwnd": 79172712,
+      "clientRect": [
+        192,
+        138,
+        1728,
+        1002
+      ],
+      "width": 1536,
+      "height": 864,
+      "sha256": "D14C196A79748F6B744573788C15A00B6AA91E98838059DBBEAAFCB9BB97B04C",
+      "foregroundPid": 65540,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\viewport-1536x864-right-dialogue.png"
+    },
+    {
+      "name": "viewport-1536x960-center",
+      "pid": 40888,
+      "hwnd": 34933816,
+      "clientRect": [
+        192,
+        90,
+        1728,
+        1050
+      ],
+      "width": 1536,
+      "height": 960,
+      "sha256": "A29ADB533FFF9AA1B1F433707A0C7A99AE4B38F3BC0BBD37005EF90F222B428A",
+      "foregroundPid": 40888,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\viewport-1536x960-center.png"
+    },
+    {
+      "name": "viewport-1536x960-right-dialogue",
+      "pid": 40888,
+      "hwnd": 34933816,
+      "clientRect": [
+        192,
+        90,
+        1728,
+        1050
+      ],
+      "width": 1536,
+      "height": 960,
+      "sha256": "5DA357CEB1588D07D22799C4CD637D388A95EFDE6F5EFB5A42F66A20BB3F3343",
+      "foregroundPid": 40888,
+      "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\runtime\\viewport-1536x960-right-dialogue.png"
+    }
+  ],
+  "focusChecks": [
+    {
+      "label": "start-directional",
+      "expectedPid": 5716,
+      "expectedHwnd": 21763778,
+      "foregroundPid": 5716,
+      "foregroundHwnd": 21763778,
+      "passed": true
+    },
+    {
+      "label": "snap-directional-idle",
+      "expectedPid": 5716,
+      "expectedHwnd": 21763778,
+      "foregroundPid": 5716,
+      "foregroundHwnd": 21763778,
+      "passed": true
+    },
+    {
+      "label": "snap-directional-left-turn",
+      "expectedPid": 5716,
+      "expectedHwnd": 21763778,
+      "foregroundPid": 5716,
+      "foregroundHwnd": 21763778,
+      "passed": true
+    },
+    {
+      "label": "snap-directional-left-walk",
+      "expectedPid": 5716,
+      "expectedHwnd": 21763778,
+      "foregroundPid": 5716,
+      "foregroundHwnd": 21763778,
+      "passed": true
+    },
+    {
+      "label": "snap-directional-left-edge",
+      "expectedPid": 5716,
+      "expectedHwnd": 21763778,
+      "foregroundPid": 5716,
+      "foregroundHwnd": 21763778,
+      "passed": true
+    },
+    {
+      "label": "snap-directional-left-return",
+      "expectedPid": 5716,
+      "expectedHwnd": 21763778,
+      "foregroundPid": 5716,
+      "foregroundHwnd": 21763778,
+      "passed": true
+    },
+    {
+      "label": "snap-directional-right-walk-before-reversal",
+      "expectedPid": 5716,
+      "expectedHwnd": 21763778,
+      "foregroundPid": 5716,
+      "foregroundHwnd": 21763778,
+      "passed": true
+    },
+    {
+      "label": "snap-directional-reversal",
+      "expectedPid": 5716,
+      "expectedHwnd": 21763778,
+      "foregroundPid": 5716,
+      "foregroundHwnd": 21763778,
+      "passed": true
+    },
+    {
+      "label": "snap-directional-both-held-neutral",
+      "expectedPid": 5716,
+      "expectedHwnd": 21763778,
+      "foregroundPid": 5716,
+      "foregroundHwnd": 21763778,
+      "passed": true
+    },
+    {
+      "label": "snap-directional-right-edge",
+      "expectedPid": 5716,
+      "expectedHwnd": 21763778,
+      "foregroundPid": 5716,
+      "foregroundHwnd": 21763778,
+      "passed": true
+    },
+    {
+      "label": "snap-directional-right-return",
+      "expectedPid": 5716,
+      "expectedHwnd": 21763778,
+      "foregroundPid": 5716,
+      "foregroundHwnd": 21763778,
+      "passed": true
+    },
+    {
+      "label": "close-directional",
+      "expectedPid": 5716,
+      "expectedHwnd": 21763778,
+      "foregroundPid": 5716,
+      "foregroundHwnd": 21763778,
+      "passed": true
+    },
+    {
+      "label": "start-speed-w-noop",
+      "expectedPid": 64980,
+      "expectedHwnd": 2758514,
+      "foregroundPid": 64980,
+      "foregroundHwnd": 2758514,
+      "passed": true
+    },
+    {
+      "label": "snap-speed-min",
+      "expectedPid": 64980,
+      "expectedHwnd": 2758514,
+      "foregroundPid": 64980,
+      "foregroundHwnd": 2758514,
+      "passed": true
+    },
+    {
+      "label": "snap-speed-min-walk",
+      "expectedPid": 64980,
+      "expectedHwnd": 2758514,
+      "foregroundPid": 64980,
+      "foregroundHwnd": 2758514,
+      "passed": true
+    },
+    {
+      "label": "snap-speed-max",
+      "expectedPid": 64980,
+      "expectedHwnd": 2758514,
+      "foregroundPid": 64980,
+      "foregroundHwnd": 2758514,
+      "passed": true
+    },
+    {
+      "label": "snap-speed-max-walk",
+      "expectedPid": 64980,
+      "expectedHwnd": 2758514,
+      "foregroundPid": 64980,
+      "foregroundHwnd": 2758514,
+      "passed": true
+    },
+    {
+      "label": "snap-w-noop-before",
+      "expectedPid": 64980,
+      "expectedHwnd": 2758514,
+      "foregroundPid": 64980,
+      "foregroundHwnd": 2758514,
+      "passed": true
+    },
+    {
+      "label": "snap-w-noop-after",
+      "expectedPid": 64980,
+      "expectedHwnd": 2758514,
+      "foregroundPid": 64980,
+      "foregroundHwnd": 2758514,
+      "passed": true
+    },
+    {
+      "label": "close-speed-w-noop",
+      "expectedPid": 64980,
+      "expectedHwnd": 2758514,
+      "foregroundPid": 64980,
+      "foregroundHwnd": 2758514,
+      "passed": true
+    },
+    {
+      "label": "start-clap",
+      "expectedPid": 63228,
+      "expectedHwnd": 57085614,
+      "foregroundPid": 63228,
+      "foregroundHwnd": 57085614,
+      "passed": true
+    },
+    {
+      "label": "snap-clap-return-front",
+      "expectedPid": 63228,
+      "expectedHwnd": 57085614,
+      "foregroundPid": 63228,
+      "foregroundHwnd": 57085614,
+      "passed": true
+    },
+    {
+      "label": "snap-clap-before-interrupt",
+      "expectedPid": 63228,
+      "expectedHwnd": 57085614,
+      "foregroundPid": 63228,
+      "foregroundHwnd": 57085614,
+      "passed": true
+    },
+    {
+      "label": "snap-clap-direction-interrupted",
+      "expectedPid": 63228,
+      "expectedHwnd": 57085614,
+      "foregroundPid": 63228,
+      "foregroundHwnd": 57085614,
+      "passed": true
+    },
+    {
+      "label": "snap-clap-c-ignored-moving",
+      "expectedPid": 63228,
+      "expectedHwnd": 57085614,
+      "foregroundPid": 63228,
+      "foregroundHwnd": 57085614,
+      "passed": true
+    },
+    {
+      "label": "close-clap",
+      "expectedPid": 63228,
+      "expectedHwnd": 57085614,
+      "foregroundPid": 63228,
+      "foregroundHwnd": 57085614,
+      "passed": true
+    },
+    {
+      "label": "start-cross",
+      "expectedPid": 61444,
+      "expectedHwnd": 6625130,
+      "foregroundPid": 61444,
+      "foregroundHwnd": 6625130,
+      "passed": true
+    },
+    {
+      "label": "snap-cross-held",
+      "expectedPid": 61444,
+      "expectedHwnd": 6625130,
+      "foregroundPid": 61444,
+      "foregroundHwnd": 6625130,
+      "passed": true
+    },
+    {
+      "label": "snap-cross-held-inputs-blocked",
+      "expectedPid": 61444,
+      "expectedHwnd": 6625130,
+      "foregroundPid": 61444,
+      "foregroundHwnd": 6625130,
+      "passed": true
+    },
+    {
+      "label": "snap-cross-release-arrow-still-held",
+      "expectedPid": 61444,
+      "expectedHwnd": 6625130,
+      "foregroundPid": 61444,
+      "foregroundHwnd": 6625130,
+      "passed": true
+    },
+    {
+      "label": "snap-cross-arrow-repress-moves",
+      "expectedPid": 61444,
+      "expectedHwnd": 6625130,
+      "foregroundPid": 61444,
+      "foregroundHwnd": 6625130,
+      "passed": true
+    },
+    {
+      "label": "close-cross",
+      "expectedPid": 61444,
+      "expectedHwnd": 6625130,
+      "foregroundPid": 61444,
+      "foregroundHwnd": 6625130,
+      "passed": true
+    },
+    {
+      "label": "start-dialogue-text-lifecycle",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-empty-input",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "dialogue-exact-paste",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "dialogue-exact-copy",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-exact-input",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "dialogue-p-typeable-copy",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "dialogue-restore-exact",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-controls-before",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-controls-after",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-exact-submitted",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "dialogue-whitespace-paste",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "dialogue-whitespace-copy",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-whitespace-submitted",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "dialogue-cancel-paste",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-cancelled",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-hidden-p",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "close-dialogue-text-lifecycle",
+      "expectedPid": 55356,
+      "expectedHwnd": 16780876,
+      "foregroundPid": 55356,
+      "foregroundHwnd": 16780876,
+      "passed": true
+    },
+    {
+      "label": "start-dialogue-fullscreen-arbitration",
+      "expectedPid": 10616,
+      "expectedHwnd": 3348338,
+      "foregroundPid": 10616,
+      "foregroundHwnd": 3348338,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-alt-enter-closed-windowed",
+      "expectedPid": 10616,
+      "expectedHwnd": 3348338,
+      "foregroundPid": 10616,
+      "foregroundHwnd": 3348338,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-alt-enter-closed-fullscreen",
+      "expectedPid": 10616,
+      "expectedHwnd": 3348338,
+      "foregroundPid": 10616,
+      "foregroundHwnd": 3348338,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-alt-enter-closed-back-windowed",
+      "expectedPid": 10616,
+      "expectedHwnd": 3348338,
+      "foregroundPid": 10616,
+      "foregroundHwnd": 3348338,
+      "passed": true
+    },
+    {
+      "label": "dialogue-fullscreen-paste",
+      "expectedPid": 10616,
+      "expectedHwnd": 3348338,
+      "foregroundPid": 10616,
+      "foregroundHwnd": 3348338,
+      "passed": true
+    },
+    {
+      "label": "dialogue-fullscreen-copy-before",
+      "expectedPid": 10616,
+      "expectedHwnd": 3348338,
+      "foregroundPid": 10616,
+      "foregroundHwnd": 3348338,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-f11-open-fullscreen",
+      "expectedPid": 10616,
+      "expectedHwnd": 3348338,
+      "foregroundPid": 10616,
+      "foregroundHwnd": 3348338,
+      "passed": true
+    },
+    {
+      "label": "dialogue-f11-copy",
+      "expectedPid": 10616,
+      "expectedHwnd": 3348338,
+      "foregroundPid": 10616,
+      "foregroundHwnd": 3348338,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-alt-enter-open-windowed",
+      "expectedPid": 10616,
+      "expectedHwnd": 3348338,
+      "foregroundPid": 10616,
+      "foregroundHwnd": 3348338,
+      "passed": true
+    },
+    {
+      "label": "dialogue-alt-enter-windowed-copy",
+      "expectedPid": 10616,
+      "expectedHwnd": 3348338,
+      "foregroundPid": 10616,
+      "foregroundHwnd": 3348338,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-alt-enter-open-fullscreen",
+      "expectedPid": 10616,
+      "expectedHwnd": 3348338,
+      "foregroundPid": 10616,
+      "foregroundHwnd": 3348338,
+      "passed": true
+    },
+    {
+      "label": "dialogue-alt-enter-fullscreen-copy",
+      "expectedPid": 10616,
+      "expectedHwnd": 3348338,
+      "foregroundPid": 10616,
+      "foregroundHwnd": 3348338,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-before-first-escape-fullscreen",
+      "expectedPid": 10616,
+      "expectedHwnd": 3348338,
+      "foregroundPid": 10616,
+      "foregroundHwnd": 3348338,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-first-escape-cancel-only",
+      "expectedPid": 10616,
+      "expectedHwnd": 3348338,
+      "foregroundPid": 10616,
+      "foregroundHwnd": 3348338,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-second-escape-exits-fullscreen",
+      "expectedPid": 10616,
+      "expectedHwnd": 3348338,
+      "foregroundPid": 10616,
+      "foregroundHwnd": 3348338,
+      "passed": true
+    },
+    {
+      "label": "close-dialogue-fullscreen-arbitration",
+      "expectedPid": 10616,
+      "expectedHwnd": 3348338,
+      "foregroundPid": 10616,
+      "foregroundHwnd": 3348338,
+      "passed": true
+    },
+    {
+      "label": "start-dialogue-scalar-limits",
+      "expectedPid": 62696,
+      "expectedHwnd": 30805682,
+      "foregroundPid": 62696,
+      "foregroundHwnd": 30805682,
+      "passed": true
+    },
+    {
+      "label": "dialogue-500-paste",
+      "expectedPid": 62696,
+      "expectedHwnd": 30805682,
+      "foregroundPid": 62696,
+      "foregroundHwnd": 30805682,
+      "passed": true
+    },
+    {
+      "label": "dialogue-500-copy",
+      "expectedPid": 62696,
+      "expectedHwnd": 30805682,
+      "foregroundPid": 62696,
+      "foregroundHwnd": 30805682,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-500-input",
+      "expectedPid": 62696,
+      "expectedHwnd": 30805682,
+      "foregroundPid": 62696,
+      "foregroundHwnd": 30805682,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-500-submitted",
+      "expectedPid": 62696,
+      "expectedHwnd": 30805682,
+      "foregroundPid": 62696,
+      "foregroundHwnd": 30805682,
+      "passed": true
+    },
+    {
+      "label": "dialogue-501-paste",
+      "expectedPid": 62696,
+      "expectedHwnd": 30805682,
+      "foregroundPid": 62696,
+      "foregroundHwnd": 30805682,
+      "passed": true
+    },
+    {
+      "label": "dialogue-501-copy",
+      "expectedPid": 62696,
+      "expectedHwnd": 30805682,
+      "foregroundPid": 62696,
+      "foregroundHwnd": 30805682,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-501-input",
+      "expectedPid": 62696,
+      "expectedHwnd": 30805682,
+      "foregroundPid": 62696,
+      "foregroundHwnd": 30805682,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-501-submitted",
+      "expectedPid": 62696,
+      "expectedHwnd": 30805682,
+      "foregroundPid": 62696,
+      "foregroundHwnd": 30805682,
+      "passed": true
+    },
+    {
+      "label": "close-dialogue-scalar-limits",
+      "expectedPid": 62696,
+      "expectedHwnd": 30805682,
+      "foregroundPid": 62696,
+      "foregroundHwnd": 30805682,
+      "passed": true
+    },
+    {
+      "label": "start-dialogue-edges",
+      "expectedPid": 50288,
+      "expectedHwnd": 78713960,
+      "foregroundPid": 50288,
+      "foregroundHwnd": 78713960,
+      "passed": true
+    },
+    {
+      "label": "dialogue-left-edge-paste",
+      "expectedPid": 50288,
+      "expectedHwnd": 78713960,
+      "foregroundPid": 50288,
+      "foregroundHwnd": 78713960,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-left-edge-windowed",
+      "expectedPid": 50288,
+      "expectedHwnd": 78713960,
+      "foregroundPid": 50288,
+      "foregroundHwnd": 78713960,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-left-edge-fullscreen",
+      "expectedPid": 50288,
+      "expectedHwnd": 78713960,
+      "foregroundPid": 50288,
+      "foregroundHwnd": 78713960,
+      "passed": true
+    },
+    {
+      "label": "dialogue-right-edge-paste",
+      "expectedPid": 50288,
+      "expectedHwnd": 78713960,
+      "foregroundPid": 50288,
+      "foregroundHwnd": 78713960,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-right-edge-windowed",
+      "expectedPid": 50288,
+      "expectedHwnd": 78713960,
+      "foregroundPid": 50288,
+      "foregroundHwnd": 78713960,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-right-edge-fullscreen",
+      "expectedPid": 50288,
+      "expectedHwnd": 78713960,
+      "foregroundPid": 50288,
+      "foregroundHwnd": 78713960,
+      "passed": true
+    },
+    {
+      "label": "snap-dialogue-right-edge-back-windowed",
+      "expectedPid": 50288,
+      "expectedHwnd": 78713960,
+      "foregroundPid": 50288,
+      "foregroundHwnd": 78713960,
+      "passed": true
+    },
+    {
+      "label": "close-dialogue-edges",
+      "expectedPid": 50288,
+      "expectedHwnd": 78713960,
+      "foregroundPid": 50288,
+      "foregroundHwnd": 78713960,
+      "passed": true
+    },
+    {
+      "label": "start-viewport-1000x800",
+      "expectedPid": 63644,
+      "expectedHwnd": 13373232,
+      "foregroundPid": 63644,
+      "foregroundHwnd": 13373232,
+      "passed": true
+    },
+    {
+      "label": "snap-viewport-1000x800-center",
+      "expectedPid": 63644,
+      "expectedHwnd": 13373232,
+      "foregroundPid": 63644,
+      "foregroundHwnd": 13373232,
+      "passed": true
+    },
+    {
+      "label": "viewport-1000x800-paste",
+      "expectedPid": 63644,
+      "expectedHwnd": 13373232,
+      "foregroundPid": 63644,
+      "foregroundHwnd": 13373232,
+      "passed": true
+    },
+    {
+      "label": "snap-viewport-1000x800-right-dialogue",
+      "expectedPid": 63644,
+      "expectedHwnd": 13373232,
+      "foregroundPid": 63644,
+      "foregroundHwnd": 13373232,
+      "passed": true
+    },
+    {
+      "label": "close-viewport-1000x800",
+      "expectedPid": 63644,
+      "expectedHwnd": 13373232,
+      "foregroundPid": 63644,
+      "foregroundHwnd": 13373232,
+      "passed": true
+    },
+    {
+      "label": "start-viewport-1280x720",
+      "expectedPid": 11404,
+      "expectedHwnd": 23008962,
+      "foregroundPid": 11404,
+      "foregroundHwnd": 23008962,
+      "passed": true
+    },
+    {
+      "label": "snap-viewport-1280x720-center",
+      "expectedPid": 11404,
+      "expectedHwnd": 23008962,
+      "foregroundPid": 11404,
+      "foregroundHwnd": 23008962,
+      "passed": true
+    },
+    {
+      "label": "viewport-1280x720-paste",
+      "expectedPid": 11404,
+      "expectedHwnd": 23008962,
+      "foregroundPid": 11404,
+      "foregroundHwnd": 23008962,
+      "passed": true
+    },
+    {
+      "label": "snap-viewport-1280x720-right-dialogue",
+      "expectedPid": 11404,
+      "expectedHwnd": 23008962,
+      "foregroundPid": 11404,
+      "foregroundHwnd": 23008962,
+      "passed": true
+    },
+    {
+      "label": "close-viewport-1280x720",
+      "expectedPid": 11404,
+      "expectedHwnd": 23008962,
+      "foregroundPid": 11404,
+      "foregroundHwnd": 23008962,
+      "passed": true
+    },
+    {
+      "label": "start-viewport-1536x864",
+      "expectedPid": 65540,
+      "expectedHwnd": 79172712,
+      "foregroundPid": 65540,
+      "foregroundHwnd": 79172712,
+      "passed": true
+    },
+    {
+      "label": "snap-viewport-1536x864-center",
+      "expectedPid": 65540,
+      "expectedHwnd": 79172712,
+      "foregroundPid": 65540,
+      "foregroundHwnd": 79172712,
+      "passed": true
+    },
+    {
+      "label": "viewport-1536x864-paste",
+      "expectedPid": 65540,
+      "expectedHwnd": 79172712,
+      "foregroundPid": 65540,
+      "foregroundHwnd": 79172712,
+      "passed": true
+    },
+    {
+      "label": "snap-viewport-1536x864-right-dialogue",
+      "expectedPid": 65540,
+      "expectedHwnd": 79172712,
+      "foregroundPid": 65540,
+      "foregroundHwnd": 79172712,
+      "passed": true
+    },
+    {
+      "label": "close-viewport-1536x864",
+      "expectedPid": 65540,
+      "expectedHwnd": 79172712,
+      "foregroundPid": 65540,
+      "foregroundHwnd": 79172712,
+      "passed": true
+    },
+    {
+      "label": "start-viewport-1536x960",
+      "expectedPid": 40888,
+      "expectedHwnd": 34933816,
+      "foregroundPid": 40888,
+      "foregroundHwnd": 34933816,
+      "passed": true
+    },
+    {
+      "label": "snap-viewport-1536x960-center",
+      "expectedPid": 40888,
+      "expectedHwnd": 34933816,
+      "foregroundPid": 40888,
+      "foregroundHwnd": 34933816,
+      "passed": true
+    },
+    {
+      "label": "viewport-1536x960-paste",
+      "expectedPid": 40888,
+      "expectedHwnd": 34933816,
+      "foregroundPid": 40888,
+      "foregroundHwnd": 34933816,
+      "passed": true
+    },
+    {
+      "label": "snap-viewport-1536x960-right-dialogue",
+      "expectedPid": 40888,
+      "expectedHwnd": 34933816,
+      "foregroundPid": 40888,
+      "foregroundHwnd": 34933816,
+      "passed": true
+    },
+    {
+      "label": "close-viewport-1536x960",
+      "expectedPid": 40888,
+      "expectedHwnd": 34933816,
+      "foregroundPid": 40888,
+      "foregroundHwnd": 34933816,
+      "passed": true
+    }
+  ],
+  "processes": [
+    {
+      "name": "directional",
+      "pid": 5716,
+      "exitCode": 0,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU",
+      "stderr": ""
+    },
+    {
+      "name": "speed-w-noop",
+      "pid": 64980,
+      "exitCode": 0,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU\n\nWALK_SPEED multiplier=0.75x movement=180px/s walk_fps=4.5\nWALK_SPEED multiplier=0.50x movement=120px/s walk_fps=3\nWALK_SPEED multiplier=0.25x movement=60px/s walk_fps=1.5\nWALK_SPEED multiplier=0.50x movement=120px/s walk_fps=3\nWALK_SPEED multiplier=0.75x movement=180px/s walk_fps=4.5\nWALK_SPEED multiplier=1.00x movement=240px/s walk_fps=6\nWALK_SPEED multiplier=1.25x movement=300px/s walk_fps=7.5\nWALK_SPEED multiplier=1.50x movement=360px/s walk_fps=9\nWALK_SPEED multiplier=1.75x movement=420px/s walk_fps=10.5\nWALK_SPEED multiplier=2.00x movement=480px/s walk_fps=12\nWALK_SPEED multiplier=2.25x movement=540px/s walk_fps=13.5\nWALK_SPEED multiplier=2.50x movement=600px/s walk_fps=15\nWALK_SPEED multiplier=2.75x movement=660px/s walk_fps=16.5\nWALK_SPEED multiplier=3.00x movement=720px/s walk_fps=18",
+      "stderr": ""
+    },
+    {
+      "name": "clap",
+      "pid": 63228,
+      "exitCode": 0,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU",
+      "stderr": ""
+    },
+    {
+      "name": "cross",
+      "pid": 61444,
+      "exitCode": 0,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU",
+      "stderr": ""
+    },
+    {
+      "name": "dialogue-text-lifecycle",
+      "pid": 55356,
+      "exitCode": 0,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU",
+      "stderr": ""
+    },
+    {
+      "name": "dialogue-fullscreen-arbitration",
+      "pid": 10616,
+      "exitCode": 0,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU",
+      "stderr": ""
+    },
+    {
+      "name": "dialogue-scalar-limits",
+      "pid": 62696,
+      "exitCode": 0,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU",
+      "stderr": ""
+    },
+    {
+      "name": "dialogue-edges",
+      "pid": 50288,
+      "exitCode": 0,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU",
+      "stderr": ""
+    },
+    {
+      "name": "viewport-1000x800",
+      "pid": 63644,
+      "exitCode": 0,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU",
+      "stderr": ""
+    },
+    {
+      "name": "viewport-1280x720",
+      "pid": 11404,
+      "exitCode": 0,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU",
+      "stderr": ""
+    },
+    {
+      "name": "viewport-1536x864",
+      "pid": 65540,
+      "exitCode": 0,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU",
+      "stderr": ""
+    },
+    {
+      "name": "viewport-1536x960",
+      "pid": 40888,
+      "exitCode": 0,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU",
+      "stderr": ""
+    }
+  ],
+  "observations": {
+    "dialogueExactClipboard": "ASCII w/W | العربية | 😀🧪",
+    "dialoguePTypeableClipboard": "p",
+    "dialogueWhitespaceClipboard": "   ",
+    "dialogueClipboardBeforeFullscreen": "fullscreen w/W 😀",
+    "dialogueClipboardAfterF11": "fullscreen w/W 😀",
+    "dialogueClipboardAfterAltEnterToWindowed": "fullscreen w/W 😀",
+    "dialogueClipboardAfterAltEnterToFullscreen": "fullscreen w/W 😀",
+    "dialogueFocusedFullscreenTransitions": [
+      [
+        1280,
+        720
+      ],
+      [
+        1922,
+        1200
+      ],
+      [
+        1280,
+        720
+      ],
+      [
+        1922,
+        1200
+      ]
+    ],
+    "dialogueAltEnterEditingSucceeded": true,
+    "dialogue500Clipboard": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+    "dialogue501Clipboard": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+  },
+  "analysis": {
+    "wNoopDelta": {
+      "sameShape": true,
+      "changedPixels": 0,
+      "maxChannelDelta": 0
+    },
+    "crossHeldInputDelta": {
+      "sameShape": true,
+      "changedPixels": 0,
+      "maxChannelDelta": 0
+    },
+    "dialogueCharacterControlDelta": {
+      "sameShape": true,
+      "changedPixels": 232,
+      "maxChannelDelta": 238
+    },
+    "whitespacePreservesBubbleDelta": {
+      "sameShape": true,
+      "changedPixels": 0,
+      "maxChannelDelta": 0
+    },
+    "escapePreservesBubbleDelta": {
+      "sameShape": true,
+      "changedPixels": 0,
+      "maxChannelDelta": 0
+    },
+    "scalar500vs501SubmittedDelta": {
+      "sameShape": true,
+      "changedPixels": 0,
+      "maxChannelDelta": 0
+    }
+  },
+  "focusAllPassed": true
+}

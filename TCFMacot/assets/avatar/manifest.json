@@ -1,0 +1,133 @@
+{
+  "version": 2,
+  "source": {
+    "file": "Avatar.jpg",
+    "sha256": "04665D7D9B164B00CA55011C02E6814A318D3B45074BE68402CA0C5507EDA1CF",
+    "width": 896,
+    "height": 1195,
+    "reflectionExcluded": true
+  },
+  "canvas": {
+    "width": 896,
+    "height": 1195
+  },
+  "coordinateSpace": "Avatar.jpg source pixels",
+  "layeringNotes": "zIndex records the frozen five-layer painter order: whole legs paint behind torsoHead, while whole arms paint above it. White sleeve caps move with their whole arms; green waistcoat, collar, and qameez artwork remains static in torsoHead. Articulated layers overlap only along narrow root contours and within manifest-declared localized garment backing hidden beneath source-faithful whole-arm artwork.",
+  "backgroundRemoval": {
+    "method": "edge-connected adaptive matte segmentation protected by central artwork seeds, nearest-background color decontamination, a wide dark-edge feather, and a source-space floor/reflection polygon",
+    "preservesInteriorDarkDetail": true,
+    "darkEdgeFeatherRadius": 14,
+    "floorReflectionMask": "spatial source-space polygon preserving the illustrated right-shoe contour through y=1171"
+  },
+  "idleFallback": {
+    "url": "./assets/avatar/idle.png",
+    "sourceRect": {
+      "x": 0,
+      "y": 0,
+      "width": 896,
+      "height": 1195
+    },
+    "sha256": "8885910791DDBCF5EF9A13306CA542C4297BC8F2054FB888D653F263D6061DFD"
+  },
+  "continuityBacking": [
+    {
+      "name": "right-waist-qameez-sweep",
+      "owner": "torsoHead",
+      "occludedBy": "rightArm",
+      "sweptRegion": {
+        "xMin": 555,
+        "xMax": 575,
+        "yMin": 650,
+        "yMax": 690
+      },
+      "maximumPixels": 400
+    }
+  ],
+  "layers": [
+    {
+      "role": "leftLeg",
+      "parent": "torsoHead",
+      "pivot": {
+        "x": 420,
+        "y": 806
+      },
+      "zIndex": 10,
+      "url": "./assets/avatar/leftLeg.png",
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "width": 896,
+        "height": 1195
+      },
+      "sha256": "D16375E2D06DC6E4E32AD90F510F118DBDE5820459B6712123760AF3C2290EBA"
+    },
+    {
+      "role": "rightLeg",
+      "parent": "torsoHead",
+      "pivot": {
+        "x": 515,
+        "y": 812
+      },
+      "zIndex": 20,
+      "url": "./assets/avatar/rightLeg.png",
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "width": 896,
+        "height": 1195
+      },
+      "sha256": "F4191700A3BC37E77EEDED7DCAA56A6C92C314E40345638A60B4448D9C463EBD"
+    },
+    {
+      "role": "torsoHead",
+      "parent": null,
+      "pivot": {
+        "x": 448,
+        "y": 785
+      },
+      "zIndex": 30,
+      "url": "./assets/avatar/torsoHead.png",
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "width": 896,
+        "height": 1195
+      },
+      "sha256": "86DA06F35517E1D4C4E2BC7E45C9F6FC718510DCA59DCC33607520FEFB82209E"
+    },
+    {
+      "role": "leftArm",
+      "parent": "torsoHead",
+      "pivot": {
+        "x": 337,
+        "y": 276
+      },
+      "zIndex": 40,
+      "url": "./assets/avatar/leftArm.png",
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "width": 896,
+        "height": 1195
+      },
+      "sha256": "7CC16A672152746AA3FD4CDA0F5F46D81EF6CB71627D2ACF9DCAB16471460C9E"
+    },
+    {
+      "role": "rightArm",
+      "parent": "torsoHead",
+      "pivot": {
+        "x": 560,
+        "y": 278
+      },
+      "zIndex": 50,
+      "url": "./assets/avatar/rightArm.png",
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "width": 896,
+        "height": 1195
+      },
+      "sha256": "C42A1EB538E5EC76D424FABCE80A1E35C88C51683768D92CCD7E17C7B59F2064"
+    }
+  ]
+}

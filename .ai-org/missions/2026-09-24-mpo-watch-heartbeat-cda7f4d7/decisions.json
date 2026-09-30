@@ -1,0 +1,10 @@
+{
+  "mpo": "Only JPEG/JPG-named MPO inputs; process primary frame zero, apply orientation, omit metadata from bounded PNG upload; preserve original bytes.",
+  "limits": "Existing input byte/dimension/pixel/decompression checks and strict single-frame PNG outputs unchanged. No automatic resizing or limit increase.",
+  "recovery": "Fresh matching snapshot, same request identity, local input-validation provenance and zero attempt rows required for transactional FAILED-to-READY reconsideration. Preserve historical failure audit.",
+  "visibility": "Console text optional with legacy JSON default; active configs select text. File logs remain JSON.",
+  "heartbeat": "15-second configurable bounded interval; parent-process ticker reused by idle/rate waits and provider join callbacks. No background SQLite threads or invented percentages.",
+  "privacy": "No photo pixels or EXIF details in logs; no credentials/prompt/token contents.",
+  "validation": "Synthetic MPO fixtures and fake providers for regressions; real photo local decode/normalization only before live permission.",
+  "existingBehavior": "Keep confirmed tenant, model, endpoint, two-RPM pacing, three attempts, and no replay of any previously sent image."
+}

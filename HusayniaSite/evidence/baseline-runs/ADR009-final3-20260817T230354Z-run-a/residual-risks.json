@@ -1,0 +1,23 @@
+[
+  {
+    "riskId": "risk-sitemap-c39fe2b165c62839",
+    "area": "sitemap",
+    "description": "Sitemap unavailable: crawl-request-failed:TaskCanceledException",
+    "evidence": "https://www.husaynia.org/sitemap.xml",
+    "requiredFollowUp": "Re-run and reconcile against an authorized export."
+  },
+  {
+    "riskId": "risk-sitemap-6a34c54cb69d477d",
+    "area": "sitemap",
+    "description": "Sitemap unavailable: crawl-request-failed:TaskCanceledException",
+    "evidence": "https://www.husaynia.org/page-sitemap.xml",
+    "requiredFollowUp": "Re-run and reconcile against an authorized export."
+  },
+  {
+    "riskId": "RISK-CAPTURE-INCOMPLETE",
+    "area": "diagnostics",
+    "description": "Capture ended before completion during route-capture (capture-error:socketexception).",
+    "evidence": "capture-summary.json; screenshots.json",
+    "requiredFollowUp": "Retain this run for diagnosis only. Start a fresh empty-output run; do not seal, verify, or promote this evidence."
+  }
+]

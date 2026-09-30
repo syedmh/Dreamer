@@ -1,0 +1,4 @@
+{
+  "format": "dreamer.life-memoir.backup",
+  "formatVersion": 1,
+  "note": "This fixture is intentionally malformed and must fail JSON parsing."

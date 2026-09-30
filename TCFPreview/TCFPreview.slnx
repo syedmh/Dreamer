@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TCFPreview.Core/TCFPreview.Core.csproj" />
+    <Project Path="src/TCFPreview.WinForms/TCFPreview.WinForms.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TCFPreview.Tests/TCFPreview.Tests.csproj" />
+  </Folder>
+</Solution>

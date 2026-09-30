@@ -1,0 +1,33 @@
+.elementor-1863 .elementor-element.elementor-element-d14a920:not(.elementor-motion-effects-element-type-background), .elementor-1863 .elementor-element.elementor-element-d14a920 > .elementor-motion-effects-container > .elementor-motion-effects-layer{background-image:var(--e-bg-lazyload-loaded);--e-bg-lazyload:url("https://www.husaynia.org/wp-content/uploads/2022/08/20220422_195001-scaled.jpg");background-position:0px -316px;background-repeat:no-repeat;background-size:cover;}.elementor-1863 .elementor-element.elementor-element-d14a920 > .elementor-background-overlay{background-color:#000000;opacity:0.14;transition:background 0.3s, border-radius 0.3s, opacity 0.3s;}.elementor-1863 .elementor-element.elementor-element-d14a920 .elementor-background-overlay{filter:brightness( 100% ) contrast( 100% ) saturate( 100% ) blur( 0px ) hue-rotate( 0deg );}.elementor-1863 .elementor-element.elementor-element-d14a920{transition:background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;padding:180px 0px 150px 0px;overflow:visible;}.elementor-1863 .elementor-element.elementor-element-776f7e0{text-align:center;}.elementor-1863 .elementor-element.elementor-element-776f7e0 .elementor-heading-title{color:#FFFFFF;}.elementor-1863 .elementor-element.elementor-element-69c93b8 > .elementor-container{max-width:1200px;}.elementor-1863 .elementor-element.elementor-element-69c93b8:not(.elementor-motion-effects-element-type-background), .elementor-1863 .elementor-element.elementor-element-69c93b8 > .elementor-motion-effects-container > .elementor-motion-effects-layer{background-color:var( --e-global-color-astglobalcolor5 );}.elementor-1863 .elementor-element.elementor-element-69c93b8 > .elementor-background-overlay{opacity:0.5;transition:background 0.3s, border-radius 0.3s, opacity 0.3s;}.elementor-1863 .elementor-element.elementor-element-69c93b8{transition:background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;padding:100px 0px 100px 0px;overflow:visible;}.elementor-1863 .elementor-element.elementor-element-4e703b9 > .elementor-element-populated, .elementor-1863 .elementor-element.elementor-element-4e703b9 > .elementor-element-populated > .elementor-background-overlay, .elementor-1863 .elementor-element.elementor-element-4e703b9 > .elementor-background-slideshow{border-radius:10px 10px 10px 10px;}.elementor-1863 .elementor-element.elementor-element-4e703b9 > .elementor-element-populated{transition:background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;}.elementor-1863 .elementor-element.elementor-element-4e703b9 > .elementor-element-populated > .elementor-background-overlay{transition:background 0.3s, border-radius 0.3s, opacity 0.3s;}.elementor-1863 .elementor-element.elementor-element-0eece6b{overflow:visible;}@media(min-width:1025px){.elementor-1863 .elementor-element.elementor-element-d14a920:not(.elementor-motion-effects-element-type-background), .elementor-1863 .elementor-element.elementor-element-d14a920 > .elementor-motion-effects-container > .elementor-motion-effects-layer{background-attachment:fixed;}}@media(max-width:1024px){.elementor-1863 .elementor-element.elementor-element-d14a920:not(.elementor-motion-effects-element-type-background), .elementor-1863 .elementor-element.elementor-element-d14a920 > .elementor-motion-effects-container > .elementor-motion-effects-layer{background-position:0px 0px;}.elementor-1863 .elementor-element.elementor-element-d14a920{padding:150px 0px 150px 0px;}.elementor-1863 .elementor-element.elementor-element-69c93b8{padding:60px 30px 60px 30px;}}@media(max-width:767px){.elementor-1863 .elementor-element.elementor-element-d14a920:not(.elementor-motion-effects-element-type-background), .elementor-1863 .elementor-element.elementor-element-d14a920 > .elementor-motion-effects-container > .elementor-motion-effects-layer{background-image:var(--e-bg-lazyload-loaded);--e-bg-lazyload:url("https://www.husaynia.org/wp-content/uploads/2022/08/20220422_195001-1-scaled-e1660953726365.jpg");background-position:0px 0px;}.elementor-1863 .elementor-element.elementor-element-d14a920{margin-top:0px;margin-bottom:0px;padding:150px 0px 80px 0px;}.elementor-1863 .elementor-element.elementor-element-69c93b8{padding:50px 30px 50px 30px;}}/* Start custom CSS for tec_elementor_widget_events_view, class: .elementor-element-138e39c */.tribe-events-calendar-list__event-venue, .tribe-events-c-subscribe-dropdown__container {
+    display: none !important;
+}
+.tribe-events .tribe-events-l-container {
+    min-height: auto !important;
+}
+.tribe-events-calendar-list__event-description > p {
+    padding-top: 10px !important;
+}
+.tribe-common--breakpoint-medium.tribe-events .tribe-events-l-container {
+    padding-bottom: 0px !important;
+    padding-top: 0px !important;
+}
+.tribe-events-c-top-bar__datepicker-mobile, .tribe-events-c-top-bar__datepicker-desktop, .tribe-events-calendar-list__month-separator-text, .tribe-events-calendar-list__event-date-tag-daynum, .tribe-events-calendar-list__event-date-tag-weekday, .tribe-events-calendar-list__event-datetime, .tribe-events .tribe-events-calendar-list__event-title-link {
+    color: var(--ast-global-color-2) !important;
+}
+.tribe-events-calendar-list__event-description > p.read-more a {
+    color: var(--ast-global-color-2) !important;
+    text-decoration: underline
+}
+.tribe-events-calendar-list__event-description > p:last-child {
+  display: none;
+}
+.tribe-common--breakpoint-medium.tribe-events .tribe-events-calendar-list__event-description {
+  margin-top: 0px !important;
+}
+.tribe-common--breakpoint-medium.tribe-events .tribe-events-calendar-list__event-row:last-child {
+    margin-bottom: 30px !important;
+}
+.tribe-common--breakpoint-medium.tribe-events .tribe-events-calendar-list__event-row {
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}/* End custom CSS */

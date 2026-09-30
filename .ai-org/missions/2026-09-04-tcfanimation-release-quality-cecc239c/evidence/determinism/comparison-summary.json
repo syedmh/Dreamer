@@ -1,0 +1,27 @@
+{
+  "baseline_vs_pass2": {
+    "bytes": [],
+    "extra": [],
+    "missing": [],
+    "pixels": []
+  },
+  "nonframe_diff": [],
+  "nonframe_extra": [],
+  "nonframe_missing": [],
+  "pass1_vs_pass2": {
+    "bytes": [],
+    "extra": [],
+    "missing": [],
+    "pixels": []
+  },
+  "protected_diff": [],
+  "source_diff": [],
+  "walk_mirror_exact": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+  ]
+}

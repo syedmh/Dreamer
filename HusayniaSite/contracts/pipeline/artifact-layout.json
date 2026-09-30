@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "namePattern": "husaynia-site-{version}",
+  "requiredPaths": [
+    "app/Husaynia.Web.zip",
+    "migrations/sql/*.sql",
+    "migrations/bundle/*",
+    "contracts/route-manifest.json",
+    "contracts/import-manifest.schema.json",
+    "sbom/sbom.spdx.json",
+    "reports/test-results/**",
+    "reports/security/**",
+    "reports/accessibility/**",
+    "release/release-manifest.json",
+    "release/SHA256SUMS"
+  ],
+  "promotionRule": "Promote the same application archive SHA-256 through Development, Staging, and separately authorized Production; environment configuration never rebuilds it."
+}

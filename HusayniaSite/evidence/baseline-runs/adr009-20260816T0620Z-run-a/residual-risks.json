@@ -1,0 +1,23 @@
+[
+  {
+    "riskId": "RISK-FORMS-NO-SUBMIT",
+    "area": "forms",
+    "description": "348 forms were observed but never submitted, by design.",
+    "evidence": "forms-widgets.json",
+    "requiredFollowUp": "Confirm field rules, anti-abuse, destinations, consent, and success/error states in an authorized non-production environment or export."
+  },
+  {
+    "riskId": "RISK-DYNAMIC-PROVIDERS",
+    "area": "dynamic-content",
+    "description": "1070 volatile/third-party regions were normalized for reproducibility.",
+    "evidence": "forms-widgets.json",
+    "requiredFollowUp": "Create deterministic fixtures for loading, populated, empty, consent-denied, and upstream-error states."
+  },
+  {
+    "riskId": "RISK-QUERY-ROUTE-SCHEMA",
+    "area": "urls",
+    "description": "Contractually significant query endpoints are retained in http-inventory.json but cannot be represented by the frozen route schema path pattern.",
+    "evidence": "http-inventory.json",
+    "requiredFollowUp": "Later URL implementation must preserve these endpoints; resolve the frozen schema contradiction through the architecture change process before altering C1."
+  }
+]

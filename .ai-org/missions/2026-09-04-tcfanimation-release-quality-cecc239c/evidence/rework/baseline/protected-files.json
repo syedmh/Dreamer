@@ -1,0 +1,378 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-04T03:54:43.1613230Z",
+  "projectRoot": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\TCFAnimation",
+  "fileCount": 74,
+  "files": [
+    {
+      "path": "AnimationGeometry.cs",
+      "length": 2581,
+      "sha256": "EE02208E094DE64FFB4703CCD7FC510F1144939270F855AA7C56808B2CE8D947"
+    },
+    {
+      "path": "AnimationGeometry.cs.uid",
+      "length": 19,
+      "sha256": "A7DC47B79996A01EA15A02B2A14A7579E90EC9F782C733FB1BC5074014A2150B"
+    },
+    {
+      "path": "Avatar.jpg",
+      "length": 86284,
+      "sha256": "0D52748EF36FD13AE994B5BD30FBC79493007373EF8FABFAA1B33021BFD0107D"
+    },
+    {
+      "path": "Avatar.jpg.import",
+      "length": 922,
+      "sha256": "20A10DEDDC3CEA1CDFD6F449D03B581EFF313263DA606781AC91DD736A6CE069"
+    },
+    {
+      "path": "CapturePathPolicy.cs",
+      "length": 9574,
+      "sha256": "1475FA7B9E500C3F0803C0351AA30CA9994A3240C29FE724A06650D51668A6A0"
+    },
+    {
+      "path": "CapturePathPolicy.cs.uid",
+      "length": 20,
+      "sha256": "C42D51BA09CAC90831CE0436ADFE452F71B0759BA1ECFBCA22623E0A68BF70ED"
+    },
+    {
+      "path": "Clapping.png",
+      "length": 599760,
+      "sha256": "F0AC9E5F4D537849D071AAFC0AB26C2C5EB5219CBDACC52C2F428BA48E8A4587"
+    },
+    {
+      "path": "Clapping.png.import",
+      "length": 736,
+      "sha256": "3D85B7588D59607E6557D9CB34CD3C6958B8826E611F1A56A0F0A4675A7FB478"
+    },
+    {
+      "path": "Clapping2.png",
+      "length": 654450,
+      "sha256": "FBB46FBEAD0D5815F4E23307240535C600C29D0DF650B493137D05E762319C00"
+    },
+    {
+      "path": "CrossArm.png",
+      "length": 512262,
+      "sha256": "B17405B379C1C067544C652018FA71D8C3044AFF2911512763598A28ECCC7048"
+    },
+    {
+      "path": "CrossArm.png.import",
+      "length": 25,
+      "sha256": "C7D129DF259FEB5ADDB132A77DED322A6D94840A35E6112510CF7FF731F474BB"
+    },
+    {
+      "path": "CrossArm2.png",
+      "length": 523500,
+      "sha256": "D66F8B0B7B9D875F13A203895D6602A4AB3302F97689CF7625FB319578410C5C"
+    },
+    {
+      "path": "CrossArm2.png.import",
+      "length": 25,
+      "sha256": "C7D129DF259FEB5ADDB132A77DED322A6D94840A35E6112510CF7FF731F474BB"
+    },
+    {
+      "path": "CrossArm3.png",
+      "length": 628721,
+      "sha256": "276413B76F13D4940FD8B746D3AEA13D27922A47EACD750DCCC6FF622A6A8192"
+    },
+    {
+      "path": "CrossArm4.png",
+      "length": 632179,
+      "sha256": "475614A7B2DB0B7469FA88E9B7B5F5C8548F8095B56DAD99F6270098E9174A3F"
+    },
+    {
+      "path": "DialogueModel.cs",
+      "length": 9554,
+      "sha256": "0B1DEBED776BC20D04F4ECAA1E6AFEC09F18B852A378AFA3D079200AB8FEF3A0"
+    },
+    {
+      "path": "DialogueModel.cs.uid",
+      "length": 19,
+      "sha256": "5437570969B61CD86F2335B942FD96E5E04082BF359125FD6F313CA44AD586D6"
+    },
+    {
+      "path": "DialogueUi.cs",
+      "length": 10662,
+      "sha256": "2553E13303A2C7899FD3D678425BEBFAEA10376B69F50AA64CB29552D4E20D4C"
+    },
+    {
+      "path": "DialogueUi.cs.uid",
+      "length": 20,
+      "sha256": "A20BF072C9DE410333E29C853773D775F23819E1FE877EE873DE3CDD83D35442"
+    },
+    {
+      "path": "DirectionalTurnStateMachine.cs",
+      "length": 17433,
+      "sha256": "F475FFF2BCF565C69EC19A29EA4F127A7E67A7191D2FF58C5BC85BA968404948"
+    },
+    {
+      "path": "DirectionalTurnStateMachine.cs.uid",
+      "length": 20,
+      "sha256": "0381E30C9F5A53A673E2ED0A0796C3523A5CE66EF1D4AEF853D9E5BFA842BC57"
+    },
+    {
+      "path": "export_presets.cfg",
+      "length": 2044,
+      "sha256": "6EFA1CF66C58137586C5CCBDD364697B047E38A6C5B12A3BD0D6762F0CCF0EF4"
+    },
+    {
+      "path": "Frames/Clap/clap_00.png",
+      "length": 203169,
+      "sha256": "06C28C50ED43F3783A07CAB67718A559B1A7148473AF859A995B37A710E65A63"
+    },
+    {
+      "path": "Frames/Clap/clap_01.png",
+      "length": 189711,
+      "sha256": "880D73F03902330060BCE7AA0EDE547CB7FE678692E3B0DDFB1F1986C256694D"
+    },
+    {
+      "path": "Frames/Clap/clap_02.png",
+      "length": 190714,
+      "sha256": "74149B96B2E00322F06B5DAD420DC3F5664153437C832C1DE37744BEBCED8F65"
+    },
+    {
+      "path": "Frames/Clap/clap_03.png",
+      "length": 184422,
+      "sha256": "0F38C689D104370F6FB2F3C39B90C2E9C56F93E4DC908FC57CDD7F10693C4EA4"
+    },
+    {
+      "path": "Frames/Clap/clap_04.png",
+      "length": 188248,
+      "sha256": "9D5920237305E634DA547347A3D3E7A10F9A3C561B6B7C234D11169C99675FAA"
+    },
+    {
+      "path": "Frames/Clap/clap_05.png",
+      "length": 198556,
+      "sha256": "FC2B3246C940F955F2F1F11532A43FF7977CCFF1A865966960E5DCE5256CC912"
+    },
+    {
+      "path": "Frames/CrossArm/cross_00.png",
+      "length": 182654,
+      "sha256": "C11B3644CF73AA9E8AB5FD7C9B50822E9534DA8405836158BB10D0F8CE40A680"
+    },
+    {
+      "path": "Frames/CrossArm/cross_01.png",
+      "length": 172562,
+      "sha256": "FBF167EF42E9DFC8C456E8E329BBCD7BFEDE4C2FF69515A42A0D62364BA3E4B7"
+    },
+    {
+      "path": "Frames/CrossArm/cross_02.png",
+      "length": 176663,
+      "sha256": "DC8B8829AB58CBEB084F864945089DC03CEFD5A89FA02F9AAC8C777B46F096B2"
+    },
+    {
+      "path": "Frames/CrossArmRelease/release_00.png",
+      "length": 171750,
+      "sha256": "101D2297A89E0ABC3A4CF1CDE9134CF9EBED36DE811AA807DF4DEF28065893DD"
+    },
+    {
+      "path": "Frames/CrossArmRelease/release_01.png",
+      "length": 183967,
+      "sha256": "ACA74DC31B184800761E62AD6D1B5FC648F8A4E7B0EE6717711B01F075D1D215"
+    },
+    {
+      "path": "Frames/CrossArmRelease/release_02.png",
+      "length": 183981,
+      "sha256": "2F63BA20DC29F6A2E4F9F7F182FB36DE8711353E50459C8808B730957E877E78"
+    },
+    {
+      "path": "Frames/CrossArmRelease/release_03.png",
+      "length": 194032,
+      "sha256": "733D36AC13EAFE0AAF24A233D54F7DD674255F3712A42536BFF98D605A9B5D26"
+    },
+    {
+      "path": "Frames/CrossArmRelease/release_04.png",
+      "length": 185609,
+      "sha256": "1B321DB484DAA7CBAA41E0C671C8F2D888AB283829DADFEFC16FFAD89FFE4512"
+    },
+    {
+      "path": "Frames/CrossArmRelease/release_05.png",
+      "length": 188917,
+      "sha256": "8850A0D9CD3FEDFA5E02D84AD65B2F5382B571C6177E71C3F0A2DEA7EC9F4664"
+    },
+    {
+      "path": "Frames/LeftTurn/turn_0.png",
+      "length": 182683,
+      "sha256": "4B0C5FB16D85A03A7411E1A0F1E40B51AC1CF0257452CE9580D3FB51376B199B"
+    },
+    {
+      "path": "Frames/LeftTurn/turn_1.png",
+      "length": 176762,
+      "sha256": "5E7AFE2DA1465EF59CF940BA4F6DBA189D9484F706F4D8960110804B5F9B7F2E"
+    },
+    {
+      "path": "Frames/LeftTurn/turn_2.png",
+      "length": 129527,
+      "sha256": "8E001A2F3668AAE9E08949DB13E4F9E5BFE4E1E8F5F7DFD040D755DB31722E6E"
+    },
+    {
+      "path": "Frames/LeftWalk/walk_00.png",
+      "length": 186552,
+      "sha256": "211101AFC6A28CCEE3140BE6C88D7EDCD500F25DBC1A4DCA131B812EB0E693D1"
+    },
+    {
+      "path": "Frames/LeftWalk/walk_01.png",
+      "length": 183872,
+      "sha256": "72A8E2E8FFC82F33E9E790D11F4F659362B18D2D730135F18C9B6C97794C4BF9"
+    },
+    {
+      "path": "Frames/LeftWalk/walk_02.png",
+      "length": 177769,
+      "sha256": "2F6F0879B0A9369FAED36C0EE5C301FB9197B4B15EF30D75A10CAA0117F0119B"
+    },
+    {
+      "path": "Frames/LeftWalk/walk_03.png",
+      "length": 164319,
+      "sha256": "41A70A470E22755885DF1E1D718DA988F7125056D0F58B44FB1FBC5A344ACB7B"
+    },
+    {
+      "path": "Frames/LeftWalk/walk_04.png",
+      "length": 182527,
+      "sha256": "B48C619842BA9B5A35F0536FDA23B4DAB97E3DEA3D14D14F952903565528F12D"
+    },
+    {
+      "path": "Frames/LeftWalk/walk_05.png",
+      "length": 169784,
+      "sha256": "4DE552ACAB7A0283331E5B2AED02B06EDA9DF2DA8E8782A2313C0D66763C19BC"
+    },
+    {
+      "path": "Frames/RightTurn/turn_0.png",
+      "length": 189787,
+      "sha256": "5D3E14F7470C99C4C569A67561A78791AA2C9DD439EC5C0F80BB9D2F5D90AEA1"
+    },
+    {
+      "path": "Frames/RightTurn/turn_1.png",
+      "length": 181913,
+      "sha256": "D891561FE5E5414A984AC3DFA061DE48050BC73B2E2C96500BDFDBDB0B3BA9D1"
+    },
+    {
+      "path": "Frames/RightTurn/turn_2.png",
+      "length": 135406,
+      "sha256": "05DA7808228E94259560F5B2D35377A25D78F937DE573DDF15770AF04D6C76CD"
+    },
+    {
+      "path": "Frames/RightWalk/walk_00.png",
+      "length": 187080,
+      "sha256": "8B6CE1DFF4D3BA9DD49F20DEE3F91CD79A45845B22F492D498B76504CDD0682B"
+    },
+    {
+      "path": "Frames/RightWalk/walk_01.png",
+      "length": 184476,
+      "sha256": "00AFEB7B4C55F328E1C616BF3D55AD0EB0A08180BE25449BB9412ED0F14A30AB"
+    },
+    {
+      "path": "Frames/RightWalk/walk_02.png",
+      "length": 178009,
+      "sha256": "8F72A5C721D7C44E2F5F4C5BF7249B8FE0967B67FA2FC4996799F65374D56ECA"
+    },
+    {
+      "path": "Frames/RightWalk/walk_03.png",
+      "length": 163796,
+      "sha256": "CE60A38925F6A39D6177725CADC53227DC717730B5994B99D817BB2E24C6A575"
+    },
+    {
+      "path": "Frames/RightWalk/walk_04.png",
+      "length": 182195,
+      "sha256": "A1D187A9597096E6F82E2AA2DDCAEE7C77CAB53F2DE802AFC5B86570D0E3CF11"
+    },
+    {
+      "path": "Frames/RightWalk/walk_05.png",
+      "length": 169153,
+      "sha256": "19A2D927408B8ABA4202584BDD212A4673DEAB2A9ED2E84069AD1B0D82A302BF"
+    },
+    {
+      "path": "GlobalInputPolicy.cs",
+      "length": 922,
+      "sha256": "3455D610B80FC17E52825485C5A53F27BE28D5846CE0070B723787DB9CDFB8B8"
+    },
+    {
+      "path": "LTurning.png",
+      "length": 1502641,
+      "sha256": "9EDD38F303B17CD043EDCCABF2E6C2BC50F182B9A2B918B4BDECF1B2861E3A91"
+    },
+    {
+      "path": "Main.tscn",
+      "length": 427,
+      "sha256": "A136756B414181B00E77967BEF235B91B31461222618AE5E722D2FCCAF23FD19"
+    },
+    {
+      "path": "project.godot",
+      "length": 842,
+      "sha256": "771DB486856186456D466AF56055521A5756D969EE69F53A1E2C59AB28464614"
+    },
+    {
+      "path": "RTurning.png",
+      "length": 1390487,
+      "sha256": "2D20B97B4BC630DBFF9D6DD932F3314A9BC6FE0587013E6C12E72BF1D40D5840"
+    },
+    {
+      "path": "RWalking2.png",
+      "length": 495754,
+      "sha256": "CD56287A4830D068292793256DBEB5A29E1EB9D888520A5339FE3957E7B7FA3A"
+    },
+    {
+      "path": "TCFAnimation.csproj",
+      "length": 550,
+      "sha256": "9BBDACBD4A27EEDE0060907D1A54B2D85695619C1ADFB007D6F1FA03D458F6D6"
+    },
+    {
+      "path": "TurnController.cs",
+      "length": 25886,
+      "sha256": "84DD4810B32CFB5BCA6938230D3812A65A78BFCE85EF55C629322639A3E74F1B"
+    },
+    {
+      "path": "TurnController.cs.uid",
+      "length": 20,
+      "sha256": "A7E204CC0BE2CCF5668F36C876615036FBF1A959842281E3DD8BF106CFDC1B7E"
+    },
+    {
+      "path": "WalkRightSheet.png",
+      "length": 168701,
+      "sha256": "64C2B07D1697B3BF094513404DB777FD778FABE781B0EEA59078C6F081EA6D46"
+    },
+    {
+      "path": "WalkRightSheet.png.import",
+      "length": 946,
+      "sha256": "1CAEDF3EC0C8EE8788F73E5172BC0A9779C82A29FE4076A0AB2190365E8D0141"
+    },
+    {
+      "path": "Waving.png",
+      "length": 599735,
+      "sha256": "FB11A7D571776DF91346403BFBE55D656F25EDBC706BF5B76536E59BBB7E5435"
+    },
+    {
+      "path": "Waving.png.import",
+      "length": 735,
+      "sha256": "EDC54046A6FBA31D1717081919F544FE2B5C491EEED538BEE7B09838A1D06CB6"
+    },
+    {
+      "path": "Waving2.png",
+      "length": 539619,
+      "sha256": "7F845A172FE9F4E7D2B7BD48CDD663A0FFB1173E2CC891AB92EDAFB5CE20E6F8"
+    },
+    {
+      "path": "Waving2.png.import",
+      "length": 25,
+      "sha256": "C7D129DF259FEB5ADDB132A77DED322A6D94840A35E6112510CF7FF731F474BB"
+    },
+    {
+      "path": "Waving3.png",
+      "length": 723245,
+      "sha256": "88A82428B470CF31392A2E48EDDC0A236E9EF914F72D82A447EC57F4FEFCF142"
+    },
+    {
+      "path": "Waving3.png.import",
+      "length": 25,
+      "sha256": "C7D129DF259FEB5ADDB132A77DED322A6D94840A35E6112510CF7FF731F474BB"
+    },
+    {
+      "path": "Waving4.png",
+      "length": 586057,
+      "sha256": "9EC0286C79E9E4F2CDE3BA809068B7120B19207AD48E69C5FD7BCF091D683278"
+    },
+    {
+      "path": "Waving4.png.import",
+      "length": 28,
+      "sha256": "EB38CA201D91973448A11295B3B42BAD12344F887C8B2257CDDF993B738C2C78"
+    }
+  ]
+}

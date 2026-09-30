@@ -1,0 +1,32 @@
+[
+  {
+    "frame": 0,
+    "mismatch_pixels": 0,
+    "max_channel_delta": 0
+  },
+  {
+    "frame": 1,
+    "mismatch_pixels": 0,
+    "max_channel_delta": 0
+  },
+  {
+    "frame": 2,
+    "mismatch_pixels": 0,
+    "max_channel_delta": 0
+  },
+  {
+    "frame": 3,
+    "mismatch_pixels": 0,
+    "max_channel_delta": 0
+  },
+  {
+    "frame": 4,
+    "mismatch_pixels": 0,
+    "max_channel_delta": 0
+  },
+  {
+    "frame": 5,
+    "mismatch_pixels": 0,
+    "max_channel_delta": 0
+  }
+]

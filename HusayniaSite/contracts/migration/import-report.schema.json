@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.husaynia.org/migration/import-report.schema.json",
+  "title": "Husaynia migration import report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "planId",
+    "mode",
+    "generatedAtUtc",
+    "counts",
+    "decisions",
+    "unresolvedDependencies",
+    "checksums"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "planId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["dry-run", "apply"]
+    },
+    "generatedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "create", "update", "skip", "conflict", "orphan", "reject"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "create": { "type": "integer", "minimum": 0 },
+        "update": { "type": "integer", "minimum": 0 },
+        "skip": { "type": "integer", "minimum": 0 },
+        "conflict": { "type": "integer", "minimum": 0 },
+        "orphan": { "type": "integer", "minimum": 0 },
+        "reject": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sourceKey", "sourceVersion", "targetKey", "decision"],
+        "properties": {
+          "sourceKey": { "type": "string", "minLength": 1 },
+          "sourceVersion": { "type": "string", "minLength": 1 },
+          "targetKey": { "type": "string", "minLength": 1 },
+          "decision": {
+            "type": "string",
+            "enum": ["create", "update", "skip", "conflict", "orphan", "reject"]
+          },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "unresolvedDependencies": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "checksums": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-fA-F0-9]{64}$"
+      }
+    }
+  },
+  "$comment": "Reports contain no secret values."
+}

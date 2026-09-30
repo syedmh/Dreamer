@@ -1,0 +1,64 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.46.1.21595",
+      "templateHash": "10474829703856663336"
+    }
+  },
+  "parameters": {
+    "privateEndpointsRequested": {
+      "type": "bool",
+      "metadata": {
+        "description": "Request-only metadata. No optional resource exists in T20 and every true request blocks the parent deployment."
+      }
+    },
+    "frontDoorOrCdnRequested": {
+      "type": "bool"
+    },
+    "deploymentSlotsRequested": {
+      "type": "bool"
+    },
+    "defenderForStorageRequested": {
+      "type": "bool"
+    },
+    "zoneOrEnhancedBackupRedundancyRequested": {
+      "type": "bool"
+    }
+  },
+  "resources": [],
+  "outputs": {
+    "capabilities": {
+      "type": "object",
+      "value": {
+        "privateEndpoints": {
+          "requested": "[parameters('privateEndpointsRequested')]",
+          "effective": false,
+          "status": "REQUEST_ONLY_NEEDS_DECISION"
+        },
+        "frontDoorOrCdn": {
+          "requested": "[parameters('frontDoorOrCdnRequested')]",
+          "effective": false,
+          "status": "REQUEST_ONLY_NEEDS_DECISION"
+        },
+        "deploymentSlots": {
+          "requested": "[parameters('deploymentSlotsRequested')]",
+          "effective": false,
+          "status": "REQUEST_ONLY_NEEDS_DECISION"
+        },
+        "defenderForStorage": {
+          "requested": "[parameters('defenderForStorageRequested')]",
+          "effective": false,
+          "status": "REQUEST_ONLY_NEEDS_DECISION"
+        },
+        "zoneOrEnhancedBackupRedundancy": {
+          "requested": "[parameters('zoneOrEnhancedBackupRedundancyRequested')]",
+          "effective": false,
+          "status": "REQUEST_ONLY_NEEDS_DECISION"
+        }
+      }
+    }
+  }
+}

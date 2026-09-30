@@ -1,0 +1,71 @@
+{
+  "captureId": "husaynia-20260817T230407Z",
+  "capturedAtUtc": "2026-08-17T23:04:08.9434188+00:00",
+  "operatingSystem": "Microsoft Windows 10.0.26200",
+  "architecture": "X64",
+  "dotNetSdkVersion": "10.0.400",
+  "playwrightPackageVersion": "1.62.0",
+  "chromiumVersion": "151.0.7922.34",
+  "chromiumExecutable": "playwright-chromium-1234",
+  "browserInstallCommand": "pwsh tools/Husaynia.BaselineCapture/bin/Release/net10.0/playwright.ps1 install --no-shell chromium",
+  "browserCacheKey": "Microsoft Windows 10.0.26200|X64|9d737d7bfb7ffe174866ac35ffb42a3fc2f02f5bcd77acc571b8142e265575f3|1.62.0",
+  "networkPolicyVersion": "adr-009-v2",
+  "navigationAttempts": 3,
+  "navigationAttemptTimeoutSeconds": 10,
+  "readinessTimeoutSeconds": 30,
+  "captureTimeoutSeconds": 45,
+  "interCaptureDelayMilliseconds": 3000,
+  "toolingOnlyDependency": true,
+  "chromiumRevision": "1234",
+  "expectedExecutableSha256": "409805a16d6416087e6b2f778df1cf8f7bbb267d6b99f6b5bb0a618eace234f2",
+  "actualExecutableSha256": "409805a16d6416087e6b2f778df1cf8f7bbb267d6b99f6b5bb0a618eace234f2",
+  "chromiumSandbox": true,
+  "childEnvironmentKeys": [
+    "SystemRoot",
+    "TEMP",
+    "TMP",
+    "WINDIR"
+  ],
+  "browserWorkingDirectory": "isolated-os-temp-directory",
+  "processElevated": false,
+  "primaryOrigin": "https://www.husaynia.org",
+  "pinnedDnsAnswers": {
+    "cdn.jsdelivr.net": [
+      "104.17.207.5",
+      "104.17.208.5"
+    ],
+    "cdnjs.cloudflare.com": [
+      "104.17.24.14",
+      "104.17.25.14"
+    ],
+    "fonts.googleapis.com": [
+      "74.125.135.95"
+    ],
+    "fonts.gstatic.com": [
+      "142.250.73.99"
+    ],
+    "www.husaynia.org": [
+      "104.21.76.77",
+      "172.67.191.103"
+    ]
+  },
+  "chromiumHostResolverRules": [
+    "MAP cdn.jsdelivr.net 104.17.207.5",
+    "MAP cdnjs.cloudflare.com 104.17.24.14",
+    "MAP fonts.googleapis.com 74.125.135.95",
+    "MAP fonts.gstatic.com 142.250.73.99",
+    "MAP www.husaynia.org 104.21.76.77",
+    "MAP * ~NOTFOUND"
+  ],
+  "cookiesUsed": false,
+  "storageStateUsed": false,
+  "permissionsGranted": false,
+  "proxyUsed": false,
+  "credentialsUsed": false,
+  "status": "complete",
+  "failureReason": null,
+  "browserExecutableOutsideWorkspace": true,
+  "browserWorkingDirectoryOutsideWorkspace": true,
+  "browserWorkingDirectoryEmpty": true,
+  "childEnvironmentSanitized": true
+}

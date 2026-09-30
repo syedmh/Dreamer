@@ -1,0 +1,10 @@
+{
+  "configuration": "provider.requests_per_minute optional; omitted retains previous no-pacing behavior. Set actual and example Azure configs to 2; actual retry max_attempts to 3.",
+  "pacing": "At least 60/RPM seconds after previous counted attempt completion. Conservative extra spacing prevents subprocess startup variation from compressing request starts.",
+  "scope": "One durable destination queue, all recorded provider attempts counted conservatively; local preflight failures before begin_attempt do not use slots.",
+  "history": "Reuse attempts timestamps for restart-safe pacing. Minimal additive metadata only for provider Retry-After; no destructive schema migration.",
+  "ordering": "Effective ready deadline gates before credential refresh or atomic queue claim. Preserve job-specific retry deadlines and global cooldown.",
+  "watch": "Scan/admit between dispatches, not after draining all pending work; sources remain intact during backpressure.",
+  "safety": "Bounded retries and conservative ambiguous-request handling unchanged. No live images, policy changes, credentials, or paid calls during implementation.",
+  "limitations": "Does not coordinate separate destination databases or other Azure clients; independent token quotas may still produce 429."
+}

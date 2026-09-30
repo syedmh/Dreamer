@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'none'; font-src 'none'; object-src 'none'; frame-src 'none'; media-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Life Memoir Writer</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div id="book-writer-app" class="app-shell">
+    <header class="site-header">
+      <div>
+        <p class="eyebrow">Private, local-only writing</p>
+        <h1>Life Memoir Writer</h1>
+        <p class="header-copy">Gather memories, shape chapters, and keep portable copies you control.</p>
+      </div>
+      <div class="save-panel" aria-label="Save status">
+        <strong id="save-status" role="status" aria-live="polite">Starting…</strong>
+        <span id="save-detail">Your memoir stays in this browser.</span>
+      </div>
+    </header>
+
+    <noscript>
+      <p class="banner banner-error">JavaScript is required. No network or account is used.</p>
+    </noscript>
+
+    <section id="storage-banner" class="banner banner-error" hidden tabindex="-1">
+      <div>
+        <strong>Local saving is unavailable.</strong>
+        <p id="storage-message">Do not close this page until you have downloaded a backup.</p>
+      </div>
+      <div class="button-row">
+        <button id="retry-save" type="button">Retry save</button>
+        <button id="emergency-backup" type="button" class="secondary">Emergency backup</button>
+      </div>
+    </section>
+
+    <section id="conflict-banner" class="banner banner-warning" hidden tabindex="-1">
+      <div>
+        <strong>A newer copy is stored in another tab.</strong>
+        <p>Choose the stored copy or explicitly overwrite it with this tab. Changes are never merged automatically.</p>
+      </div>
+      <div class="button-row">
+        <button id="reload-external" type="button">Load stored copy</button>
+        <button id="force-overwrite" type="button" class="danger">Overwrite stored copy</button>
+      </div>
+    </section>
+
+    <section id="first-run" class="first-run card" hidden>
+      <div>
+        <p class="eyebrow">Start privately</p>
+        <h2>Your working copy stays on this device</h2>
+        <p>No memoir text, metadata, analytics, or telemetry is sent anywhere. Browser-data clearing or device loss can remove the working copy, so download backups regularly.</p>
+        <p><strong>Backups are not encrypted.</strong> Store them somewhere private and keep more than one copy.</p>
+      </div>
+      <div class="button-row">
+        <button id="create-first-memory" type="button">Create my first memory</button>
+        <button id="first-run-restore" type="button" class="secondary">Restore a backup</button>
+      </div>
+    </section>
+
+    <nav class="app-nav" aria-label="Memoir sections">
+      <button type="button" data-view="memories" aria-current="page">Memories</button>
+      <button type="button" data-view="chapters">Chapters</button>
+      <button type="button" data-view="book">Book view</button>
+      <button type="button" data-view="data">Backup &amp; data</button>
+    </nav>
+
+    <main>
+      <section id="view-memories" class="app-view" aria-labelledby="memories-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Capture and expand</p>
+            <h2 id="memories-heading">Memories</h2>
+          </div>
+          <button id="create-memory" type="button">New memory</button>
+        </div>
+
+        <div class="filter-grid" aria-label="Memory search and filters">
+          <label>
+            Search
+            <input id="memory-search" type="search" autocomplete="off"
+                   placeholder="Title, words, people, places, themes">
+          </label>
+          <label>
+            Chapter
+            <select id="chapter-filter">
+              <option value="">All chapters</option>
+              <option value="__unassigned__">Unassigned</option>
+            </select>
+          </label>
+          <label>
+            Theme
+            <select id="theme-filter">
+              <option value="">All themes</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="workspace">
+          <aside class="memory-list-panel" aria-label="Memory list">
+            <p id="memory-count" class="muted"></p>
+            <div id="memory-list" class="memory-list"></div>
+          </aside>
+          <section id="memory-editor" class="editor card" aria-label="Memory editor">
+            <p class="empty-state">Create or choose a memory to begin.</p>
+          </section>
+        </div>
+      </section>
+
+      <section id="view-chapters" class="app-view" aria-labelledby="chapters-heading" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Shape the manuscript</p>
+            <h2 id="chapters-heading">Chapters</h2>
+          </div>
+        </div>
+        <form id="chapter-create-form" class="inline-form">
+          <label for="new-chapter-title">New chapter title</label>
+          <div class="button-row">
+            <input id="new-chapter-title" type="text" required maxlength="200">
+            <button type="submit">Add chapter</button>
+          </div>
+        </form>
+        <p class="help-text">Use the explicit move controls to arrange chapters and memories. Deleting a chapter leaves its memories safely unassigned.</p>
+        <div id="chapter-organizer" class="chapter-organizer"></div>
+      </section>
+
+      <section id="view-book" class="app-view" aria-labelledby="book-heading" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Review the whole story</p>
+            <h2 id="book-heading">Book view</h2>
+          </div>
+        </div>
+        <div class="book-layout">
+          <form id="book-metadata" class="card form-stack" aria-label="Book details">
+            <label>Title <input name="title" type="text" maxlength="300"></label>
+            <label>Subtitle <input name="subtitle" type="text" maxlength="300"></label>
+            <label>Author name <input name="authorName" type="text" maxlength="300"></label>
+            <label>Dedication <textarea name="dedication" rows="4"></textarea></label>
+            <label>Preface <textarea name="preface" rows="6"></textarea></label>
+          </form>
+          <article id="book-preview" class="book-preview card" aria-label="Assembled memoir"></article>
+        </div>
+      </section>
+
+      <section id="view-data" class="app-view" aria-labelledby="data-heading" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Keep durable copies</p>
+            <h2 id="data-heading">Backup, restore, export, and erase</h2>
+          </div>
+        </div>
+        <div class="data-grid">
+          <section class="card">
+            <h3>Portable backup</h3>
+            <p>A backup preserves all supported fields and ordering for later restore. It is a readable JSON file, but it is not encrypted.</p>
+            <button id="download-backup" type="button">Download backup</button>
+          </section>
+          <section class="card">
+            <h3>Replace from backup</h3>
+            <p>A valid restore shows counts and asks before replacing this browser’s current collection. Invalid files change nothing.</p>
+            <label class="file-label">
+              Choose JSON backup
+              <input id="restore-file" type="file" accept="application/json,.json">
+            </label>
+            <p id="restore-status" class="muted" role="status" aria-live="polite"></p>
+          </section>
+          <section class="card">
+            <h3>Readable exports</h3>
+            <p>HTML and UTF-8 text exports are independent reading copies. They cannot be restored into the app.</p>
+            <div class="button-row">
+              <button id="export-html" type="button">Export HTML</button>
+              <button id="export-text" type="button" class="secondary">Export text</button>
+            </div>
+          </section>
+          <section class="card danger-zone">
+            <h3>Erase this browser’s memoir</h3>
+            <p>This removes only Life Memoir Writer’s local storage key. It cannot erase downloaded backups or exports.</p>
+            <button id="erase-all" type="button" class="danger">Erase all local data</button>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Local-only by design. No account, cloud, network call, analytics, external font, or AI service.</p>
+    </footer>
+  </div>
+
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+    <div class="dialog-content">
+      <h2 id="confirm-title">Confirm action</h2>
+      <p id="confirm-message"></p>
+      <div class="button-row dialog-actions">
+        <button id="confirm-cancel" type="button" class="secondary">Cancel</button>
+        <button id="confirm-accept" type="button" class="danger">Confirm</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="restore-dialog" aria-labelledby="restore-title" aria-describedby="restore-summary">
+    <div class="dialog-content">
+      <h2 id="restore-title">Replace current memoir?</h2>
+      <p id="restore-summary"></p>
+      <p><strong>This replaces the current browser copy after one successful local save.</strong> Download a backup first if you may need the current copy.</p>
+      <div class="button-row dialog-actions">
+        <button id="restore-cancel" type="button" class="secondary">Cancel restore</button>
+        <button id="restore-accept" type="button" class="danger">Replace memoir</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="js/namespace.js"></script>
+  <script src="js/domain.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/persistence.js"></script>
+  <script src="js/prompts.js"></script>
+  <script src="js/backup.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

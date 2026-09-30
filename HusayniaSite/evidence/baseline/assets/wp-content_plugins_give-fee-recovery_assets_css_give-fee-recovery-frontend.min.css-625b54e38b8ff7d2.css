@@ -1,0 +1,4 @@
+/*!
+ * Give - Fee Recovery Frontend CSS.
+ * @package:     Give_Fee_Recovery
+*/form[id*=give-form] .give-fee-message{clear:both;display:inline-block;width:100%}form[id*=give-form] .give_fee_mode_checkbox{width:auto}.give-display-button-only form[id*=give-form] .give-fee-message{display:none!important}.give-fee-collect-wrap{margin:0 0 10px}

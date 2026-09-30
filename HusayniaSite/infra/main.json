@@ -1,0 +1,2099 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "languageVersion": "2.0",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.46.1.21595",
+      "templateHash": "5879475393223197366"
+    }
+  },
+  "definitions": {
+    "CostConfiguration": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string",
+          "minLength": 1
+        },
+        "appServicePlanSkuName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "appServicePlanSkuTier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sqlSkuName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sqlSkuTier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sqlSkuCapacity": {
+          "type": "int",
+          "minValue": 0
+        },
+        "sqlBackupStorageRedundancy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "storageSkuName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "storageAccessTier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "logAnalyticsSkuName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "keyVaultSkuName": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "AppServiceAccessRestriction": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ipAddress": {
+          "type": "string",
+          "minLength": 1
+        },
+        "action": {
+          "type": "string",
+          "allowedValues": [
+            "Allow"
+          ]
+        },
+        "priority": {
+          "type": "int",
+          "minValue": 100
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "SqlFirewallRule": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "startIpAddress": {
+          "type": "string",
+          "minLength": 7
+        },
+        "endIpAddress": {
+          "type": "string",
+          "minLength": 7
+        }
+      },
+      "additionalProperties": false
+    },
+    "IpRule": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "minLength": 3
+        }
+      },
+      "additionalProperties": false
+    },
+    "NetworkConfiguration": {
+      "type": "object",
+      "properties": {
+        "appServicePublicNetworkAccess": {
+          "type": "string",
+          "allowedValues": [
+            "Disabled",
+            "Enabled"
+          ]
+        },
+        "appServiceAccessRestrictions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AppServiceAccessRestriction"
+          }
+        },
+        "sqlPublicNetworkAccess": {
+          "type": "string",
+          "allowedValues": [
+            "Disabled",
+            "Enabled"
+          ]
+        },
+        "sqlFirewallRules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SqlFirewallRule"
+          }
+        },
+        "storagePublicNetworkAccess": {
+          "type": "string",
+          "allowedValues": [
+            "Disabled",
+            "Enabled"
+          ]
+        },
+        "storageIpRules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IpRule"
+          }
+        },
+        "keyVaultPublicNetworkAccess": {
+          "type": "string",
+          "allowedValues": [
+            "Disabled",
+            "Enabled"
+          ]
+        },
+        "keyVaultIpRules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IpRule"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "AvailabilityConfiguration": {
+      "type": "object",
+      "properties": {
+        "locationId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "frequencySeconds": {
+          "type": "int",
+          "minValue": 0
+        },
+        "timeoutSeconds": {
+          "type": "int",
+          "minValue": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "ActionGroupEmailReceiver": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "emailAddress": {
+          "type": "string",
+          "minLength": 3
+        }
+      },
+      "additionalProperties": false
+    },
+    "AlertConfiguration": {
+      "type": "object",
+      "properties": {
+        "approvedEmailReceivers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ActionGroupEmailReceiver"
+          }
+        },
+        "runbookUrl": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "owner": {
+          "type": "string",
+          "maxLength": 128
+        }
+      },
+      "additionalProperties": false
+    },
+    "RetentionConfiguration": {
+      "type": "object",
+      "properties": {
+        "logAnalyticsDays": {
+          "type": "int",
+          "minValue": 1
+        },
+        "mediaVersionDays": {
+          "type": "int",
+          "minValue": 0
+        },
+        "operationalEvidenceDays": {
+          "type": "int",
+          "minValue": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "CapabilityRequests": {
+      "type": "object",
+      "properties": {
+        "privateEndpoints": {
+          "type": "bool"
+        },
+        "frontDoorOrCdn": {
+          "type": "bool"
+        },
+        "deploymentSlots": {
+          "type": "bool"
+        },
+        "defenderForStorage": {
+          "type": "bool"
+        },
+        "zoneOrEnhancedBackupRedundancy": {
+          "type": "bool"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "parameters": {
+    "stage": {
+      "type": "string",
+      "allowedValues": [
+        "Development",
+        "Staging",
+        "Production"
+      ],
+      "metadata": {
+        "description": "Selects one immutable T20 stage definition. Resource group, naming, tags, and Production policy are not caller inputs."
+      }
+    },
+    "deploymentEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Non-production resource creation request. Every supplied stage file is false. Production remains blocked by code even if this value is overridden."
+      }
+    },
+    "costConfiguration": {
+      "$ref": "#/definitions/CostConfiguration",
+      "defaultValue": {
+        "location": "UNAPPROVED-LOCATION",
+        "appServicePlanSkuName": "UNAPPROVED",
+        "appServicePlanSkuTier": "UNAPPROVED",
+        "sqlSkuName": "UNAPPROVED",
+        "sqlSkuTier": "UNAPPROVED",
+        "sqlSkuCapacity": 0,
+        "sqlBackupStorageRedundancy": "UNAPPROVED",
+        "storageSkuName": "UNAPPROVED",
+        "storageAccessTier": "UNAPPROVED",
+        "logAnalyticsSkuName": "UNAPPROVED",
+        "keyVaultSkuName": "UNAPPROVED"
+      },
+      "metadata": {
+        "description": "Cost-bearing values are placeholders in every supplied stage file. T20 does not approve a SKU, capacity, region, or retention bill."
+      }
+    },
+    "networkConfiguration": {
+      "$ref": "#/definitions/NetworkConfiguration",
+      "defaultValue": {
+        "appServicePublicNetworkAccess": "Disabled",
+        "appServiceAccessRestrictions": [],
+        "sqlPublicNetworkAccess": "Disabled",
+        "sqlFirewallRules": [],
+        "storagePublicNetworkAccess": "Disabled",
+        "storageIpRules": [],
+        "keyVaultPublicNetworkAccess": "Disabled",
+        "keyVaultIpRules": []
+      },
+      "metadata": {
+        "description": "Deny-by-default public network capability. Deployable non-production input must provide only explicit narrow allow rules."
+      }
+    },
+    "availabilityConfiguration": {
+      "$ref": "#/definitions/AvailabilityConfiguration",
+      "defaultValue": {
+        "locationId": "UNAPPROVED",
+        "frequencySeconds": 0,
+        "timeoutSeconds": 0
+      },
+      "metadata": {
+        "description": "Synthetic web-test location and timing. The target URL is derived from the deterministic stage web-app name and /health."
+      }
+    },
+    "alertConfiguration": {
+      "$ref": "#/definitions/AlertConfiguration",
+      "defaultValue": {
+        "approvedEmailReceivers": [],
+        "runbookUrl": "",
+        "owner": ""
+      },
+      "metadata": {
+        "description": "At least one approved receiver plus an HTTPS runbook and owner are required before a non-production deployment can be effective."
+      }
+    },
+    "retentionConfiguration": {
+      "$ref": "#/definitions/RetentionConfiguration",
+      "defaultValue": {
+        "logAnalyticsDays": 30,
+        "mediaVersionDays": 0,
+        "operationalEvidenceDays": 0
+      },
+      "metadata": {
+        "description": "Lifecycle values require privacy, recovery, operations, and cost approval. Zero is deliberately inert for data deletion."
+      }
+    },
+    "capabilityRequests": {
+      "$ref": "#/definitions/CapabilityRequests",
+      "defaultValue": {
+        "privateEndpoints": false,
+        "frontDoorOrCdn": false,
+        "deploymentSlots": false,
+        "defenderForStorage": false,
+        "zoneOrEnhancedBackupRedundancy": false
+      },
+      "metadata": {
+        "description": "Unimplemented cost-reserved features are request-only. Any true value blocks effective deployment until a future approved implementation."
+      }
+    },
+    "appConfigurationEndpoint": {
+      "type": "string",
+      "defaultValue": "",
+      "maxLength": 2048,
+      "metadata": {
+        "description": "Optional non-secret App Configuration endpoint handed to T21. T20 does not own App Service application settings."
+      }
+    }
+  },
+  "variables": {
+    "stageDefinitions": {
+      "Development": {
+        "code": "dev",
+        "resourceGroupName": "rg-husaynia-development",
+        "dataClassification": "non-production",
+        "t20DeploymentAllowed": false,
+        "storageLockRequired": false,
+        "automaticPromotionAllowed": true
+      },
+      "Staging": {
+        "code": "stg",
+        "resourceGroupName": "rg-husaynia-staging",
+        "dataClassification": "non-production",
+        "t20DeploymentAllowed": false,
+        "storageLockRequired": false,
+        "automaticPromotionAllowed": false
+      },
+      "Production": {
+        "code": "prd",
+        "resourceGroupName": "rg-husaynia-production",
+        "dataClassification": "production",
+        "t20DeploymentAllowed": false,
+        "storageLockRequired": true,
+        "automaticPromotionAllowed": false
+      }
+    },
+    "selectedStage": "[variables('stageDefinitions')[parameters('stage')]]",
+    "stageCode": "[variables('selectedStage').code]",
+    "resourceGroupName": "[variables('selectedStage').resourceGroupName]",
+    "stableSubscriptionToken": "[uniqueString(subscription().subscriptionId)]",
+    "appServicePlanName": "[format('husaynia-plan-{0}', variables('stageCode'))]",
+    "webAppName": "[format('husaynia-web-{0}-{1}', variables('stageCode'), variables('stableSubscriptionToken'))]",
+    "sqlServerName": "[format('husaynia-sql-{0}-{1}', variables('stageCode'), variables('stableSubscriptionToken'))]",
+    "sqlDatabaseName": "[format('husaynia-{0}', variables('stageCode'))]",
+    "storageAccountName": "[format('husaynia{0}{1}', variables('stageCode'), variables('stableSubscriptionToken'))]",
+    "keyVaultName": "[format('hsy-kv-{0}-{1}', variables('stageCode'), variables('stableSubscriptionToken'))]",
+    "logAnalyticsName": "[format('husaynia-log-{0}', variables('stageCode'))]",
+    "applicationInsightsName": "[format('husaynia-ai-{0}', variables('stageCode'))]",
+    "availabilityTestName": "[format('husaynia-availability-{0}', variables('stageCode'))]",
+    "actionGroupName": "[format('husaynia-ag-{0}', variables('stageCode'))]",
+    "linuxFxVersion": "DOTNETCORE|10.0",
+    "availabilityTestUrl": "[format('https://{0}.azurewebsites.net/health', variables('webAppName'))]",
+    "targetRpoHours": 24,
+    "targetRtoHours": 4,
+    "invalidAppServiceRules": "[filter(parameters('networkConfiguration').appServiceAccessRestrictions, lambda('rule', or(or(or(empty(trim(lambdaVariables('rule').name)), empty(trim(lambdaVariables('rule').description))), not(equals(lambdaVariables('rule').action, 'Allow'))), not(equals(parseCidr(lambdaVariables('rule').ipAddress).cidr, if(contains(lambdaVariables('rule').ipAddress, ':'), 128, 32))))))]",
+    "invalidSqlFirewallRules": "[filter(parameters('networkConfiguration').sqlFirewallRules, lambda('rule', or(or(or(empty(trim(lambdaVariables('rule').name)), not(contains(lambdaVariables('rule').startIpAddress, '.'))), not(equals(trim(lambdaVariables('rule').startIpAddress), trim(lambdaVariables('rule').endIpAddress)))), equals(trim(lambdaVariables('rule').startIpAddress), '0.0.0.0'))))]",
+    "invalidStorageIpRules": "[filter(parameters('networkConfiguration').storageIpRules, lambda('rule', not(equals(parseCidr(lambdaVariables('rule').value).cidr, if(contains(lambdaVariables('rule').value, ':'), 128, 32)))))]",
+    "invalidKeyVaultIpRules": "[filter(parameters('networkConfiguration').keyVaultIpRules, lambda('rule', not(equals(parseCidr(lambdaVariables('rule').value).cidr, if(contains(lambdaVariables('rule').value, ':'), 128, 32)))))]",
+    "networkRulesAreNarrow": "[and(and(and(equals(length(variables('invalidAppServiceRules')), 0), equals(length(variables('invalidSqlFirewallRules')), 0)), equals(length(variables('invalidStorageIpRules')), 0)), equals(length(variables('invalidKeyVaultIpRules')), 0))]",
+    "appServiceConnectivityApproved": "[and(equals(parameters('networkConfiguration').appServicePublicNetworkAccess, 'Enabled'), greater(length(parameters('networkConfiguration').appServiceAccessRestrictions), 0))]",
+    "sqlConnectivityApproved": "[and(equals(parameters('networkConfiguration').sqlPublicNetworkAccess, 'Enabled'), greater(length(parameters('networkConfiguration').sqlFirewallRules), 0))]",
+    "storageConnectivityApproved": "[and(equals(parameters('networkConfiguration').storagePublicNetworkAccess, 'Enabled'), greater(length(parameters('networkConfiguration').storageIpRules), 0))]",
+    "keyVaultConnectivityApproved": "[and(equals(parameters('networkConfiguration').keyVaultPublicNetworkAccess, 'Enabled'), greater(length(parameters('networkConfiguration').keyVaultIpRules), 0))]",
+    "allConnectivityInputsApproved": "[and(and(and(and(variables('appServiceConnectivityApproved'), variables('sqlConnectivityApproved')), variables('storageConnectivityApproved')), variables('keyVaultConnectivityApproved')), variables('networkRulesAreNarrow'))]",
+    "costInputsApproved": "[and(and(and(and(and(and(and(and(and(and(not(equals(parameters('costConfiguration').location, 'UNAPPROVED-LOCATION')), not(equals(parameters('costConfiguration').appServicePlanSkuName, 'UNAPPROVED'))), not(equals(parameters('costConfiguration').appServicePlanSkuTier, 'UNAPPROVED'))), not(equals(parameters('costConfiguration').sqlSkuName, 'UNAPPROVED'))), not(equals(parameters('costConfiguration').sqlSkuTier, 'UNAPPROVED'))), greater(parameters('costConfiguration').sqlSkuCapacity, 0)), not(equals(parameters('costConfiguration').sqlBackupStorageRedundancy, 'UNAPPROVED'))), not(equals(parameters('costConfiguration').storageSkuName, 'UNAPPROVED'))), not(equals(parameters('costConfiguration').storageAccessTier, 'UNAPPROVED'))), not(equals(parameters('costConfiguration').logAnalyticsSkuName, 'UNAPPROVED'))), not(equals(parameters('costConfiguration').keyVaultSkuName, 'UNAPPROVED')))]",
+    "availabilityInputsApproved": "[and(and(not(equals(parameters('availabilityConfiguration').locationId, 'UNAPPROVED')), greater(parameters('availabilityConfiguration').frequencySeconds, 0)), greater(parameters('availabilityConfiguration').timeoutSeconds, 0))]",
+    "retentionInputsApproved": "[and(greater(parameters('retentionConfiguration').mediaVersionDays, 0), greater(parameters('retentionConfiguration').operationalEvidenceDays, 0))]",
+    "invalidAlertReceivers": "[filter(parameters('alertConfiguration').approvedEmailReceivers, lambda('receiver', or(or(empty(trim(lambdaVariables('receiver').name)), not(contains(lambdaVariables('receiver').emailAddress, '@'))), contains(lambdaVariables('receiver').emailAddress, ' '))))]",
+    "normalizedRunbookUrl": "[toLower(trim(parameters('alertConfiguration').runbookUrl))]",
+    "runbookUrlApproved": "[and(and(and(and(and(startsWith(variables('normalizedRunbookUrl'), 'https://'), greater(length(variables('normalizedRunbookUrl')), 11)), contains(replace(variables('normalizedRunbookUrl'), 'https://', ''), '.')), not(contains(variables('normalizedRunbookUrl'), '@'))), not(contains(variables('normalizedRunbookUrl'), '?'))), not(contains(variables('normalizedRunbookUrl'), '#')))]",
+    "alertingInputsApproved": "[and(and(and(greater(length(parameters('alertConfiguration').approvedEmailReceivers), 0), equals(length(variables('invalidAlertReceivers')), 0)), variables('runbookUrlApproved')), not(empty(trim(parameters('alertConfiguration').owner))))]",
+    "allDeploymentInputsApproved": "[and(and(and(variables('costInputsApproved'), variables('availabilityInputsApproved')), variables('retentionInputsApproved')), variables('alertingInputsApproved'))]",
+    "reservedCapabilityRequested": "[or(or(or(or(parameters('capabilityRequests').privateEndpoints, parameters('capabilityRequests').frontDoorOrCdn), parameters('capabilityRequests').deploymentSlots), parameters('capabilityRequests').defenderForStorage), parameters('capabilityRequests').zoneOrEnhancedBackupRedundancy)]",
+    "deploymentRequested": "[parameters('deploymentEnabled')]",
+    "storageAccountNameValid": "[and(and(greaterOrEquals(length(variables('storageAccountName')), 3), lessOrEquals(length(variables('storageAccountName')), 24)), equals(variables('storageAccountName'), toLower(variables('storageAccountName'))))]",
+    "keyVaultNameValid": "[and(and(and(greaterOrEquals(length(variables('keyVaultName')), 3), lessOrEquals(length(variables('keyVaultName')), 24)), not(startsWith(variables('keyVaultName'), '-'))), not(endsWith(variables('keyVaultName'), '-')))]",
+    "webAppNameValid": "[and(and(and(greaterOrEquals(length(variables('webAppName')), 2), lessOrEquals(length(variables('webAppName')), 60)), not(startsWith(variables('webAppName'), '-'))), not(endsWith(variables('webAppName'), '-')))]",
+    "sqlServerNameValid": "[and(and(and(greaterOrEquals(length(variables('sqlServerName')), 1), lessOrEquals(length(variables('sqlServerName')), 63)), not(startsWith(variables('sqlServerName'), '-'))), not(endsWith(variables('sqlServerName'), '-')))]",
+    "resourceGroupNameValid": "[and(greaterOrEquals(length(variables('resourceGroupName')), 1), lessOrEquals(length(variables('resourceGroupName')), 90))]",
+    "resourceNamesValid": "[and(and(and(and(variables('storageAccountNameValid'), variables('keyVaultNameValid')), variables('webAppNameValid')), variables('sqlServerNameValid')), variables('resourceGroupNameValid'))]",
+    "stageDeploymentEnabled": "[and(and(and(and(and(variables('deploymentRequested'), variables('selectedStage').t20DeploymentAllowed), variables('allDeploymentInputsApproved')), variables('allConnectivityInputsApproved')), variables('resourceNamesValid')), not(variables('reservedCapabilityRequested')))]",
+    "deploymentBlockers": "[concat(if(equals(parameters('stage'), 'Production'), createArray('Production is unconditionally blocked in T20. Enabling it requires a future CTO-authorized code and pipeline change.'), createArray()), if(not(equals(parameters('stage'), 'Production')), createArray('Development and Staging are also non-deployable in T20. T21 must introduce a reviewed stage-scoped enablement change after cost, identity, network, and operations approval.'), createArray()), if(and(variables('deploymentRequested'), not(variables('costInputsApproved'))), createArray('Cost-bearing region, SKU, capacity, and redundancy values remain unapproved.'), createArray()), if(and(variables('deploymentRequested'), not(variables('availabilityInputsApproved'))), createArray('A valid HTTPS synthetic target, Azure test location, frequency, and timeout are required.'), createArray()), if(and(variables('deploymentRequested'), not(variables('retentionInputsApproved'))), createArray('Media-version and operational-evidence retention require privacy, recovery, operations, and cost approval.'), createArray()), if(and(variables('deploymentRequested'), not(variables('alertingInputsApproved'))), createArray('At least one approved receiver, a non-empty owner, and an HTTPS runbook are required.'), createArray()), if(and(variables('deploymentRequested'), not(variables('allConnectivityInputsApproved'))), createArray('All public paths require explicit narrow allow lists; wildcard, allow-all, malformed, and Azure-services SQL rules are rejected.'), createArray()), if(variables('reservedCapabilityRequested'), createArray('An unimplemented cost-reserved capability was requested. This remains NEEDS_DECISION and blocks deployment.'), createArray()))]",
+    "commonTags": {
+      "application": "husaynia-site",
+      "environment": "[parameters('stage')]",
+      "stageCode": "[variables('stageCode')]",
+      "dataClassification": "[variables('selectedStage').dataClassification]",
+      "managedBy": "bicep",
+      "topology": "isolated-paas-baseline",
+      "deploymentState": "[if(variables('stageDeploymentEnabled'), 'effective-nonproduction-infrastructure', 'inert-capability-baseline')]",
+      "applicationReadiness": "awaiting-t21-package-and-secret-bootstrap",
+      "stageDeploymentIdentity": "T21_STAGE_SCOPED_WORKLOAD_IDENTITY_REQUIRED",
+      "crossStageIdentityUseProhibited": "true",
+      "productionDeploymentAllowedByT20": "false",
+      "productionStorageLockRequired": "[string(variables('selectedStage').storageLockRequired)]",
+      "rpoTargetHours": "[string(variables('targetRpoHours'))]",
+      "rtoTargetHours": "[string(variables('targetRtoHours'))]",
+      "costApprovalRequired": "true"
+    }
+  },
+  "resources": {
+    "stageResourceGroup": {
+      "condition": "[variables('stageDeploymentEnabled')]",
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2024-03-01",
+      "name": "[variables('resourceGroupName')]",
+      "location": "[parameters('costConfiguration').location]",
+      "tags": "[variables('commonTags')]"
+    },
+    "monitoring": {
+      "condition": "[variables('stageDeploymentEnabled')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('monitoring-{0}', variables('stageCode'))]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "deployResources": {
+            "value": "[variables('stageDeploymentEnabled')]"
+          },
+          "location": {
+            "value": "[parameters('costConfiguration').location]"
+          },
+          "tags": {
+            "value": "[variables('commonTags')]"
+          },
+          "logAnalyticsName": {
+            "value": "[variables('logAnalyticsName')]"
+          },
+          "applicationInsightsName": {
+            "value": "[variables('applicationInsightsName')]"
+          },
+          "logAnalyticsSkuName": {
+            "value": "[parameters('costConfiguration').logAnalyticsSkuName]"
+          },
+          "logRetentionDays": {
+            "value": "[parameters('retentionConfiguration').logAnalyticsDays]"
+          },
+          "availabilityTestName": {
+            "value": "[variables('availabilityTestName')]"
+          },
+          "availabilityTestUrl": {
+            "value": "[variables('availabilityTestUrl')]"
+          },
+          "availabilityTestLocations": {
+            "value": [
+              {
+                "Id": "[parameters('availabilityConfiguration').locationId]"
+              }
+            ]
+          },
+          "availabilityTestFrequencySeconds": {
+            "value": "[parameters('availabilityConfiguration').frequencySeconds]"
+          },
+          "availabilityTestTimeoutSeconds": {
+            "value": "[parameters('availabilityConfiguration').timeoutSeconds]"
+          },
+          "webAppName": {
+            "value": "[variables('webAppName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.46.1.21595",
+              "templateHash": "1980093394259757081"
+            }
+          },
+          "parameters": {
+            "deployResources": {
+              "type": "bool"
+            },
+            "location": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "object"
+            },
+            "logAnalyticsName": {
+              "type": "string"
+            },
+            "applicationInsightsName": {
+              "type": "string"
+            },
+            "logAnalyticsSkuName": {
+              "type": "string"
+            },
+            "logRetentionDays": {
+              "type": "int"
+            },
+            "availabilityTestName": {
+              "type": "string"
+            },
+            "availabilityTestUrl": {
+              "type": "string"
+            },
+            "availabilityTestLocations": {
+              "type": "array"
+            },
+            "availabilityTestFrequencySeconds": {
+              "type": "int"
+            },
+            "availabilityTestTimeoutSeconds": {
+              "type": "int"
+            },
+            "webAppName": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.OperationalInsights/workspaces",
+              "apiVersion": "2023-09-01",
+              "name": "[parameters('logAnalyticsName')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "sku": {
+                  "name": "[parameters('logAnalyticsSkuName')]"
+                },
+                "retentionInDays": "[parameters('logRetentionDays')]"
+              }
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Insights/components",
+              "apiVersion": "2020-02-02",
+              "name": "[parameters('applicationInsightsName')]",
+              "location": "[parameters('location')]",
+              "kind": "web",
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "Application_Type": "web",
+                "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsName'))]",
+                "DisableIpMasking": false,
+                "Request_Source": "rest"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsName'))]"
+              ]
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Insights/webtests",
+              "apiVersion": "2022-06-15",
+              "name": "[parameters('availabilityTestName')]",
+              "location": "global",
+              "kind": "standard",
+              "tags": "[union(parameters('tags'), createObject(format('hidden-link:{0}', resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))), 'Resource', format('hidden-link:{0}', resourceId('Microsoft.Web/sites', parameters('webAppName'))), 'Resource'))]",
+              "properties": {
+                "SyntheticMonitorId": "[parameters('availabilityTestName')]",
+                "Name": "[parameters('availabilityTestName')]",
+                "Enabled": true,
+                "Frequency": "[parameters('availabilityTestFrequencySeconds')]",
+                "Timeout": "[parameters('availabilityTestTimeoutSeconds')]",
+                "Kind": "standard",
+                "RetryEnabled": true,
+                "Locations": "[parameters('availabilityTestLocations')]",
+                "Request": {
+                  "RequestUrl": "[parameters('availabilityTestUrl')]",
+                  "HttpVerb": "GET",
+                  "ParseDependentRequests": false,
+                  "FollowRedirects": true
+                },
+                "ValidationRules": {
+                  "ExpectedHttpStatusCode": 200,
+                  "SSLCheck": true,
+                  "SSLCertRemainingLifetimeCheck": 7
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "stageResourceGroup"
+      ]
+    },
+    "storage": {
+      "condition": "[variables('stageDeploymentEnabled')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('storage-{0}', variables('stageCode'))]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "deployResources": {
+            "value": "[variables('stageDeploymentEnabled')]"
+          },
+          "location": {
+            "value": "[parameters('costConfiguration').location]"
+          },
+          "tags": {
+            "value": "[variables('commonTags')]"
+          },
+          "storageAccountName": {
+            "value": "[variables('storageAccountName')]"
+          },
+          "storageSkuName": {
+            "value": "[parameters('costConfiguration').storageSkuName]"
+          },
+          "storageAccessTier": {
+            "value": "[parameters('costConfiguration').storageAccessTier]"
+          },
+          "publicNetworkAccess": {
+            "value": "[parameters('networkConfiguration').storagePublicNetworkAccess]"
+          },
+          "allowedIpRules": {
+            "value": "[parameters('networkConfiguration').storageIpRules]"
+          },
+          "storageResourceLockEnabled": {
+            "value": "[variables('selectedStage').storageLockRequired]"
+          },
+          "mediaVersionRetentionDays": {
+            "value": "[parameters('retentionConfiguration').mediaVersionDays]"
+          },
+          "operationalEvidenceRetentionDays": {
+            "value": "[parameters('retentionConfiguration').operationalEvidenceDays]"
+          },
+          "logAnalyticsWorkspaceResourceId": {
+            "value": "[resourceId(subscription().subscriptionId, variables('resourceGroupName'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsName'))]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.46.1.21595",
+              "templateHash": "4345715232587964678"
+            }
+          },
+          "parameters": {
+            "deployResources": {
+              "type": "bool"
+            },
+            "location": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "object"
+            },
+            "storageAccountName": {
+              "type": "string"
+            },
+            "storageSkuName": {
+              "type": "string"
+            },
+            "storageAccessTier": {
+              "type": "string"
+            },
+            "publicNetworkAccess": {
+              "type": "string"
+            },
+            "allowedIpRules": {
+              "type": "array"
+            },
+            "storageResourceLockEnabled": {
+              "type": "bool"
+            },
+            "mediaVersionRetentionDays": {
+              "type": "int"
+            },
+            "operationalEvidenceRetentionDays": {
+              "type": "int"
+            },
+            "logAnalyticsWorkspaceResourceId": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2023-05-01",
+              "name": "[parameters('storageAccountName')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "kind": "StorageV2",
+              "sku": {
+                "name": "[parameters('storageSkuName')]"
+              },
+              "properties": {
+                "accessTier": "[parameters('storageAccessTier')]",
+                "allowBlobPublicAccess": false,
+                "allowSharedKeyAccess": false,
+                "minimumTlsVersion": "TLS1_2",
+                "supportsHttpsTrafficOnly": true,
+                "publicNetworkAccess": "[parameters('publicNetworkAccess')]",
+                "networkAcls": {
+                  "copy": [
+                    {
+                      "name": "ipRules",
+                      "count": "[length(parameters('allowedIpRules'))]",
+                      "input": {
+                        "value": "[parameters('allowedIpRules')[copyIndex('ipRules')].value]",
+                        "action": "Allow"
+                      }
+                    }
+                  ],
+                  "bypass": "None",
+                  "defaultAction": "Deny",
+                  "virtualNetworkRules": []
+                },
+                "encryption": {
+                  "services": {
+                    "blob": {
+                      "enabled": true,
+                      "keyType": "Account"
+                    }
+                  },
+                  "keySource": "Microsoft.Storage"
+                }
+              }
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Storage/storageAccounts/blobServices",
+              "apiVersion": "2023-05-01",
+              "name": "[format('{0}/{1}', parameters('storageAccountName'), 'default')]",
+              "properties": {
+                "deleteRetentionPolicy": {
+                  "enabled": true,
+                  "days": 30
+                },
+                "containerDeleteRetentionPolicy": {
+                  "enabled": true,
+                  "days": 30
+                },
+                "isVersioningEnabled": true
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+              ]
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2023-05-01",
+              "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', 'media')]",
+              "properties": {
+                "publicAccess": "None"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
+              ]
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2023-05-01",
+              "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', 'import-evidence')]",
+              "properties": {
+                "publicAccess": "None"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
+              ]
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2023-05-01",
+              "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', 'reports')]",
+              "properties": {
+                "publicAccess": "None"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
+              ]
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
+              "name": "storage-to-log-analytics",
+              "properties": {
+                "workspaceId": "[parameters('logAnalyticsWorkspaceResourceId')]",
+                "logs": [
+                  {
+                    "category": "StorageRead",
+                    "enabled": true
+                  },
+                  {
+                    "category": "StorageWrite",
+                    "enabled": true
+                  },
+                  {
+                    "category": "StorageDelete",
+                    "enabled": true
+                  }
+                ],
+                "metrics": [
+                  {
+                    "category": "Transaction",
+                    "enabled": true
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
+              ]
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Storage/storageAccounts/managementPolicies",
+              "apiVersion": "2023-05-01",
+              "name": "[format('{0}/{1}', parameters('storageAccountName'), 'default')]",
+              "properties": {
+                "policy": {
+                  "rules": [
+                    {
+                      "name": "mediaVersionLifecycle",
+                      "enabled": true,
+                      "type": "Lifecycle",
+                      "definition": {
+                        "filters": {
+                          "blobTypes": [
+                            "blockBlob"
+                          ],
+                          "prefixMatch": [
+                            "media/"
+                          ]
+                        },
+                        "actions": {
+                          "version": {
+                            "delete": {
+                              "daysAfterCreationGreaterThan": "[parameters('mediaVersionRetentionDays')]"
+                            }
+                          },
+                          "snapshot": {
+                            "delete": {
+                              "daysAfterCreationGreaterThan": "[parameters('mediaVersionRetentionDays')]"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "name": "operationalEvidenceLifecycle",
+                      "enabled": true,
+                      "type": "Lifecycle",
+                      "definition": {
+                        "filters": {
+                          "blobTypes": [
+                            "blockBlob"
+                          ],
+                          "prefixMatch": [
+                            "import-evidence/",
+                            "reports/"
+                          ]
+                        },
+                        "actions": {
+                          "baseBlob": {
+                            "delete": {
+                              "daysAfterModificationGreaterThan": "[parameters('operationalEvidenceRetentionDays')]"
+                            }
+                          },
+                          "version": {
+                            "delete": {
+                              "daysAfterCreationGreaterThan": "[parameters('operationalEvidenceRetentionDays')]"
+                            }
+                          },
+                          "snapshot": {
+                            "delete": {
+                              "daysAfterCreationGreaterThan": "[parameters('operationalEvidenceRetentionDays')]"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+              ]
+            },
+            {
+              "condition": "[and(parameters('deployResources'), parameters('storageResourceLockEnabled'))]",
+              "type": "Microsoft.Authorization/locks",
+              "apiVersion": "2020-05-01",
+              "scope": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
+              "name": "media-protection",
+              "properties": {
+                "level": "CanNotDelete",
+                "notes": "Protect media lifecycle resources after an authorized deployment."
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "monitoring",
+        "stageResourceGroup"
+      ]
+    },
+    "keyVault": {
+      "condition": "[variables('stageDeploymentEnabled')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('key-vault-{0}', variables('stageCode'))]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "deployResources": {
+            "value": "[variables('stageDeploymentEnabled')]"
+          },
+          "location": {
+            "value": "[parameters('costConfiguration').location]"
+          },
+          "tags": {
+            "value": "[variables('commonTags')]"
+          },
+          "keyVaultName": {
+            "value": "[variables('keyVaultName')]"
+          },
+          "keyVaultSkuName": {
+            "value": "[parameters('costConfiguration').keyVaultSkuName]"
+          },
+          "publicNetworkAccess": {
+            "value": "[parameters('networkConfiguration').keyVaultPublicNetworkAccess]"
+          },
+          "allowedIpRules": {
+            "value": "[parameters('networkConfiguration').keyVaultIpRules]"
+          },
+          "logAnalyticsWorkspaceResourceId": {
+            "value": "[resourceId(subscription().subscriptionId, variables('resourceGroupName'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsName'))]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.46.1.21595",
+              "templateHash": "6764183643774677378"
+            }
+          },
+          "parameters": {
+            "deployResources": {
+              "type": "bool"
+            },
+            "location": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "object"
+            },
+            "keyVaultName": {
+              "type": "string"
+            },
+            "keyVaultSkuName": {
+              "type": "string"
+            },
+            "publicNetworkAccess": {
+              "type": "string"
+            },
+            "allowedIpRules": {
+              "type": "array"
+            },
+            "logAnalyticsWorkspaceResourceId": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.KeyVault/vaults",
+              "apiVersion": "2023-07-01",
+              "name": "[parameters('keyVaultName')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "tenantId": "[tenant().tenantId]",
+                "sku": {
+                  "family": "A",
+                  "name": "[parameters('keyVaultSkuName')]"
+                },
+                "enableRbacAuthorization": true,
+                "enablePurgeProtection": true,
+                "enableSoftDelete": true,
+                "softDeleteRetentionInDays": 90,
+                "publicNetworkAccess": "[parameters('publicNetworkAccess')]",
+                "networkAcls": {
+                  "copy": [
+                    {
+                      "name": "ipRules",
+                      "count": "[length(parameters('allowedIpRules'))]",
+                      "input": {
+                        "value": "[parameters('allowedIpRules')[copyIndex('ipRules')].value]"
+                      }
+                    }
+                  ],
+                  "bypass": "None",
+                  "defaultAction": "Deny",
+                  "virtualNetworkRules": []
+                }
+              }
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+              "name": "key-vault-to-log-analytics",
+              "properties": {
+                "workspaceId": "[parameters('logAnalyticsWorkspaceResourceId')]",
+                "logs": [
+                  {
+                    "category": "AuditEvent",
+                    "enabled": true
+                  }
+                ],
+                "metrics": [
+                  {
+                    "category": "AllMetrics",
+                    "enabled": true
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "monitoring",
+        "stageResourceGroup"
+      ]
+    },
+    "sql": {
+      "condition": "[variables('stageDeploymentEnabled')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('sql-{0}', variables('stageCode'))]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "deployResources": {
+            "value": "[variables('stageDeploymentEnabled')]"
+          },
+          "location": {
+            "value": "[parameters('costConfiguration').location]"
+          },
+          "tags": {
+            "value": "[variables('commonTags')]"
+          },
+          "sqlServerName": {
+            "value": "[variables('sqlServerName')]"
+          },
+          "sqlDatabaseName": {
+            "value": "[variables('sqlDatabaseName')]"
+          },
+          "sqlSkuName": {
+            "value": "[parameters('costConfiguration').sqlSkuName]"
+          },
+          "sqlSkuTier": {
+            "value": "[parameters('costConfiguration').sqlSkuTier]"
+          },
+          "sqlSkuCapacity": {
+            "value": "[parameters('costConfiguration').sqlSkuCapacity]"
+          },
+          "backupStorageRedundancy": {
+            "value": "[parameters('costConfiguration').sqlBackupStorageRedundancy]"
+          },
+          "publicNetworkAccess": {
+            "value": "[parameters('networkConfiguration').sqlPublicNetworkAccess]"
+          },
+          "firewallRules": {
+            "value": "[parameters('networkConfiguration').sqlFirewallRules]"
+          },
+          "logAnalyticsWorkspaceResourceId": {
+            "value": "[resourceId(subscription().subscriptionId, variables('resourceGroupName'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsName'))]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.46.1.21595",
+              "templateHash": "5990592027944892698"
+            }
+          },
+          "parameters": {
+            "deployResources": {
+              "type": "bool"
+            },
+            "location": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "object"
+            },
+            "sqlServerName": {
+              "type": "string"
+            },
+            "sqlDatabaseName": {
+              "type": "string"
+            },
+            "sqlSkuName": {
+              "type": "string"
+            },
+            "sqlSkuTier": {
+              "type": "string"
+            },
+            "sqlSkuCapacity": {
+              "type": "int"
+            },
+            "backupStorageRedundancy": {
+              "type": "string"
+            },
+            "publicNetworkAccess": {
+              "type": "string"
+            },
+            "firewallRules": {
+              "type": "array"
+            },
+            "logAnalyticsWorkspaceResourceId": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Sql/servers",
+              "apiVersion": "2023-08-01-preview",
+              "name": "[parameters('sqlServerName')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "version": "12.0",
+                "publicNetworkAccess": "[parameters('publicNetworkAccess')]",
+                "minimalTlsVersion": "1.2"
+              }
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Sql/servers/auditingSettings",
+              "apiVersion": "2023-08-01-preview",
+              "name": "[format('{0}/{1}', parameters('sqlServerName'), 'default')]",
+              "properties": {
+                "state": "Enabled",
+                "isAzureMonitorTargetEnabled": true,
+                "auditActionsAndGroups": [
+                  "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP",
+                  "FAILED_DATABASE_AUTHENTICATION_GROUP"
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]"
+              ]
+            },
+            {
+              "copy": {
+                "name": "sqlFirewallRuleResources",
+                "count": "[length(parameters('firewallRules'))]"
+              },
+              "condition": "[and(parameters('deployResources'), equals(parameters('publicNetworkAccess'), 'Enabled'))]",
+              "type": "Microsoft.Sql/servers/firewallRules",
+              "apiVersion": "2023-08-01-preview",
+              "name": "[format('{0}/{1}', parameters('sqlServerName'), parameters('firewallRules')[copyIndex()].name)]",
+              "properties": {
+                "startIpAddress": "[parameters('firewallRules')[copyIndex()].startIpAddress]",
+                "endIpAddress": "[parameters('firewallRules')[copyIndex()].endIpAddress]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]"
+              ]
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Sql/servers/databases",
+              "apiVersion": "2023-08-01-preview",
+              "name": "[format('{0}/{1}', parameters('sqlServerName'), parameters('sqlDatabaseName'))]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "sku": {
+                "name": "[parameters('sqlSkuName')]",
+                "tier": "[parameters('sqlSkuTier')]",
+                "capacity": "[parameters('sqlSkuCapacity')]"
+              },
+              "properties": {
+                "requestedBackupStorageRedundancy": "[parameters('backupStorageRedundancy')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]"
+              ]
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlServerName'), parameters('sqlDatabaseName'))]",
+              "name": "sql-to-log-analytics",
+              "properties": {
+                "workspaceId": "[parameters('logAnalyticsWorkspaceResourceId')]",
+                "logs": [
+                  {
+                    "category": "Errors",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Timeouts",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Blocks",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Deadlocks",
+                    "enabled": true
+                  },
+                  {
+                    "category": "SQLSecurityAuditEvents",
+                    "enabled": true
+                  }
+                ],
+                "metrics": [
+                  {
+                    "category": "Basic",
+                    "enabled": true
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlServerName'), parameters('sqlDatabaseName'))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "monitoring",
+        "stageResourceGroup"
+      ]
+    },
+    "appService": {
+      "condition": "[variables('stageDeploymentEnabled')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('app-service-{0}', variables('stageCode'))]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "deployResources": {
+            "value": "[variables('stageDeploymentEnabled')]"
+          },
+          "location": {
+            "value": "[parameters('costConfiguration').location]"
+          },
+          "tags": {
+            "value": "[variables('commonTags')]"
+          },
+          "appServicePlanName": {
+            "value": "[variables('appServicePlanName')]"
+          },
+          "webAppName": {
+            "value": "[variables('webAppName')]"
+          },
+          "appServicePlanSkuName": {
+            "value": "[parameters('costConfiguration').appServicePlanSkuName]"
+          },
+          "appServicePlanSkuTier": {
+            "value": "[parameters('costConfiguration').appServicePlanSkuTier]"
+          },
+          "linuxFxVersion": {
+            "value": "[variables('linuxFxVersion')]"
+          },
+          "publicNetworkAccess": {
+            "value": "[parameters('networkConfiguration').appServicePublicNetworkAccess]"
+          },
+          "appServiceAccessRestrictions": {
+            "value": "[parameters('networkConfiguration').appServiceAccessRestrictions]"
+          },
+          "storageAccountName": {
+            "value": "[variables('storageAccountName')]"
+          },
+          "logAnalyticsWorkspaceResourceId": {
+            "value": "[resourceId(subscription().subscriptionId, variables('resourceGroupName'), 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsName'))]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.46.1.21595",
+              "templateHash": "17063282129934400384"
+            }
+          },
+          "parameters": {
+            "deployResources": {
+              "type": "bool",
+              "metadata": {
+                "description": "Controls whether this module can create any resource."
+              }
+            },
+            "location": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "object"
+            },
+            "appServicePlanName": {
+              "type": "string"
+            },
+            "webAppName": {
+              "type": "string"
+            },
+            "appServicePlanSkuName": {
+              "type": "string"
+            },
+            "appServicePlanSkuTier": {
+              "type": "string"
+            },
+            "linuxFxVersion": {
+              "type": "string"
+            },
+            "publicNetworkAccess": {
+              "type": "string"
+            },
+            "appServiceAccessRestrictions": {
+              "type": "array"
+            },
+            "storageAccountName": {
+              "type": "string"
+            },
+            "logAnalyticsWorkspaceResourceId": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2024-04-01",
+              "name": "[parameters('appServicePlanName')]",
+              "location": "[parameters('location')]",
+              "kind": "linux",
+              "sku": {
+                "name": "[parameters('appServicePlanSkuName')]",
+                "tier": "[parameters('appServicePlanSkuTier')]"
+              },
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "reserved": true,
+                "perSiteScaling": false
+              }
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2024-04-01",
+              "name": "[parameters('webAppName')]",
+              "location": "[parameters('location')]",
+              "kind": "app,linux",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+                "httpsOnly": true,
+                "publicNetworkAccess": "[parameters('publicNetworkAccess')]",
+                "siteConfig": {
+                  "copy": [
+                    {
+                      "name": "ipSecurityRestrictions",
+                      "count": "[length(parameters('appServiceAccessRestrictions'))]",
+                      "input": {
+                        "name": "[parameters('appServiceAccessRestrictions')[copyIndex('ipSecurityRestrictions')].name]",
+                        "ipAddress": "[parameters('appServiceAccessRestrictions')[copyIndex('ipSecurityRestrictions')].ipAddress]",
+                        "action": "Allow",
+                        "priority": "[parameters('appServiceAccessRestrictions')[copyIndex('ipSecurityRestrictions')].priority]",
+                        "description": "[parameters('appServiceAccessRestrictions')[copyIndex('ipSecurityRestrictions')].description]"
+                      }
+                    }
+                  ],
+                  "linuxFxVersion": "[parameters('linuxFxVersion')]",
+                  "minTlsVersion": "1.2",
+                  "ftpsState": "Disabled",
+                  "http20Enabled": true,
+                  "healthCheckPath": "/health",
+                  "ipSecurityRestrictionsDefaultAction": "Deny",
+                  "scmIpSecurityRestrictionsUseMain": true,
+                  "scmIpSecurityRestrictionsDefaultAction": "Deny"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+              ]
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+              "apiVersion": "2024-04-01",
+              "name": "[format('{0}/{1}', parameters('webAppName'), 'ftp')]",
+              "properties": {
+                "allow": false
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+              ]
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+              "apiVersion": "2024-04-01",
+              "name": "[format('{0}/{1}', parameters('webAppName'), 'scm')]",
+              "properties": {
+                "allow": false
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+              ]
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Authorization/roleDefinitions",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(resourceGroup().id, 'OperationalBlobWriterNoDelete')]",
+              "properties": {
+                "roleName": "Husaynia Operational Blob Writer No Delete",
+                "description": "Read, write, and append blobs in explicitly assigned operational containers without delete permission.",
+                "type": "CustomRole",
+                "permissions": [
+                  {
+                    "actions": [],
+                    "notActions": [],
+                    "dataActions": [
+                      "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read",
+                      "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write",
+                      "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/add/action"
+                    ],
+                    "notDataActions": [
+                      "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/delete"
+                    ]
+                  }
+                ],
+                "assignableScopes": [
+                  "[resourceGroup().id]"
+                ]
+              }
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', 'media')]",
+              "name": "[guid(resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', 'media'), resourceId('Microsoft.Web/sites', parameters('webAppName')), 'StorageBlobDataContributor')]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
+                "principalId": "[reference(resourceId('Microsoft.Web/sites', parameters('webAppName')), '2024-04-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+              ]
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', 'import-evidence')]",
+              "name": "[guid(resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', 'import-evidence'), resourceId('Microsoft.Web/sites', parameters('webAppName')), resourceId('Microsoft.Authorization/roleDefinitions', guid(resourceGroup().id, 'OperationalBlobWriterNoDelete')))]",
+              "properties": {
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', guid(resourceGroup().id, 'OperationalBlobWriterNoDelete'))]",
+                "principalId": "[reference(resourceId('Microsoft.Web/sites', parameters('webAppName')), '2024-04-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Authorization/roleDefinitions', guid(resourceGroup().id, 'OperationalBlobWriterNoDelete'))]",
+                "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+              ]
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', 'reports')]",
+              "name": "[guid(resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', 'reports'), resourceId('Microsoft.Web/sites', parameters('webAppName')), resourceId('Microsoft.Authorization/roleDefinitions', guid(resourceGroup().id, 'OperationalBlobWriterNoDelete')))]",
+              "properties": {
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', guid(resourceGroup().id, 'OperationalBlobWriterNoDelete'))]",
+                "principalId": "[reference(resourceId('Microsoft.Web/sites', parameters('webAppName')), '2024-04-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Authorization/roleDefinitions', guid(resourceGroup().id, 'OperationalBlobWriterNoDelete'))]",
+                "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+              ]
+            },
+            {
+              "condition": "[parameters('deployResources')]",
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]",
+              "name": "app-to-log-analytics",
+              "properties": {
+                "workspaceId": "[parameters('logAnalyticsWorkspaceResourceId')]",
+                "logs": [
+                  {
+                    "category": "AppServiceHTTPLogs",
+                    "enabled": true
+                  },
+                  {
+                    "category": "AppServiceConsoleLogs",
+                    "enabled": true
+                  },
+                  {
+                    "category": "AppServiceAuditLogs",
+                    "enabled": true
+                  }
+                ],
+                "metrics": [
+                  {
+                    "category": "AllMetrics",
+                    "enabled": true
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "monitoring",
+        "stageResourceGroup",
+        "storage"
+      ]
+    },
+    "alerts": {
+      "condition": "[variables('stageDeploymentEnabled')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('alerts-{0}', variables('stageCode'))]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "deployResources": {
+            "value": "[variables('stageDeploymentEnabled')]"
+          },
+          "location": {
+            "value": "[parameters('costConfiguration').location]"
+          },
+          "tags": {
+            "value": "[variables('commonTags')]"
+          },
+          "actionGroupName": {
+            "value": "[variables('actionGroupName')]"
+          },
+          "webAppName": {
+            "value": "[variables('webAppName')]"
+          },
+          "sqlServerName": {
+            "value": "[variables('sqlServerName')]"
+          },
+          "sqlDatabaseName": {
+            "value": "[variables('sqlDatabaseName')]"
+          },
+          "applicationInsightsName": {
+            "value": "[variables('applicationInsightsName')]"
+          },
+          "availabilityTestName": {
+            "value": "[variables('availabilityTestName')]"
+          },
+          "approvedEmailReceivers": {
+            "value": "[parameters('alertConfiguration').approvedEmailReceivers]"
+          },
+          "runbookUrl": {
+            "value": "[parameters('alertConfiguration').runbookUrl]"
+          },
+          "alertOwner": {
+            "value": "[parameters('alertConfiguration').owner]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.46.1.21595",
+              "templateHash": "16691203217201930973"
+            }
+          },
+          "parameters": {
+            "deployResources": {
+              "type": "bool"
+            },
+            "location": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "object"
+            },
+            "actionGroupName": {
+              "type": "string"
+            },
+            "webAppName": {
+              "type": "string"
+            },
+            "sqlServerName": {
+              "type": "string"
+            },
+            "sqlDatabaseName": {
+              "type": "string"
+            },
+            "applicationInsightsName": {
+              "type": "string"
+            },
+            "availabilityTestName": {
+              "type": "string"
+            },
+            "approvedEmailReceivers": {
+              "type": "array"
+            },
+            "runbookUrl": {
+              "type": "string"
+            },
+            "alertOwner": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "invalidReceivers": "[filter(parameters('approvedEmailReceivers'), lambda('receiver', or(or(empty(trim(lambdaVariables('receiver').name)), not(contains(lambdaVariables('receiver').emailAddress, '@'))), contains(lambdaVariables('receiver').emailAddress, ' '))))]",
+            "normalizedRunbookUrl": "[toLower(trim(parameters('runbookUrl')))]",
+            "runbookUrlValid": "[and(and(and(and(and(startsWith(variables('normalizedRunbookUrl'), 'https://'), greater(length(variables('normalizedRunbookUrl')), 11)), contains(replace(variables('normalizedRunbookUrl'), 'https://', ''), '.')), not(contains(variables('normalizedRunbookUrl'), '@'))), not(contains(variables('normalizedRunbookUrl'), '?'))), not(contains(variables('normalizedRunbookUrl'), '#')))]",
+            "alertingInputsValid": "[and(and(and(greater(length(parameters('approvedEmailReceivers')), 0), equals(length(variables('invalidReceivers')), 0)), variables('runbookUrlValid')), not(empty(trim(parameters('alertOwner')))))]"
+          },
+          "resources": [
+            {
+              "condition": "[and(parameters('deployResources'), variables('alertingInputsValid'))]",
+              "type": "Microsoft.Insights/actionGroups",
+              "apiVersion": "2023-01-01",
+              "name": "[parameters('actionGroupName')]",
+              "location": "global",
+              "tags": "[union(parameters('tags'), createObject('alertOwner', parameters('alertOwner'), 'runbookUrl', parameters('runbookUrl')))]",
+              "properties": {
+                "copy": [
+                  {
+                    "name": "emailReceivers",
+                    "count": "[length(parameters('approvedEmailReceivers'))]",
+                    "input": {
+                      "name": "[parameters('approvedEmailReceivers')[copyIndex('emailReceivers')].name]",
+                      "emailAddress": "[parameters('approvedEmailReceivers')[copyIndex('emailReceivers')].emailAddress]",
+                      "useCommonAlertSchema": true
+                    }
+                  }
+                ],
+                "groupShortName": "[take(replace(parameters('actionGroupName'), '-', ''), 12)]",
+                "enabled": true
+              }
+            },
+            {
+              "condition": "[and(parameters('deployResources'), variables('alertingInputsValid'))]",
+              "type": "Microsoft.Insights/metricAlerts",
+              "apiVersion": "2018-03-01",
+              "name": "[format('{0}-synthetic-availability', parameters('webAppName'))]",
+              "location": "global",
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "description": "[format('Synthetic availability failure. Owner: {0}. Runbook: {1}', parameters('alertOwner'), parameters('runbookUrl'))]",
+                "severity": 1,
+                "enabled": true,
+                "scopes": [
+                  "[resourceId('Microsoft.Insights/webtests', parameters('availabilityTestName'))]",
+                  "[resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))]"
+                ],
+                "evaluationFrequency": "PT1M",
+                "windowSize": "PT5M",
+                "criteria": {
+                  "odata.type": "Microsoft.Azure.Monitor.WebtestLocationAvailabilityCriteria",
+                  "webTestId": "[resourceId('Microsoft.Insights/webtests', parameters('availabilityTestName'))]",
+                  "componentId": "[resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))]",
+                  "failedLocationCount": 1
+                },
+                "actions": [
+                  {
+                    "actionGroupId": "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
+                  }
+                ],
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Insights/webtests",
+                "targetResourceRegion": "global"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
+              ]
+            },
+            {
+              "condition": "[and(parameters('deployResources'), variables('alertingInputsValid'))]",
+              "type": "Microsoft.Insights/metricAlerts",
+              "apiVersion": "2018-03-01",
+              "name": "[format('{0}-http5xx', parameters('webAppName'))]",
+              "location": "global",
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "description": "[format('App Service HTTP 5xx response count. Owner: {0}. Runbook: {1}', parameters('alertOwner'), parameters('runbookUrl'))]",
+                "severity": 2,
+                "enabled": true,
+                "scopes": [
+                  "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT15M",
+                "criteria": {
+                  "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                  "allOf": [
+                    {
+                      "name": "Http5xx",
+                      "metricName": "Http5xx",
+                      "metricNamespace": "Microsoft.Web/sites",
+                      "operator": "GreaterThan",
+                      "threshold": 0,
+                      "timeAggregation": "Total",
+                      "criterionType": "StaticThresholdCriterion"
+                    }
+                  ]
+                },
+                "actions": [
+                  {
+                    "actionGroupId": "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
+                  }
+                ],
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Web/sites",
+                "targetResourceRegion": "[parameters('location')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
+              ]
+            },
+            {
+              "condition": "[and(parameters('deployResources'), variables('alertingInputsValid'))]",
+              "type": "Microsoft.Insights/metricAlerts",
+              "apiVersion": "2018-03-01",
+              "name": "[format('{0}-{1}-capacity', parameters('sqlServerName'), parameters('sqlDatabaseName'))]",
+              "location": "global",
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "description": "[format('Azure SQL capacity pressure. Owner: {0}. Runbook: {1}', parameters('alertOwner'), parameters('runbookUrl'))]",
+                "severity": 2,
+                "enabled": true,
+                "scopes": [
+                  "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlServerName'), parameters('sqlDatabaseName'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT15M",
+                "criteria": {
+                  "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                  "allOf": [
+                    {
+                      "name": "SqlCpuPercent",
+                      "metricName": "cpu_percent",
+                      "metricNamespace": "Microsoft.Sql/servers/databases",
+                      "operator": "GreaterThan",
+                      "threshold": 90,
+                      "timeAggregation": "Average",
+                      "criterionType": "StaticThresholdCriterion"
+                    }
+                  ]
+                },
+                "actions": [
+                  {
+                    "actionGroupId": "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
+                  }
+                ],
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Sql/servers/databases",
+                "targetResourceRegion": "[parameters('location')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "appService",
+        "monitoring",
+        "sql",
+        "stageResourceGroup"
+      ]
+    },
+    "optionalCapabilities": {
+      "condition": "[variables('stageDeploymentEnabled')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('optional-capabilities-{0}', variables('stageCode'))]",
+      "location": "[deployment().location]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "privateEndpointsRequested": {
+            "value": "[parameters('capabilityRequests').privateEndpoints]"
+          },
+          "frontDoorOrCdnRequested": {
+            "value": "[parameters('capabilityRequests').frontDoorOrCdn]"
+          },
+          "deploymentSlotsRequested": {
+            "value": "[parameters('capabilityRequests').deploymentSlots]"
+          },
+          "defenderForStorageRequested": {
+            "value": "[parameters('capabilityRequests').defenderForStorage]"
+          },
+          "zoneOrEnhancedBackupRedundancyRequested": {
+            "value": "[parameters('capabilityRequests').zoneOrEnhancedBackupRedundancy]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.46.1.21595",
+              "templateHash": "10474829703856663336"
+            }
+          },
+          "parameters": {
+            "privateEndpointsRequested": {
+              "type": "bool",
+              "metadata": {
+                "description": "Request-only metadata. No optional resource exists in T20 and every true request blocks the parent deployment."
+              }
+            },
+            "frontDoorOrCdnRequested": {
+              "type": "bool"
+            },
+            "deploymentSlotsRequested": {
+              "type": "bool"
+            },
+            "defenderForStorageRequested": {
+              "type": "bool"
+            },
+            "zoneOrEnhancedBackupRedundancyRequested": {
+              "type": "bool"
+            }
+          },
+          "resources": [],
+          "outputs": {
+            "capabilities": {
+              "type": "object",
+              "value": {
+                "privateEndpoints": {
+                  "requested": "[parameters('privateEndpointsRequested')]",
+                  "effective": false,
+                  "status": "REQUEST_ONLY_NEEDS_DECISION"
+                },
+                "frontDoorOrCdn": {
+                  "requested": "[parameters('frontDoorOrCdnRequested')]",
+                  "effective": false,
+                  "status": "REQUEST_ONLY_NEEDS_DECISION"
+                },
+                "deploymentSlots": {
+                  "requested": "[parameters('deploymentSlotsRequested')]",
+                  "effective": false,
+                  "status": "REQUEST_ONLY_NEEDS_DECISION"
+                },
+                "defenderForStorage": {
+                  "requested": "[parameters('defenderForStorageRequested')]",
+                  "effective": false,
+                  "status": "REQUEST_ONLY_NEEDS_DECISION"
+                },
+                "zoneOrEnhancedBackupRedundancy": {
+                  "requested": "[parameters('zoneOrEnhancedBackupRedundancyRequested')]",
+                  "effective": false,
+                  "status": "REQUEST_ONLY_NEEDS_DECISION"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "outputs": {
+    "t21Handoff": {
+      "type": "object",
+      "metadata": {
+        "description": "Non-secret T21 contract. T20 never creates secret values, assigns secret access, owns runtime app settings, or applies a package."
+      },
+      "value": {
+        "stage": "[parameters('stage')]",
+        "stageCode": "[variables('stageCode')]",
+        "immutableResourceGroupName": "[variables('resourceGroupName')]",
+        "expectedDeploymentIdentity": "one stage-scoped federated workload identity with no cross-stage role assignments",
+        "deploymentEnabled": "[variables('stageDeploymentEnabled')]",
+        "deploymentRequested": "[parameters('deploymentEnabled')]",
+        "deploymentBlockers": "[variables('deploymentBlockers')]",
+        "productionEnablement": "FUTURE_CTO_AUTHORIZED_CODE_AND_PIPELINE_CHANGE_REQUIRED",
+        "nonProductionEnablement": "FUTURE_REVIEWED_T21_CODE_AND_STAGE_PIPELINE_CHANGE_REQUIRED",
+        "productionStorageLockRequired": "[variables('selectedStage').storageLockRequired]",
+        "webAppName": "[variables('webAppName')]",
+        "healthPath": "/health",
+        "readinessPath": "/ready",
+        "cleanApplicationHealthy": false,
+        "healthClaimOwner": "T21_AFTER_PACKAGE_SECRETS_AND_SMOKE_TESTS",
+        "packageSettingKey": "WEBSITE_RUN_FROM_PACKAGE",
+        "packageConfigurationOwner": "T21_PIPELINE",
+        "secretBootstrapOwner": "T21_PIPELINE",
+        "sqlAdministratorBootstrapOwner": "T21_STAGE_SCOPED_PIPELINE",
+        "sqlAdministratorBootstrapRequirement": "Use the immutable approved group for this stage; no caller-supplied principal and no cross-stage administrator.",
+        "secretBootstrapSequence": [
+          "Deploy the inertly configured infrastructure with the stage-scoped workload identity.",
+          "Create approved Key Vault secret values outside T20 without logging or committing them.",
+          "Assign the immutable stage-approved Microsoft Entra SQL administrator and enable Entra-only authentication outside T20.",
+          "Create secret-scoped read assignments for the web identity only after each approved secret exists.",
+          "Apply Key Vault-reference app settings and the immutable package setting in one T21-controlled configuration step.",
+          "Run health, readiness, synthetic, alert-receiver, rollback, and staging restore evidence before promotion."
+        ],
+        "sqlConnectionStringSecretName": "SqlConnectionString",
+        "applicationInsightsSecretName": "ApplicationInsightsConnectionString",
+        "sqlConnectionStringSettingKey": "ConnectionStrings__HusayniaDatabase",
+        "applicationInsightsSettingKey": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+        "appConfigurationEndpointSettingKey": "AppConfiguration__Endpoint",
+        "appConfigurationEndpoint": "[parameters('appConfigurationEndpoint')]",
+        "storageAccountSettingKey": "Storage__AccountName",
+        "storageAccountName": "[variables('storageAccountName')]",
+        "keyVaultUriSettingKey": "KeyVault__Uri",
+        "keyVaultName": "[variables('keyVaultName')]",
+        "sqlServerName": "[variables('sqlServerName')]",
+        "sqlDatabaseName": "[variables('sqlDatabaseName')]",
+        "applicationInsightsName": "[variables('applicationInsightsName')]",
+        "availabilityTestName": "[variables('availabilityTestName')]",
+        "logAnalyticsName": "[variables('logAnalyticsName')]",
+        "actionOwner": "[parameters('alertConfiguration').owner]",
+        "runbookUrl": "[parameters('alertConfiguration').runbookUrl]"
+      }
+    },
+    "reservedCapabilities": {
+      "type": "object",
+      "metadata": {
+        "description": "All unimplemented cost-bearing features remain non-effective request metadata. Any request blocks deployment and is NEEDS_DECISION."
+      },
+      "value": {
+        "privateEndpoints": {
+          "requested": "[parameters('capabilityRequests').privateEndpoints]",
+          "effective": false,
+          "status": "REQUEST_ONLY_NEEDS_DECISION"
+        },
+        "frontDoorOrCdn": {
+          "requested": "[parameters('capabilityRequests').frontDoorOrCdn]",
+          "effective": false,
+          "status": "REQUEST_ONLY_NEEDS_DECISION"
+        },
+        "deploymentSlots": {
+          "requested": "[parameters('capabilityRequests').deploymentSlots]",
+          "effective": false,
+          "status": "REQUEST_ONLY_NEEDS_DECISION"
+        },
+        "defenderForStorage": {
+          "requested": "[parameters('capabilityRequests').defenderForStorage]",
+          "effective": false,
+          "status": "REQUEST_ONLY_NEEDS_DECISION"
+        },
+        "zoneOrEnhancedBackupRedundancy": {
+          "requested": "[parameters('capabilityRequests').zoneOrEnhancedBackupRedundancy]",
+          "effective": false,
+          "status": "REQUEST_ONLY_NEEDS_DECISION"
+        }
+      }
+    },
+    "recoveryTargets": {
+      "type": "object",
+      "metadata": {
+        "description": "Recovery targets remain planning goals until the T21 Staging restore exercise proves them."
+      },
+      "value": {
+        "rpoHours": "[variables('targetRpoHours')]",
+        "rtoHours": "[variables('targetRtoHours')]",
+        "stagingRestoreExerciseRequired": true,
+        "sqlPointInTimeRestoreCapability": true,
+        "mediaVersioningAndSoftDeleteCapability": true,
+        "operationalEvidenceVersionAndSnapshotLifecycleCapability": true,
+        "productionStorageLockRequired": true
+      }
+    }
+  }
+}

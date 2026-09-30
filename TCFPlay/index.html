@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>TCF Seattle Character Playground</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Ccircle cx='.5' cy='.5' r='.5' fill='%231f6feb'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="playground" aria-label="TCF Seattle interactive character playground">
+    <canvas id="stage" width="1920" height="1080" aria-label="Animated TCF Seattle campus scene"></canvas>
+    <section id="legend" class="legend" aria-label="Keyboard controls"></section>
+    <output id="status" class="status" aria-live="polite">Loading playground...</output>
+    <div id="error" class="error" role="alert" hidden></div>
+  </main>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

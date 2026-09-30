@@ -1,0 +1,187 @@
+{
+  "name": "T21 disabled nonproduction operation wrapper",
+  "run-name": "T21 R10 ${{ inputs.mode }} ${{ inputs.stage }} r${{ inputs.sourceReleaseRunId }} p${{ inputs.preflightRunId || 'none' }} i${{ inputs.stageOperationInputsRunId || 'none' }} m${{ inputs.migrationAuthorizationRunId || 'none' }} correlation=${{ inputs.orchestrationCorrelationId || 'manual' }}",
+  "on": {
+    "workflow_dispatch": {
+      "inputs": {
+        "mode": {
+          "required": true,
+          "type": "choice",
+          "options": ["Preflight", "PreparedInputs", "StageOperations"]
+        },
+        "stage": {
+          "required": true,
+          "type": "choice",
+          "options": ["Development", "Staging"]
+        },
+        "sourceReleaseRunId": { "required": true, "type": "string" },
+        "expectedAppSha256": { "required": true, "type": "string" },
+        "preflightRunId": { "required": false, "default": "", "type": "string" },
+        "stageOperationInputsRunId": { "required": false, "default": "", "type": "string" },
+        "migrationAuthorizationRunId": { "required": false, "default": "", "type": "string" },
+        "ctoAuthorizationRunId": { "required": false, "default": "", "type": "string" },
+        "orchestrationCorrelationId": { "required": false, "default": "", "type": "string" }
+      }
+    }
+  },
+  "permissions": {},
+  "jobs": {
+    "validate-input-shape": {
+      "if": "${{ (inputs.stage == 'Development' && vars.T21_DEVELOPMENT_DEPLOYMENT_ENABLED == 'true') || (inputs.stage == 'Staging' && vars.T21_STAGING_DEPLOYMENT_ENABLED == 'true') }}",
+      "runs-on": "ubuntu-24.04",
+      "permissions": {},
+      "defaults": {
+        "run": {
+          "shell": "pwsh"
+        }
+      },
+      "steps": [
+        {
+          "name": "Reject mixed producer modes and current-run selectors",
+          "env": {
+            "T21_MODE": "${{ inputs.mode }}",
+            "T21_RELEASE_RUN_ID": "${{ inputs.sourceReleaseRunId }}",
+            "T21_EXPECTED_APP_SHA256": "${{ inputs.expectedAppSha256 }}",
+            "T21_PREFLIGHT_RUN_ID": "${{ inputs.preflightRunId }}",
+            "T21_PREPARED_INPUT_RUN_ID": "${{ inputs.stageOperationInputsRunId }}",
+            "T21_MIGRATION_AUTHORIZATION_RUN_ID": "${{ inputs.migrationAuthorizationRunId }}",
+            "T21_CTO_AUTHORIZATION_RUN_ID": "${{ inputs.ctoAuthorizationRunId }}",
+            "T21_CORRELATION_ID": "${{ inputs.orchestrationCorrelationId }}"
+          },
+          "run": "$base = $env:T21_RELEASE_RUN_ID -match '^[1-9][0-9]*$' -and $env:T21_RELEASE_RUN_ID -cne $env:GITHUB_RUN_ID -and $env:T21_EXPECTED_APP_SHA256 -match '^[a-f0-9]{64}$' -and [string]::IsNullOrWhiteSpace($env:T21_CTO_AUTHORIZATION_RUN_ID) -and ([string]::IsNullOrWhiteSpace($env:T21_CORRELATION_ID) -or $env:T21_CORRELATION_ID -match '^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$'); $modeValid = switch ($env:T21_MODE) { 'Preflight' { [string]::IsNullOrWhiteSpace($env:T21_PREFLIGHT_RUN_ID) -and [string]::IsNullOrWhiteSpace($env:T21_PREPARED_INPUT_RUN_ID) -and [string]::IsNullOrWhiteSpace($env:T21_MIGRATION_AUTHORIZATION_RUN_ID) } 'PreparedInputs' { [string]::IsNullOrWhiteSpace($env:T21_PREFLIGHT_RUN_ID) -and [string]::IsNullOrWhiteSpace($env:T21_PREPARED_INPUT_RUN_ID) -and [string]::IsNullOrWhiteSpace($env:T21_MIGRATION_AUTHORIZATION_RUN_ID) } 'StageOperations' { $env:T21_PREFLIGHT_RUN_ID -match '^[1-9][0-9]*$' -and $env:T21_PREPARED_INPUT_RUN_ID -match '^[1-9][0-9]*$' -and $env:T21_MIGRATION_AUTHORIZATION_RUN_ID -match '^[1-9][0-9]*$' -and @($env:T21_RELEASE_RUN_ID,$env:T21_PREFLIGHT_RUN_ID,$env:T21_PREPARED_INPUT_RUN_ID,$env:T21_MIGRATION_AUTHORIZATION_RUN_ID | Select-Object -Unique).Count -eq 4 -and @($env:T21_PREFLIGHT_RUN_ID,$env:T21_PREPARED_INPUT_RUN_ID,$env:T21_MIGRATION_AUTHORIZATION_RUN_ID) -notcontains $env:GITHUB_RUN_ID } default { $false } }; if (-not $base -or -not $modeValid) { throw 'T21 nonproduction wrapper mode/input exclusivity or completed prior-run selectors are invalid.' }"
+        }
+      ]
+    },
+    "preflight": {
+      "if": "${{ inputs.mode == 'Preflight' }}",
+      "needs": ["validate-input-shape"],
+      "permissions": {
+        "actions": "read",
+        "attestations": "write",
+        "id-token": "write"
+      },
+      "uses": "syedmh/Dreamer/.github/workflows/trusted-protected-operations.yml@0000000000000000000000000000000000000000",
+      "with": {
+        "operation": "Preflight",
+        "stage": "${{ inputs.stage }}",
+        "sourceReleaseRunId": "${{ inputs.sourceReleaseRunId }}",
+        "expectedAppSha256": "${{ inputs.expectedAppSha256 }}"
+      }
+    },
+    "prepared-inputs": {
+      "if": "${{ inputs.mode == 'PreparedInputs' }}",
+      "needs": ["validate-input-shape"],
+      "permissions": {
+        "actions": "read",
+        "attestations": "write",
+        "contents": "read",
+        "id-token": "write"
+      },
+      "uses": "syedmh/Dreamer/.github/workflows/stage-operation-inputs.yml@0000000000000000000000000000000000000000",
+      "with": {
+        "stage": "${{ inputs.stage }}",
+        "sourceReleaseRunId": "${{ inputs.sourceReleaseRunId }}",
+        "expectedAppSha256": "${{ inputs.expectedAppSha256 }}"
+      }
+    },
+    "stage-operations": {
+      "if": "${{ inputs.mode == 'StageOperations' }}",
+      "needs": ["validate-input-shape"],
+      "permissions": {
+        "actions": "read",
+        "attestations": "write",
+        "id-token": "write"
+      },
+      "uses": "syedmh/Dreamer/.github/workflows/trusted-protected-operations.yml@0000000000000000000000000000000000000000",
+      "with": {
+        "operation": "StageOperations",
+        "stage": "${{ inputs.stage }}",
+        "sourceReleaseRunId": "${{ inputs.sourceReleaseRunId }}",
+        "expectedAppSha256": "${{ inputs.expectedAppSha256 }}",
+        "preflightRunId": "${{ inputs.preflightRunId }}",
+        "stageOperationInputsRunId": "${{ inputs.stageOperationInputsRunId }}",
+        "migrationAuthorizationRunId": "${{ inputs.migrationAuthorizationRunId }}"
+      }
+    },
+    "record-completion": {
+      "name": "T21 canonical completed-run attestation",
+      "if": "${{ always() && needs['validate-input-shape'].result == 'success' && ((inputs.mode == 'Preflight' && needs.preflight.result == 'success' && needs['prepared-inputs'].result == 'skipped' && needs['stage-operations'].result == 'skipped') || (inputs.mode == 'PreparedInputs' && needs.preflight.result == 'skipped' && needs['prepared-inputs'].result == 'success' && needs['stage-operations'].result == 'skipped') || (inputs.mode == 'StageOperations' && needs.preflight.result == 'skipped' && needs['prepared-inputs'].result == 'skipped' && needs['stage-operations'].result == 'success')) }}",
+      "needs": [
+        "validate-input-shape",
+        "preflight",
+        "prepared-inputs",
+        "stage-operations"
+      ],
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 10,
+      "permissions": {
+        "attestations": "write",
+        "contents": "read",
+        "id-token": "write"
+      },
+      "env": {
+        "HUSAYNIA_REPOSITORY_ROOT": "${{ github.workspace }}/HusayniaSite"
+      },
+      "defaults": {
+        "run": {
+          "shell": "pwsh",
+          "working-directory": "HusayniaSite"
+        }
+      },
+      "steps": [
+        {
+          "name": "Checkout canonical completed-run manifest writer",
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 1
+          }
+        },
+        {
+          "name": "Validate canonical Husaynia checkout root",
+          "run": "$workspace = (Resolve-Path -LiteralPath $env:GITHUB_WORKSPACE).Path; $root = (Resolve-Path -LiteralPath $env:HUSAYNIA_REPOSITORY_ROOT).Path; $expected = Join-Path $workspace 'HusayniaSite'; if ($root -cne $expected -or -not $root.StartsWith($workspace + [IO.Path]::DirectorySeparatorChar, [StringComparison]::Ordinal) -or -not (Test-Path -LiteralPath (Join-Path $root 'HusayniaSite.sln') -PathType Leaf) -or -not (Test-Path -LiteralPath (Join-Path $root 'eng') -PathType Container) -or -not (Test-Path -LiteralPath (Join-Path $root 'pipelines') -PathType Container)) { throw 'T21 canonical Dreamer/HusayniaSite checkout root validation failed.' }"
+        },
+        {
+          "name": "Write canonical submitted-input completion manifest",
+          "env": {
+            "T21_MODE": "${{ inputs.mode }}",
+            "T21_STAGE": "${{ inputs.stage }}",
+            "T21_RELEASE_RUN_ID": "${{ inputs.sourceReleaseRunId }}",
+            "T21_EXPECTED_APP_SHA256": "${{ inputs.expectedAppSha256 }}",
+            "T21_PREFLIGHT_RUN_ID": "${{ inputs.preflightRunId }}",
+            "T21_PREPARED_INPUT_RUN_ID": "${{ inputs.stageOperationInputsRunId }}",
+            "T21_MIGRATION_AUTHORIZATION_RUN_ID": "${{ inputs.migrationAuthorizationRunId }}",
+            "T21_CTO_AUTHORIZATION_RUN_ID": "${{ inputs.ctoAuthorizationRunId }}",
+            "T21_CORRELATION_ID": "${{ inputs.orchestrationCorrelationId }}",
+            "T21_VALIDATE_RESULT": "${{ needs['validate-input-shape'].result }}",
+            "T21_PREFLIGHT_RESULT": "${{ needs.preflight.result }}",
+            "T21_PREPARED_RESULT": "${{ needs['prepared-inputs'].result }}",
+            "T21_STAGE_OPERATIONS_RESULT": "${{ needs['stage-operations'].result }}",
+            "T21_REPOSITORY_ID": "${{ github.repository_id }}"
+          },
+          "run": "& (Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'eng/promotion/New-T21CompletedRunManifest.ps1') -Mode $env:T21_MODE -Stage $env:T21_STAGE -SourceReleaseRunId $env:T21_RELEASE_RUN_ID -ExpectedAppSha256 $env:T21_EXPECTED_APP_SHA256 -PreflightRunId $env:T21_PREFLIGHT_RUN_ID -StageOperationInputsRunId $env:T21_PREPARED_INPUT_RUN_ID -MigrationAuthorizationRunId $env:T21_MIGRATION_AUTHORIZATION_RUN_ID -CtoAuthorizationRunId $env:T21_CTO_AUTHORIZATION_RUN_ID -OrchestrationCorrelationId $env:T21_CORRELATION_ID -Repository $env:GITHUB_REPOSITORY -RepositoryId $env:T21_REPOSITORY_ID -WorkflowPath '.github/workflows/operation-evidence-producer.yml' -EventName $env:GITHUB_EVENT_NAME -HeadRef $env:GITHUB_REF -HeadSha $env:GITHUB_SHA -RunId $env:GITHUB_RUN_ID -RunAttempt ([int]$env:GITHUB_RUN_ATTEMPT) -ValidateInputShapeResult $env:T21_VALIDATE_RESULT -PreflightResult $env:T21_PREFLIGHT_RESULT -PreparedInputsResult $env:T21_PREPARED_RESULT -StageOperationsResult $env:T21_STAGE_OPERATIONS_RESULT -OutputPath (Join-Path $env:RUNNER_TEMP 't21-completed-run.json')"
+        },
+        {
+          "name": "Upload canonical completed-run manifest",
+          "uses": "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "with": {
+            "name": "t21-completed-run-${{ github.run_id }}-${{ github.run_attempt }}",
+            "path": "${{ runner.temp }}/t21-completed-run.json",
+            "if-no-files-found": "error",
+            "retention-days": 90,
+            "compression-level": 0,
+            "overwrite": false,
+            "include-hidden-files": false
+          }
+        },
+        {
+          "name": "Attest canonical completed-run manifest",
+          "uses": "actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be",
+          "with": {
+            "subject-path": "${{ runner.temp }}/t21-completed-run.json"
+          }
+        }
+      ]
+    }
+  }
+}

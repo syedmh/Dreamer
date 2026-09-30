@@ -1,0 +1,71 @@
+{
+  "sessionId": "47498a37-d823-488b-b8c2-0f953510d910",
+  "missionId": "2026-09-29-build-photo-preview-47498a37",
+  "missionDir": ".ai-org/missions/2026-09-29-build-photo-preview-47498a37",
+  "objective": "Build an app which can show preview of photos from a given folder, ability to go next or previous. Provide copy button which can copy the current image into a designated folder. Build as C# Windows App",
+  "classification": "feature",
+  "size": "medium",
+  "state": "COMPLETED",
+  "workflow": "feature",
+  "definitionOfDone": [
+    "A C# Windows desktop app lets the user select a source photo folder and a destination folder.",
+    "Supported photos are listed deterministically and the current photo is previewed without locking the source file.",
+    "Previous and Next navigation works at boundaries and communicates current position.",
+    "Copy copies the current photo to the destination without silently overwriting an existing file.",
+    "The UI handles empty folders, unsupported or unreadable images, missing folders, and copy errors explicitly.",
+    "The solution builds in Release and automated tests cover photo discovery, navigation, and copy collision behavior.",
+    "Independent test, code review, desktop QA, and engineering judgment approve the implementation."
+  ],
+  "gates": {
+    "requirements": "passed",
+    "architecture": "passed",
+    "implementation": "passed",
+    "tests": "passed: final 114/114 across 3 runs; prior stability 370/370",
+    "security": "n/a: local offline desktop app; filesystem safety validated",
+    "review": "approved",
+    "e2e": "passed: initial 11/12, defect fixed, rerun 2/2",
+    "judge": "approved"
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "owner": "architect",
+      "status": "DONE",
+      "evidence": "WinForms net10.0-windows shell, net10.0 core, MSTest, detached built-in image loading, collision-safe copy, and explicit failure states defined in architecture.md."
+    },
+    {
+      "id": "T2",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "Implemented complete application, then remediated copy cleanup, accessibility, close-during-copy lifecycle, publication cleanup, test flakiness, and invalid-destination recovery."
+    },
+    {
+      "id": "T3",
+      "owner": "test-engineer",
+      "status": "DONE",
+      "evidence": "Release build 0 warnings/errors; final focused 5/5; full 38/38 for 3 consecutive runs, aggregate 114/114; prior stability 370/370."
+    },
+    {
+      "id": "T4",
+      "owner": "code-reviewer",
+      "status": "DONE",
+      "evidence": "Final complete-tree review APPROVED after all prior findings were independently verified closed."
+    },
+    {
+      "id": "T5",
+      "owner": "qa-engineer",
+      "status": "DONE",
+      "evidence": "Real Windows desktop QA found one defect at 11/12; after remediation the exact recovery scenario and primary journey passed 2/2 with hash-identical copy."
+    },
+    {
+      "id": "T6",
+      "owner": "engineering-judge",
+      "status": "DONE",
+      "evidence": "FINAL APPROVED against the CTO's original objective and all Definition-of-Done items."
+    }
+  ],
+  "blockers": [],
+  "reworkCount": 3,
+  "nextAction": "None. Application is complete; commit or push only with CTO authorization.",
+  "updatedAt": "2026-09-30T02:40:00Z"
+}

@@ -1,0 +1,107 @@
+{
+  "name": "T21 disabled manual Production operation wrapper",
+  "run-name": "T21 R10 ${{ inputs.mode }} Production r${{ inputs.sourceReleaseRunId }} p${{ inputs.preflightRunId || 'none' }} i${{ inputs.stageOperationInputsRunId || 'none' }} c${{ inputs.ctoAuthorizationRunId || 'none' }} m${{ inputs.migrationAuthorizationRunId || 'none' }} correlation=${{ inputs.orchestrationCorrelationId || 'manual' }}",
+  "on": {
+    "workflow_dispatch": {
+      "inputs": {
+        "mode": {
+          "required": true,
+          "type": "choice",
+          "options": ["Preflight", "PreparedInputs", "StageOperations"]
+        },
+        "sourceReleaseRunId": { "required": true, "type": "string" },
+        "expectedAppSha256": { "required": true, "type": "string" },
+        "preflightRunId": { "required": false, "default": "", "type": "string" },
+        "stageOperationInputsRunId": { "required": false, "default": "", "type": "string" },
+        "migrationAuthorizationRunId": { "required": false, "default": "", "type": "string" },
+        "ctoAuthorizationRunId": { "required": false, "default": "", "type": "string" },
+        "ctoApprovalReference": { "required": false, "default": "", "type": "string" },
+        "orchestrationCorrelationId": { "required": false, "default": "", "type": "string" }
+      }
+    }
+  },
+  "permissions": {},
+  "jobs": {
+    "validate-input-shape": {
+      "if": "${{ vars.T21_PRODUCTION_DEPLOYMENT_ENABLED == 'true' }}",
+      "runs-on": "ubuntu-24.04",
+      "permissions": {},
+      "defaults": {
+        "run": {
+          "shell": "pwsh"
+        }
+      },
+      "steps": [
+        {
+          "name": "Reject mixed Production modes and current-run selectors",
+          "env": {
+            "T21_MODE": "${{ inputs.mode }}",
+            "T21_RELEASE_RUN_ID": "${{ inputs.sourceReleaseRunId }}",
+            "T21_EXPECTED_APP_SHA256": "${{ inputs.expectedAppSha256 }}",
+            "T21_PREFLIGHT_RUN_ID": "${{ inputs.preflightRunId }}",
+            "T21_PREPARED_INPUT_RUN_ID": "${{ inputs.stageOperationInputsRunId }}",
+            "T21_MIGRATION_AUTHORIZATION_RUN_ID": "${{ inputs.migrationAuthorizationRunId }}",
+            "T21_CTO_AUTHORIZATION_RUN_ID": "${{ inputs.ctoAuthorizationRunId }}",
+            "T21_CTO_APPROVAL_REFERENCE": "${{ inputs.ctoApprovalReference }}",
+            "T21_CORRELATION_ID": "${{ inputs.orchestrationCorrelationId }}"
+          },
+          "run": "$base = $env:T21_RELEASE_RUN_ID -match '^[1-9][0-9]*$' -and $env:T21_RELEASE_RUN_ID -cne $env:GITHUB_RUN_ID -and $env:T21_EXPECTED_APP_SHA256 -match '^[a-f0-9]{64}$' -and ([string]::IsNullOrWhiteSpace($env:T21_CORRELATION_ID) -or $env:T21_CORRELATION_ID -match '^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$'); $modeValid = switch ($env:T21_MODE) { 'Preflight' { [string]::IsNullOrWhiteSpace($env:T21_PREFLIGHT_RUN_ID) -and [string]::IsNullOrWhiteSpace($env:T21_PREPARED_INPUT_RUN_ID) -and [string]::IsNullOrWhiteSpace($env:T21_MIGRATION_AUTHORIZATION_RUN_ID) -and [string]::IsNullOrWhiteSpace($env:T21_CTO_AUTHORIZATION_RUN_ID) -and [string]::IsNullOrWhiteSpace($env:T21_CTO_APPROVAL_REFERENCE) } 'PreparedInputs' { [string]::IsNullOrWhiteSpace($env:T21_PREFLIGHT_RUN_ID) -and [string]::IsNullOrWhiteSpace($env:T21_PREPARED_INPUT_RUN_ID) -and [string]::IsNullOrWhiteSpace($env:T21_MIGRATION_AUTHORIZATION_RUN_ID) -and [string]::IsNullOrWhiteSpace($env:T21_CTO_AUTHORIZATION_RUN_ID) -and $env:T21_CTO_APPROVAL_REFERENCE -match '^[A-Za-z0-9][A-Za-z0-9._:/#-]{0,127}$' } 'StageOperations' { $ids = @($env:T21_PREFLIGHT_RUN_ID,$env:T21_PREPARED_INPUT_RUN_ID,$env:T21_CTO_AUTHORIZATION_RUN_ID,$env:T21_MIGRATION_AUTHORIZATION_RUN_ID); @($ids | Where-Object { $_ -notmatch '^[1-9][0-9]*$' -or $_ -ceq $env:GITHUB_RUN_ID }).Count -eq 0 -and $env:T21_PREFLIGHT_RUN_ID -cne $env:T21_PREPARED_INPUT_RUN_ID -and $env:T21_CTO_APPROVAL_REFERENCE -match '^[A-Za-z0-9][A-Za-z0-9._:/#-]{0,127}$' } default { $false } }; if (-not $base -or -not $modeValid) { throw 'T21 Production wrapper mode/input exclusivity or completed prior-run selectors are invalid.' }"
+        }
+      ]
+    },
+    "preflight": {
+      "if": "${{ inputs.mode == 'Preflight' }}",
+      "needs": ["validate-input-shape"],
+      "permissions": {
+        "actions": "read",
+        "attestations": "write",
+        "id-token": "write"
+      },
+      "uses": "syedmh/Dreamer/.github/workflows/trusted-protected-operations.yml@0000000000000000000000000000000000000000",
+      "with": {
+        "operation": "Preflight",
+        "stage": "Production",
+        "sourceReleaseRunId": "${{ inputs.sourceReleaseRunId }}",
+        "expectedAppSha256": "${{ inputs.expectedAppSha256 }}"
+      }
+    },
+    "prepared-inputs": {
+      "if": "${{ inputs.mode == 'PreparedInputs' }}",
+      "needs": ["validate-input-shape"],
+      "permissions": {
+        "actions": "read",
+        "attestations": "write",
+        "contents": "read",
+        "id-token": "write"
+      },
+      "uses": "syedmh/Dreamer/.github/workflows/stage-operation-inputs.yml@0000000000000000000000000000000000000000",
+      "with": {
+        "stage": "Production",
+        "sourceReleaseRunId": "${{ inputs.sourceReleaseRunId }}",
+        "expectedAppSha256": "${{ inputs.expectedAppSha256 }}",
+        "ctoApprovalReference": "${{ inputs.ctoApprovalReference }}"
+      }
+    },
+    "stage-operations": {
+      "if": "${{ inputs.mode == 'StageOperations' }}",
+      "needs": ["validate-input-shape"],
+      "permissions": {
+        "actions": "read",
+        "attestations": "write",
+        "id-token": "write"
+      },
+      "uses": "syedmh/Dreamer/.github/workflows/trusted-protected-operations.yml@0000000000000000000000000000000000000000",
+      "with": {
+        "operation": "StageOperations",
+        "stage": "Production",
+        "sourceReleaseRunId": "${{ inputs.sourceReleaseRunId }}",
+        "expectedAppSha256": "${{ inputs.expectedAppSha256 }}",
+        "preflightRunId": "${{ inputs.preflightRunId }}",
+        "stageOperationInputsRunId": "${{ inputs.stageOperationInputsRunId }}",
+        "migrationAuthorizationRunId": "${{ inputs.migrationAuthorizationRunId }}",
+        "ctoAuthorizationRunId": "${{ inputs.ctoAuthorizationRunId }}",
+        "ctoApprovalReference": "${{ inputs.ctoApprovalReference }}"
+      }
+    }
+  }
+}

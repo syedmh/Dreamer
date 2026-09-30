@@ -1,0 +1,23 @@
+{
+  "seamY": 640,
+  "productionSeams": {
+    "extract_cross_arm": 640,
+    "validate_release": 640
+  },
+  "frames": 33,
+  "boundaries": 45,
+  "boundaryClasses": {
+    "stationary": 27,
+    "turning": 6,
+    "walking": 12
+  },
+  "contactSheets": {
+    "native": 7,
+    "zoom2x": 7,
+    "feet": 7
+  },
+  "individualBoundarySheets": 45,
+  "aggregateBoundarySheets": 5,
+  "plateConsumers": 7,
+  "allChecksPassed": true
+}

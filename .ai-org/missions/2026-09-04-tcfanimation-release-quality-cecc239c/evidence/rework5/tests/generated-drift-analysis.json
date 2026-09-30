@@ -1,0 +1,15 @@
+{
+  "beforeFiles": 3118,
+  "afterFiles": 3120,
+  "changed": [
+    ".godot/mono/temp/obj/Debug/TCFAnimation.assets.cache",
+    ".godot/mono/temp/obj/Debug/TCFAnimation.csproj.AssemblyReference.cache",
+    ".godot/mono/temp/obj/TCFAnimation.csproj.nuget.dgspec.json",
+    ".godot/mono/temp/obj/project.assets.json",
+    ".godot/mono/temp/obj/project.nuget.cache",
+    ".tools/godot-4.5.1-mono/Godot_v4.5.1-stable_mono_win64/editor_data/mono/build_logs/c95631f8747e70abc4153c795e8b1dbf_ExportRelease/msbuild_issues.csv",
+    ".tools/godot-4.5.1-mono/Godot_v4.5.1-stable_mono_win64/editor_data/mono/build_logs/c95631f8747e70abc4153c795e8b1dbf_ExportRelease/msbuild_log.txt"
+  ],
+  "unexpected": [],
+  "generatedOnly": true
+}

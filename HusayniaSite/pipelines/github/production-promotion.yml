@@ -1,0 +1,25 @@
+{
+  "name": "T21 manual-disabled Production promotion",
+  "on": {
+    "workflow_dispatch": {
+      "inputs": {
+        "sourceReleaseRunId": { "required": true, "type": "string" },
+        "expectedAppSha256": { "required": true, "type": "string" },
+        "ctoApprovalReference": { "required": true, "type": "string" }
+      }
+    }
+  },
+  "permissions": {},
+  "jobs": {
+    "production": {
+      "if": "${{ github.event_name == 'schedule' }}",
+      "environment": { "name": "Husaynia-Production" },
+      "permissions": { "actions": "read", "attestations": "read" },
+      "runs-on": "ubuntu-24.04",
+      "defaults": { "run": { "shell": "pwsh" } },
+      "steps": [
+        { "name": "Reject absent deployment producer before receipt", "run": "throw 'T21_DEPLOYMENT_EVIDENCE_PRODUCER_FORBIDDEN'" }
+      ]
+    }
+  }
+}

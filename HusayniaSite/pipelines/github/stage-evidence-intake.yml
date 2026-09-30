@@ -1,0 +1,19 @@
+{
+  "name": "T21 disabled stage evidence intake",
+  "on": { "workflow_call": { "inputs": { "stage": { "required": true, "type": "string" }, "sourceReleaseRunId": { "required": true, "type": "string" }, "expectedAppSha256": { "required": true, "type": "string" } } } },
+  "permissions": {},
+  "jobs": {
+    "intake": {
+      "if": "${{ github.event_name == 'schedule' }}",
+      "permissions": { "actions": "read", "attestations": "read" },
+      "runs-on": "ubuntu-24.04",
+      "defaults": { "run": { "shell": "pwsh" } },
+      "steps": [
+        {
+          "name": "Resolve API and Sigstore verified raw evidence",
+          "run": "throw 'T21_DEPLOYMENT_EVIDENCE_PRODUCER_FORBIDDEN'"
+        }
+      ]
+    }
+  }
+}

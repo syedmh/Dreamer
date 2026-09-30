@@ -1,0 +1,47 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "name": "reserved-CON",
+      "requested": "CON.png",
+      "exit": 1,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\r\n\r\nCAPTURE_ROOT kind=executable_adjacent",
+      "stderr": "ERROR: CAPTURE_MODE_FAIL error=ArgumentException message=Capture path must be a file name without directories. (Parameter 'requestedFileName')\r\n   at: void TCFAnimation.TurnController._Ready() (:0)\r\n   C# backtrace (most recent call first):\r\n       [0] void Godot.GD.PushError(string)\r\n       [1] void TCFAnimation.TurnController._Ready()\r\n       [2] bool Godot.Node.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [3] bool Godot.CanvasItem.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [4] bool Godot.Node2D.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [5] bool TCFAnimation.TurnController.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [6] Godot.NativeInterop.godot_bool Godot.Bridge.CSharpInstanceBridge.Call(nint, Godot.NativeInterop.godot_string_name*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant_call_error*, Godot.NativeInterop.godot_variant*)",
+      "specific": true
+    },
+    {
+      "name": "reserved-COM1",
+      "requested": "COM1.png",
+      "exit": 1,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\r\n\r\nCAPTURE_ROOT kind=executable_adjacent",
+      "stderr": "ERROR: CAPTURE_MODE_FAIL error=ArgumentException message=Capture path must be a file name without directories. (Parameter 'requestedFileName')\r\n   at: void TCFAnimation.TurnController._Ready() (:0)\r\n   C# backtrace (most recent call first):\r\n       [0] void Godot.GD.PushError(string)\r\n       [1] void TCFAnimation.TurnController._Ready()\r\n       [2] bool Godot.Node.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [3] bool Godot.CanvasItem.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [4] bool Godot.Node2D.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [5] bool TCFAnimation.TurnController.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [6] Godot.NativeInterop.godot_bool Godot.Bridge.CSharpInstanceBridge.Call(nint, Godot.NativeInterop.godot_string_name*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant_call_error*, Godot.NativeInterop.godot_variant*)",
+      "specific": true
+    },
+    {
+      "name": "drive-relative",
+      "requested": "C:escape.png",
+      "exit": 1,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\r\n\r\nCAPTURE_ROOT kind=executable_adjacent",
+      "stderr": "ERROR: CAPTURE_MODE_FAIL error=ArgumentException message=Capture path must be a file name without directories. (Parameter 'requestedFileName')\r\n   at: void TCFAnimation.TurnController._Ready() (:0)\r\n   C# backtrace (most recent call first):\r\n       [0] void Godot.GD.PushError(string)\r\n       [1] void TCFAnimation.TurnController._Ready()\r\n       [2] bool Godot.Node.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [3] bool Godot.CanvasItem.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [4] bool Godot.Node2D.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [5] bool TCFAnimation.TurnController.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [6] Godot.NativeInterop.godot_bool Godot.Bridge.CSharpInstanceBridge.Call(nint, Godot.NativeInterop.godot_string_name*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant_call_error*, Godot.NativeInterop.godot_variant*)",
+      "specific": true
+    },
+    {
+      "name": "unc",
+      "requested": "\\server\\share.png",
+      "exit": 1,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\r\n\r\nCAPTURE_ROOT kind=executable_adjacent",
+      "stderr": "ERROR: CAPTURE_MODE_FAIL error=ArgumentException message=Capture path must be a file name without directories. (Parameter 'requestedFileName')\r\n   at: void TCFAnimation.TurnController._Ready() (:0)\r\n   C# backtrace (most recent call first):\r\n       [0] void Godot.GD.PushError(string)\r\n       [1] void TCFAnimation.TurnController._Ready()\r\n       [2] bool Godot.Node.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [3] bool Godot.CanvasItem.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [4] bool Godot.Node2D.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [5] bool TCFAnimation.TurnController.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [6] Godot.NativeInterop.godot_bool Godot.Bridge.CSharpInstanceBridge.Call(nint, Godot.NativeInterop.godot_string_name*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant_call_error*, Godot.NativeInterop.godot_variant*)",
+      "specific": true
+    },
+    {
+      "name": "device",
+      "requested": "\\?\\C:\\outside.png",
+      "exit": 1,
+      "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\r\n\r\nCAPTURE_ROOT kind=executable_adjacent",
+      "stderr": "ERROR: CAPTURE_MODE_FAIL error=ArgumentException message=Capture path must be a file name without directories. (Parameter 'requestedFileName')\r\n   at: void TCFAnimation.TurnController._Ready() (:0)\r\n   C# backtrace (most recent call first):\r\n       [0] void Godot.GD.PushError(string)\r\n       [1] void TCFAnimation.TurnController._Ready()\r\n       [2] bool Godot.Node.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [3] bool Godot.CanvasItem.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [4] bool Godot.Node2D.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [5] bool TCFAnimation.TurnController.InvokeGodotClassMethod(Godot.NativeInterop.godot_string_name&, Godot.NativeInterop.NativeVariantPtrArgs, Godot.NativeInterop.godot_variant&)\r\n       [6] Godot.NativeInterop.godot_bool Godot.Bridge.CSharpInstanceBridge.Call(nint, Godot.NativeInterop.godot_string_name*, Godot.NativeInterop.godot_variant**, int, Godot.NativeInterop.godot_variant_call_error*, Godot.NativeInterop.godot_variant*)",
+      "specific": true
+    }
+  ],
+  "staging": 0,
+  "captureFiles": 0
+}

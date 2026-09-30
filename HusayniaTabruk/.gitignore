@@ -1,0 +1,27 @@
+# .NET
+**/bin/
+**/obj/
+*.user
+*.suo
+.vs/
+TestResults/
+coverage/
+
+# Expo / Node
+apps/mobile/node_modules/
+apps/mobile/.expo/
+apps/mobile/dist/
+apps/mobile/web-build/
+apps/mobile/.env
+apps/mobile/.env.*
+!apps/mobile/.env.example
+npm-debug.log*
+
+# Local configuration and operating system files
+.env
+.DS_Store
+Thumbs.db
+*.log
+
+# Local engineering mission state
+.ai-org/

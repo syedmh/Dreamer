@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import math
@@ -76,6 +77,13 @@ SOURCE_CONTRACTS = {
         "RGB",
         (1086, 1448),
     ),
+    "WalkingGirlFrames.png": (
+        "524F6F3CA6F55B5062433766734BF304D0285E5994B54A9AD12915C4FBF4D881",
+        2_120_344,
+        "PNG",
+        "RGB",
+        (1942, 809),
+    ),
     "School1.png": (
         "2FED5C0AD5D5927BF22272634F2E879703436291962A46CBB5CB96C4434A986A",
         1186592,
@@ -137,6 +145,109 @@ EXPECTED_FRAME_PATHS = tuple(
     for directory, names in FRAME_GROUPS.items()
     for name in names
 )
+GIRL_SOURCE_VALID_Y = (0, 516)
+GIRL_SOURCE_X_INTERVALS = (
+    (0, 158),
+    (160, 317),
+    (320, 480),
+    (483, 642),
+    (645, 805),
+    (808, 967),
+    (970, 1130),
+    (1133, 1294),
+    (1297, 1457),
+    (1460, 1619),
+    (1621, 1780),
+    (1783, 1942),
+)
+GIRL_FRAME_CONTRACTS = {
+    "Frames/GirlWalk/girl_00.png": (
+        "AF0EDE5A0081F4D11D38024B34554AB23391424AACC47B837C7DBD12D3974572",
+        196_886,
+        (136, 59, 359, 840),
+    ),
+    "Frames/GirlWalk/girl_01.png": (
+        "4F0D8F81BADABA85E1E3527BB8BEEE0EE98694590F333EF3D7B97E6A18E30D31",
+        228_147,
+        (114, 61, 353, 840),
+    ),
+    "Frames/GirlWalk/girl_02.png": (
+        "108DB273CA4E3B956CFBB4E4BD2F7BF4C7930D0C8FF41BD4B2E0F3649358A229",
+        225_464,
+        (120, 59, 391, 840),
+    ),
+    "Frames/GirlWalk/girl_03.png": (
+        "4A535BBCDCF1EFF88F6803C57BCF6EF7EDB4E03157E0A27DBC7E5EB169CF17A1",
+        231_870,
+        (120, 61, 389, 840),
+    ),
+    "Frames/GirlWalk/girl_04.png": (
+        "BD5F4B9CFF5CC3D5D2EA021334CFA87318CE4F060A446769FBCD60BF09DC034C",
+        238_119,
+        (135, 59, 406, 840),
+    ),
+    "Frames/GirlWalk/girl_05.png": (
+        "0D22F60047F5ADCC6730AE740C86D70FC97A08D74CF1C2F7E63203FD530CF269",
+        231_070,
+        (123, 57, 355, 840),
+    ),
+    "Frames/GirlWalk/girl_06.png": (
+        "67EE8E54578B61B7313545F63DACCED810D3204A2698C0E94C40CB477F1D568F",
+        234_046,
+        (127, 57, 398, 840),
+    ),
+    "Frames/GirlWalk/girl_07.png": (
+        "38C43EE47DD120033FEFA3284B42FF13EEEFF02E7311707F34A506532705C2A1",
+        236_638,
+        (120, 62, 393, 840),
+    ),
+    "Frames/GirlWalk/girl_08.png": (
+        "B17BACA436B3B9B63B492BD09E80641639C55677729A1CCC296D8868FE86A2C7",
+        234_929,
+        (108, 61, 379, 840),
+    ),
+    "Frames/GirlWalk/girl_09.png": (
+        "B0ECBF290A5DDF18C5FC85C123D7966D2A50AAEE17565DBDCF7EC5110D2CAD5E",
+        224_746,
+        (113, 59, 382, 840),
+    ),
+    "Frames/GirlWalk/girl_10.png": (
+        "5D1C152EC8742585BE21C33F414808F6E0F012D46DADDCF8A6F6819D9B88B0ED",
+        236_507,
+        (109, 57, 378, 840),
+    ),
+    "Frames/GirlWalk/girl_11.png": (
+        "64EBB8C977AD08BD247D65644DC024DD152BD7F732D2D8D20EB487B4416AA53C",
+        201_451,
+        (119, 59, 368, 840),
+    ),
+}
+EXPECTED_GIRL_FRAME_PATHS = tuple(GIRL_FRAME_CONTRACTS)
+GIRL_ALPHA_UNION_BOUNDS = (108, 57, 406, 840)
+GIRL_TORSO_TARGET_X = 256.0
+GIRL_MAXIMUM_TORSO_DRIFT = 5.0
+GIRL_EXPECTED_TORSO_CENTERS = (
+    255.5,
+    252.0,
+    256.5,
+    256.0,
+    257.5,
+    256.5,
+    256.5,
+    256.0,
+    255.5,
+    257.0,
+    257.0,
+    257.0,
+)
+GIRL_TORSO_METRIC_TOLERANCE = 0.01
+GIRL_TARGET_BASELINE_Y = 840
+GIRL_MAXIMUM_BASELINE_DRIFT = 0
+GIRL_MINIMUM_ALPHA_PIXELS = 70_000
+GIRL_MAXIMUM_ALPHA_PIXELS = 180_000
+GIRL_MINIMUM_ADJACENT_CHANGED_PIXELS = 12_000
+GIRL_MAXIMUM_GREEN_PIXELS = 1_000
+GIRL_MAXIMUM_GREEN_COMPONENT = 256
 EXPECTED_SCHOOL_CHARACTER_PATHS = tuple(
     f"Frames/SchoolCharacter/{directory}/{name}"
     for directory, names in FRAME_GROUPS.items()
@@ -187,6 +298,7 @@ EXPECTED_EFFECT_PATHS = (
 )
 EXPECTED_TEXTURE_PATHS = (
     *EXPECTED_FRAME_PATHS,
+    *EXPECTED_GIRL_FRAME_PATHS,
     *EXPECTED_BACKGROUND_PATHS,
     *EXPECTED_EFFECT_PATHS,
     *EXPECTED_SCHOOL_CHARACTER_PATHS,
@@ -196,6 +308,70 @@ EXPECTED_EXPORT_RESOURCES = (
     "res://AnimationConfig.json",
     "res://ActionMessages.json",
     *(f"res://{path}" for path in EXPECTED_TEXTURE_PATHS),
+)
+EXPECTED_STAGE_NON_TEXTURE_ENTRIES = (
+    "project.godot",
+    "Main.tscn",
+    "TCFAnimation.csproj",
+    "export_presets.cfg",
+    "AnimationConfig.json",
+    "ActionMessages.json",
+    "AnimationConfig.cs",
+    "ActionLegendLayout.cs",
+    "ActionLegendUi.cs",
+    "ActionMessageCatalog.cs",
+    "AnimationGeometry.cs",
+    "AvatarPresenceStateMachine.cs",
+    "CapturePathPolicy.cs",
+    "CelebrationStateMachine.cs",
+    "DialogueModel.cs",
+    "DialogueUi.cs",
+    "DirectionalTurnStateMachine.cs",
+    "FireworksLayer.cs",
+    "FireworksSimulation.cs",
+    "GirlEntranceStateMachine.cs",
+    "GlobalInputPolicy.cs",
+    "LogoRainLayer.cs",
+    "LogoRainSimulation.cs",
+    "NeonLogoBackground.cs",
+    "PresentationInputPolicy.cs",
+    "SchoolSceneStateMachine.cs",
+    "TurnController.cs",
+    "AnimationConfig.cs.uid",
+    "ActionLegendLayout.cs.uid",
+    "ActionLegendUi.cs.uid",
+    "ActionMessageCatalog.cs.uid",
+    "AnimationGeometry.cs.uid",
+    "AvatarPresenceStateMachine.cs.uid",
+    "CapturePathPolicy.cs.uid",
+    "CelebrationStateMachine.cs.uid",
+    "DialogueModel.cs.uid",
+    "DialogueUi.cs.uid",
+    "DirectionalTurnStateMachine.cs.uid",
+    "FireworksLayer.cs.uid",
+    "FireworksSimulation.cs.uid",
+    "GirlEntranceStateMachine.cs.uid",
+    "LogoRainLayer.cs.uid",
+    "LogoRainSimulation.cs.uid",
+    "NeonLogoBackground.cs.uid",
+    "PresentationInputPolicy.cs.uid",
+    "SchoolSceneStateMachine.cs.uid",
+    "TurnController.cs.uid",
+)
+EXPECTED_STAGE_ENTRIES = (
+    *EXPECTED_STAGE_NON_TEXTURE_ENTRIES,
+    *EXPECTED_FRAME_PATHS,
+    *EXPECTED_GIRL_FRAME_PATHS,
+    *EXPECTED_BACKGROUND_PATHS,
+    EXPECTED_EFFECT_PATHS[0],
+    EXPECTED_EFFECT_PATHS[1],
+    f"{EXPECTED_EFFECT_PATHS[1]}.import",
+    *EXPECTED_SCHOOL_CHARACTER_PATHS,
+)
+EXPECTED_CHARACTER_TEXTURE_COUNT = (
+    len(EXPECTED_FRAME_PATHS)
+    + len(EXPECTED_GIRL_FRAME_PATHS)
+    + len(EXPECTED_SCHOOL_CHARACTER_PATHS)
 )
 EXPECTED_SCRIPT_PAYLOADS = (
     "DialogueUi.cs",
@@ -990,6 +1166,350 @@ def validate_sources() -> None:
                 )
 
 
+def validate_walking_girl_source_geometry() -> None:
+    if GIRL_SOURCE_VALID_Y != (0, 516):
+        raise RuntimeError(
+            "Walking-girl source y contract must remain exactly [0,516)."
+        )
+    if len(GIRL_SOURCE_X_INTERVALS) != 12:
+        raise RuntimeError(
+            "Walking-girl source contract must contain exactly 12 intervals."
+        )
+
+    source_width, source_height = SOURCE_CONTRACTS[
+        "WalkingGirlFrames.png"
+    ][4]
+    y0, y1 = GIRL_SOURCE_VALID_Y
+    if not (0 <= y0 < y1 <= source_height):
+        raise RuntimeError(
+            "Walking-girl source y contract exceeds the source dimensions."
+        )
+
+    previous_x1 = -1
+    for index, (x0, x1) in enumerate(GIRL_SOURCE_X_INTERVALS):
+        if not (0 <= x0 < x1 <= source_width):
+            raise RuntimeError(
+                f"Walking-girl interval {index} {(x0, x1)} is invalid."
+            )
+        if x0 <= previous_x1:
+            raise RuntimeError(
+                f"Walking-girl interval {index} overlaps its predecessor."
+            )
+        previous_x1 = x1
+    if (
+        GIRL_SOURCE_X_INTERVALS[0][0] != 0
+        or GIRL_SOURCE_X_INTERVALS[-1][1] != source_width
+    ):
+        raise RuntimeError(
+            "Walking-girl intervals must retain the frozen sheet endpoints."
+        )
+    print(
+        "girl_source_geometry_ok=frames:12 "
+        f"x_intervals={GIRL_SOURCE_X_INTERVALS} "
+        "valid_source_y=[0,516) extractor_state_trusted=false"
+    )
+
+
+def validate_walking_girl_extractor_contract() -> None:
+    path = FRAME_EXTRACTION / "extract_walking_girl.py"
+    source = path.read_text(encoding="utf-8")
+    tree = ast.parse(source, filename=str(path))
+    assignments: dict[str, object] = {}
+    for node in tree.body:
+        if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+            continue
+        target = node.targets[0]
+        if not isinstance(target, ast.Name):
+            continue
+        try:
+            assignments[target.id] = ast.literal_eval(node.value)
+        except (ValueError, TypeError):
+            continue
+
+    expected_assignments = {
+        "SOURCE_SHA256": SOURCE_CONTRACTS["WalkingGirlFrames.png"][0],
+        "SOURCE_SIZE_BYTES": SOURCE_CONTRACTS["WalkingGirlFrames.png"][1],
+        "SOURCE_FORMAT": SOURCE_CONTRACTS["WalkingGirlFrames.png"][2],
+        "SOURCE_MODE": SOURCE_CONTRACTS["WalkingGirlFrames.png"][3],
+        "SOURCE_SIZE": SOURCE_CONTRACTS["WalkingGirlFrames.png"][4],
+        "VALID_SOURCE_Y": GIRL_SOURCE_VALID_Y,
+        "X_INTERVALS": GIRL_SOURCE_X_INTERVALS,
+        "FRAME_COUNT": len(EXPECTED_GIRL_FRAME_PATHS),
+    }
+    actual = {
+        name: assignments.get(name)
+        for name in expected_assignments
+    }
+    if actual != expected_assignments:
+        raise RuntimeError(
+            "Walking-girl extractor source/crop constants differ from the "
+            f"independent validator contract: {actual}."
+        )
+
+    required_fragments = (
+        'SOURCE_PATH = ROOT / "WalkingGirlFrames.png"',
+        'OUTPUT_DIR = ROOT / "Frames" / "GirlWalk"',
+        "crop_y0, crop_y1 = VALID_SOURCE_Y",
+        "for index, (x0, x1) in enumerate(X_INTERVALS):",
+        "panel = source[crop_y0:crop_y1, x0:x1].copy()",
+    )
+    missing = [
+        fragment for fragment in required_fragments if fragment not in source
+    ]
+    if missing:
+        raise RuntimeError(
+            "Walking-girl extractor no longer applies the frozen crop "
+            f"contract: {missing}."
+        )
+    print(
+        "girl_extractor_contract_ok=source:WalkingGirlFrames.png "
+        "output:Frames/GirlWalk frames:12 exact_crops=true "
+        "valid_source_y=[0,516) validator_owned=true"
+    )
+
+
+def measure_girl_torso_x(pixels: np.ndarray) -> float:
+    rgb = pixels[:, :, :3]
+    alpha = pixels[:, :, 3]
+    hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+    hue, saturation, value = cv2.split(hsv)
+    rows = np.indices(alpha.shape)[0]
+    red = rgb[:, :, 0].astype(np.int16)
+    blue = rgb[:, :, 2].astype(np.int16)
+    garment = (
+        (alpha > 0)
+        & (hue >= 6)
+        & (hue <= 32)
+        & (saturation >= 28)
+        & (value >= 45)
+        & (red > blue * 1.15)
+        & (rows >= 250)
+        & (rows < 650)
+    )
+    centers = []
+    for y in range(280, 600):
+        xs = np.flatnonzero(garment[y])
+        if xs.size >= 20:
+            centers.append(
+                (
+                    float(np.percentile(xs, 10))
+                    + float(np.percentile(xs, 90))
+                )
+                / 2.0
+            )
+    if not centers:
+        raise RuntimeError(
+            "Walking-girl frame has no independently measurable torso."
+        )
+    return float(np.median(centers))
+
+
+def validate_girl_green_background(
+    relative_path: str,
+    pixels: np.ndarray,
+) -> tuple[int, int]:
+    alpha = pixels[:, :, 3]
+    hsv = cv2.cvtColor(pixels[:, :, :3], cv2.COLOR_RGB2HSV)
+    green = (
+        (alpha == 255)
+        & (hsv[:, :, 0] >= 30)
+        & (hsv[:, :, 0] <= 110)
+        & (hsv[:, :, 1] >= 70)
+        & (hsv[:, :, 2] >= 30)
+    )
+    green[760:, :] = False
+    count, labels, stats, _ = cv2.connectedComponentsWithStats(
+        green.astype(np.uint8),
+        8,
+    )
+    largest = max(
+        (
+            int(stats[label, cv2.CC_STAT_AREA])
+            for label in range(1, count)
+        ),
+        default=0,
+    )
+    for label in range(1, count):
+        x, y, width, height, area = map(int, stats[label])
+        fill_ratio = area / (width * height)
+        if (
+            area >= 64
+            and width >= 4
+            and height >= 4
+            and fill_ratio >= 0.80
+        ):
+            raise RuntimeError(
+                f"{relative_path} retains an opaque green rectangle "
+                f"{(x, y, width, height, area)} fill={fill_ratio:.3f}."
+            )
+    green_pixels = int(np.count_nonzero(green))
+    if (
+        green_pixels > GIRL_MAXIMUM_GREEN_PIXELS
+        or largest > GIRL_MAXIMUM_GREEN_COMPONENT
+    ):
+        raise RuntimeError(
+            f"{relative_path} retains green-screen contamination: "
+            f"pixels={green_pixels}, largest_component={largest}."
+        )
+    return green_pixels, largest
+
+
+def validate_walking_girl_frames() -> None:
+    hashes = []
+    bounds = []
+    frames = []
+    torso_centers = []
+    baselines = []
+    green_counts = []
+    for index, (relative_path, contract) in enumerate(
+        GIRL_FRAME_CONTRACTS.items()
+    ):
+        expected_hash, expected_bytes, expected_bounds = contract
+        path = ROOT / relative_path
+        actual_hash = sha256_file(path, expected_bytes)
+        if actual_hash != expected_hash:
+            raise RuntimeError(
+                f"{relative_path} SHA-256 is {actual_hash}; "
+                f"expected {expected_hash}."
+            )
+        with Image.open(path) as image:
+            if (
+                image.format != "PNG"
+                or image.mode != "RGBA"
+                or image.size != CANVAS_SIZE
+            ):
+                raise RuntimeError(
+                    f"{relative_path} is {image.format} {image.mode} "
+                    f"{image.size}; expected PNG RGBA {CANVAS_SIZE}."
+                )
+            pixels = np.asarray(image, dtype=np.uint8)
+
+        alpha = pixels[:, :, 3]
+        if (
+            not np.any(alpha == 0)
+            or not np.any(alpha == 255)
+            or not np.any((alpha > 0) & (alpha < 255))
+        ):
+            raise RuntimeError(
+                f"{relative_path} does not contain true RGBA transparency."
+            )
+        alpha_pixels = int(np.count_nonzero(alpha))
+        if not (
+            GIRL_MINIMUM_ALPHA_PIXELS
+            <= alpha_pixels
+            <= GIRL_MAXIMUM_ALPHA_PIXELS
+        ):
+            raise RuntimeError(
+                f"{relative_path} alpha population {alpha_pixels} is outside "
+                f"[{GIRL_MINIMUM_ALPHA_PIXELS},"
+                f"{GIRL_MAXIMUM_ALPHA_PIXELS}]."
+            )
+        if np.any(pixels[:, :, :3][alpha == 0] != 0):
+            raise RuntimeError(
+                f"{relative_path} has nonzero RGB where alpha is zero."
+            )
+        alpha_y, alpha_x = np.where(alpha > 0)
+        if alpha_x.size == 0:
+            raise RuntimeError(f"{relative_path} has empty alpha.")
+        measured_bounds = (
+            int(alpha_x.min()),
+            int(alpha_y.min()),
+            int(alpha_x.max()),
+            int(alpha_y.max()),
+        )
+        if measured_bounds != expected_bounds:
+            raise RuntimeError(
+                f"{relative_path} alpha bounds are {measured_bounds}; "
+                f"expected {expected_bounds}."
+            )
+
+        torso_x = measure_girl_torso_x(pixels)
+        if abs(torso_x - GIRL_TORSO_TARGET_X) > GIRL_MAXIMUM_TORSO_DRIFT:
+            raise RuntimeError(
+                f"{relative_path} torso center is {torso_x}; expected within "
+                f"{GIRL_MAXIMUM_TORSO_DRIFT} of {GIRL_TORSO_TARGET_X}."
+            )
+        expected_torso_x = GIRL_EXPECTED_TORSO_CENTERS[index]
+        if (
+            abs(torso_x - expected_torso_x)
+            > GIRL_TORSO_METRIC_TOLERANCE
+        ):
+            raise RuntimeError(
+                f"{relative_path} independent torso metric is {torso_x}; "
+                f"expected {expected_torso_x}."
+            )
+        baseline_y = int(alpha_y.max())
+        if (
+            abs(baseline_y - GIRL_TARGET_BASELINE_Y)
+            > GIRL_MAXIMUM_BASELINE_DRIFT
+        ):
+            raise RuntimeError(
+                f"{relative_path} baseline is {baseline_y}; expected "
+                f"{GIRL_TARGET_BASELINE_Y}."
+            )
+        green_pixels, largest_green = validate_girl_green_background(
+            relative_path,
+            pixels,
+        )
+        print(
+            f"girl_frame_ok={relative_path} bytes={expected_bytes} "
+            f"sha256={actual_hash} alpha_pixels={alpha_pixels} "
+            f"alpha_bounds={measured_bounds} torso_x={torso_x:.2f} "
+            f"baseline_y={baseline_y} green_pixels={green_pixels} "
+            f"largest_green_component={largest_green}"
+        )
+        hashes.append(actual_hash)
+        bounds.append(measured_bounds)
+        frames.append(pixels)
+        torso_centers.append(torso_x)
+        baselines.append(baseline_y)
+        green_counts.append(green_pixels)
+
+    if len(set(hashes)) != 12:
+        raise RuntimeError(
+            "Walking-girl output hashes must be exactly 12 distinct values."
+        )
+
+    adjacent_changes = []
+    for index in range(len(frames) - 1):
+        changed = int(
+            np.count_nonzero(
+                np.any(frames[index] != frames[index + 1], axis=2)
+            )
+        )
+        if changed < GIRL_MINIMUM_ADJACENT_CHANGED_PIXELS:
+            raise RuntimeError(
+                f"Walking-girl frames {index:02d}/{index + 1:02d} differ "
+                f"in only {changed} pixels."
+            )
+        adjacent_changes.append(changed)
+
+    union_bounds = (
+        min(bound[0] for bound in bounds),
+        min(bound[1] for bound in bounds),
+        max(bound[2] for bound in bounds),
+        max(bound[3] for bound in bounds),
+    )
+    if union_bounds != GIRL_ALPHA_UNION_BOUNDS:
+        raise RuntimeError(
+            f"Walking-girl alpha union is {union_bounds}; "
+            f"expected {GIRL_ALPHA_UNION_BOUNDS}."
+        )
+    print(
+        "girl_frames_ok=count:12 distinct_hashes:12 "
+        f"union_bounds={union_bounds} adjacent_changes={adjacent_changes} "
+        f"torso_target={GIRL_TORSO_TARGET_X:.0f} "
+        "torso_alignment_maximum_drift="
+        f"{max(abs(value - GIRL_TORSO_TARGET_X) for value in torso_centers):.2f} "
+        "torso_contract_maximum_drift="
+        f"{max(abs(actual - expected) for actual, expected in zip(torso_centers, GIRL_EXPECTED_TORSO_CENTERS, strict=True)):.2f} "
+        f"baseline_y={GIRL_TARGET_BASELINE_Y} "
+        "baseline_maximum_drift="
+        f"{max(abs(value - GIRL_TARGET_BASELINE_Y) for value in baselines)} "
+        f"green_pixels_max={max(green_counts, default=0)}"
+    )
+
+
 def validate_frame_tree() -> None:
     frames_root = ROOT / "Frames"
     actual_directories = {
@@ -999,12 +1519,36 @@ def validate_frame_tree() -> None:
         *FRAME_GROUPS,
         "Backgrounds",
         "Effects",
+        "GirlWalk",
         "SchoolCharacter",
     }
     if actual_directories != expected_directories:
         raise RuntimeError(
             f"Frame directories are {sorted(actual_directories)}; "
             f"expected {sorted(expected_directories)}."
+        )
+
+    girl_png_names = {
+        Path(relative_path).name
+        for relative_path in EXPECTED_GIRL_FRAME_PATHS
+    }
+    girl_entries = {
+        path.name
+        for path in (frames_root / "GirlWalk").iterdir()
+        if path.is_file()
+    }
+    girl_entries_without_imports = girl_png_names
+    girl_entries_with_imports = girl_png_names | {
+        f"{name}.import" for name in girl_png_names
+    }
+    if girl_entries not in (
+        girl_entries_without_imports,
+        girl_entries_with_imports,
+    ):
+        raise RuntimeError(
+        f"Frames/GirlWalk files are {sorted(girl_entries)}; expected "
+        "exactly 12 PNGs, with either zero or all 12 Godot import "
+        "sidecars."
         )
 
     for directory, png_names in FRAME_GROUPS.items():
@@ -1080,11 +1624,36 @@ def validate_frame_tree() -> None:
     )
     if (
         set(actual_pngs) != set(EXPECTED_TEXTURE_PATHS)
-        or len(actual_pngs) != 74
+        or len(actual_pngs) != 86
     ):
         raise RuntimeError(
-            f"Runtime PNG set has {len(actual_pngs)} files; expected exact 74."
+            f"Runtime PNG set has {len(actual_pngs)} files; expected exact 86."
         )
+
+
+def validate_inventory_counts() -> None:
+    counts = {
+        "sources": len(SOURCE_CONTRACTS),
+        "character_textures": EXPECTED_CHARACTER_TEXTURE_COUNT,
+        "runtime_textures": len(EXPECTED_TEXTURE_PATHS),
+        "export_resources": len(EXPECTED_EXPORT_RESOURCES),
+        "stage_entries": len(EXPECTED_STAGE_ENTRIES),
+    }
+    expected = {
+        "sources": 13,
+        "character_textures": 78,
+        "runtime_textures": 86,
+        "export_resources": 89,
+        "stage_entries": 134,
+    }
+    if counts != expected:
+        raise RuntimeError(
+            f"Calculated release counts are {counts}; expected {expected}."
+        )
+    print(
+        "inventory_counts_ok="
+        + ",".join(f"{name}:{value}" for name, value in counts.items())
+    )
 
 
 def validate_action_messages() -> None:
@@ -1131,6 +1700,8 @@ def validate_animation_config() -> None:
     expected_keys = {
         "turnFps",
         "walkFps",
+        "girlWalkFps",
+        "girlEntrySeconds",
         "clapFps",
         "crossArmFps",
         "crossArmReleaseFps",
@@ -1166,7 +1737,114 @@ def validate_animation_config() -> None:
                 f"AnimationConfig.json value {key} must be a finite "
                 "positive number."
             )
-    print("animation_config_ok=config_keys:21 positive=true")
+    if document["girlWalkFps"] != 8.0:
+        raise RuntimeError(
+            "AnimationConfig.json girlWalkFps must remain exactly 8.0."
+        )
+    if document["girlEntrySeconds"] != 6.0:
+        raise RuntimeError(
+            "AnimationConfig.json girlEntrySeconds must remain exactly 6.0."
+        )
+    if document["girlEntrySeconds"] * document["girlWalkFps"] < 12:
+        raise RuntimeError(
+            "AnimationConfig.json girl timing product must be at least 12."
+        )
+
+    config_source = (ROOT / "AnimationConfig.cs").read_text(
+        encoding="utf-8"
+    )
+    for name, expected in (
+        ("GirlWalkFps", "8.0"),
+        ("GirlEntrySeconds", "6.0"),
+    ):
+        if re.search(
+            rf"\b{name}\s*=\s*{re.escape(expected)}\s*,",
+            config_source,
+        ) is None:
+            raise RuntimeError(
+                f"AnimationConfig.cs default {name} must remain {expected}."
+            )
+    if re.search(
+        r"GirlEntrySeconds\s*\*\s*GirlWalkFps\s*"
+        r"<\s*GirlEntranceStateMachine\.FrameCount",
+        config_source,
+    ) is None:
+        raise RuntimeError(
+            "AnimationConfig.cs must reject girl timing products below "
+            "GirlEntranceStateMachine.FrameCount."
+        )
+    print(
+        "animation_config_ok=config_keys:23 positive=true "
+        "girl_walk_fps=8 girl_entry_seconds=6 "
+        "girl_timing_product=48 minimum=12 strict=true"
+    )
+
+
+def validate_girl_geometry_contract() -> None:
+    source = (ROOT / "AnimationGeometry.cs").read_text(encoding="utf-8")
+    expected_constants = {
+        "ViewportWidth": 1920.0,
+        "CanvasCenterX": 256.0,
+        "CharacterScale": 1.25,
+        "GirlLeftVisibleX": 108.0,
+        "GirlTopVisibleY": 57.0,
+        "GirlRightVisibleX": 406.0,
+        "GirlBottomVisibleY": 840.0,
+    }
+    actual_constants = {}
+    for name, expected in expected_constants.items():
+        match = re.search(
+            rf"public const float {name}\s*=\s*([0-9]+(?:\.[0-9]+)?)f\s*;",
+            source,
+        )
+        if match is None:
+            raise RuntimeError(
+                f"AnimationGeometry.cs is missing float constant {name}."
+            )
+        actual = float(match.group(1))
+        if actual != expected:
+            raise RuntimeError(
+                f"AnimationGeometry.cs {name} is {actual}; "
+                f"expected {expected}."
+            )
+        actual_constants[name] = actual
+
+    if re.search(
+        r"GirlOffscreenCenters\s*=>\s*CalculateOffscreenCenters\s*\("
+        r".*?leftVisibleX:\s*GirlLeftVisibleX\s*,"
+        r".*?rightVisibleX:\s*GirlRightVisibleX\s*\)",
+        source,
+        flags=re.DOTALL,
+    ) is None:
+        raise RuntimeError(
+            "AnimationGeometry.GirlOffscreenCenters must route through "
+            "CalculateOffscreenCenters with the frozen girl extrema."
+        )
+
+    expected_bounds = (
+        int(actual_constants["GirlLeftVisibleX"]),
+        int(actual_constants["GirlTopVisibleY"]),
+        int(actual_constants["GirlRightVisibleX"]),
+        int(actual_constants["GirlBottomVisibleY"]),
+    )
+    if expected_bounds != GIRL_ALPHA_UNION_BOUNDS:
+        raise RuntimeError(
+            f"AnimationGeometry girl bounds are {expected_bounds}; "
+            f"expected {GIRL_ALPHA_UNION_BOUNDS}."
+        )
+    offscreen_left = -(
+        actual_constants["GirlRightVisibleX"]
+        - actual_constants["CanvasCenterX"]
+    ) * actual_constants["CharacterScale"]
+    if offscreen_left != -187.5:
+        raise RuntimeError(
+            f"Girl offscreen-left center is {offscreen_left}; "
+            "expected -187.5."
+        )
+    print(
+        "girl_geometry_ok=bounds:108,57,406,840 "
+        "offscreen_left=-187.5 viewport_center=960 fixed_constants=true"
+    )
 
 
 def validate_logo_effect() -> None:
@@ -2389,6 +3067,81 @@ def parse_export_resources() -> tuple[str, ...]:
     return resources
 
 
+def validate_release_stage_inventory() -> None:
+    manifest_path = ROOT / "release-stage-manifest.txt"
+    manifest_bytes = manifest_path.read_bytes()
+    if manifest_bytes.startswith(b"\xef\xbb\xbf"):
+        raise RuntimeError(
+            "release-stage-manifest.txt must not contain a UTF-8 BOM."
+        )
+    try:
+        manifest_entries = tuple(
+            manifest_bytes.decode("utf-8").splitlines()
+        )
+    except UnicodeDecodeError as exception:
+        raise RuntimeError(
+            "release-stage-manifest.txt must be valid UTF-8."
+        ) from exception
+    if manifest_entries != EXPECTED_STAGE_ENTRIES:
+        raise RuntimeError(
+            "Release stage manifest differs from the exact 134-entry "
+            "validator contract."
+        )
+    if len(manifest_entries) != len(set(manifest_entries)):
+        raise RuntimeError("Release stage manifest contains duplicates.")
+
+    tooling_text = (ROOT / "release-tooling.ps1").read_text(
+        encoding="utf-8"
+    )
+    tooling_match = re.search(
+        r"function Get-FrozenReleaseStageEntries\s*\{\s*return @\("
+        r"(.*?)\)\s*\}",
+        tooling_text,
+        flags=re.DOTALL,
+    )
+    if tooling_match is None:
+        raise RuntimeError(
+            "release-tooling.ps1 has no frozen stage-entry function."
+        )
+    tooling_entries = tuple(
+        re.findall(r'"([^"]+)"', tooling_match.group(1))
+    )
+    if tooling_entries != EXPECTED_STAGE_ENTRIES:
+        raise RuntimeError(
+            "release-tooling.ps1 frozen stage inventory differs from the "
+            "exact 134-entry validator contract."
+        )
+    if len(tooling_entries) != len(set(tooling_entries)):
+        raise RuntimeError(
+            "release-tooling.ps1 frozen stage inventory contains duplicates."
+        )
+
+    denied_tokens = (
+        "WalkingGirlFrames.png",
+        "extract_walking_girl.py",
+        "extract_walking_girl",
+        "FrameExtraction",
+        "ControllerProbe",
+        ".ai-org",
+        "Build",
+        "README",
+    )
+    denied = [
+        entry
+        for entry in manifest_entries
+        if any(token.casefold() in entry.casefold() for token in denied_tokens)
+    ]
+    if denied:
+        raise RuntimeError(
+            f"Release stage inventory contains denied entries: {denied}."
+        )
+    print(
+        "release_stage_inventory_ok=manifest_entries:134 "
+        "tooling_entries:134 duplicates:false raw_girl_source:false "
+        "girl_extractor:false"
+    )
+
+
 def validate_export_hygiene() -> None:
     resources = parse_export_resources()
     preset_text = (ROOT / "export_presets.cfg").read_text(encoding="utf-8")
@@ -2409,6 +3162,9 @@ def validate_export_hygiene() -> None:
         )
     deny_tokens = (
         "Waving",
+        "WalkingGirlFrames.png",
+        "extract_walking_girl.py",
+        "extract_walking_girl",
         "ControllerProbe",
         "FrameExtraction",
         "LTurning.png",
@@ -2674,6 +3430,11 @@ def expected_imported_textures() -> set[str]:
     imported = set()
     for relative_path in EXPECTED_TEXTURE_PATHS:
         import_path = ROOT / f"{relative_path}.import"
+        if not import_path.is_file():
+            raise RuntimeError(
+                f"{relative_path}.import is missing; run the authenticated "
+                "Godot import before validating built artifacts."
+            )
         text = import_path.read_text(encoding="utf-8")
         match = re.search(
             r'^path="res://(\.godot/imported/[^"]+\.ctex)"$',
@@ -2693,6 +3454,9 @@ def expected_imported_textures() -> set[str]:
 def denied_metadata_tokens(payload: bytes) -> tuple[str, ...]:
     tokens = (
         "Waving",
+        "WalkingGirlFrames.png",
+        "extract_walking_girl.py",
+        "extract_walking_girl",
         "Avatar.jpg",
         "Clapping.png",
         "CrossArm.png",
@@ -2778,6 +3542,14 @@ def validate_pack_metadata(
 def validate_pack_negative_controls() -> None:
     for name, payload in (
         ("ascii_waving", b"res://Waving.png"),
+        (
+            "ascii_walking_girl_source",
+            b"res://WalkingGirlFrames.png",
+        ),
+        (
+            "ascii_walking_girl_extractor",
+            b"FrameExtraction/extract_walking_girl.py",
+        ),
         (
             "utf16_development_path",
             (
@@ -2877,6 +3649,9 @@ def validate_pack_payload(
 
     deny_tokens = (
         "Waving",
+        "WalkingGirlFrames.png",
+        "extract_walking_girl.py",
+        "extract_walking_girl",
         "ControllerProbe",
         "FrameExtraction",
         ".ai-org",
@@ -2929,7 +3704,7 @@ def validate_pack_payload(
     print(
         f"pack_payload_ok={path.name} runtime_scene=1 runtime_scripts=2 "
         "runtime_json=2 "
-        "runtime_textures=74 import_metadata=74 engine_metadata=4 "
+        "runtime_textures=86 import_metadata=86 engine_metadata=4 "
         "denied_payloads=false source_content=false metadata_denied_tokens=0"
     )
 
@@ -3008,8 +3783,13 @@ def validate_built_artifacts() -> None:
 def main() -> int:
     validate_extractor_segmentation_contract()
     validate_sources()
+    validate_walking_girl_source_geometry()
+    validate_walking_girl_extractor_contract()
     validate_frame_tree()
+    validate_inventory_counts()
+    validate_walking_girl_frames()
     validate_animation_config()
+    validate_girl_geometry_contract()
     validate_action_messages()
     validate_logo_effect()
     validate_neon_background()
@@ -3020,14 +3800,21 @@ def main() -> int:
     validate_school_runtime_assets(regenerated)
     validate_viewport_fit_configuration()
     validate_identity_and_continuity(regenerated)
+    validate_release_stage_inventory()
     validate_export_hygiene()
     validate_requirements_lock()
     validate_pack_negative_controls()
     validate_built_artifacts()
     validate_sources()
     print(
-        "ASSET_RELEASE_CHECK_PASS frames=33 school_overlays=33 "
-        "backgrounds=6 sources=12 read_only=true export_resources=77 "
+        "ASSET_RELEASE_CHECK_PASS frames=33 girl_frames=12 "
+        "school_overlays=33 backgrounds=6 "
+        f"sources={len(SOURCE_CONTRACTS)} "
+        f"character_textures={EXPECTED_CHARACTER_TEXTURE_COUNT} "
+        f"runtime_textures={len(EXPECTED_TEXTURE_PATHS)} read_only=true "
+        f"export_resources={len(EXPECTED_EXPORT_RESOURCES)} "
+        f"stage_entries={len(EXPECTED_STAGE_ENTRIES)} "
+        "girl_bounds=108,57,406,840 girl_offscreen_left=-187.5 "
         "artifact_manifest=checked_if_present"
     )
     return 0

@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType Condition="Exists('Program.cs')">Exe</OutputType>
+    <OutputType Condition="!Exists('Program.cs')">Library</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Husaynia.Application\Husaynia.Application.csproj" />
+    <ProjectReference Include="..\..\src\Husaynia.Infrastructure\Husaynia.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

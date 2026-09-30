@@ -1,0 +1,76 @@
+{
+  "name": "T21 automatic nonproduction completed-run coordinator",
+  "on": {
+    "workflow_run": {
+      "workflows": [
+        "T21 immutable release C6",
+        "T21 protected migration Apply authorization",
+        "T21 disabled nonproduction operation wrapper"
+      ],
+      "types": ["completed"]
+    }
+  },
+  "permissions": {
+    "actions": "write",
+    "attestations": "read",
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "t21-r10-coordinator-${{ github.event.workflow_run.id }}",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "coordinate": {
+      "if": "${{ github.event.workflow_run.status == 'completed' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.repository.full_name == github.repository && github.event.workflow_run.head_branch == 'main' }}",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 30,
+      "env": {
+        "HUSAYNIA_REPOSITORY_ROOT": "${{ github.workspace }}/HusayniaSite"
+      },
+      "defaults": {
+        "run": {
+          "shell": "pwsh",
+          "working-directory": "HusayniaSite"
+        }
+      },
+      "steps": [
+        {
+          "name": "Checkout protected-main orchestration contracts",
+          "uses": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "with": {
+            "ref": "refs/heads/main",
+            "persist-credentials": false,
+            "fetch-depth": 1
+          }
+        },
+        {
+          "name": "Validate canonical Husaynia checkout root",
+          "run": "$workspace = (Resolve-Path -LiteralPath $env:GITHUB_WORKSPACE).Path; $root = (Resolve-Path -LiteralPath $env:HUSAYNIA_REPOSITORY_ROOT).Path; $expected = Join-Path $workspace 'HusayniaSite'; if ($root -cne $expected -or -not $root.StartsWith($workspace + [IO.Path]::DirectorySeparatorChar, [StringComparison]::Ordinal) -or -not (Test-Path -LiteralPath (Join-Path $root 'HusayniaSite.sln') -PathType Leaf) -or -not (Test-Path -LiteralPath (Join-Path $root 'eng') -PathType Container) -or -not (Test-Path -LiteralPath (Join-Path $root 'pipelines') -PathType Container)) { throw 'T21 coordinator canonical Dreamer/HusayniaSite checkout root validation failed.' }"
+        },
+        {
+          "name": "Bind coordinator to checked-out protected-main head",
+          "run": "$sha = (& git rev-parse HEAD).Trim().ToLowerInvariant(); if ($LASTEXITCODE -ne 0 -or $sha -notmatch '^[a-f0-9]{40}$') { throw 'T21 coordinator could not bind the checked-out protected-main head.' }; \"T21_PROTECTED_HEAD_SHA=$sha\" | Add-Content -LiteralPath $env:GITHUB_ENV -Encoding utf8"
+        },
+        {
+          "name": "Dispatch only idempotent completed-run successors",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}",
+            "GITHUB_TOKEN": "${{ github.token }}",
+            "T21_PREDECESSOR_ID": "${{ github.event.workflow_run.id }}",
+            "T21_PREDECESSOR_NAME": "${{ github.event.workflow_run.name }}",
+            "T21_PREDECESSOR_PATH": "${{ github.event.workflow_run.path }}",
+            "T21_REPOSITORY_ID": "${{ github.repository_id }}",
+            "T21_TRUSTED_BUNDLE_SHA256": "${{ vars.T21_TRUSTED_BUNDLE_SHA256 }}",
+            "T21_TRUSTED_WORKFLOW_REF": "${{ vars.T21_TRUSTED_WORKFLOW_REF }}",
+            "T21_STAGE_INPUTS_WORKFLOW_REF": "${{ vars.T21_STAGE_INPUTS_WORKFLOW_REF }}",
+            "T21_MIGRATION_AUTHORIZATION_WORKFLOW_REF": "${{ vars.T21_MIGRATION_AUTHORIZATION_WORKFLOW_REF }}",
+            "T21_STAGE_TARGET_METADATA_JSON": "${{ vars.T21_STAGE_TARGET_METADATA_JSON }}",
+            "T21_DEVELOPMENT_ENABLED": "${{ vars.T21_DEVELOPMENT_DEPLOYMENT_ENABLED }}",
+            "T21_STAGING_ENABLED": "${{ vars.T21_STAGING_DEPLOYMENT_ENABLED }}"
+          },
+          "run": "& (Join-Path $env:HUSAYNIA_REPOSITORY_ROOT 'eng/promotion/Invoke-T21CompletedRunCoordinator.ps1')"
+        }
+      ]
+    }
+  }
+}

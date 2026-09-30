@@ -1,0 +1,14 @@
+MISSION:              Make TCFPlay’s shipped JSON key-to-prompt based, with Digit1 exactly `Girl walk from the left side of the screen, turn front facing and say "Welcome Seattle"`, compiled into the required deterministic scene.
+
+REQUIREMENTS:         PASS      All nine DoD criteria trace to shipped data, runtime code, tests, scoped git evidence, and a fresh browser run.
+IMPLEMENTATION:       PASS      `app.js` loads v2; all five v2 scenes author `prompt` and no `actions`; `validateConfig` compiles prompts; the compiler emits spawn(-0.12/right), moveTo(0.5), reverse turn-to-front, and exact timed speech; timeline clears speech at expiry; renderer draws the Canvas bubble; controls retain Escape and Digit keys; v1 remains valid/allowlisted.
+TESTS:                PASS      Fresh `npm test` (Node v24.19.0): 23 tests, 23 passed, 0 failed, 0 cancelled, 0 skipped, 0 todo. Fresh `node --check` passed for server and all inspected runtime modules.
+SECURITY:             PASS      Same-origin allowlist includes only required v1/v2/compiler assets; traversal tests pass; CSP/security headers remain; speech uses Canvas text rather than HTML; package.json has no dependencies or devDependencies.
+CODE REVIEW:          PASS      Independently inspected shipped JSON, compiler, validator, timeline, renderer, controls, app, server allowlist, and regression tests. Timed speech expiry and duplicate-ID rejection are implemented and substantively tested; no blocking defect found.
+E2E:                  PASS      Fresh headless Edge/CDP run loaded v2 with 0 runtime/log errors; observed left-walk frames, reverse turn frames 09→08→…→01 at center, exact `Welcome Seattle` bubble for about 4 seconds then expiry, Escape dismissal, and Digit2 playback. Network contained only allowlisted app/assets and no favicon request.
+DEFINITION OF DONE:   PASS      (1) PASS—active `playground.v2.json` has prompts and no authored actions for all five keys. (2) PASS—Digit1 text is byte-for-byte exact. (3) PASS—compiler golden test, timeline test, code inspection, and fresh E2E prove deterministic left entry, center walk, front turn, speech. (4) PASS—renderer test plus E2E prove exact comic bubble and timed expiry. (5) PASS—Escape/Digit mappings and live Escape/Digit2 pass. (6) PASS—unsupported/contradictory/unknown prompts and duplicate IDs throw explicit errors. (7) PASS—v1 validation and serving remain covered. (8) PASS—fresh 23/23 tests, independent review, and fresh browser E2E pass. (9) PASS—no dependencies/external AI; TCFPlay remains uncommitted as requested; scoped git status shows no TCFBuild changes.
+
+RISKS:                Controlled-English support is intentionally narrow. Canvas speech is visual only; the live status remains `Playing: Welcome Seattle` rather than announcing the spoken phrase, an accessibility limitation outside the stated DoD.
+REMAINING WORK:       none
+
+FINAL: APPROVED

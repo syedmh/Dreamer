@@ -1,0 +1,28 @@
+{
+  "status": "IMPLEMENTED_OFFLINE_VERIFIED",
+  "cloudAccessStatus": "UNRESOLVED",
+  "changes": [
+    "Added bounded read-only check-auth command without image submission or queue access.",
+    "Definitive Azure 401/403 stops processing after durable failure recording, retaining unattempted queued work.",
+    "Preserved a ready denial IPC message at the parent timeout or worker-exit boundary.",
+    "Documented command examples, safe diagnostics and catalog-access limitations."
+  ],
+  "evidence": {
+    "initialDeveloperReport": "667 focused tests passed before independent rerun.",
+    "initialIndependentRun": "1 failed, 79 passed: spawned 403 stalled-body probe returned inconclusive timeout.",
+    "deterministicReproduction": "Developer: terminal-boundary selection 6 failed, 6 passed before fix; 12 passed after fix.",
+    "causalityLimit": "Ready-message loss at terminal boundaries is proven. The original intermittent failure could also have occurred before headers because process startup shared a two-second test budget; historical cause is not distinguishable.",
+    "testHarness": "Spawn scenario now permits five seconds and proves entry into mock transport; separate deterministic controls retain two-second production deadline coverage.",
+    "developerRerun": "92 passed in access-diagnostics module; six real-spawn cases passed in each of three repetitions.",
+    "independentCommand": "python -m pytest -q tests\\integration\\test_access_diagnostics.py tests\\unit\\test_azure_provider.py tests\\unit\\test_rate_config_headers.py tests\\unit\\test_retry_cda7_classifier.py",
+    "independentResult": "446 passed in 51.32s",
+    "compilation": "python -m compileall -q src\\tcfcomic: exit 0",
+    "commandHelp": "python -m tcfcomic check-auth --help: exit 0"
+  },
+  "restrictionsPreserved": [
+    "No live Azure requests, image retries, queue resets, credential fallback or policy changes.",
+    "Existing failed jobs remain closed.",
+    "Broad review, QA and judgment phases remain paused."
+  ],
+  "nextAction": "User runs check-auth with config.azure.yaml in the PowerShell session holding AZURE_OPENAI_API_KEY; catalog success alone does not establish image-edit access."
+}

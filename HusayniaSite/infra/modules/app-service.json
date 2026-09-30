@@ -1,0 +1,246 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.46.1.21595",
+      "templateHash": "17063282129934400384"
+    }
+  },
+  "parameters": {
+    "deployResources": {
+      "type": "bool",
+      "metadata": {
+        "description": "Controls whether this module can create any resource."
+      }
+    },
+    "location": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "object"
+    },
+    "appServicePlanName": {
+      "type": "string"
+    },
+    "webAppName": {
+      "type": "string"
+    },
+    "appServicePlanSkuName": {
+      "type": "string"
+    },
+    "appServicePlanSkuTier": {
+      "type": "string"
+    },
+    "linuxFxVersion": {
+      "type": "string"
+    },
+    "publicNetworkAccess": {
+      "type": "string"
+    },
+    "appServiceAccessRestrictions": {
+      "type": "array"
+    },
+    "storageAccountName": {
+      "type": "string"
+    },
+    "logAnalyticsWorkspaceResourceId": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2024-04-01",
+      "name": "[parameters('appServicePlanName')]",
+      "location": "[parameters('location')]",
+      "kind": "linux",
+      "sku": {
+        "name": "[parameters('appServicePlanSkuName')]",
+        "tier": "[parameters('appServicePlanSkuTier')]"
+      },
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "reserved": true,
+        "perSiteScaling": false
+      }
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2024-04-01",
+      "name": "[parameters('webAppName')]",
+      "location": "[parameters('location')]",
+      "kind": "app,linux",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+        "httpsOnly": true,
+        "publicNetworkAccess": "[parameters('publicNetworkAccess')]",
+        "siteConfig": {
+          "copy": [
+            {
+              "name": "ipSecurityRestrictions",
+              "count": "[length(parameters('appServiceAccessRestrictions'))]",
+              "input": {
+                "name": "[parameters('appServiceAccessRestrictions')[copyIndex('ipSecurityRestrictions')].name]",
+                "ipAddress": "[parameters('appServiceAccessRestrictions')[copyIndex('ipSecurityRestrictions')].ipAddress]",
+                "action": "Allow",
+                "priority": "[parameters('appServiceAccessRestrictions')[copyIndex('ipSecurityRestrictions')].priority]",
+                "description": "[parameters('appServiceAccessRestrictions')[copyIndex('ipSecurityRestrictions')].description]"
+              }
+            }
+          ],
+          "linuxFxVersion": "[parameters('linuxFxVersion')]",
+          "minTlsVersion": "1.2",
+          "ftpsState": "Disabled",
+          "http20Enabled": true,
+          "healthCheckPath": "/health",
+          "ipSecurityRestrictionsDefaultAction": "Deny",
+          "scmIpSecurityRestrictionsUseMain": true,
+          "scmIpSecurityRestrictionsDefaultAction": "Deny"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2024-04-01",
+      "name": "[format('{0}/{1}', parameters('webAppName'), 'ftp')]",
+      "properties": {
+        "allow": false
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2024-04-01",
+      "name": "[format('{0}/{1}', parameters('webAppName'), 'scm')]",
+      "properties": {
+        "allow": false
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Authorization/roleDefinitions",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(resourceGroup().id, 'OperationalBlobWriterNoDelete')]",
+      "properties": {
+        "roleName": "Husaynia Operational Blob Writer No Delete",
+        "description": "Read, write, and append blobs in explicitly assigned operational containers without delete permission.",
+        "type": "CustomRole",
+        "permissions": [
+          {
+            "actions": [],
+            "notActions": [],
+            "dataActions": [
+              "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read",
+              "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write",
+              "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/add/action"
+            ],
+            "notDataActions": [
+              "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/delete"
+            ]
+          }
+        ],
+        "assignableScopes": [
+          "[resourceGroup().id]"
+        ]
+      }
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "scope": "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', 'media')]",
+      "name": "[guid(resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', 'media'), resourceId('Microsoft.Web/sites', parameters('webAppName')), 'StorageBlobDataContributor')]",
+      "properties": {
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
+        "principalId": "[reference(resourceId('Microsoft.Web/sites', parameters('webAppName')), '2024-04-01', 'full').identity.principalId]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "scope": "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', 'import-evidence')]",
+      "name": "[guid(resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', 'import-evidence'), resourceId('Microsoft.Web/sites', parameters('webAppName')), resourceId('Microsoft.Authorization/roleDefinitions', guid(resourceGroup().id, 'OperationalBlobWriterNoDelete')))]",
+      "properties": {
+        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', guid(resourceGroup().id, 'OperationalBlobWriterNoDelete'))]",
+        "principalId": "[reference(resourceId('Microsoft.Web/sites', parameters('webAppName')), '2024-04-01', 'full').identity.principalId]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Authorization/roleDefinitions', guid(resourceGroup().id, 'OperationalBlobWriterNoDelete'))]",
+        "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "scope": "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', 'reports')]",
+      "name": "[guid(resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', 'reports'), resourceId('Microsoft.Web/sites', parameters('webAppName')), resourceId('Microsoft.Authorization/roleDefinitions', guid(resourceGroup().id, 'OperationalBlobWriterNoDelete')))]",
+      "properties": {
+        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', guid(resourceGroup().id, 'OperationalBlobWriterNoDelete'))]",
+        "principalId": "[reference(resourceId('Microsoft.Web/sites', parameters('webAppName')), '2024-04-01', 'full').identity.principalId]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Authorization/roleDefinitions', guid(resourceGroup().id, 'OperationalBlobWriterNoDelete'))]",
+        "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployResources')]",
+      "type": "Microsoft.Insights/diagnosticSettings",
+      "apiVersion": "2021-05-01-preview",
+      "scope": "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]",
+      "name": "app-to-log-analytics",
+      "properties": {
+        "workspaceId": "[parameters('logAnalyticsWorkspaceResourceId')]",
+        "logs": [
+          {
+            "category": "AppServiceHTTPLogs",
+            "enabled": true
+          },
+          {
+            "category": "AppServiceConsoleLogs",
+            "enabled": true
+          },
+          {
+            "category": "AppServiceAuditLogs",
+            "enabled": true
+          }
+        ],
+        "metrics": [
+          {
+            "category": "AllMetrics",
+            "enabled": true
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+      ]
+    }
+  ]
+}

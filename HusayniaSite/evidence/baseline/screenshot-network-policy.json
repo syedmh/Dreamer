@@ -1,0 +1,39 @@
+{
+  "policyVersion": "adr-009-v1",
+  "allowedMethods": [
+    "GET",
+    "HEAD"
+  ],
+  "allowedOrigins": [
+    "https://www.husaynia.org"
+  ],
+  "allowedStaticHosts": [
+    "cdn.jsdelivr.net",
+    "cdnjs.cloudflare.com",
+    "fonts.googleapis.com",
+    "fonts.gstatic.com"
+  ],
+  "allowedStaticResourceTypes": [
+    "stylesheet",
+    "font",
+    "image"
+  ],
+  "blockedCapabilities": [
+    "form-submission",
+    "payment-hosts",
+    "analytics",
+    "trackers",
+    "websockets",
+    "eventsource",
+    "sendbeacon",
+    "service-workers",
+    "downloads",
+    "unexpected-navigation"
+  ],
+  "navigationAttempts": 3,
+  "navigationAttemptTimeoutSeconds": 10,
+  "readinessTimeoutSeconds": 30,
+  "captureTimeoutSeconds": 45,
+  "interCaptureDelayMilliseconds": 3000,
+  "enforcement": "Microsoft.Playwright context-wide default-deny routing. Live HTTPS documents are not rewritten and no DOM, fixture, masking, or layout CSS is injected."
+}

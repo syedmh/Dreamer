@@ -1,0 +1,169 @@
+{
+  "executableSha256": "6421D47A982DD97427C4F2DCAC0F79F9E06F4D411AE8CEB7F4606A8EFB5EF9E9",
+  "pid": 37828,
+  "hwnd": 22087772,
+  "foregroundPid": 8964,
+  "captures": [
+    {
+      "state": "idle",
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "methods": {
+        "imagegrab": {
+          "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\probe-idle-imagegrab.png",
+          "size": [
+            1280,
+            720
+          ],
+          "sha256": "EAE15E8C3DE61946D895385F5857F993B97BCDE5CB1F1F12F3716F5B2DE46975",
+          "nonBlackPixels": 65770
+        },
+        "bitblt": {
+          "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\probe-idle-bitblt.png",
+          "size": [
+            1280,
+            720
+          ],
+          "sha256": "EAE15E8C3DE61946D895385F5857F993B97BCDE5CB1F1F12F3716F5B2DE46975",
+          "nonBlackPixels": 65770
+        },
+        "printwindow": {
+          "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\probe-idle-printwindow.png",
+          "size": [
+            1280,
+            720
+          ],
+          "sha256": "276C2669F853284A319C73FF998F1919E5684A8F89AEDFBA953452036AA5B54C",
+          "nonBlackPixels": 65716
+        }
+      }
+    },
+    {
+      "state": "left",
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "methods": {
+        "imagegrab": {
+          "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\probe-left-imagegrab.png",
+          "size": [
+            1280,
+            720
+          ],
+          "sha256": "FD9B00A8DE2E9B49FC6B70C7BA2D9A19A6857864EE36723D400FF8AE7E8A627B",
+          "nonBlackPixels": 56544
+        },
+        "bitblt": {
+          "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\probe-left-bitblt.png",
+          "size": [
+            1280,
+            720
+          ],
+          "sha256": "C75C2BA921C4800E3E1EC9550360B0B65FC3166CC2808455C94888AC5872DCAC",
+          "nonBlackPixels": 56544
+        },
+        "printwindow": {
+          "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\probe-left-printwindow.png",
+          "size": [
+            1280,
+            720
+          ],
+          "sha256": "EA5199414666870CFDCE9CC27F2146970E3D1F5F23A497643A3C7BBF4F345BA0",
+          "nonBlackPixels": 56490
+        }
+      }
+    },
+    {
+      "state": "dialogue",
+      "clientRect": [
+        320,
+        210,
+        1600,
+        930
+      ],
+      "methods": {
+        "imagegrab": {
+          "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\probe-dialogue-imagegrab.png",
+          "size": [
+            1280,
+            720
+          ],
+          "sha256": "E4A0E92AA98B55382A366C130E7B9853E280D1D373E955FFB33F82E863D2C5D6",
+          "nonBlackPixels": 121761
+        },
+        "bitblt": {
+          "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\probe-dialogue-bitblt.png",
+          "size": [
+            1280,
+            720
+          ],
+          "sha256": "E4A0E92AA98B55382A366C130E7B9853E280D1D373E955FFB33F82E863D2C5D6",
+          "nonBlackPixels": 121761
+        },
+        "printwindow": {
+          "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\qa-final\\qa-foreground-fixed\\probe-dialogue-printwindow.png",
+          "size": [
+            1280,
+            720
+          ],
+          "sha256": "FCCC5F3A1DF549E4E0B99B17C1E2EE9509AEDF3F59B6FA4B73734F2174D3C564",
+          "nonBlackPixels": 121707
+        }
+      }
+    }
+  ],
+  "deltas": {
+    "imagegrab": {
+      "idleToLeft": {
+        "sameShape": true,
+        "changedPixels": 122647,
+        "meanAbsoluteDelta": 17.71266673900463,
+        "maxChannelDelta": 255
+      },
+      "idleToDialogue": {
+        "sameShape": true,
+        "changedPixels": 187647,
+        "meanAbsoluteDelta": 25.435221715856482,
+        "maxChannelDelta": 255
+      }
+    },
+    "bitblt": {
+      "idleToLeft": {
+        "sameShape": true,
+        "changedPixels": 122647,
+        "meanAbsoluteDelta": 17.71266673900463,
+        "maxChannelDelta": 255
+      },
+      "idleToDialogue": {
+        "sameShape": true,
+        "changedPixels": 187647,
+        "meanAbsoluteDelta": 25.435221715856482,
+        "maxChannelDelta": 255
+      }
+    },
+    "printwindow": {
+      "idleToLeft": {
+        "sameShape": true,
+        "changedPixels": 122647,
+        "meanAbsoluteDelta": 17.71266673900463,
+        "maxChannelDelta": 255
+      },
+      "idleToDialogue": {
+        "sameShape": true,
+        "changedPixels": 187647,
+        "meanAbsoluteDelta": 25.435221715856482,
+        "maxChannelDelta": 255
+      }
+    }
+  },
+  "exitCode": 0,
+  "stdout": "Godot Engine v4.5.1.stable.mono.official.f62fdbde1 - https://godotengine.org\nOpenGL API 3.3.0 NVIDIA 595.95 - Compatibility - Using Device: NVIDIA - NVIDIA RTX PRO 1000 Blackwell Generation Laptop GPU",
+  "stderr": ""
+}

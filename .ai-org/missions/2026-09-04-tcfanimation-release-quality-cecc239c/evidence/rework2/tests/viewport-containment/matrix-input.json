@@ -1,0 +1,194 @@
+[
+  {
+    "name": "rc2-test-default-center",
+    "requested": "default",
+    "scenario": "center",
+    "expectedWidth": 1280,
+    "expectedHeight": 720,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-default-center.png"
+  },
+  {
+    "name": "rc2-test-default-left-dialogue",
+    "requested": "default",
+    "scenario": "left-dialogue",
+    "expectedWidth": 1280,
+    "expectedHeight": 720,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-default-left-dialogue.png"
+  },
+  {
+    "name": "rc2-test-default-right-dialogue",
+    "requested": "default",
+    "scenario": "right-dialogue",
+    "expectedWidth": 1280,
+    "expectedHeight": 720,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-default-right-dialogue.png"
+  },
+  {
+    "name": "rc2-test-default-input-dialogue",
+    "requested": "default",
+    "scenario": "input-dialogue",
+    "expectedWidth": 1280,
+    "expectedHeight": 720,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-default-input-dialogue.png"
+  },
+  {
+    "name": "rc2-test-1920x1080-center",
+    "requested": "1920x1080",
+    "scenario": "center",
+    "expectedWidth": 1920,
+    "expectedHeight": 1080,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1920x1080-center.png"
+  },
+  {
+    "name": "rc2-test-1920x1080-left-dialogue",
+    "requested": "1920x1080",
+    "scenario": "left-dialogue",
+    "expectedWidth": 1920,
+    "expectedHeight": 1080,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1920x1080-left-dialogue.png"
+  },
+  {
+    "name": "rc2-test-1920x1080-right-dialogue",
+    "requested": "1920x1080",
+    "scenario": "right-dialogue",
+    "expectedWidth": 1920,
+    "expectedHeight": 1080,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1920x1080-right-dialogue.png"
+  },
+  {
+    "name": "rc2-test-1920x1080-input-dialogue",
+    "requested": "1920x1080",
+    "scenario": "input-dialogue",
+    "expectedWidth": 1920,
+    "expectedHeight": 1080,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1920x1080-input-dialogue.png"
+  },
+  {
+    "name": "rc2-test-1536x960-center",
+    "requested": "1536x960",
+    "scenario": "center",
+    "expectedWidth": 1536,
+    "expectedHeight": 864,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1536x960-center.png"
+  },
+  {
+    "name": "rc2-test-1536x960-left-dialogue",
+    "requested": "1536x960",
+    "scenario": "left-dialogue",
+    "expectedWidth": 1536,
+    "expectedHeight": 864,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1536x960-left-dialogue.png"
+  },
+  {
+    "name": "rc2-test-1536x960-right-dialogue",
+    "requested": "1536x960",
+    "scenario": "right-dialogue",
+    "expectedWidth": 1536,
+    "expectedHeight": 864,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1536x960-right-dialogue.png"
+  },
+  {
+    "name": "rc2-test-1536x960-input-dialogue",
+    "requested": "1536x960",
+    "scenario": "input-dialogue",
+    "expectedWidth": 1536,
+    "expectedHeight": 864,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1536x960-input-dialogue.png"
+  },
+  {
+    "name": "rc2-test-1536x864-center",
+    "requested": "1536x864",
+    "scenario": "center",
+    "expectedWidth": 1536,
+    "expectedHeight": 864,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1536x864-center.png"
+  },
+  {
+    "name": "rc2-test-1536x864-left-dialogue",
+    "requested": "1536x864",
+    "scenario": "left-dialogue",
+    "expectedWidth": 1536,
+    "expectedHeight": 864,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1536x864-left-dialogue.png"
+  },
+  {
+    "name": "rc2-test-1536x864-right-dialogue",
+    "requested": "1536x864",
+    "scenario": "right-dialogue",
+    "expectedWidth": 1536,
+    "expectedHeight": 864,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1536x864-right-dialogue.png"
+  },
+  {
+    "name": "rc2-test-1536x864-input-dialogue",
+    "requested": "1536x864",
+    "scenario": "input-dialogue",
+    "expectedWidth": 1536,
+    "expectedHeight": 864,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1536x864-input-dialogue.png"
+  },
+  {
+    "name": "rc2-test-1280x720-center",
+    "requested": "1280x720",
+    "scenario": "center",
+    "expectedWidth": 1280,
+    "expectedHeight": 720,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1280x720-center.png"
+  },
+  {
+    "name": "rc2-test-1280x720-left-dialogue",
+    "requested": "1280x720",
+    "scenario": "left-dialogue",
+    "expectedWidth": 1280,
+    "expectedHeight": 720,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1280x720-left-dialogue.png"
+  },
+  {
+    "name": "rc2-test-1280x720-right-dialogue",
+    "requested": "1280x720",
+    "scenario": "right-dialogue",
+    "expectedWidth": 1280,
+    "expectedHeight": 720,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1280x720-right-dialogue.png"
+  },
+  {
+    "name": "rc2-test-1280x720-input-dialogue",
+    "requested": "1280x720",
+    "scenario": "input-dialogue",
+    "expectedWidth": 1280,
+    "expectedHeight": 720,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1280x720-input-dialogue.png"
+  },
+  {
+    "name": "rc2-test-1000x800-center",
+    "requested": "1000x800",
+    "scenario": "center",
+    "expectedWidth": 1000,
+    "expectedHeight": 562,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1000x800-center.png"
+  },
+  {
+    "name": "rc2-test-1000x800-left-dialogue",
+    "requested": "1000x800",
+    "scenario": "left-dialogue",
+    "expectedWidth": 1000,
+    "expectedHeight": 562,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1000x800-left-dialogue.png"
+  },
+  {
+    "name": "rc2-test-1000x800-right-dialogue",
+    "requested": "1000x800",
+    "scenario": "right-dialogue",
+    "expectedWidth": 1000,
+    "expectedHeight": 562,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1000x800-right-dialogue.png"
+  },
+  {
+    "name": "rc2-test-1000x800-input-dialogue",
+    "requested": "1000x800",
+    "scenario": "input-dialogue",
+    "expectedWidth": 1000,
+    "expectedHeight": 562,
+    "path": "C:\\Users\\syedhu\\source\\repos\\Dreamer\\.ai-org\\missions\\2026-09-04-tcfanimation-release-quality-cecc239c\\evidence\\rework2\\tests\\viewport-containment\\rc2-test-1000x800-input-dialogue.png"
+  }
+]

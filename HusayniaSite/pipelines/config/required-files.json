@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0.0",
+  "gates": [
+    {
+      "name": "contract",
+      "requiredPaths": [
+        "tests/Husaynia.ContractTests/Husaynia.ContractTests.csproj",
+        "contracts/routes/route-manifest.schema.json",
+        "contracts/migration/import-manifest.schema.json",
+        "contracts/pipeline/release-manifest.schema.json"
+      ]
+    },
+    {
+      "name": "accessibility",
+      "requiredPaths": [
+        "tests/Husaynia.AccessibilityTests/Husaynia.AccessibilityTests.csproj",
+        "tests/Husaynia.AccessibilityTests/packages.lock.json"
+      ]
+    }
+  ]
+}

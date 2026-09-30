@@ -1,0 +1,65 @@
+{
+  "format": "dreamer.life-memoir.backup",
+  "formatVersion": 1,
+  "exportedAt": "2026-08-12T20:00:00.000Z",
+  "appVersion": "1.0.0",
+  "collection": {
+    "schemaVersion": 1,
+    "collectionId": "10000000-0000-4000-8000-000000000001",
+    "revision": 4,
+    "createdAt": "2026-08-12T20:00:00.000Z",
+    "updatedAt": "2026-08-12T20:00:00.000Z",
+    "book": {
+      "title": "A Life in Pieces",
+      "subtitle": "",
+      "authorName": "Memoir Author",
+      "dedication": "",
+      "preface": ""
+    },
+    "chapters": [
+      {
+        "id": "30000000-0000-4000-8000-000000000001",
+        "title": "Beginnings",
+        "createdAt": "2026-08-12T20:00:00.000Z",
+        "updatedAt": "2026-08-12T20:00:00.000Z",
+        "memoryIds": [
+          "20000000-0000-4000-8000-000000000001"
+        ]
+      }
+    ],
+    "unassignedMemoryIds": [],
+    "memories": {
+      "20000000-0000-4000-8000-000000000001": {
+        "id": "20000000-0000-4000-8000-000000000001",
+        "title": "A summer morning",
+        "memoryText": "The kitchen smelled of cardamom.\n\nWe watched the rain.",
+        "dateText": "One summer in childhood",
+        "people": [
+          "Amma"
+        ],
+        "places": [
+          "Home"
+        ],
+        "themes": [
+          "Family"
+        ],
+        "sensoryDetails": "Warm tea, rain, and cardamom",
+        "promptResponses": {
+          "context": "",
+          "people": "",
+          "setting": "",
+          "senses": "",
+          "emotions": "",
+          "significance": "",
+          "beforeAfter": ""
+        },
+        "narrativeText": "",
+        "createdAt": "2026-08-12T20:00:00.000Z",
+        "updatedAt": "2026-08-12T20:00:00.000Z"
+      }
+    },
+    "settings": {
+      "backupReminderDismissedAt": null
+    }
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "stage": "before",
+  "frame_count": 33,
+  "source_hashes": {
+    "LTurning.png": "9EDD38F303B17CD043EDCCABF2E6C2BC50F182B9A2B918B4BDECF1B2861E3A91",
+    "RTurning.png": "2D20B97B4BC630DBFF9D6DD932F3314A9BC6FE0587013E6C12E72BF1D40D5840",
+    "RWalking2.png": "CD56287A4830D068292793256DBEB5A29E1EB9D888520A5339FE3957E7B7FA3A",
+    "Clapping2.png": "FBB46FBEAD0D5815F4E23307240535C600C29D0DF650B493137D05E762319C00",
+    "CrossArm3.png": "276413B76F13D4940FD8B746D3AEA13D27922A47EACD750DCCC6FF622A6A8192",
+    "CrossArm4.png": "475614A7B2DB0B7469FA88E9B7B5F5C8548F8095B56DAD99F6270098E9174A3F"
+  },
+  "frame_hashes": {
+    "Frames/LeftTurn/turn_0.png": "4B0C5FB16D85A03A7411E1A0F1E40B51AC1CF0257452CE9580D3FB51376B199B",
+    "Frames/LeftTurn/turn_1.png": "5E7AFE2DA1465EF59CF940BA4F6DBA189D9484F706F4D8960110804B5F9B7F2E",
+    "Frames/LeftTurn/turn_2.png": "8E001A2F3668AAE9E08949DB13E4F9E5BFE4E1E8F5F7DFD040D755DB31722E6E",
+    "Frames/RightTurn/turn_0.png": "5D3E14F7470C99C4C569A67561A78791AA2C9DD439EC5C0F80BB9D2F5D90AEA1",
+    "Frames/RightTurn/turn_1.png": "D891561FE5E5414A984AC3DFA061DE48050BC73B2E2C96500BDFDBDB0B3BA9D1",
+    "Frames/RightTurn/turn_2.png": "05DA7808228E94259560F5B2D35377A25D78F937DE573DDF15770AF04D6C76CD",
+    "Frames/LeftWalk/walk_00.png": "211101AFC6A28CCEE3140BE6C88D7EDCD500F25DBC1A4DCA131B812EB0E693D1",
+    "Frames/LeftWalk/walk_01.png": "72A8E2E8FFC82F33E9E790D11F4F659362B18D2D730135F18C9B6C97794C4BF9",
+    "Frames/LeftWalk/walk_02.png": "2F6F0879B0A9369FAED36C0EE5C301FB9197B4B15EF30D75A10CAA0117F0119B",
+    "Frames/LeftWalk/walk_03.png": "41A70A470E22755885DF1E1D718DA988F7125056D0F58B44FB1FBC5A344ACB7B",
+    "Frames/LeftWalk/walk_04.png": "B48C619842BA9B5A35F0536FDA23B4DAB97E3DEA3D14D14F952903565528F12D",
+    "Frames/LeftWalk/walk_05.png": "4DE552ACAB7A0283331E5B2AED02B06EDA9DF2DA8E8782A2313C0D66763C19BC",
+    "Frames/RightWalk/walk_00.png": "8B6CE1DFF4D3BA9DD49F20DEE3F91CD79A45845B22F492D498B76504CDD0682B",
+    "Frames/RightWalk/walk_01.png": "00AFEB7B4C55F328E1C616BF3D55AD0EB0A08180BE25449BB9412ED0F14A30AB",
+    "Frames/RightWalk/walk_02.png": "8F72A5C721D7C44E2F5F4C5BF7249B8FE0967B67FA2FC4996799F65374D56ECA",
+    "Frames/RightWalk/walk_03.png": "CE60A38925F6A39D6177725CADC53227DC717730B5994B99D817BB2E24C6A575",
+    "Frames/RightWalk/walk_04.png": "A1D187A9597096E6F82E2AA2DDCAEE7C77CAB53F2DE802AFC5B86570D0E3CF11",
+    "Frames/RightWalk/walk_05.png": "19A2D927408B8ABA4202584BDD212A4673DEAB2A9ED2E84069AD1B0D82A302BF",
+    "Frames/Clap/clap_00.png": "06C28C50ED43F3783A07CAB67718A559B1A7148473AF859A995B37A710E65A63",
+    "Frames/Clap/clap_01.png": "880D73F03902330060BCE7AA0EDE547CB7FE678692E3B0DDFB1F1986C256694D",
+    "Frames/Clap/clap_02.png": "74149B96B2E00322F06B5DAD420DC3F5664153437C832C1DE37744BEBCED8F65",
+    "Frames/Clap/clap_03.png": "0F38C689D104370F6FB2F3C39B90C2E9C56F93E4DC908FC57CDD7F10693C4EA4",
+    "Frames/Clap/clap_04.png": "9D5920237305E634DA547347A3D3E7A10F9A3C561B6B7C234D11169C99675FAA",
+    "Frames/Clap/clap_05.png": "FC2B3246C940F955F2F1F11532A43FF7977CCFF1A865966960E5DCE5256CC912",
+    "Frames/CrossArm/cross_00.png": "C11B3644CF73AA9E8AB5FD7C9B50822E9534DA8405836158BB10D0F8CE40A680",
+    "Frames/CrossArm/cross_01.png": "FBF167EF42E9DFC8C456E8E329BBCD7BFEDE4C2FF69515A42A0D62364BA3E4B7",
+    "Frames/CrossArm/cross_02.png": "DC8B8829AB58CBEB084F864945089DC03CEFD5A89FA02F9AAC8C777B46F096B2",
+    "Frames/CrossArmRelease/release_00.png": "101D2297A89E0ABC3A4CF1CDE9134CF9EBED36DE811AA807DF4DEF28065893DD",
+    "Frames/CrossArmRelease/release_01.png": "ACA74DC31B184800761E62AD6D1B5FC648F8A4E7B0EE6717711B01F075D1D215",
+    "Frames/CrossArmRelease/release_02.png": "2F63BA20DC29F6A2E4F9F7F182FB36DE8711353E50459C8808B730957E877E78",
+    "Frames/CrossArmRelease/release_03.png": "733D36AC13EAFE0AAF24A233D54F7DD674255F3712A42536BFF98D605A9B5D26",
+    "Frames/CrossArmRelease/release_04.png": "1B321DB484DAA7CBAA41E0C671C8F2D888AB283829DADFEFC16FFAD89FFE4512",
+    "Frames/CrossArmRelease/release_05.png": "8850A0D9CD3FEDFA5E02D84AD65B2F5382B571C6177E71C3F0A2DEA7EC9F4664"
+  },
+  "defect_roi_nonblack_counts": {
+    "Frames/LeftTurn/turn_0.png": [
+      589
+    ],
+    "Frames/LeftTurn/turn_1.png": [
+      1501
+    ],
+    "Frames/LeftTurn/turn_2.png": [
+      34
+    ],
+    "Frames/RightTurn/turn_0.png": [
+      48
+    ],
+    "Frames/RightTurn/turn_2.png": [
+      5883
+    ],
+    "Frames/Clap/clap_00.png": [
+      817
+    ],
+    "Frames/Clap/clap_01.png": [
+      678
+    ],
+    "Frames/Clap/clap_02.png": [
+      636
+    ],
+    "Frames/Clap/clap_03.png": [
+      671
+    ],
+    "Frames/Clap/clap_04.png": [
+      670
+    ],
+    "Frames/Clap/clap_05.png": [
+      693
+    ],
+    "Frames/CrossArm/cross_00.png": [
+      700
+    ],
+    "Frames/CrossArm/cross_01.png": [
+      640
+    ],
+    "Frames/CrossArm/cross_02.png": [
+      661
+    ]
+  },
+  "all_defect_rois_black": false,
+  "front_png_bytes_identical": false,
+  "front_pixels_identical": false,
+  "boundaries": {
+    "front_handoff": {
+      "from": "Frames/LeftTurn/turn_0.png",
+      "to": "Frames/RightTurn/turn_0.png",
+      "bbox_top_delta": -1.0,
+      "bbox_bottom_delta": -1.0,
+      "bbox_height_delta": 0.0,
+      "head_x_delta": 2.94,
+      "head_y_delta": -0.88,
+      "torso_x_delta": 2.54,
+      "torso_y_delta": -0.78,
+      "foot_x_delta": -33.82,
+      "foot_y_delta": -1.0
+    },
+    "cross02_to_release00": {
+      "from": "Frames/CrossArm/cross_02.png",
+      "to": "Frames/CrossArmRelease/release_00.png",
+      "bbox_top_delta": 0.0,
+      "bbox_bottom_delta": 0.0,
+      "bbox_height_delta": 0.0,
+      "head_x_delta": -16.81,
+      "head_y_delta": -1.29,
+      "torso_x_delta": -18.18,
+      "torso_y_delta": -0.6,
+      "foot_x_delta": 48.48,
+      "foot_y_delta": 0.0
+    }
+  },
+  "adversarial_controls": {
+    "in_envelope_dark_rectangle": {
+      "accepted": true,
+      "reason": "accepted",
+      "rect": [
+        198,
+        838,
+        208,
+        844
+      ]
+    },
+    "detached_cool_fragment": {
+      "accepted": true,
+      "reason": "accepted",
+      "rect": [
+        180,
+        730,
+        185,
+        734
+      ]
+    }
+  }
+}

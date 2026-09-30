@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\HusayniaTabruk.Domain\HusayniaTabruk.Domain.csproj" />
+  </ItemGroup>
+</Project>

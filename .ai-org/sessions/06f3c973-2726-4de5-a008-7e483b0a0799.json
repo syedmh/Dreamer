@@ -1,0 +1,244 @@
+{
+  "sessionId": "06f3c973-2726-4de5-a008-7e483b0a0799",
+  "missionId": "2026-09-29-lumabooth-folder-watcher-06f3c973",
+  "missionDir": ".ai-org/missions/2026-09-29-lumabooth-folder-watcher-06f3c973",
+  "objective": "Build a command-line application that watches a local folder for incoming files and uploads them to https://dash.lumabooth.com/event/-P1Y143qUTagjT1hDguA/upload.",
+  "classification": "feature",
+  "size": "large",
+  "state": "IMPLEMENTATION",
+  "workflow": "feature",
+  "definitionOfDone": [
+    "The .NET 8 CLI recursively processes an initial backlog and newly arriving stable files.",
+    "Files are streamed through the verified LumaBooth PUT and event-registration POST contract.",
+    "Bearer credentials are supplied externally, never logged or persisted, and only sent to allowlisted hosts.",
+    "Durable atomic state prevents routine duplicate uploads and resumes safely after restart.",
+    "Retries, reconciliation, corrupt-state handling, and graceful shutdown are covered by automated tests.",
+    "Release restore, build, test, and publish succeed.",
+    "Independent test, security, code review, QA, and final judgment gates approve."
+  ],
+  "gates": {
+    "requirements": "passed",
+    "architecture": "passed",
+    "implementation": "active",
+    "tests": "paused_by_cto",
+    "security": "paused_by_cto",
+    "review": "paused_by_cto",
+    "e2e": "paused_by_cto",
+    "judge": "paused_by_cto"
+  },
+  "tasks": [
+    {
+      "status": "DONE",
+      "owner": "developer",
+      "id": "T1-T10",
+      "evidence": "Complete .NET 8 CLI, README, and 49 passing automated tests."
+    },
+    {
+      "status": "DONE",
+      "owner": "test-engineer",
+      "id": "T11",
+      "evidence": "49 passed, 0 failed, 0 skipped; AC-01 through AC-24 passed."
+    },
+    {
+      "status": "DONE",
+      "owner": "code-reviewer/security-engineer",
+      "id": "T12",
+      "evidence": "Code review APPROVED; security PASS with zero Critical/High findings."
+    },
+    {
+      "status": "DONE",
+      "owner": "qa-engineer",
+      "id": "T13",
+      "evidence": "Local/injected QA journeys PASS; no live network."
+    },
+    {
+      "status": "DONE",
+      "owner": "engineering-judge",
+      "id": "T14",
+      "evidence": "HISTORICAL/SUPERSEDED: FINAL APPROVED applied to an earlier tree state only; it is not current final approval."
+    },
+    {
+      "id": "T15",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "Developer reports 66/66 Release tests, build/publish/package inspection pass; independent validation pending."
+    },
+    {
+      "id": "T21",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "Developer reports all wave-3 findings fixed; 75/75 self-tests pass; independent rerun pending."
+    },
+    {
+      "id": "T26",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "Developer reports wave-4 blockers fixed; 78/78 tests; true AC-21 4096/8192 proof; independent final rerun pending."
+    },
+    {
+      "id": "T31",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "Developer reports atomic admission/backoff and stateful streaming reconciliation fixed; 84/84 tests; independent final rerun pending."
+    },
+    {
+      "id": "T36",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "Developer reports restart-safe journal commit/rollback and 85/85 tests; independent rerun pending."
+    },
+    {
+      "id": "T37-T39",
+      "owner": "test-engineer/security-engineer/code-reviewer",
+      "status": "DONE",
+      "evidence": "Final rerun: tests PASS 85/85; security PASS 0 C/H/M/L; code review APPROVED."
+    },
+    {
+      "id": "T40",
+      "owner": "engineering-judge",
+      "status": "DONE",
+      "evidence": "HISTORICAL/SUPERSEDED: Engineering judge APPROVED remediation and independent-rerun readiness for an earlier tree state; explicitly not mission COMPLETED and not current final approval."
+    },
+    {
+      "id": "T41",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "Closed second-round completed-spool fatal handling and completed-duplicate quota ownership findings; added four regressions."
+    },
+    {
+      "id": "T42-T44",
+      "owner": "test-engineer/qa-engineer/code-reviewer",
+      "status": "DONE",
+      "evidence": "Independent Release 89/89, focused 4/4, mocked QA PASS, code review APPROVED; publish/package inspection passed."
+    },
+    {
+      "id": "T45",
+      "owner": "engineering-judge",
+      "status": "DONE",
+      "evidence": "HISTORICAL/SUPERSEDED: Independent re-judgment APPROVED an earlier tree state after correction and artifact verification; it is not current final approval and the mission remains REWORK."
+    },
+    {
+      "id": "T46",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "Closed shared admission for duplicate cleanup, snapshot storage, and pending-state persistence fatals; replaced recursive reconciliation with iterative depth-bounded traversal; 94/94 self-tests."
+    },
+    {
+      "id": "T47-T49",
+      "owner": "test-engineer/security-engineer/code-reviewer",
+      "status": "DONE",
+      "evidence": "Independent Release 94/94, focused 9/9, security PASS 0 Critical/High, and code review APPROVED."
+    },
+    {
+      "id": "T50",
+      "owner": "engineering-judge",
+      "status": "DONE",
+      "evidence": "FINAL APPROVED: current source independently inspected; locked restore, Release build 0 warnings/errors, full suite 96/96, five-file publish, package audit, and published help smoke passed. AC-25 remains separately authorization-gated."
+    },
+    {
+      "id": "T51",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "Centralized fatal StopFatalIntake ordering; added four deterministic regressions; developer self-tests 96/96 and focused 4/4."
+    },
+    {
+      "id": "T52",
+      "owner": "test-engineer",
+      "status": "DONE",
+      "evidence": "Independent test PASS: restore/build, focused 4/4 plus 10x repeat, full 96/96, publish/package/ZIP checks."
+    },
+    {
+      "id": "T53",
+      "owner": "code-reviewer",
+      "status": "FAILED",
+      "evidence": "CHANGES_REQUIRED: feed.Stop test uses immediate cancellation, so it would pass without admission closure and does not prove post-PUT/queued suppression."
+    },
+    {
+      "id": "T54",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "Added internal intake-stop seam and corrected feed.Stop test; mutation without StopFatalIntake produced 4 requests and failed; restored test passed 25/25, full 96/96."
+    },
+    {
+      "id": "T55",
+      "owner": "test-engineer",
+      "status": "FAILED",
+      "evidence": "Independent revalidation: feed.Stop 10/10 and focused 4/4 pass, but first full run 95/96 due intermittent CompletedSpoolIdentityDrift fixture restoration; rerun 96/96 and isolated 10/10."
+    },
+    {
+      "id": "T56",
+      "owner": "code-reviewer",
+      "status": "DONE",
+      "evidence": "Independent code review APPROVED; fatal admission implementation and corrected mutation-sensitive tests accepted."
+    },
+    {
+      "id": "T57",
+      "owner": "incident-debugger",
+      "status": "DONE",
+      "evidence": "Diagnosed fragile destructive spool restoration in identity-drift test; exact DNF reproduced under stress; production cleanup/disposal eliminated; direct persisted-state validation recommended."
+    },
+    {
+      "id": "T58",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "Removed destructive restore/reopen; direct durable completed-state and original payload assertions; isolated 100/100, stress 50/50, full suite 288/288 across 3 runs."
+    },
+    {
+      "id": "T59",
+      "owner": "test-engineer",
+      "status": "FAILED",
+      "evidence": "Final independent test: fatal 4/4, feed.Stop 10/10, full suites 192/192, publish/package PASS; identity drift isolated 36/38 with moved payload missing."
+    },
+    {
+      "id": "T60",
+      "owner": "code-reviewer",
+      "status": "DONE",
+      "evidence": "Final independent code review APPROVED; no production/test correctness findings."
+    },
+    {
+      "id": "T61",
+      "owner": "incident-debugger",
+      "status": "DONE",
+      "evidence": "Proved race: initial reconciliation re-snapshotted retained identity.bin, opened spool temp FileShare.None, causing injected Directory.Move to fail; deleted source after pending persistence; fail-before 4/100, pass-after 200/200; coordinator 21/21."
+    },
+    {
+      "id": "T62",
+      "owner": "test-engineer",
+      "status": "DONE",
+      "evidence": "Independent PASS: 306/306, identity stress 100/100, fatal 4/4, feed.Stop 10/10, full 96/96 twice, release/package checks pass."
+    },
+    {
+      "id": "T63",
+      "owner": "code-reviewer",
+      "status": "DONE",
+      "evidence": "Independent code review APPROVED; no Critical/High/Medium findings."
+    },
+    {
+      "id": "T64",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "Development self-validation PASS: targeted 23/23, full Release 111/111, build/publish/ZIP inspection pass, zero production packages. Evidence: development-browser-login.md. Non-development gates remain paused_by_cto."
+    },
+    {
+      "id": "T65",
+      "owner": "developer",
+      "status": "DONE",
+      "evidence": "Development self-validation PASS: focused filtering 45/45, coordinator/state 39/39, full Release 136/136, build 0 warnings/errors, publish/ZIP SHA-256 parity/help smoke pass. Evidence: development-media-filtering.md. Non-development gates remain paused_by_cto."
+    }
+  ],
+  "blockers": [],
+  "reworkCount": 12,
+  "nextAction": "JPG/JPEG/PNG-only development implementation and evidence complete; await the next CTO directive without advancing paused gates.",
+  "updatedAt": "2026-09-29T17:14:03.0245882Z",
+  "phasePolicy": {
+    "development": "active",
+    "requirements": "paused_by_cto",
+    "architecture": "paused_by_cto",
+    "planning": "paused_by_cto",
+    "tests": "paused_by_cto",
+    "security": "paused_by_cto",
+    "review": "paused_by_cto",
+    "e2e": "paused_by_cto",
+    "judgment": "paused_by_cto"
+  }
+}

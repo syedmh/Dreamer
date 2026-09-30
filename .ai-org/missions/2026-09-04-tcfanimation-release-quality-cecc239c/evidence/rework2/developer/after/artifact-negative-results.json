@@ -1,0 +1,970 @@
+[
+  {
+    "path": "Frames/LeftTurn/turn_0.png",
+    "rect": [
+      0,
+      841,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftTurn/turn_0.png",
+    "rect": [
+      215,
+      838,
+      221,
+      841
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftTurn/turn_0.png",
+    "rect": [
+      247,
+      766,
+      253,
+      775
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftTurn/turn_0.png",
+    "rect": [
+      256,
+      730,
+      279,
+      840
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftTurn/turn_1.png",
+    "rect": [
+      0,
+      845,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftTurn/turn_1.png",
+    "rect": [
+      191,
+      820,
+      258,
+      845
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftTurn/turn_2.png",
+    "rect": [
+      0,
+      835,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftTurn/turn_2.png",
+    "rect": [
+      212,
+      808,
+      223,
+      812
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightTurn/turn_0.png",
+    "rect": [
+      0,
+      841,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightTurn/turn_0.png",
+    "rect": [
+      215,
+      838,
+      221,
+      841
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightTurn/turn_0.png",
+    "rect": [
+      247,
+      766,
+      253,
+      775
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightTurn/turn_0.png",
+    "rect": [
+      256,
+      730,
+      279,
+      840
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightTurn/turn_1.png",
+    "rect": [
+      0,
+      848,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightTurn/turn_1.png",
+    "rect": [
+      244,
+      730,
+      265,
+      833
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightTurn/turn_2.png",
+    "rect": [
+      0,
+      836,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightTurn/turn_2.png",
+    "rect": [
+      215,
+      836,
+      329,
+      843
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftWalk/walk_00.png",
+    "rect": [
+      0,
+      833,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftWalk/walk_00.png",
+    "rect": [
+      220,
+      730,
+      289,
+      832
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftWalk/walk_01.png",
+    "rect": [
+      0,
+      833,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftWalk/walk_01.png",
+    "rect": [
+      225,
+      730,
+      299,
+      829
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftWalk/walk_02.png",
+    "rect": [
+      0,
+      838,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftWalk/walk_02.png",
+    "rect": [
+      256,
+      730,
+      313,
+      809
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftWalk/walk_03.png",
+    "rect": [
+      0,
+      838,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftWalk/walk_04.png",
+    "rect": [
+      0,
+      827,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftWalk/walk_05.png",
+    "rect": [
+      0,
+      835,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/LeftWalk/walk_05.png",
+    "rect": [
+      225,
+      730,
+      279,
+      826
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightWalk/walk_00.png",
+    "rect": [
+      0,
+      833,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightWalk/walk_00.png",
+    "rect": [
+      223,
+      730,
+      292,
+      832
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightWalk/walk_01.png",
+    "rect": [
+      0,
+      833,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightWalk/walk_01.png",
+    "rect": [
+      213,
+      730,
+      287,
+      829
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightWalk/walk_02.png",
+    "rect": [
+      0,
+      838,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightWalk/walk_02.png",
+    "rect": [
+      199,
+      730,
+      256,
+      809
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightWalk/walk_03.png",
+    "rect": [
+      0,
+      838,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightWalk/walk_04.png",
+    "rect": [
+      0,
+      827,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightWalk/walk_05.png",
+    "rect": [
+      0,
+      835,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/RightWalk/walk_05.png",
+    "rect": [
+      233,
+      730,
+      287,
+      826
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_00.png",
+    "rect": [
+      0,
+      843,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_00.png",
+    "rect": [
+      217,
+      835,
+      245,
+      843
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_00.png",
+    "rect": [
+      252,
+      730,
+      281,
+      842
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_01.png",
+    "rect": [
+      0,
+      843,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_01.png",
+    "rect": [
+      217,
+      835,
+      245,
+      843
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_01.png",
+    "rect": [
+      248,
+      730,
+      282,
+      842
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_02.png",
+    "rect": [
+      0,
+      843,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_02.png",
+    "rect": [
+      217,
+      835,
+      245,
+      843
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_02.png",
+    "rect": [
+      247,
+      730,
+      282,
+      842
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_03.png",
+    "rect": [
+      0,
+      843,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_03.png",
+    "rect": [
+      217,
+      835,
+      245,
+      843
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_03.png",
+    "rect": [
+      247,
+      730,
+      283,
+      842
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_04.png",
+    "rect": [
+      0,
+      843,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_04.png",
+    "rect": [
+      217,
+      835,
+      245,
+      843
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_04.png",
+    "rect": [
+      251,
+      730,
+      285,
+      842
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_05.png",
+    "rect": [
+      0,
+      843,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_05.png",
+    "rect": [
+      217,
+      835,
+      245,
+      843
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/Clap/clap_05.png",
+    "rect": [
+      248,
+      730,
+      283,
+      842
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArm/cross_00.png",
+    "rect": [
+      0,
+      843,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArm/cross_00.png",
+    "rect": [
+      210,
+      835,
+      245,
+      843
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArm/cross_00.png",
+    "rect": [
+      249,
+      730,
+      283,
+      841
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArm/cross_01.png",
+    "rect": [
+      0,
+      843,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArm/cross_01.png",
+    "rect": [
+      210,
+      835,
+      245,
+      843
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArm/cross_01.png",
+    "rect": [
+      252,
+      730,
+      285,
+      842
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArm/cross_02.png",
+    "rect": [
+      0,
+      841,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArm/cross_02.png",
+    "rect": [
+      215,
+      838,
+      221,
+      841
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArm/cross_02.png",
+    "rect": [
+      247,
+      766,
+      253,
+      775
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArm/cross_02.png",
+    "rect": [
+      256,
+      730,
+      279,
+      840
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_00.png",
+    "rect": [
+      0,
+      841,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_00.png",
+    "rect": [
+      215,
+      838,
+      221,
+      841
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_00.png",
+    "rect": [
+      247,
+      766,
+      253,
+      775
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_00.png",
+    "rect": [
+      256,
+      730,
+      279,
+      840
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_01.png",
+    "rect": [
+      0,
+      841,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_01.png",
+    "rect": [
+      215,
+      838,
+      221,
+      841
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_01.png",
+    "rect": [
+      247,
+      766,
+      253,
+      775
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_01.png",
+    "rect": [
+      256,
+      730,
+      279,
+      840
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_02.png",
+    "rect": [
+      0,
+      841,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_02.png",
+    "rect": [
+      215,
+      838,
+      221,
+      841
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_02.png",
+    "rect": [
+      247,
+      766,
+      253,
+      775
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_02.png",
+    "rect": [
+      256,
+      730,
+      279,
+      840
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_03.png",
+    "rect": [
+      0,
+      841,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_03.png",
+    "rect": [
+      215,
+      838,
+      221,
+      841
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_03.png",
+    "rect": [
+      247,
+      766,
+      253,
+      775
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_03.png",
+    "rect": [
+      256,
+      730,
+      279,
+      840
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_04.png",
+    "rect": [
+      0,
+      841,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_04.png",
+    "rect": [
+      215,
+      838,
+      221,
+      841
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_04.png",
+    "rect": [
+      247,
+      766,
+      253,
+      775
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_04.png",
+    "rect": [
+      256,
+      730,
+      279,
+      840
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_05.png",
+    "rect": [
+      0,
+      841,
+      512,
+      864
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_05.png",
+    "rect": [
+      215,
+      838,
+      221,
+      841
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_05.png",
+    "rect": [
+      247,
+      766,
+      253,
+      775
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  },
+  {
+    "path": "Frames/CrossArmRelease/release_05.png",
+    "rect": [
+      256,
+      730,
+      279,
+      840
+    ],
+    "nonblack_pixels": 0,
+    "pass": true
+  }
+]

@@ -17,6 +17,10 @@ public static class AnimationGeometry
     public const float CharacterScale = 1.25f;
     public const float LeftWalkVisibleX = 74.0f;
     public const float RightWalkVisibleX = 437.0f;
+    public const float GirlLeftVisibleX = 108.0f;
+    public const float GirlTopVisibleY = 57.0f;
+    public const float GirlRightVisibleX = 406.0f;
+    public const float GirlBottomVisibleY = 840.0f;
 
     public static AnimationSafeCenters DefaultSafeCenters =>
         CalculateSafeCenters(
@@ -35,6 +39,15 @@ public static class AnimationGeometry
             characterScale: CharacterScale,
             leftVisibleX: LeftWalkVisibleX,
             rightVisibleX: RightWalkVisibleX);
+
+    public static AnimationOffscreenCenters GirlOffscreenCenters =>
+        CalculateOffscreenCenters(
+            viewportLeft: 0.0f,
+            viewportWidth: ViewportWidth,
+            canvasCenterX: CanvasCenterX,
+            characterScale: CharacterScale,
+            leftVisibleX: GirlLeftVisibleX,
+            rightVisibleX: GirlRightVisibleX);
 
     public static AnimationSafeCenters CalculateSafeCenters(
         float viewportLeft,

@@ -1,0 +1,717 @@
+{
+  "schemaVersion": "1.0.0",
+  "scriptIntegrity": {
+    "algorithm": "sha256-utf8-lf-v1",
+    "encoding": "utf-8",
+    "lineEndings": "lf"
+  },
+  "artifactNamePrefix": "husaynia-site-",
+  "artifactApplicationPath": "app/Husaynia.Web.zip",
+  "trustedActions": {
+    "resolutionMethod": "git-ls-remote-tag-or-peeled-commit-v1",
+    "actions": [
+      {
+        "name": "actions/checkout",
+        "repositoryUrl": "https://github.com/actions/checkout.git",
+        "tag": "v4.2.2",
+        "commitSha": "11bd71901bbe5b1630ceea73d27597364c9af683",
+        "tagObjectSha": null
+      },
+      {
+        "name": "actions/setup-dotnet",
+        "repositoryUrl": "https://github.com/actions/setup-dotnet.git",
+        "tag": "v4.3.1",
+        "commitSha": "67a3573c9a986a3f9c594539f4ab511d57bb3ce9",
+        "tagObjectSha": null
+      },
+      {
+        "name": "actions/upload-artifact",
+        "repositoryUrl": "https://github.com/actions/upload-artifact.git",
+        "tag": "v4.6.2",
+        "commitSha": "ea165f8d65b6e75b540449e92b4886f43607fa02",
+        "tagObjectSha": null
+      },
+      {
+        "name": "azure/login",
+        "repositoryUrl": "https://github.com/Azure/login.git",
+        "tag": "v2.3.1",
+        "commitSha": "7184910d9eb2b1c5e48f7073824a90609bb9b6d6",
+        "tagObjectSha": "2035af27c2cea8ff426397d10e3edb28906b51df"
+      },
+      {
+        "name": "actions/attest-build-provenance",
+        "repositoryUrl": "https://github.com/actions/attest-build-provenance.git",
+        "tag": "v2.4.0",
+        "commitSha": "e8998f949152b193b063cb0ec769d69d929409be",
+        "tagObjectSha": null
+      }
+    ]
+  },
+  "evidenceRetentionDays": 90,
+  "httpProbePolicy": {
+    "connectTimeoutMilliseconds": 5000,
+    "requestTimeoutMilliseconds": 15000,
+    "maxResponseBytes": 1048576,
+    "maxJsonDepth": 32
+  },
+  "protectedHookRootRelativePath": "eng/promotion/hooks",
+  "protectedHookSupportFiles": [
+    {
+      "relativePath": "OperationHook.Common.ps1",
+      "sha256": "5efd1137cd51862fd1b824eb24ef2bd579d5a1835b587ca7847024310d084c6b"
+    }
+  ],
+  "stageOperationInputContract": {
+    "schemaVersion": "2.1.0",
+    "artifactNameTemplate": "stage-operation-inputs-{stageLower}-{applicationSha256}",
+    "manifestPath": "stage-operation-inputs.json",
+    "checksumPath": "SHA256SUMS",
+    "reports": [
+      {
+        "evidenceType": "backup",
+        "path": "source-backup.json"
+      },
+      {
+        "evidenceType": "health",
+        "path": "source-health.json"
+      },
+      {
+        "evidenceType": "smoke",
+        "path": "source-smoke.json"
+      },
+      {
+        "evidenceType": "crawl",
+        "path": "source-crawl.json"
+      },
+      {
+        "evidenceType": "performance",
+        "path": "source-performance.json"
+      },
+      {
+        "evidenceType": "accessibility",
+        "path": "source-accessibility.json"
+      },
+      {
+        "evidenceType": "visual",
+        "path": "source-visual.json"
+      },
+      {
+        "evidenceType": "sandbox-integrations",
+        "path": "source-sandbox-integrations.json"
+      },
+      {
+        "evidenceType": "rollback",
+        "path": "source-rollback.json"
+      },
+      {
+        "evidenceType": "restore",
+        "path": "source-restore.json"
+      }
+    ]
+  },
+  "migration": {
+    "preflight": {
+      "queryContract": "fixed-read-only-metadata-v1",
+      "repositorySqlExecutionAllowed": false,
+      "requiredIdentityMode": "readonly",
+      "requiredDatabasePermission": "SELECT",
+      "prohibitedDatabasePermissions": [
+        "ALTER",
+        "CONTROL",
+        "CREATE TABLE",
+        "DELETE",
+        "INSERT",
+        "UPDATE"
+      ]
+    },
+    "lock": {
+      "provider": "sqlserver-sp-getapplock-session-v1",
+      "mode": "Exclusive",
+      "owner": "Session",
+      "timeoutMilliseconds": 0,
+      "resourcePrefix": "husaynia-migration"
+    },
+    "orchestrationFiles": [
+      {
+        "relativePath": "migrations/bundle/Invoke-MigrationBundle.ps1",
+        "sha256": "8caf0f82f9570fda32f14c04e0741da90a6f67610c431db2ae560511707fb9a1"
+      },
+      {
+        "relativePath": "migrations/bundle/Migration.Common.ps1",
+        "sha256": "96f012509751c87235a612a044968152feec539a2c001dedcb9b3222e7284617"
+      }
+    ],
+    "applicationBundle": {
+      "relativePath": "migrations/bundle/Husaynia.Database.Migrations.dll",
+      "format": "dotnet-managed-migration-bundle-v1",
+      "sha256": null
+    },
+    "resultSchemaVersion": "1.0.0",
+    "applyLease": {
+      "provider": "sqlserver-stage-lease-v1",
+      "resourcePrefix": "husaynia-stage-lease",
+      "tableName": "__HusayniaStageLease",
+      "leaseDurationSeconds": 900,
+      "renewAfterSeconds": 300,
+      "staleAfterSeconds": 900
+    }
+  },
+  "deploymentContract": {
+    "schemaVersion": "1.0.0",
+    "packageAndConfigurationHookRequired": true,
+    "runningVersionChecksumRequired": true,
+    "postDeploymentEvidenceRequiresRunningVersion": true
+  },
+  "trustedExecutionContract": {
+    "schemaVersion": "2.0.0",
+    "workflowPath": ".github/workflows/trusted-protected-operations.yml",
+    "bundlePath": "operations/protected-execution-bundle.zip",
+    "externalWorkflowRefVariableName": "T21_TRUSTED_WORKFLOW_REF",
+    "externalSubjectsVariableName": "T21_TRUSTED_OIDC_SUBJECTS_JSON",
+    "externalBundleSha256VariableName": "T21_TRUSTED_BUNDLE_SHA256"
+  },
+  "t21ProvenanceContract": {
+    "schemaVersion": "2.1.0",
+    "repository": "syedmh/Dreamer",
+    "protectedRef": "refs/heads/main",
+    "callerMatrix": [
+      {
+        "stage": "Development",
+        "context": "Husaynia-Development-Operations",
+        "workflowRef": "syedmh/Dreamer/.github/workflows/operation-evidence-producer.yml@refs/heads/main"
+      },
+      {
+        "stage": "Staging",
+        "context": "Husaynia-Staging-Operations",
+        "workflowRef": "syedmh/Dreamer/.github/workflows/operation-evidence-producer.yml@refs/heads/main"
+      },
+      {
+        "stage": "Production",
+        "context": "Husaynia-Production",
+        "workflowRef": "syedmh/Dreamer/.github/workflows/production-operation-evidence.yml@refs/heads/main"
+      }
+    ],
+    "producerRoles": [
+      {
+        "role": "release-c6",
+        "workflowPath": ".github/workflows/release-build-and-nonproduction.yml",
+        "requiresAttestation": false,
+        "requiresCompletedSuccess": true,
+        "forbidden": false
+      },
+      {
+        "role": "trusted-preflight",
+        "workflowPath": ".github/workflows/trusted-protected-operations.yml",
+        "requiresAttestation": true,
+        "requiresCompletedSuccess": true,
+        "forbidden": false
+      },
+      {
+        "role": "stage-operation-inputs",
+        "workflowPath": ".github/workflows/stage-operation-inputs.yml",
+        "requiresAttestation": true,
+        "requiresCompletedSuccess": true,
+        "forbidden": false
+      },
+      {
+        "role": "migration-authorization",
+        "workflowPath": ".github/workflows/migration-apply-authorization.yml",
+        "requiresAttestation": true,
+        "requiresCompletedSuccess": true,
+        "forbidden": false
+      },
+      {
+        "role": "cto-authorization",
+        "workflowPath": ".github/workflows/cto-authorization-record.yml",
+        "requiresAttestation": true,
+        "requiresCompletedSuccess": true,
+        "forbidden": false
+      },
+      {
+        "role": "deployment-evidence",
+        "workflowPath": "",
+        "requiresAttestation": false,
+        "requiresCompletedSuccess": true,
+        "forbidden": true
+      },
+      {
+        "role": "trusted-stage-evidence",
+        "workflowPath": ".github/workflows/trusted-protected-operations.yml",
+        "requiresAttestation": true,
+        "requiresCompletedSuccess": true,
+        "forbidden": false
+      }
+    ],
+    "attestation": {
+      "action": "actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be",
+      "predicateType": "https://slsa.dev/provenance/v1",
+      "verifier": "gh-attestation-v1"
+    }
+  },
+  "provenance": {
+    "repository": "syedmh/Dreamer",
+    "protectedRef": "refs/heads/main",
+    "releaseWorkflowPath": ".github/workflows/release-build-and-nonproduction.yml",
+    "trustedProtectedOperationsWorkflowPath": ".github/workflows/trusted-protected-operations.yml",
+    "productionPromotionWorkflowPath": ".github/workflows/production-promotion.yml",
+    "evidenceIntakeWorkflowPath": ".github/workflows/stage-evidence-intake.yml",
+    "stageOperationInputsWorkflowPath": ".github/workflows/stage-operation-inputs.yml",
+    "productionOperationEvidenceWorkflowPath": ".github/workflows/production-operation-evidence.yml",
+    "migrationRunIssuers": [
+      {
+        "stage": "Development",
+        "repository": "syedmh/Dreamer",
+        "workflowPaths": [
+          ".github/workflows/operation-evidence-producer.yml",
+          ".github/workflows/trusted-protected-operations.yml"
+        ],
+        "ref": "refs/heads/main"
+      },
+      {
+        "stage": "Staging",
+        "repository": "syedmh/Dreamer",
+        "workflowPaths": [
+          ".github/workflows/operation-evidence-producer.yml",
+          ".github/workflows/trusted-protected-operations.yml"
+        ],
+        "ref": "refs/heads/main"
+      },
+      {
+        "stage": "Production",
+        "repository": "syedmh/Dreamer",
+        "workflowPaths": [
+          ".github/workflows/production-operation-evidence.yml",
+          ".github/workflows/trusted-protected-operations.yml"
+        ],
+        "ref": "refs/heads/main"
+      }
+    ],
+    "migrationAuthorizationIssuers": [
+      {
+        "stage": "Development",
+        "repository": "syedmh/Dreamer",
+        "workflowPath": ".github/workflows/migration-apply-authorization.yml",
+        "ref": "refs/heads/main"
+      },
+      {
+        "stage": "Staging",
+        "repository": "syedmh/Dreamer",
+        "workflowPath": ".github/workflows/migration-apply-authorization.yml",
+        "ref": "refs/heads/main"
+      },
+      {
+        "stage": "Production",
+        "repository": "syedmh/Dreamer",
+        "workflowPath": ".github/workflows/migration-apply-authorization.yml",
+        "ref": "refs/heads/main"
+      }
+    ],
+    "ctoAuthorizationWorkflowPath": ".github/workflows/cto-authorization-record.yml",
+    "ctoActorIdsVariableName": "T21_CTO_AUTHORIZED_ACTOR_IDS",
+    "migrationAuthorizationActorIdsVariableName": "T21_MIGRATION_AUTHORIZED_ACTOR_IDS",
+    "maxClockSkewMinutes": 5
+  },
+  "stages": [
+    {
+      "name": "Development",
+      "order": 1,
+      "stageCode": "dev",
+      "immutableResourceGroupName": "rg-husaynia-development",
+      "githubEnvironment": "Husaynia-Development",
+      "serviceConnectionSecretName": "AZURE_CLIENT_ID_DEVELOPMENT",
+      "targetMetadataVariableName": "T21_STAGE_TARGET_METADATA_JSON",
+      "dataIsolationKey": "husaynia-development",
+      "trigger": "protected-integration-branch",
+      "automaticPromotionAllowed": true,
+      "deploymentEnabled": false,
+      "rebuildAllowed": false,
+      "environmentApprovalRequired": false,
+      "ctoAuthorizationRequired": false,
+      "maxEvidenceAgeHours": 24,
+      "maxPreflightAgeMinutes": 60,
+      "postMigrationEvidence": [],
+      "approvedPrivateServiceProbeEndpoints": [],
+      "allowedProviderModes": {
+        "payments": [
+          "disabled",
+          "sandbox"
+        ],
+        "messaging": [
+          "disabled",
+          "capture-only"
+        ],
+        "analytics": [
+          "disabled",
+          "test"
+        ],
+        "contentMutation": [
+          "disabled",
+          "isolated"
+        ]
+      },
+      "operationHooks": [
+        {
+          "evidenceType": "configuration",
+          "relativePath": "Invoke-Configuration.ps1",
+          "sha256": "9341eee693edc4519000277463fbebbf42bc0a511a64fa308befe88e6cec4734"
+        },
+        {
+          "evidenceType": "health",
+          "relativePath": "Invoke-Health.ps1",
+          "sha256": "4c9127d5dd3f2684798554e0b100f07523f0a2e4fbab44bfc3a690df6e5ff601"
+        },
+        {
+          "evidenceType": "smoke",
+          "relativePath": "Invoke-Smoke.ps1",
+          "sha256": "f248087afa8db83568c659369b488ad74dfd7f61e85427c009783494697e6437"
+        },
+        {
+          "evidenceType": "rollback",
+          "relativePath": "Invoke-Rollback.ps1",
+          "sha256": "3941ac4875c0a0facd0486e5015cf2f3d62156ddf003977583974504e0bd5d38"
+        }
+      ],
+      "requiredEvidence": [
+        "configuration.json",
+        "migration-preflight.json",
+        "health.json",
+        "smoke.json",
+        "rollback.json"
+      ]
+    },
+    {
+      "name": "Staging",
+      "order": 2,
+      "stageCode": "stg",
+      "immutableResourceGroupName": "rg-husaynia-staging",
+      "githubEnvironment": "Husaynia-Staging",
+      "serviceConnectionSecretName": "AZURE_CLIENT_ID_STAGING",
+      "targetMetadataVariableName": "T21_STAGE_TARGET_METADATA_JSON",
+      "dataIsolationKey": "husaynia-staging",
+      "trigger": "successful-development-receipt",
+      "automaticPromotionAllowed": true,
+      "deploymentEnabled": false,
+      "rebuildAllowed": false,
+      "environmentApprovalRequired": false,
+      "ctoAuthorizationRequired": false,
+      "maxEvidenceAgeHours": 24,
+      "maxPreflightAgeMinutes": 60,
+      "postMigrationEvidence": [
+        "health",
+        "smoke",
+        "crawl",
+        "performance"
+      ],
+      "approvedPrivateServiceProbeEndpoints": [],
+      "allowedProviderModes": {
+        "payments": [
+          "disabled",
+          "sandbox"
+        ],
+        "messaging": [
+          "disabled",
+          "capture-only"
+        ],
+        "analytics": [
+          "disabled",
+          "test"
+        ],
+        "contentMutation": [
+          "disabled",
+          "isolated"
+        ]
+      },
+      "operationHooks": [
+        {
+          "evidenceType": "configuration",
+          "relativePath": "Invoke-Configuration.ps1",
+          "sha256": "9341eee693edc4519000277463fbebbf42bc0a511a64fa308befe88e6cec4734"
+        },
+        {
+          "evidenceType": "backup",
+          "relativePath": "Invoke-Backup.ps1",
+          "sha256": "655f382f2fcf9e7d620313db77f7907846964a419cd597ff7aa485d1d8d608c8"
+        },
+        {
+          "evidenceType": "health",
+          "relativePath": "Invoke-Health.ps1",
+          "sha256": "4c9127d5dd3f2684798554e0b100f07523f0a2e4fbab44bfc3a690df6e5ff601"
+        },
+        {
+          "evidenceType": "smoke",
+          "relativePath": "Invoke-Smoke.ps1",
+          "sha256": "f248087afa8db83568c659369b488ad74dfd7f61e85427c009783494697e6437"
+        },
+        {
+          "evidenceType": "crawl",
+          "relativePath": "Invoke-Crawl.ps1",
+          "sha256": "dd16919fb5350cb710678430aeeebc46be3d04846e357d5c3f4a7ecfa15be2f6"
+        },
+        {
+          "evidenceType": "restore",
+          "relativePath": "Invoke-Restore.ps1",
+          "sha256": "2330b7d6e3c9e552efdf17eddd9054d2f54a744ad4b95e28a607fe4bf78524d1"
+        },
+        {
+          "evidenceType": "performance",
+          "relativePath": "Invoke-Performance.ps1",
+          "sha256": "cad07ed87b2282761496209f8b83f025b22ab33b0c91c28ccf74d27b5da1120c"
+        },
+        {
+          "evidenceType": "accessibility",
+          "relativePath": "Invoke-Accessibility.ps1",
+          "sha256": "6c7e7d20568ae5e03226aa6891616d8f75d4b72b5522111889e2f3b818d68a90"
+        },
+        {
+          "evidenceType": "visual",
+          "relativePath": "Invoke-Visual.ps1",
+          "sha256": "4685b94c4414a9c758b6f9b2fda034171c410c37825c27b5d0aa597af34f6d5c"
+        },
+        {
+          "evidenceType": "sandbox-integrations",
+          "relativePath": "Invoke-SandboxIntegrations.ps1",
+          "sha256": "2eb1527cb44b92c6d3d7c658ffd7d060cb26bf786f6750e08022b737db1ddad9"
+        },
+        {
+          "evidenceType": "rollback",
+          "relativePath": "Invoke-Rollback.ps1",
+          "sha256": "3941ac4875c0a0facd0486e5015cf2f3d62156ddf003977583974504e0bd5d38"
+        }
+      ],
+      "requiredEvidence": [
+        "configuration.json",
+        "migration-preflight.json",
+        "backup.json",
+        "restore.json",
+        "migration-apply.json",
+        "health.json",
+        "smoke.json",
+        "crawl.json",
+        "performance.json",
+        "accessibility.json",
+        "visual.json",
+        "sandbox-integrations.json",
+        "rollback.json"
+      ]
+    },
+    {
+      "name": "Production",
+      "order": 3,
+      "stageCode": "prd",
+      "immutableResourceGroupName": "rg-husaynia-production",
+      "githubEnvironment": "Husaynia-Production",
+      "serviceConnectionSecretName": "AZURE_CLIENT_ID_PRODUCTION",
+      "targetMetadataVariableName": "T21_STAGE_TARGET_METADATA_JSON",
+      "dataIsolationKey": "husaynia-production",
+      "trigger": "workflow-dispatch-only",
+      "automaticPromotionAllowed": false,
+      "deploymentEnabled": false,
+      "rebuildAllowed": false,
+      "environmentApprovalRequired": true,
+      "ctoAuthorizationRequired": true,
+      "maxEvidenceAgeHours": 8,
+      "maxPreflightAgeMinutes": 30,
+      "postMigrationEvidence": [
+        "health",
+        "smoke",
+        "crawl",
+        "performance"
+      ],
+      "approvedPrivateServiceProbeEndpoints": [],
+      "allowedProviderModes": {
+        "payments": [
+          "disabled",
+          "sandbox",
+          "approved-live"
+        ],
+        "messaging": [
+          "disabled",
+          "capture-only",
+          "approved-live"
+        ],
+        "analytics": [
+          "disabled",
+          "test",
+          "approved-live"
+        ],
+        "contentMutation": [
+          "disabled",
+          "isolated",
+          "approved-production"
+        ]
+      },
+      "operationHooks": [
+        {
+          "evidenceType": "configuration",
+          "relativePath": "Invoke-Configuration.ps1",
+          "sha256": "9341eee693edc4519000277463fbebbf42bc0a511a64fa308befe88e6cec4734"
+        },
+        {
+          "evidenceType": "change-record",
+          "relativePath": "Invoke-ChangeRecord.ps1",
+          "sha256": "c5314c681616bf16af3672a45671e36a769e31118660b576b76dcf47246a576b"
+        },
+        {
+          "evidenceType": "backup",
+          "relativePath": "Invoke-Backup.ps1",
+          "sha256": "655f382f2fcf9e7d620313db77f7907846964a419cd597ff7aa485d1d8d608c8"
+        },
+        {
+          "evidenceType": "restore",
+          "relativePath": "Invoke-Restore.ps1",
+          "sha256": "2330b7d6e3c9e552efdf17eddd9054d2f54a744ad4b95e28a607fe4bf78524d1"
+        },
+        {
+          "evidenceType": "health",
+          "relativePath": "Invoke-Health.ps1",
+          "sha256": "4c9127d5dd3f2684798554e0b100f07523f0a2e4fbab44bfc3a690df6e5ff601"
+        },
+        {
+          "evidenceType": "smoke",
+          "relativePath": "Invoke-Smoke.ps1",
+          "sha256": "f248087afa8db83568c659369b488ad74dfd7f61e85427c009783494697e6437"
+        },
+        {
+          "evidenceType": "crawl",
+          "relativePath": "Invoke-Crawl.ps1",
+          "sha256": "dd16919fb5350cb710678430aeeebc46be3d04846e357d5c3f4a7ecfa15be2f6"
+        },
+        {
+          "evidenceType": "performance",
+          "relativePath": "Invoke-Performance.ps1",
+          "sha256": "cad07ed87b2282761496209f8b83f025b22ab33b0c91c28ccf74d27b5da1120c"
+        },
+        {
+          "evidenceType": "accessibility",
+          "relativePath": "Invoke-Accessibility.ps1",
+          "sha256": "6c7e7d20568ae5e03226aa6891616d8f75d4b72b5522111889e2f3b818d68a90"
+        },
+        {
+          "evidenceType": "visual",
+          "relativePath": "Invoke-Visual.ps1",
+          "sha256": "4685b94c4414a9c758b6f9b2fda034171c410c37825c27b5d0aa597af34f6d5c"
+        },
+        {
+          "evidenceType": "sandbox-integrations",
+          "relativePath": "Invoke-SandboxIntegrations.ps1",
+          "sha256": "2eb1527cb44b92c6d3d7c658ffd7d060cb26bf786f6750e08022b737db1ddad9"
+        },
+        {
+          "evidenceType": "rollback",
+          "relativePath": "Invoke-Rollback.ps1",
+          "sha256": "3941ac4875c0a0facd0486e5015cf2f3d62156ddf003977583974504e0bd5d38"
+        }
+      ],
+      "requiredEvidence": [
+        "configuration.json",
+        "change-record.json",
+        "migration-preflight.json",
+        "backup.json",
+        "restore.json",
+        "migration-apply.json",
+        "health.json",
+        "smoke.json",
+        "crawl.json",
+        "performance.json",
+        "accessibility.json",
+        "visual.json",
+        "sandbox-integrations.json",
+        "rollback.json"
+      ]
+    }
+  ],
+  "privilegedRepositoryFiles": [
+    {
+      "relativePath": "eng/artifact/Resolve-ReleaseArtifactRoot.ps1",
+      "sha256": "bea7af31e252979daf049174389f1468aa4e44352250c260c3e5b894f1143382"
+    },
+    {
+      "relativePath": "eng/artifact/Test-ProtectedExecutionBundle.ps1",
+      "sha256": "be18c41c82595a9f8f36522526718a6ab587fdf2b4ec2dbe73e3fe36df284236"
+    },
+    {
+      "relativePath": "eng/artifact/Test-ReleaseArtifact.ps1",
+      "sha256": "d2db8f5b1c06c1cbbeaed804a92a5266218091a9098559744b9a435ea659483f"
+    },
+    {
+      "relativePath": "eng/common/Invoke-CheckedScriptChild.ps1",
+      "sha256": "931f13a81877a1b1e13557774b1fc52001853facfdd78a673512227b2a04f0d9"
+    },
+    {
+      "relativePath": "eng/common/Release.Common.ps1",
+      "sha256": "07e599c6a42d1c783f0baa54fbcf82a78b3a0c8068ca992c09108ebf62731868"
+    },
+    {
+      "relativePath": "eng/promotion/Get-GitHubRunMetadata.ps1",
+      "sha256": "4f891c4415f3a2596c7b03e5e58590e4d6561190f08bd3ae43cb59c5457e00eb"
+    },
+    {
+      "relativePath": "eng/promotion/Invoke-AutomaticStagingPromotion.ps1",
+      "sha256": "b9d4acdba6161dd4381edce4f079e2713ac5b856613d3e5bea19c7618375f38c"
+    },
+    {
+      "relativePath": "eng/promotion/Invoke-OperationEvidenceProducer.ps1",
+      "sha256": "15c06c59f1ccf971411ab63151b7204ca63ceac3884803fed72df69d292a841e"
+    },
+    {
+      "relativePath": "eng/promotion/Invoke-ProtectedOperationHook.ps1",
+      "sha256": "1895de8de76d61a82235bf029d49537d4ae9d4c270e63a680a3b94447c6670ac"
+    },
+    {
+      "relativePath": "eng/promotion/New-CtoAuthorizationRecord.ps1",
+      "sha256": "b27e937939936bf025394230e5f6131d66664ea403e9b36ef821720e9c248b44"
+    },
+    {
+      "relativePath": "eng/promotion/New-MigrationApplyAuthorization.ps1",
+      "sha256": "0fc055499fdad9cca42c6faf15501d10897db8f7b93dbb941f00d3cc27c69cc6"
+    },
+    {
+      "relativePath": "eng/promotion/New-StageOperationInputBundle.ps1",
+      "sha256": "c679bf71edf810cce4ff3fae6fb39fe7f3449d75ee241570a4ffe49196ad6612"
+    },
+    {
+      "relativePath": "eng/promotion/New-StageOperationReport.ps1",
+      "sha256": "a9db191284e40caa84d93d019430b0ecc1b046104bdfb9419599c5c459b51077"
+    },
+    {
+      "relativePath": "eng/promotion/New-T21ProducerManifest.ps1",
+      "sha256": "ff4aca6616b8d7b3c0772719b7471688fefeb379b6641b965de047ecfe1d311c"
+    },
+    {
+      "relativePath": "eng/promotion/Resolve-GitHubArtifactProvenance.ps1",
+      "sha256": "2820a4760e197260f7bf161b41afd6e8c91e15dc027da7b8ba2c6eddb9d42106"
+    },
+    {
+      "relativePath": "eng/promotion/StageOperationInput.Common.ps1",
+      "sha256": "7e616c2b30b49533f9bbf412287048ca8cbcbc7bed7ad57d8828c1956c768a40"
+    },
+    {
+      "relativePath": "eng/promotion/StageTarget.Common.ps1",
+      "sha256": "ecf6ddd593a07f81136d98bd75d2c302c429aaec229289891c58ab469c66c37c"
+    },
+    {
+      "relativePath": "eng/promotion/Test-CtoAuthorizationRecord.ps1",
+      "sha256": "46d023225e2c7177b98b98b171f01d3137b476cd8a88708d55c01177c7ec3b56"
+    },
+    {
+      "relativePath": "eng/promotion/Test-ExternalTrustMarker.ps1",
+      "sha256": "c7da97819c2a671d5350147423cec195ce54e1591078c76cd7db91243ff55963"
+    },
+    {
+      "relativePath": "eng/promotion/Test-StageEvidenceBundle.ps1",
+      "sha256": "2ab0def839772161e6eaa78c59d7a195061194f4a1c8761eafea90e25131def8"
+    },
+    {
+      "relativePath": "eng/promotion/Test-StageOperationInputBundle.ps1",
+      "sha256": "8531a345f044dcb53d507e93eb72c51e671ac9c1edad5803606eb680da5d43a0"
+    },
+    {
+      "relativePath": "eng/promotion/Test-StageReadOnlyConfiguration.ps1",
+      "sha256": "d61dc7417a823140cd160215f4df0d2bbd50e7d725b7ebe2d98140e2e238678d"
+    },
+    {
+      "relativePath": "eng/promotion/Test-TrustedProtectedOperationInputs.ps1",
+      "sha256": "0e305b382adfa248fbee1c7de91596987ba149854bd04172cbc6cb904ea627f7"
+    }
+  ]
+}
