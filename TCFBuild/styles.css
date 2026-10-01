@@ -147,9 +147,7 @@ body { display: grid; place-items: center; }
   overflow: hidden;
   border-radius: clamp(24px, 2.2cqw, 64px);
   background: #003d20;
-  box-shadow:
-    0 22px 75px rgb(0 0 0 / .42),
-    0 0 38px rgb(0 166 81 / .65);
+  box-shadow: 0 22px 75px rgb(0 0 0 / .42);
   opacity: 1;
   transform: translate(-50%, -50%);
   transition:
@@ -167,12 +165,12 @@ body { display: grid; place-items: center; }
   border-radius: inherit;
   background-image:
     radial-gradient(circle at 25% 50%, #fff 0 17%, #dfffea 18% 25%, transparent 27%),
-    radial-gradient(circle at 75% 50%, #00a651 0 17%, #61e89e 18% 25%, transparent 27%),
-    radial-gradient(circle at 25% 50%, #00a651 0 17%, #61e89e 18% 25%, transparent 27%),
+    radial-gradient(circle at 75% 50%, #fff 0 17%, #dfffea 18% 25%, transparent 27%),
+    radial-gradient(circle at 25% 50%, #fff 0 17%, #dfffea 18% 25%, transparent 27%),
     radial-gradient(circle at 75% 50%, #fff 0 17%, #dfffea 18% 25%, transparent 27%),
     radial-gradient(circle at 50% 25%, #fff 0 17%, #dfffea 18% 25%, transparent 27%),
-    radial-gradient(circle at 50% 75%, #00a651 0 17%, #61e89e 18% 25%, transparent 27%),
-    radial-gradient(circle at 50% 25%, #00a651 0 17%, #61e89e 18% 25%, transparent 27%),
+    radial-gradient(circle at 50% 75%, #fff 0 17%, #dfffea 18% 25%, transparent 27%),
+    radial-gradient(circle at 50% 25%, #fff 0 17%, #dfffea 18% 25%, transparent 27%),
     radial-gradient(circle at 50% 75%, #fff 0 17%, #dfffea 18% 25%, transparent 27%);
   background-position:
     top left,
@@ -201,8 +199,6 @@ body { display: grid; place-items: center; }
     var(--bulb-depth) var(--bulb-step),
     var(--bulb-depth) var(--bulb-step),
     var(--bulb-depth) var(--bulb-step);
-  filter: drop-shadow(0 0 7px rgb(255 255 255 / .9));
-  animation: total-bulbs-pulse 900ms ease-in-out infinite alternate;
 }
 
 .total-box-inner {
@@ -222,7 +218,7 @@ body { display: grid; place-items: center; }
 }
 
 .total-box-label {
-  color: #fff7df;
+  color: #fff;
   font-size: clamp(16px, 1.6cqw, 48px);
   font-weight: 900;
   letter-spacing: .12em;
@@ -231,20 +227,12 @@ body { display: grid; place-items: center; }
 }
 
 .total-box-amount {
-  color: #f8fffb;
+  color: #fff;
   font-size: clamp(54px, 7cqw, 190px);
   font-weight: 950;
   line-height: .95;
   letter-spacing: -.06em;
-  -webkit-text-stroke: clamp(1px, .08cqw, 3px) #dfffea;
-  text-shadow:
-    0 0 3px #fff,
-    0 0 8px #fff,
-    0 0 18px #61e89e,
-    0 0 34px #00a651,
-    0 0 58px rgb(0 166 81 / .9),
-    0 5px 14px rgb(0 0 0 / .65);
-  animation: total-amount-neon 1.45s ease-in-out infinite alternate;
+  text-shadow: 0 5px 14px rgb(0 0 0 / .65);
 }
 
 .total-box.is-hidden {
@@ -267,40 +255,6 @@ body { display: grid; place-items: center; }
   }
   50% {
     transform: translate(-50%, -57%) rotate(.45deg);
-  }
-}
-
-@keyframes total-bulbs-pulse {
-  from {
-    opacity: .72;
-    filter: drop-shadow(0 0 4px rgb(0 166 81 / .75));
-  }
-  to {
-    opacity: 1;
-    filter: drop-shadow(0 0 10px rgb(255 255 255 / .95));
-  }
-}
-
-@keyframes total-amount-neon {
-  from {
-    filter: brightness(.92);
-    text-shadow:
-      0 0 3px #fff,
-      0 0 7px #fff,
-      0 0 14px #61e89e,
-      0 0 26px #00a651,
-      0 0 42px rgb(0 166 81 / .75),
-      0 5px 14px rgb(0 0 0 / .65);
-  }
-  to {
-    filter: brightness(1.18);
-    text-shadow:
-      0 0 5px #fff,
-      0 0 12px #fff,
-      0 0 24px #9dffc7,
-      0 0 44px #00d168,
-      0 0 72px rgb(0 166 81 / 1),
-      0 5px 14px rgb(0 0 0 / .65);
   }
 }
 
