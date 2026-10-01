@@ -2921,18 +2921,18 @@ export function createFundraiserView(root, scene, config) {
     const wholePercentage = wholeDisplayPercentage(percentage);
     raisedDisplay.textContent = money.format(raised);
     goalDisplay.textContent = `Goal ${money.format(goal)}`;
-    if (donationRatio < 1) {
-      percentDisplay.textContent = `${Math.min(99, wholePercentage)}% complete`;
-    } else if (donationRatio < 1.03) {
-      percentDisplay.textContent = `${wholePercentage}% — students arriving!`;
-    } else if (donationRatio < 1.10) {
-      percentDisplay.textContent = `${wholePercentage}% — playground growing!`;
-    } else if (donationRatio < 1.17) {
-      percentDisplay.textContent = `${wholePercentage}% — campus growing!`;
-    } else if (donationRatio < 1.25) {
-      percentDisplay.textContent = `${wholePercentage}% — playground finishing!`;
-    } else if (donationRatio < 1.35) {
+    if (donationRatio < .2) {
+      percentDisplay.textContent = `${wholePercentage}% — first level building!`;
+    } else if (donationRatio < .4) {
+      percentDisplay.textContent = `${wholePercentage}% — second level and swings!`;
+    } else if (donationRatio < .6) {
       percentDisplay.textContent = `${wholePercentage}% — school bus arriving!`;
+    } else if (donationRatio < .8) {
+      percentDisplay.textContent = `${wholePercentage}% — school completing!`;
+    } else if (donationRatio < 1) {
+      percentDisplay.textContent = `${wholePercentage}% — first students arriving!`;
+    } else if (donationRatio < 1.2) {
+      percentDisplay.textContent = `${wholePercentage}% — campus completing!`;
     } else {
       percentDisplay.textContent = `${wholePercentage}% — campus ready!`;
     }

@@ -4,14 +4,14 @@ export const DEFAULT_CONFIG = Object.freeze({
   currency: "USD",
   locale: "en-US",
   maxStudents: 24,
-  overGoalRamp: 0.25,
+  overGoalRamp: 0.15,
   animationTimeConstantMs: 420,
-  demoDurationMs: 144000
+  demoDurationMs: 86400
 });
 
 export const MIN_GOAL = 0.01;
 export const MAX_RAISED = Number.MAX_SAFE_INTEGER;
-export const MAX_PROGRESS_RATIO = 2;
+export const MAX_PROGRESS_RATIO = 1.2;
 export const MAX_GOAL = MAX_RAISED / MAX_PROGRESS_RATIO;
 const ALLOWED_RAISED_STEP_FRACTIONS = new Set([-.05, -.01, .01, .05]);
 
@@ -123,7 +123,7 @@ export function validateOperatorAmounts(raisedValue, goalValue) {
     return Object.freeze({
       valid: false,
       field: "raised",
-      message: "Enter a raised amount no greater than 200% of the goal."
+      message: "Enter a raised amount no greater than 120% of the goal."
     });
   }
 

@@ -9,56 +9,54 @@ function rampRatio(value, start, span) {
   return clamp(ratio);
 }
 
-export function deriveProgress(raised, goal, overGoalRamp = 0.25) {
+function interpolateMilestone(value, start, end, startValue, endValue) {
+  const progress = rampRatio(value, start, end - start);
+  return startValue + (endValue - startValue) * progress;
+}
+
+export function deriveProgress(raised, goal, overGoalRamp = 0.15) {
   const safeRaised = Number.isFinite(raised) ? Math.max(0, raised) : 0;
   const safeGoal = Number.isFinite(goal) && goal > 0 ? goal : 1;
-  const safeRamp = Number.isFinite(overGoalRamp) && overGoalRamp > 0
-    ? overGoalRamp
-    : 0.25;
-  const completionRatio = 1 + safeRamp;
-  const completionRaised = safeGoal * completionRatio;
-  const busStartRatio = 1.25;
-  const busStartRaised = safeGoal * busStartRatio;
-  const busMidpointRatio = 1.30;
-  const busMidpointRaised = safeGoal * busMidpointRatio;
-  const busCompletionRatio = 1.35;
-  const busCompletionRaised = safeGoal * busCompletionRatio;
-  const donationRatio = safeRaised === busCompletionRaised
-    ? busCompletionRatio
-    : safeRaised === busMidpointRaised
-      ? busMidpointRatio
-      : safeRaised === busStartRaised
-        ? busStartRatio
-        : safeRaised === completionRaised
-          ? completionRatio
-          : Math.min(Number.MAX_VALUE, Math.max(0, safeRaised / safeGoal));
+  void overGoalRamp;
+  const donationRatio = Math.min(
+    Number.MAX_VALUE,
+    Math.max(0, safeRaised / safeGoal)
+  );
+  const firstLevelComplete = 160 / 308;
+  const secondLevelComplete = 226 / 308;
+  const buildingRatio = donationRatio < .2
+    ? interpolateMilestone(donationRatio, 0, .2, 0, firstLevelComplete)
+    : donationRatio < .4
+      ? interpolateMilestone(
+        donationRatio,
+        .2,
+        .4,
+        firstLevelComplete,
+        secondLevelComplete
+      )
+      : donationRatio < .8
+        ? interpolateMilestone(
+          donationRatio,
+          .4,
+          .8,
+          secondLevelComplete,
+          1
+        )
+        : 1;
+  const studentRatio = donationRatio < .8
+    ? 0
+    : donationRatio < 1
+      ? interpolateMilestone(donationRatio, .8, 1, 0, .5)
+      : interpolateMilestone(donationRatio, 1, 1.2, .5, 1);
   return {
     donationRatio,
-    buildingRatio: clamp(donationRatio),
-    studentRatio: clamp((donationRatio - 1) / safeRamp),
+    buildingRatio: clamp(buildingRatio),
+    studentRatio: clamp(studentRatio),
     goalAchieved: donationRatio >= 1,
-    swingRatio: rampRatio(
-      donationRatio,
-      1 + .12 * safeRamp,
-      .28 * safeRamp
-    ),
-    teacherRatio: rampRatio(
-      donationRatio,
-      1 + .40 * safeRamp,
-      .28 * safeRamp
-    ),
-    playgroundRatio: rampRatio(
-      donationRatio,
-      1 + .68 * safeRamp,
-      .32 * safeRamp
-    ),
-    busRatio: donationRatio <= busStartRatio
-      ? 0
-      : donationRatio >= busCompletionRatio
-        ? 1
-        : donationRatio === busMidpointRatio
-          ? .5
-          : (donationRatio - busStartRatio) / .10
+    swingRatio: rampRatio(donationRatio, .2, .2),
+    teacherRatio: rampRatio(donationRatio, 1, .2),
+    playgroundRatio: rampRatio(donationRatio, 1, .2),
+    busRatio: rampRatio(donationRatio, .4, .2)
   };
 }
 

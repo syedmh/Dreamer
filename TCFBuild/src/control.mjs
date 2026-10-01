@@ -1,4 +1,5 @@
 import {
+  MAX_RAISED,
   deriveOperatorControlValues,
   deriveRaisedFromSliderValue,
   validateOperatorAmounts
@@ -6,17 +7,21 @@ import {
 import { createCurrencyFormatter } from "./currency.mjs";
 
 const form = document.querySelector("#progress-form");
+const overrideForm = document.querySelector("#override-form");
 const buildSummaryForm = document.querySelector("#build-summary-form");
 const seattleSchoolsInput = document.querySelector("#seattle-schools-input");
-const operationCostInput = document.querySelector("#operation-cost-input");
 const raisedInput = document.querySelector("#raised-input");
 const goalInput = document.querySelector("#goal-input");
+const overrideRaisedInput = document.querySelector("#override-raised-input");
 const raisedSlider = document.querySelector("#raised-slider");
 const serverIndicator = document.querySelector("#server-indicator");
 const displayIndicator = document.querySelector("#display-indicator");
 const operationStatus = document.querySelector("#operation-status");
 const displayPreview = document.querySelector("#display-preview");
 const celebrationToggle = document.querySelector("#celebration-toggle");
+const amountEditToggle = document.querySelector("#edit-amounts-toggle");
+const overrideEditToggle = document.querySelector("#edit-override-toggle");
+const applyOverrideButton = document.querySelector("#apply-override-button");
 const money = createCurrencyFormatter("en-US", "USD");
 
 const toggles = {
@@ -27,12 +32,14 @@ const toggles = {
   continuousFireworks: document.querySelector("#continuous-toggle")
   ,
   buildSummaryVisible: document.querySelector("#build-summary-toggle"),
+  totalBoxVisible: document.querySelector("#total-box-toggle"),
   keyboardLegendVisible: document.querySelector("#keyboard-legend-toggle"),
   keypressEnabled: document.querySelector("#keypress-toggle")
 };
 
 let state = null;
 let editingProgress = false;
+let editingOverride = false;
 let editingBuildSummary = false;
 let highestAuthoritativeRevision = null;
 
@@ -56,10 +63,14 @@ function synchronizeProgressControls() {
   synchronizeSliderText();
 }
 
+function synchronizeOverrideControls() {
+  if (!state || editingOverride) return;
+  overrideRaisedInput.value = String(money.round(Number(state.overrideRaised)));
+}
+
 function synchronizeBuildSummaryControls() {
   if (!state || editingBuildSummary || !buildSummaryForm) return;
   seattleSchoolsInput.value = String(state.seattleSchools);
-  operationCostInput.value = String(money.round(state.operationCost));
 }
 
 function synchronizeSliderText(goal = Number(goalInput.value)) {
@@ -83,6 +94,18 @@ function synchronizeSliderFromDraft() {
   synchronizeSliderText(goalValidation.goal);
 }
 
+function synchronizeAmountEditState() {
+  const editable = Boolean(amountEditToggle?.checked);
+  raisedInput.readOnly = !editable;
+  goalInput.readOnly = !editable;
+}
+
+function synchronizeOverrideEditState() {
+  const editable = Boolean(overrideEditToggle?.checked);
+  overrideRaisedInput.readOnly = !editable;
+  if (applyOverrideButton) applyOverrideButton.disabled = !editable;
+}
+
 function synchronizeToggles() {
   if (!state) return;
   const labels = {
@@ -96,8 +119,11 @@ function synchronizeToggles() {
       ? "Stop continuous fireworks"
       : "Start continuous fireworks",
     buildSummaryVisible: state.buildSummaryVisible
-      ? "Hide build summary"
-      : "Show build summary",
+      ? "Hide Seattle Schools"
+      : "Show Seattle Schools",
+    totalBoxVisible: state.totalBoxVisible
+      ? "Hide Total Box"
+      : "Show Total Box",
     keyboardLegendVisible: state.keyboardLegendVisible
       ? "Hide key legend"
       : "Show key legend",
@@ -136,6 +162,7 @@ function applyState(nextState) {
   if (revision !== null) highestAuthoritativeRevision = revision;
   state = { ...state, ...nextState };
   synchronizeProgressControls();
+  synchronizeOverrideControls();
   synchronizeBuildSummaryControls();
   synchronizeToggles();
   return true;
@@ -202,11 +229,9 @@ function sendCommand(command, message) {
 }
 
 if (buildSummaryForm) {
-  for (const input of [seattleSchoolsInput, operationCostInput]) {
-    input.addEventListener("input", () => {
-      editingBuildSummary = true;
-    });
-  }
+  seattleSchoolsInput.addEventListener("input", () => {
+    editingBuildSummary = true;
+  });
 
   buildSummaryForm.addEventListener("focusout", (event) => {
     if (
@@ -227,25 +252,19 @@ if (buildSummaryForm) {
   buildSummaryForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const seattleSchools = Number(seattleSchoolsInput.value);
-    const operationCost = Number(operationCostInput.value);
     if (!Number.isSafeInteger(seattleSchools) || seattleSchools < 0) {
       setStatus("Seattle Schools must be a non-negative whole number.", true);
       seattleSchoolsInput.focus();
       return;
     }
-    if (!Number.isFinite(operationCost) || operationCost < 0) {
-      setStatus("Operation Cost must be a non-negative number.", true);
-      operationCostInput.focus();
-      return;
-    }
     try {
       const nextState = await requestJson("/api/state", {
         method: "PATCH",
-        body: JSON.stringify({ seattleSchools, operationCost })
+        body: JSON.stringify({ seattleSchools })
       });
       editingBuildSummary = false;
       if (applyState(nextState)) {
-        setStatus("Together We Build summary applied.");
+        setStatus("Seattle Schools updated.");
       } else {
         synchronizeBuildSummaryControls();
       }
@@ -273,6 +292,21 @@ raisedSlider.addEventListener("input", () => {
   synchronizeSliderText(goalValidation.goal);
 });
 
+amountEditToggle?.addEventListener("change", () => {
+  synchronizeAmountEditState();
+  if (amountEditToggle.checked) {
+    setStatus("Raised and Goal can now be edited.");
+    raisedInput.focus();
+    return;
+  }
+  if (editingProgress) {
+    form.requestSubmit();
+  } else {
+    synchronizeProgressControls();
+    setStatus("Raised and Goal are read-only.");
+  }
+});
+
 for (const input of [raisedInput, goalInput]) {
   input.addEventListener("input", () => {
     editingProgress = true;
@@ -297,6 +331,8 @@ form.addEventListener("submit", async (event) => {
   event.preventDefault();
   const submission = validateOperatorAmounts(raisedInput.value, goalInput.value);
   if (!submission.valid) {
+    if (amountEditToggle) amountEditToggle.checked = true;
+    synchronizeAmountEditState();
     setStatus(submission.message, true);
     (submission.field === "raised" ? raisedInput : goalInput).focus();
     return;
@@ -311,6 +347,8 @@ form.addEventListener("submit", async (event) => {
       })
     });
     editingProgress = false;
+    if (amountEditToggle) amountEditToggle.checked = false;
+    synchronizeAmountEditState();
     if (applyState(nextState)) {
       setStatus("Raised amount and goal applied.");
     } else {
@@ -318,6 +356,8 @@ form.addEventListener("submit", async (event) => {
     }
   } catch (error) {
     editingProgress = false;
+    if (amountEditToggle) amountEditToggle.checked = false;
+    synchronizeAmountEditState();
     try {
       await refetchState();
     } catch {
@@ -328,6 +368,77 @@ form.addEventListener("submit", async (event) => {
     setStatus(error.message, true);
   }
 });
+
+synchronizeAmountEditState();
+
+overrideRaisedInput.addEventListener("input", () => {
+  editingOverride = true;
+});
+
+overrideEditToggle?.addEventListener("change", () => {
+  synchronizeOverrideEditState();
+  if (overrideEditToggle.checked) {
+    setStatus("Override Raised Amount can now be edited.");
+    overrideRaisedInput.focus();
+    return;
+  }
+  editingOverride = false;
+  synchronizeOverrideControls();
+  setStatus("Unsaved override changes canceled. Override Raised Amount is read-only.");
+});
+
+overrideForm?.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape") return;
+  event.preventDefault();
+  editingOverride = false;
+  if (overrideEditToggle) overrideEditToggle.checked = false;
+  synchronizeOverrideEditState();
+  synchronizeOverrideControls();
+});
+
+overrideForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const overrideRaised = Number(String(overrideRaisedInput.value).trim());
+  if (
+    !Number.isFinite(overrideRaised)
+    || overrideRaised < 0
+    || overrideRaised > MAX_RAISED
+  ) {
+    if (overrideEditToggle) overrideEditToggle.checked = true;
+    synchronizeOverrideEditState();
+    setStatus("Enter a valid Override Raised Amount within the allowed range.", true);
+    overrideRaisedInput.focus();
+    return;
+  }
+  try {
+    const nextState = await requestJson("/api/state", {
+      method: "PATCH",
+      body: JSON.stringify({ overrideRaised })
+    });
+    editingOverride = true;
+    if (overrideEditToggle) overrideEditToggle.checked = true;
+    synchronizeOverrideEditState();
+    if (applyState(nextState)) {
+      setStatus("Ultimate total override applied.");
+    } else {
+      synchronizeOverrideControls();
+    }
+  } catch (error) {
+    editingOverride = true;
+    if (overrideEditToggle) overrideEditToggle.checked = true;
+    synchronizeOverrideEditState();
+    try {
+      await refetchState();
+    } catch {
+      setIndicator(serverIndicator, false, "Dashboard connected", "Dashboard reconnecting…");
+    } finally {
+      synchronizeOverrideControls();
+    }
+    setStatus(error.message, true);
+  }
+});
+
+synchronizeOverrideEditState();
 
 for (const [field, button] of Object.entries(toggles)) {
   if (!button) continue;
@@ -386,20 +497,6 @@ for (const button of document.querySelectorAll("[data-progress-set]")) {
     sendCommand(
       { type: "raised.setRatio", ratio },
       `Progress set to ${money.format(state.goal * ratio)}.`
-    );
-  });
-}
-
-for (const button of document.querySelectorAll("[data-raised-add]")) {
-  button.addEventListener("click", () => {
-    if (!state) {
-      setStatus("Wait for the initial live state before adding a donation.", true);
-      return;
-    }
-    const addition = Number(button.dataset.raisedAdd);
-    sendCommand(
-      { type: "raised.add", amount: addition },
-      `${money.format(addition)} added.`
     );
   });
 }

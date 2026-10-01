@@ -134,6 +134,27 @@ const CAMPUS_GEOMETRY = deepFreeze({
       baseY: 640,
       scale: .5,
       bounds: { left: 422, right: 462, top: 591, bottom: 640 }
+    },
+    {
+      slot: 8,
+      x: 302,
+      baseY: 610,
+      scale: .5,
+      bounds: { left: 302, right: 342, top: 561, bottom: 610 }
+    },
+    {
+      slot: 9,
+      x: 260,
+      baseY: 660,
+      scale: .48,
+      bounds: { left: 260, right: 298.4, top: 612.96, bottom: 660 }
+    },
+    {
+      slot: 10,
+      x: 315,
+      baseY: 660,
+      scale: .48,
+      bounds: { left: 315, right: 353.4, top: 612.96, bottom: 660 }
     }
   ],
   trees: [

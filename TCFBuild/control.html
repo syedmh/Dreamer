@@ -32,67 +32,84 @@
       </div>
     </section>
 
-    <form id="build-summary-form" class="card">
-      <h2>Together We Build</h2>
-      <div class="amount-grid">
+    <form id="build-summary-form" class="card" hidden>
+      <h2>Seattle Schools</h2>
+      <div class="amount-grid summary-grid">
         <label>Seattle Schools
           <input id="seattle-schools-input" name="seattleSchools" type="number" min="0" max="9007199254740991" step="1" required>
         </label>
-        <label>Operation Cost
-          <input id="operation-cost-input" name="operationCost" type="number" min="0" max="9007199254740991" step="any" required>
-        </label>
       </div>
-      <button class="primary form-submit" type="submit">Apply build summary</button>
+      <button class="primary form-submit" type="submit">Apply school count</button>
     </form>
 
     <form id="progress-form" class="card">
       <h2>Fundraiser progress</h2>
+      <label class="edit-amounts-toggle">
+        <input id="edit-amounts-toggle" type="checkbox">
+        Edit amounts
+      </label>
       <div class="amount-grid">
         <label>Raised
-          <input id="raised-input" name="raised" type="number" min="0" max="9007199254740991" step="any" required>
+          <input id="raised-input" name="raised" type="number" min="0" max="9007199254740991" step="any" required readonly>
         </label>
         <label>Goal
-          <input id="goal-input" name="goal" type="number" min="0.01" max="4503599627370495.5" step="any" required>
+          <input id="goal-input" name="goal" type="number" min="0.01" max="4503599627370495.5" step="any" required readonly>
         </label>
       </div>
-      <label class="slider-label">Quick progress
+      <label class="slider-label" hidden>Quick progress
         <input id="raised-slider" type="range" min="0" max="200000" step="any">
       </label>
       <div class="action-grid shortcut-grid" aria-label="Keyboard-equivalent progress controls">
         <button type="button" data-progress-set="0">Set 0%</button>
+        <button type="button" data-progress-set=".2">Set 20%</button>
+        <button type="button" data-progress-set=".4">Set 40%</button>
+        <button type="button" data-progress-set=".6">Set 60%</button>
+        <button type="button" data-progress-set=".8">Set 80%</button>
         <button type="button" data-progress-set="1">Set 100%</button>
+        <button type="button" data-progress-set="1.2">Set 120%</button>
       </div>
-      <div class="action-grid donation-grid" aria-label="Quick donation additions">
-        <button type="button" data-raised-add="500">Add $500</button>
-        <button type="button" data-raised-add="1000">Add $1,000</button>
-        <button type="button" data-raised-add="5000">Add $5,000</button>
-        <button type="button" data-raised-add="10000">Add $10,000</button>
+      <button type="submit" hidden>Apply Raised and Goal</button>
+    </form>
+
+    <form id="override-form" class="card">
+      <h2>Ultimate Total Override</h2>
+      <label class="edit-amounts-toggle">
+        <input id="edit-override-toggle" type="checkbox">
+        Edit override
+      </label>
+      <div class="amount-grid summary-grid">
+        <label>Override Raised Amount
+          <input id="override-raised-input" name="overrideRaised" type="number" min="0" max="9007199254740991" step="any" required readonly>
+          <span class="field-help">Ultimate total shown in the center box</span>
+        </label>
       </div>
-      <button class="primary" type="submit">Apply raised and goal</button>
+      <button id="apply-override-button" class="primary form-submit" type="submit" disabled>Apply Override</button>
     </form>
 
     <section class="card">
       <h2>Display state</h2>
       <div class="toggle-grid">
-        <button id="demo-toggle" class="toggle" type="button" aria-pressed="false">Start demo</button>
-        <button id="night-toggle" class="toggle" type="button" aria-pressed="false">Switch to night</button>
-        <button id="clapping-toggle" class="toggle" type="button" aria-pressed="false">Start clapping</button>
-        <button id="thank-you-toggle" class="toggle" type="button" aria-pressed="true">Hide thank-you bubbles</button>
-        <button id="continuous-toggle" class="toggle" type="button" aria-pressed="false">Start continuous fireworks</button>
+        <button id="demo-toggle" class="toggle" type="button" aria-pressed="false" hidden>Start demo</button>
+        <button id="night-toggle" class="toggle" type="button" aria-pressed="false" hidden>Switch to night</button>
+        <button id="clapping-toggle" class="toggle" type="button" aria-pressed="false" hidden>Start clapping</button>
+        <button id="thank-you-toggle" class="toggle" type="button" aria-pressed="false" hidden>Show thank-you bubbles</button>
+        <button id="continuous-toggle" class="toggle" type="button" aria-pressed="false" hidden>Start continuous fireworks</button>
         <button id="celebration-toggle" class="toggle celebration-toggle" type="button" aria-pressed="false">Start celebration</button>
-        <button id="build-summary-toggle" class="toggle" type="button" aria-pressed="true">Hide build summary</button>
-        <button id="keyboard-legend-toggle" class="toggle" type="button" aria-pressed="false">Show key legend</button>
-        <button id="keypress-toggle" class="toggle" type="button" aria-pressed="true">Disable keyboard controls</button>
+        <button id="build-summary-toggle" class="toggle" type="button" aria-pressed="false">Show Seattle Schools</button>
+        <button id="total-box-toggle" class="toggle" type="button" aria-pressed="false">Show Total Box</button>
+        <button id="keyboard-legend-toggle" class="toggle" type="button" aria-pressed="false" hidden>Show key legend</button>
+        <button id="keypress-toggle" class="toggle" type="button" aria-pressed="false" hidden>Enable keyboard controls</button>
       </div>
     </section>
 
     <section class="card">
       <h2>One-time effects</h2>
       <div class="action-grid">
-        <button type="button" data-action="kite.add">Add kite</button>
-        <button type="button" data-action="kite.clear">Clear kites</button>
-        <button type="button" data-action="firework.launch">Launch firework</button>
-        <button type="button" data-action="firework.clear">Clear fireworks</button>
+        <button type="button" data-action="kite.add" hidden>Add kite</button>
+        <button type="button" data-action="kite.clear" hidden>Clear kites</button>
+        <button type="button" data-action="firework.launch" hidden>Launch firework</button>
+        <button type="button" data-action="firework.clear" hidden>Clear fireworks</button>
+        <button type="button" data-action="total.drop" hidden>Drop Total Box</button>
         <button type="button" data-action="school.add">Drop next school</button>
         <button type="button" data-action="school.remove">Remove last school</button>
       </div>

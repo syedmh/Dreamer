@@ -83,6 +83,15 @@ async function withControlHarness(run, {
   const raisedSlider = new FakeElement();
   const submitButton = new FakeElement();
   form.append(raisedInput, goalInput, raisedSlider, submitButton);
+  const overrideForm = new FakeElement();
+  const overrideRaisedInput = new FakeElement();
+  const overrideEditToggle = new FakeElement();
+  const applyOverrideButton = new FakeElement();
+  overrideForm.append(
+    overrideRaisedInput,
+    overrideEditToggle,
+    applyOverrideButton
+  );
   const buildSummaryForm = new FakeElement();
   const seattleSchoolsInput = new FakeElement();
   const operationCostInput = new FakeElement();
@@ -102,11 +111,13 @@ async function withControlHarness(run, {
 
   const elements = new Map([
     ["#progress-form", form],
+    ["#override-form", overrideForm],
     ["#build-summary-form", buildSummaryForm],
     ["#seattle-schools-input", seattleSchoolsInput],
     ["#operation-cost-input", operationCostInput],
     ["#raised-input", raisedInput],
     ["#goal-input", goalInput],
+    ["#override-raised-input", overrideRaisedInput],
     ["#raised-slider", raisedSlider],
     ["#server-indicator", new FakeElement()],
     ["#display-indicator", new FakeElement()],
@@ -116,6 +127,9 @@ async function withControlHarness(run, {
     ["#clapping-toggle", new FakeElement()],
     ["#thank-you-toggle", new FakeElement()],
     ["#continuous-toggle", new FakeElement()]
+    ,
+    ["#edit-override-toggle", overrideEditToggle],
+    ["#apply-override-button", applyOverrideButton]
   ]);
   if (includeDisplayPreview) {
     elements.set("#display-preview", new FakeElement());
@@ -148,6 +162,10 @@ async function withControlHarness(run, {
       events: FakeEventSource.instances[0],
       form,
       goalInput,
+      overrideForm,
+      overrideRaisedInput,
+      overrideEditToggle,
+      applyOverrideButton,
       raisedInput,
       raisedSlider,
       actionButtons,
@@ -176,6 +194,57 @@ function sendState(events, state) {
     ...state
   }));
 }
+
+test("applying an override preserves its draft and edit mode when focusout has no target", async () => {
+  const requests = [];
+  await withControlHarness(
+    async ({
+      events,
+      overrideForm,
+      overrideRaisedInput,
+      overrideEditToggle,
+      applyOverrideButton
+    }) => {
+      sendState(events, {
+        revision: 1,
+        raised: 600,
+        goal: 1000,
+        overrideRaised: 600
+      });
+      overrideEditToggle.checked = true;
+      await overrideEditToggle.dispatch("change");
+      overrideRaisedInput.value = "900";
+      await overrideRaisedInput.dispatch("input");
+
+      await overrideForm.dispatch("focusout", { relatedTarget: null });
+      await overrideForm.dispatch("submit");
+
+      assert.deepEqual(JSON.parse(requests[0].options.body), {
+        overrideRaised: 900
+      });
+      assert.equal(overrideRaisedInput.value, "900");
+      assert.equal(overrideEditToggle.checked, true);
+      assert.equal(overrideRaisedInput.readOnly, false);
+      assert.equal(applyOverrideButton.disabled, false);
+    },
+    {
+      fetchImplementation: async (url, options) => {
+        requests.push({ url, options });
+        return {
+          ok: true,
+          async json() {
+            return {
+              revision: 2,
+              raised: 600,
+              goal: 1000,
+              overrideRaised: 900
+            };
+          }
+        };
+      }
+    }
+  );
+});
 
 test("focus alone does not block authoritative progress updates", async () => {
   await withControlHarness(async ({ events, raisedInput, goalInput }) => {

@@ -16,27 +16,32 @@ const announcer = document.querySelector("#announcer");
 const keyboardHint = document.querySelector("#keyboard-hint");
 const buildSummaryCard = document.querySelector("#build-summary-card");
 const seattleSchoolsDisplay = document.querySelector("#seattle-schools-display");
-const operationCostDisplay = document.querySelector("#operation-cost-display");
+const totalBox = document.querySelector("#total-box");
+const totalBoxAmount = document.querySelector("#total-box-amount");
 const money = createCurrencyFormatter(config.locale, config.currency);
 
 let state = {
   raised: DEFAULT_CONFIG.raised,
   goal: DEFAULT_CONFIG.goal,
+  overrideRaised: DEFAULT_CONFIG.raised,
   seattleSchools: 0,
   operationCost: 0,
   demoActive: false,
   nightMode: false,
   studentsClapping: false,
-  thankYouVisible: true,
+  thankYouVisible: false,
   continuousFireworks: false,
-  buildSummaryVisible: true,
+  buildSummaryVisible: false,
+  totalBoxVisible: false,
   keyboardLegendVisible: false,
-  keypressEnabled: true,
+  keypressEnabled: false,
   distantSchools: []
 };
 let goal = state.goal;
 let targetRaised = state.raised;
 let displayedRaised = targetRaised;
+let targetOverrideRaised = state.overrideRaised;
+let displayedOverrideRaised = targetOverrideRaised;
 let lastFrameAt = performance.now();
 let celebrationUntil = 0;
 let previousDisplayedRatio = displayedRaised / goal;
@@ -151,6 +156,7 @@ function applyState(nextState) {
   state = { ...state, ...nextState };
   goal = state.goal;
   targetRaised = clampAmount(state.raised);
+  targetOverrideRaised = clampAmount(state.overrideRaised);
   view.setNightMode(state.nightMode);
   view.setStudentsClapping(state.studentsClapping);
   view.setThankYouVisible(state.thankYouVisible);
@@ -165,13 +171,14 @@ function applyState(nextState) {
       String(!state.buildSummaryVisible)
     );
   }
+  if (totalBox) {
+    totalBox.classList.toggle("is-hidden", !state.totalBoxVisible);
+    totalBox.setAttribute("aria-hidden", String(!state.totalBoxVisible));
+  }
   if (seattleSchoolsDisplay) {
     seattleSchoolsDisplay.textContent = Number(state.seattleSchools).toLocaleString(
       config.locale
     );
-  }
-  if (operationCostDisplay) {
-    operationCostDisplay.textContent = money.format(state.operationCost);
   }
   view.reconcileDistantSchools(state.distantSchools, {
     now: Date.now(),
@@ -271,6 +278,15 @@ function executeAction(action, { announceResult = true } = {}) {
     case "firework.clear":
       view.clearFireworks();
       message = "All fireworks cleared.";
+      break;
+    case "total.drop":
+      if (totalBox) {
+        totalBox.classList.remove("is-hidden", "is-dropping");
+        totalBox.setAttribute("aria-hidden", "false");
+        void totalBox.offsetWidth;
+        totalBox.classList.add("is-dropping");
+      }
+      message = "Fundraising total dropped into view.";
       break;
     case "school.add": {
       view.addTcfFirework({ reducedMotion: reducedMotion() });
@@ -429,8 +445,8 @@ document.addEventListener("keydown", (event) => {
       sendCommand(
         { type: "state.toggle", field: "buildSummaryVisible" },
         state.buildSummaryVisible
-          ? "Together We Build summary hidden."
-          : "Together We Build summary shown."
+          ? "Seattle Schools count hidden."
+          : "Seattle Schools count shown."
       );
       break;
     }
@@ -544,6 +560,18 @@ function frame(now) {
     ? targetRaised
     : exponentialStep(displayedRaised, targetRaised, delta, config.animationTimeConstantMs);
   if (Math.abs(displayedRaised - targetRaised) < .01) displayedRaised = targetRaised;
+  displayedOverrideRaised = reducedMotion()
+    ? targetOverrideRaised
+    : exponentialStep(
+      displayedOverrideRaised,
+      targetOverrideRaised,
+      delta,
+      config.animationTimeConstantMs
+    );
+  if (Math.abs(displayedOverrideRaised - targetOverrideRaised) < .01) {
+    displayedOverrideRaised = targetOverrideRaised;
+  }
+  if (totalBoxAmount) totalBoxAmount.textContent = money.format(displayedOverrideRaised);
 
   const progress = deriveProgress(displayedRaised, goal, config.overGoalRamp);
   if (previousDisplayedRatio < 1 && progress.donationRatio >= 1) {
@@ -561,6 +589,7 @@ function frame(now) {
   });
   if (
     displayedRaised !== targetRaised
+    || displayedOverrideRaised !== targetOverrideRaised
     || now < celebrationUntil
     || renderResult.needsFrame
   ) {

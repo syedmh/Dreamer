@@ -1,0 +1,4 @@
+package-release.bat text eol=crlf
+package-release.ps1 text eol=crlf
+release/windows/setup-tcfbuild.bat text eol=crlf
+release/macos/setup-tcfbuild.command text eol=lf

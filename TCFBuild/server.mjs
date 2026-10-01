@@ -9,6 +9,7 @@ import {
   deriveSliderMaximum,
   isAllowedRaisedStep,
   MAX_GOAL,
+  MAX_PROGRESS_RATIO,
   MAX_RAISED,
   MIN_GOAL
 } from "./src/config.mjs";
@@ -41,8 +42,8 @@ const HEARTBEAT_INTERVAL_MS = 15000;
 export const MAX_SSE_CLIENTS_PER_ROLE = 8;
 const MAX_SSE_PENDING_BYTES = 65536;
 const DEMO_UPDATE_INTERVAL_MS = 200;
-const DEMO_DURATION_MS = 144000;
-const MAX_DISTANT_SCHOOLS = 7;
+const DEMO_DURATION_MS = 86400;
+const MAX_DISTANT_SCHOOLS = 10;
 const DISTANT_SCHOOL_DROP_DURATION_MS = 6500;
 const SEATTLE_SCHOOL_BASELINE = 47;
 const BOOLEAN_STATE_FIELDS = new Set([
@@ -52,12 +53,14 @@ const BOOLEAN_STATE_FIELDS = new Set([
   "thankYouVisible",
   "continuousFireworks",
   "buildSummaryVisible",
+  "totalBoxVisible",
   "keyboardLegendVisible",
   "keypressEnabled"
 ]);
 const ALLOWED_STATE_FIELDS = new Set([
   "raised",
   "goal",
+  "overrideRaised",
   "seattleSchools",
   "operationCost",
   ...BOOLEAN_STATE_FIELDS
@@ -68,6 +71,7 @@ const ALLOWED_ACTIONS = new Set([
   "firework.launch",
   "firework.tcf",
   "firework.clear",
+  "total.drop",
   "school.add",
   "school.remove"
 ]);
@@ -142,20 +146,25 @@ export function createSharedState(initialState = {}, scheduler = {}) {
   const normalizedInitialState = Object.fromEntries(
     Object.entries(initialState).filter(([key]) => ALLOWED_STATE_FIELDS.has(key))
   );
+  const initialRaised = typeof normalizedInitialState.raised === "number"
+    ? normalizedInitialState.raised
+    : 0;
   let state = Object.freeze({
     revision: 0,
-    raised: 0,
+    raised: initialRaised,
     goal: 100000,
-    seattleSchools: 0,
+    overrideRaised: initialRaised,
+    seattleSchools: SEATTLE_SCHOOL_BASELINE,
     operationCost: 0,
     demoActive: false,
     nightMode: false,
     studentsClapping: false,
-    thankYouVisible: true,
+    thankYouVisible: false,
     continuousFireworks: false,
-    buildSummaryVisible: true,
+    buildSummaryVisible: false,
+    totalBoxVisible: false,
     keyboardLegendVisible: false,
-    keypressEnabled: true,
+    keypressEnabled: false,
     ...normalizedInitialState,
     distantSchools: Object.freeze([])
   });
@@ -254,13 +263,16 @@ export function createSharedState(initialState = {}, scheduler = {}) {
   }
 
   function updateState(patch) {
-    const changed = Object.entries(patch).some(
+    const synchronizedPatch = "raised" in patch
+      ? { ...patch, overrideRaised: patch.raised }
+      : patch;
+    const changed = Object.entries(synchronizedPatch).some(
       ([key, value]) => state[key] !== value
     );
     if (!changed) return state;
     state = Object.freeze({
       ...state,
-      ...patch,
+      ...synchronizedPatch,
       revision: state.revision + 1
     });
     broadcast("state", state);
@@ -359,7 +371,10 @@ export function createSharedState(initialState = {}, scheduler = {}) {
     ));
     updateState({
       distantSchools: Object.freeze(distantSchools),
-      seattleSchools: Math.max(0, Number(state.seattleSchools) || 0) + 1
+      seattleSchools: Math.max(
+        SEATTLE_SCHOOL_BASELINE,
+        Number(state.seattleSchools) || 0
+      ) + 1
     });
   }
 
@@ -369,7 +384,7 @@ export function createSharedState(initialState = {}, scheduler = {}) {
         return Object.freeze({
           changed: false,
           state,
-          error: "Cannot add another distant school: the seven-school maximum is already active."
+          error: "Cannot add another distant school: the ten-school maximum is already active."
         });
       }
       const slot = state.distantSchools.length + 1;
@@ -384,10 +399,7 @@ export function createSharedState(initialState = {}, scheduler = {}) {
         completesAt: startedAt + DISTANT_SCHOOL_DROP_DURATION_MS
       });
       const distantSchools = Object.freeze([...state.distantSchools, school]);
-      const nextState = updateState({
-        distantSchools,
-        ...(slot === 1 ? { seattleSchools: SEATTLE_SCHOOL_BASELINE } : {})
-      });
+      const nextState = updateState({ distantSchools });
       const timer = scheduleTimeout(
         () => completeSchool(slot, generation),
         DISTANT_SCHOOL_DROP_DURATION_MS
@@ -417,7 +429,12 @@ export function createSharedState(initialState = {}, scheduler = {}) {
       state: updateState({
       distantSchools: Object.freeze(state.distantSchools.slice(0, -1)),
       ...(school.phase === "completed"
-        ? { seattleSchools: Math.max(0, (Number(state.seattleSchools) || 0) - 1) }
+        ? {
+            seattleSchools: Math.max(
+              SEATTLE_SCHOOL_BASELINE,
+              (Number(state.seattleSchools) || 0) - 1
+            )
+          }
         : {})
       })
     });
@@ -562,6 +579,14 @@ function validateStatePatch(value, currentState) {
   )) {
     return "operationCost must be a finite non-negative number.";
   }
+  if ("overrideRaised" in value && (
+    typeof value.overrideRaised !== "number"
+      || !Number.isFinite(value.overrideRaised)
+      || value.overrideRaised < 0
+      || value.overrideRaised > MAX_RAISED
+  )) {
+    return "overrideRaised must be a finite non-negative number within the allowed range.";
+  }
 
   const raised = "raised" in value ? value.raised : currentState.raised;
   const goal = "goal" in value ? value.goal : currentState.goal;
@@ -574,7 +599,7 @@ function validateStatePatch(value, currentState) {
     return "goal must be a finite number within the allowed range.";
   }
   if (raised > deriveSliderMaximum(goal)) {
-    return "raised must be no more than 200% of goal.";
+    return "raised must be no more than 120% of goal.";
   }
   return null;
 }
@@ -605,9 +630,9 @@ function validateCommand(value) {
       typeof value.ratio !== "number"
       || !Number.isFinite(value.ratio)
       || value.ratio < 0
-      || value.ratio > 2
+      || value.ratio > MAX_PROGRESS_RATIO
     )) {
-    return "ratio must be a finite number from 0 through 2.";
+    return `ratio must be a finite number from 0 through ${MAX_PROGRESS_RATIO}.`;
   }
   if (value.type === "state.toggle"
     && !BOOLEAN_STATE_FIELDS.has(value.field)) {
@@ -858,6 +883,9 @@ export function createServer(rootDirectory, {
         ? { type: parsed.value.type }
         : { type: parsed.value.type, id: actionId });
       let actionState = sharedState.getState();
+      if (parsed.value.type === "total.drop") {
+        actionState = sharedState.update({ totalBoxVisible: true });
+      }
       if (parsed.value.type === "school.add" || parsed.value.type === "school.remove") {
         const schoolMutation = sharedState.recordSchoolAction(parsed.value.type);
         if (!schoolMutation.changed) {

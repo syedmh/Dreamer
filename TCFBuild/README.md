@@ -1,20 +1,24 @@
 # TCF Fundraiser Progress Experience
 
-A dependency-free, event-ready 16:9 visualization that constructs an original red-brick school as fundraising advances from 0% to 100%. From 100% to 125%, two rows of students arrive while a hillside swing set grows into a finished playground. From 125% to 135%, a long conventional yellow school bus facing right arrives in the lower-left, completing the campus at 135%.
+A dependency-free, event-ready 16:9 visualization with six fundraising milestones: 20% completes the first school level; 40% completes the second level and swings; 60% adds the school bus; 80% completes the school; 100% raises the Pakistan flag and completes the first student row; and 120% completes the full campus.
 
 A transparent blueprint of the completed school remains visible behind the construction until the fundraising goal is reached, illustrating what incoming donations will complete.
 
 The two student rows alternate the local `Boy.png` and `Girl.png` artwork. These production assets are served only on the display surface and are copied into `dist` by `build.bat`.
 
-The visible summary card reads “Together We Build” and shows dashboard-controlled Seattle Schools and Operation Cost values. The original raised/goal progress remains available on the dashboard and continues to drive the school animation, but its display card is hidden.
+The compact summary card reads “Seattle Schools” and presents the dashboard-controlled school count in large type. The dashboard can show or hide the entire card. The original raised/goal progress remains available on the dashboard and continues to drive the school animation, but its display card is hidden.
 
 The control dashboard includes a live 16:9 preview of the actual display server. The preview resolves the configured display port at runtime, so it also works when custom display and control ports are used.
 
 The dashboard Celebration control combines night mode, continuous fireworks, student thank-you bubbles, and a special five-second TCF firework. Stopping Celebration returns those three ongoing modes to their inactive state.
 
-The dashboard can disable or re-enable all display keyboard shortcuts. Dashboard controls remain active while display keypress handling is disabled.
+Display keyboard shortcuts start disabled. Thank-you bubbles also start hidden. The dashboard can enable or disable keyboard controls at any time, and dashboard controls remain active while display keypress handling is disabled.
 
-The first distant-school drop initializes Seattle Schools to 47. When each 6.5-second drop finishes, the shared count increases by one. Removing a completed dropped school decreases the count by one; removing a school before its landing completes cancels its pending increment.
+The dashboard can drop a large live fundraising-total box into the center of the display. It continues a gentle drop-and-bounce motion while visible, with glowing green-and-white bulbs inspired by the Pakistan flag around the full border. Separate dashboard controls can hide or show the box without replaying the entrance.
+
+The center box displays Override Raised Amount. Normal fundraiser progress changes copy Raised into Override so both move together. The **Ultimate Total Override** group can then replace only the center-box total: check **Edit override**, enter the value, and select **Apply Override**. Applying an override does not change Raised, Goal, percentage milestones, or scene progress.
+
+Up to ten distant schools can be dropped. The Seattle Schools counter starts at 47 and increases when each 6.5-second drop finishes, reaching 57 when all schools have landed. Removing a completed school decreases the count; removing one before its landing completes cancels its pending increment.
 
 The four `Building*.jpg` files are local-only visual references. The webpage does not load, embed, copy, display, or redistribute them.
 
@@ -59,9 +63,9 @@ The display page intentionally contains no operator form. Use the separate contr
 Display-local keyboard controls:
 
 - `Space` — show or hide the keyboard legend
-- `S` — drop the next distant school onto the left hillside, up to seven
+- `S` — drop the next distant school onto the left hillside, up to ten
 - `X` — remove the most recently dropped distant school
-- `D` — start or pause the server-driven 144-second demo (125% occurs at 90 seconds, the campus is complete at 97.2 seconds, and 200% occurs at 144 seconds)
+- `D` — start or pause the server-driven 86.4-second demo, which finishes at the 120% fundraising ceiling
 - `N` — switch between day and night
 - `O` — start or stop visible students clapping
 - `P` — show or hide student “Thank You” messages after the goal
@@ -77,23 +81,23 @@ Display-local keyboard controls:
 
 Fullscreen remains local to the display browser and is not remotely controlled.
 
-The distant-school controls use `/api/actions`, but the accepted action first mutates the authoritative `distantSchools` state. Each `S` press fills the next fixed hillside slot until all seven are present; `X` removes the most recently filled slot, and adding it again uses a new generation so every client replays the drop animation. Reconnecting clients resume a pending 6.5-second drop from its elapsed time or render an already completed school immediately.
+The distant-school controls use `/api/actions`, but the accepted action first mutates the authoritative `distantSchools` state. Each `S` press fills the next fixed hillside slot until all ten are present; `X` removes the most recently filled slot, and adding it again uses a new generation so every client replays the drop animation. Reconnecting clients resume a pending 6.5-second drop from its elapsed time or render an already completed school immediately.
 
 URL parameter `motion=auto|reduce|full` controls the display animation preference. The server is authoritative for live fundraiser and effect state.
 
 Valid, explicitly supplied `goal` and `raised` URL parameters are applied as a one-time authoritative initialization after the display receives its first server snapshot. The browser sends one absolute state patch containing only the fundraiser parameters that were explicitly supplied, renders the server response, and then follows normal revision ordering. Automatic SSE reconnects do not resend the initialization; reloading the page may initialize once again. A dashboard preview URL with no `goal` or `raised` parameter never initializes fundraiser state.
 
-Raised amounts are capped at 200% of the current goal across URL configuration, keyboard adjustments, the dashboard slider, demo playback, and the server API. The campus remains fully complete at 135%; amounts from 135% through 200% continue to display as additional fundraising progress. The dashboard and display retain whole-number progress copy while preserving precise amount and ratio calculations internally.
+Raised amounts are capped at 120% of the current goal across URL configuration, keyboard adjustments, dashboard controls, demo playback, and the server API. The campus is fully complete at the 120% ceiling. The dashboard and display retain whole-number progress copy while preserving precise amount and ratio calculations internally.
 
-The shared `PATCH /api/state` endpoint validates the merged raised/goal pair atomically. Values above 200% receive HTTP 400 with `{"error":"raised must be no more than 200% of goal."}` and do not change shared state or emit an SSE state update.
+The shared `PATCH /api/state` endpoint validates the merged raised/goal pair atomically. Values above 120% receive HTTP 400 with `{"error":"raised must be no more than 120% of goal."}` and do not change shared state or emit an SSE state update.
 
-Relative and toggle operations use strict `POST /api/commands` requests (`raised.add`, `raised.step`, `raised.setRatio`, `state.toggle`, and `celebration.toggle`) so simultaneous clients cannot lose updates. Raised commands clamp to 0–200% and stop demo playback. Clients cannot patch the server-owned `revision` or `distantSchools` fields, and a failed mutation is followed by an authoritative state refetch.
+Relative and toggle operations use strict `POST /api/commands` requests (`raised.add`, `raised.step`, `raised.setRatio`, `state.toggle`, and `celebration.toggle`) so simultaneous clients cannot lose updates. Raised commands clamp to 0–120% and stop demo playback. Clients cannot patch the server-owned `revision` or `distantSchools` fields, and a failed mutation is followed by an authoritative state refetch.
 
 SSE clients identify their role explicitly: the main display uses `role=presentation`, the embedded dashboard preview uses `role=preview`, and the dashboard uses `role=control`. Preview presence does not make one-time display actions ready; `/api/actions` requires a connected presentation display.
 
 Each listener accepts up to eight concurrent SSE clients for each supported role. Additional streams receive HTTP 503 with a short retry hint; disconnected, failed, or persistently backpressured clients are cleaned up so normal presentation, preview, and control usage remains available.
 
-The bus is rendered as one dependency-free SVG group. Its final scene bounds are `x=150..515`, `y=675..820`; full motion starts fully offscreen-left at offset `(-600,+25)` and follows cubic ease-out, while reduced motion keeps the bus at `translate(0 0)` and reveals it using linear opacity only. Once parked, the flat-roofed bus labeled “TCF School Bus” gently rolls forward and backward. The lower-left playground swing seats move independently; both idle animations stop when reduced motion is requested. The reveal remains exact at 0% bus visibility at 125% fundraising, 50% at 130%, and 100% at 135%.
+The bus is rendered as one dependency-free SVG group. Its final scene bounds are `x=150..515`, `y=675..820`; full motion starts fully offscreen-left at offset `(-600,+25)` and follows cubic ease-out, while reduced motion keeps the bus at `translate(0 0)` and reveals it using linear opacity only. Once parked, the flat-roofed bus labeled “TCF School Bus” gently rolls forward and backward. The lower-left playground swing seats move independently; both idle animations stop when reduced motion is requested. The bus reveal runs from 40% through 60% fundraising.
 
 Continuous mode distributes classic radial, ring, star, chrysanthemum, and willow bursts across safe left, center, upper, and right sky regions. It pauses while the page is hidden, resumes when visible, limits active effects, and automatically slows to single bursts when reduced motion is requested.
 
@@ -106,6 +110,57 @@ build.bat
 ```
 
 `run.bat` rebuilds and then launches `dist/server.mjs`, forwarding all arguments.
+
+## Release packaging
+
+Create validated Windows and macOS release ZIP archives under `artifacts`:
+
+```cmd
+package-release.bat 1.0.0
+```
+
+The version argument is optional and defaults to `1.0.0`. Packaging invokes
+`build.bat`, copies the exact 15-file application runtime into
+`app/generations/packaged`, adds the immutable updater, generated update policy,
+platform-specific launch instructions, and official Node.js v22.23.3 LTS
+runtimes, then validates that each archive contains no extra files. The policy
+records the latest Git commit affecting `TCFBuild` as the packaged base while
+marking the application bytes as a working-tree snapshot. Runtime downloads
+are cached under `artifacts\runtime-cache\v22.23.3` and verified against
+Node.js's official `SHASUMS256.txt` before every extraction.
+
+After extracting the Windows archive, run:
+
+```cmd
+setup-tcfbuild.bat --display-port=8080 --control-port=8081
+```
+
+After extracting the macOS archive, open Terminal in the extracted folder and
+run:
+
+```sh
+sh ./setup-tcfbuild.command --display-port=8080 --control-port=8081
+```
+
+No Node.js installation or `PATH` configuration is required. Each archive
+bundles Node.js for both supported architectures, and the launcher selects the
+correct embedded runtime. The macOS launcher restores executable permission on
+its selected runtime, so the `sh` command remains supported even when
+Windows-created ZIP archives do not preserve executable permissions.
+
+Before starting the local server, the immutable updater asks GitHub for the
+latest commit on `main` that affects `TCFBuild`. An equal commit is a strict
+no-op, preserving the packaged working-tree snapshot. A different commit is
+downloaded as a complete 15-file generation, checked against Git tree sizes and
+blob identities, validated for PNG/text/JavaScript correctness, and activated
+only after every file passes. Prior generations remain available for fallback.
+
+Network, authentication, rate-limit, timeout, validation, and filesystem
+failures print a sanitized warning and start the last known-good local
+generation. Offline startup therefore continues to work. `GITHUB_TOKEN` is
+optional for private-repository access or higher API rate limits; use a
+read-only token scoped only to repository contents. It is sent only to
+`api.github.com`, never to `raw.githubusercontent.com`, and is not logged.
 
 ## Automated tests
 
