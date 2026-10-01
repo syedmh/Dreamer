@@ -2,6 +2,27 @@
 
 A dependency-free, event-ready 16:9 visualization with six fundraising milestones: 20% completes the first school level; 40% completes the second level and swings; 60% adds the school bus; 80% completes the school; 100% raises the Pakistan flag and completes the first student row; and 120% completes the full campus.
 
+## Dashboard stage buttons
+
+The dashboard labels its seven quick-progress presets **Stage 0** through
+**Stage 6**. Selecting a stage sets Raised to the corresponding percentage of
+the current Goal and stops demo playback. The underlying percentages remain
+available in each button's tooltip and accessible label.
+
+| Dashboard button | Goal percentage | Result at that exact stage |
+|---|---:|---|
+| **Stage 0** | 0% | Resets fundraiser progress. No school blocks, swings, bus, students, flag, or playground enhancements are revealed. |
+| **Stage 1** | 20% | Reveals the first major school level: 160 of 308 blocks. This is the starting threshold for the swing-set phase. |
+| **Stage 2** | 40% | Reveals 226 of 308 school blocks and the complete swing set. This is the starting threshold for the bus entrance. |
+| **Stage 3** | 60% | Reveals 267 of 308 school blocks and completes the school-bus arrival. |
+| **Stage 4** | 80% | Completes all 308 school blocks and architectural finishes. This is the starting threshold for students to appear. |
+| **Stage 5** | 100% | Marks the goal achieved, raises the Pakistan flag, shows the goal message, triggers the goal celebration, and reveals 12 of 24 students. This starts the enhanced-playground phase. |
+| **Stage 6** | 120% | Completes the over-goal campus with all 24 students and all swing/playground enhancements visible. |
+
+Progress is continuous between presets. The swing set reveals from 20% through
+40%, the bus enters from 40% through 60%, students appear from 80% through
+120%, and the playground enhancements reveal from 100% through 120%.
+
 A transparent blueprint of the completed school remains visible behind the construction until the fundraising goal is reached, illustrating what incoming donations will complete.
 
 The two student rows alternate the local `Boy.png` and `Girl.png` artwork. These production assets are served only on the display surface and are copied into `dist` by `build.bat`.
@@ -10,15 +31,42 @@ The compact summary card reads “Seattle Schools” and presents the dashboard-
 
 The control dashboard includes a live 16:9 preview of the actual display server. The preview resolves the configured display port at runtime, so it also works when custom display and control ports are used.
 
+The display starts in a fitted 16:9 layout. Enable **Wide screen / fill monitor** under Display state to expand the scene canvas to an ultrawide or other non-16:9 monitor without stretching or cropping the school and other scene elements. The extended hills include additional trees and playground equipment while the standard 16:9 composition remains unchanged; disable the option to restore the fitted layout. The selection is shared live with every connected display.
+
 The dashboard Celebration control combines night mode, continuous fireworks, student thank-you bubbles, and a special five-second TCF firework. Stopping Celebration returns those three ongoing modes to their inactive state.
 
-Display keyboard shortcuts start disabled. Thank-you bubbles also start hidden. The dashboard can enable or disable keyboard controls at any time, and dashboard controls remain active while display keypress handling is disabled.
+Display keyboard shortcuts start disabled. Thank-you bubbles also start hidden. The keyboard-control state and dashboard handler remain implemented, but the individual **Enable keyboard controls** button is currently hidden. Dashboard controls remain active while display keypress handling is disabled.
 
 The dashboard can drop a large live fundraising-total box into the center of the display. It continues a gentle drop-and-bounce motion while visible, with glowing green-and-white bulbs inspired by the Pakistan flag around the full border. Separate dashboard controls can hide or show the box without replaying the entrance.
 
 The center box displays Override Raised Amount. Normal fundraiser progress changes copy Raised into Override so both move together. The **Ultimate Total Override** group can then replace only the center-box total: check **Edit override**, enter the value, and select **Apply Override**. Applying an override does not change Raised, Goal, percentage milestones, or scene progress.
 
 Up to ten distant schools can be dropped. The Seattle Schools counter starts at 47 and increases when each 6.5-second drop finishes, reaching 57 when all schools have landed. Removing a completed school decreases the count; removing one before its landing completes cancels its pending increment.
+
+## Hidden dashboard buttons
+
+The following 13 buttons remain implemented and wired, but currently have the
+HTML `hidden` attribute so they do not appear on the operator dashboard:
+
+| Hidden button | Implemented action | Current visible or keyboard route |
+|---|---|---|
+| **Apply Raised and Goal** | Validates and submits manually edited Raised and Goal values, then stops demo playback. | The hidden submit remains available when the progress form is submitted with Enter; Stage buttons provide the normal quick-progress path. |
+| **Start demo / Pause demo** | Starts or pauses the server-driven 0–120% demonstration. | `D`, when display keyboard handling is enabled. |
+| **Switch to night / Switch to day** | Toggles the display between daytime and nighttime. | **Start celebration** enables night as part of the combined celebration; `N` toggles it independently when keyboard handling is enabled. |
+| **Start clapping / Stop clapping** | Toggles the visible students' clapping animation. | `O`, when display keyboard handling is enabled. |
+| **Show thank-you bubbles / Hide thank-you bubbles** | Toggles student thank-you messages after the goal. | **Start celebration** enables them as part of the combined celebration; `P` toggles them independently when keyboard handling is enabled. |
+| **Start continuous fireworks / Stop continuous fireworks** | Toggles recurring randomized fireworks. | **Start celebration** enables them as part of the combined celebration; `W` toggles them independently when keyboard handling is enabled. |
+| **Show key legend / Hide key legend** | Shows or hides the display keyboard-shortcut legend. | `Space`, when display keyboard handling is enabled. |
+| **Enable keyboard controls / Disable keyboard controls** | Enables or disables display-local shortcut processing. | No visible dashboard replacement is currently shown; the shared state and handler remain implemented. |
+| **Add kite** | Adds one kite to the display sky. | `K`, when display keyboard handling is enabled. |
+| **Clear kites** | Removes every kite from the sky. | `L`, when display keyboard handling is enabled. |
+| **Launch firework** | Launches one manual firework. | `Q`, when display keyboard handling is enabled. |
+| **Clear fireworks** | Removes all active fireworks. | No visible dashboard replacement is currently shown. |
+| **Drop Total Box** | Replays the large center total-box drop animation. | **Show Total Box** controls persistent visibility but does not expose this one-time replay action. |
+
+The **Apply school count** button is not itself marked hidden. Its entire
+Seattle Schools form starts hidden and is shown by the visible **Show Seattle
+Schools** control.
 
 The four `Building*.jpg` files are local-only visual references. The webpage does not load, embed, copy, display, or redistribute them.
 
@@ -58,7 +106,7 @@ If either listener cannot bind, the process closes the other listener and exits 
 
 ## Display controls
 
-The display page intentionally contains no operator form. Use the separate control dashboard for Raised, Goal, quick progress, demo, day/night, clapping, thank-you bubbles, kites, and fireworks.
+The display page intentionally contains no operator form. Use the separate control dashboard for Raised, Goal, Stage quick progress, widescreen mode, the combined Celebration mode, Seattle Schools, the total box, and distant-school actions. Additional demo, day/night, clapping, thank-you, kite, firework, and keyboard controls remain wired but are hidden as documented above.
 
 Display-local keyboard controls:
 

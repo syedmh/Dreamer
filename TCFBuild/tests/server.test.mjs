@@ -15,6 +15,30 @@ import {
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
+test("wide-screen mode defaults off and accepts boolean state patches", async () => {
+  await withServers(async ({ controlBase }) => {
+    let response = await fetch(`${controlBase}/api/state`);
+    let state = await response.json();
+    assert.equal(state.wideScreen, false);
+
+    response = await fetch(`${controlBase}/api/state`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ wideScreen: true })
+    });
+    assert.equal(response.status, 200);
+    state = await response.json();
+    assert.equal(state.wideScreen, true);
+
+    response = await fetch(`${controlBase}/api/state`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ wideScreen: "yes" })
+    });
+    assert.equal(response.status, 400);
+  });
+});
+
 function adjacentFloat(value, direction) {
   const storage = new ArrayBuffer(8);
   const view = new DataView(storage);

@@ -41,6 +41,11 @@ body { display: grid; place-items: center; }
   box-shadow: 0 0 80px rgb(0 0 0 / .35);
 }
 
+#fundraiser[data-display-mode="wide"] .stage {
+  width: 100vw;
+  height: 100vh;
+}
+
 .stage::after {
   content: "";
   position: absolute;
@@ -165,22 +170,22 @@ body { display: grid; place-items: center; }
   border-radius: inherit;
   background-image:
     radial-gradient(circle at 25% 50%, #fff 0 17%, #dfffea 18% 25%, transparent 27%),
-    radial-gradient(circle at 75% 50%, #fff 0 17%, #dfffea 18% 25%, transparent 27%),
-    radial-gradient(circle at 25% 50%, #fff 0 17%, #dfffea 18% 25%, transparent 27%),
+    radial-gradient(circle at 75% 50%, #01411c 0 17%, #00a651 18% 25%, transparent 27%),
+    radial-gradient(circle at 25% 50%, #01411c 0 17%, #00a651 18% 25%, transparent 27%),
     radial-gradient(circle at 75% 50%, #fff 0 17%, #dfffea 18% 25%, transparent 27%),
     radial-gradient(circle at 50% 25%, #fff 0 17%, #dfffea 18% 25%, transparent 27%),
-    radial-gradient(circle at 50% 75%, #fff 0 17%, #dfffea 18% 25%, transparent 27%),
-    radial-gradient(circle at 50% 25%, #fff 0 17%, #dfffea 18% 25%, transparent 27%),
+    radial-gradient(circle at 50% 75%, #01411c 0 17%, #00a651 18% 25%, transparent 27%),
+    radial-gradient(circle at 50% 25%, #01411c 0 17%, #00a651 18% 25%, transparent 27%),
     radial-gradient(circle at 50% 75%, #fff 0 17%, #dfffea 18% 25%, transparent 27%);
   background-position:
-    top left,
-    top left,
-    bottom left,
-    bottom left,
-    top left,
-    top left,
-    top right,
-    top right;
+    0 0,
+    0 0,
+    0 100%,
+    0 100%,
+    0 0,
+    0 0,
+    100% 0,
+    100% 0;
   background-repeat:
     repeat-x,
     repeat-x,
@@ -199,6 +204,7 @@ body { display: grid; place-items: center; }
     var(--bulb-depth) var(--bulb-step),
     var(--bulb-depth) var(--bulb-step),
     var(--bulb-depth) var(--bulb-step);
+  animation: total-bulbs-run 1.4s linear infinite;
 }
 
 .total-box-inner {
@@ -255,6 +261,20 @@ body { display: grid; place-items: center; }
   }
   50% {
     transform: translate(-50%, -57%) rotate(.45deg);
+  }
+}
+
+@keyframes total-bulbs-run {
+  to {
+    background-position:
+      var(--bulb-step) 0,
+      var(--bulb-step) 0,
+      calc(-1 * var(--bulb-step)) 100%,
+      calc(-1 * var(--bulb-step)) 100%,
+      0 calc(-1 * var(--bulb-step)),
+      0 calc(-1 * var(--bulb-step)),
+      100% var(--bulb-step),
+      100% var(--bulb-step);
   }
 }
 

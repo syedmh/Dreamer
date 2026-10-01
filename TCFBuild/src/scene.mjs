@@ -78,12 +78,7 @@ const CAMPUS_GEOMETRY = deepFreeze({
         { x1: 113, y1: 581, x2: 134, y2: 576 },
         { x1: 115, y1: 603, x2: 138, y2: 598 }
       ]
-    },
-    pennants: [
-      { x: 65, y: 511, color: "#FFD45F" },
-      { x: 86, y: 506, color: "#FFF7DF" },
-      { x: 107, y: 500, color: "#D54843" }
-    ]
+    }
   },
   distantSchools: [
     {

@@ -18,6 +18,7 @@ const buildSummaryCard = document.querySelector("#build-summary-card");
 const seattleSchoolsDisplay = document.querySelector("#seattle-schools-display");
 const totalBox = document.querySelector("#total-box");
 const totalBoxAmount = document.querySelector("#total-box-amount");
+const schoolScene = root.querySelector("#school-scene");
 const money = createCurrencyFormatter(config.locale, config.currency);
 
 let state = {
@@ -35,6 +36,7 @@ let state = {
   totalBoxVisible: false,
   keyboardLegendVisible: false,
   keypressEnabled: false,
+  wideScreen: false,
   distantSchools: []
 };
 let goal = state.goal;
@@ -58,6 +60,37 @@ const MAX_EXECUTED_ACTION_IDS = 256;
 const mediaReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
 const reducedMotion = () => config.motion === "reduce"
   || (config.motion === "auto" && mediaReduced.matches);
+const BASE_SCENE_WIDTH = 1600;
+const BASE_SCENE_HEIGHT = 900;
+
+function formatViewBoxNumber(value) {
+  return String(Number(value.toFixed(3)));
+}
+
+function deriveDisplayViewBox(wideScreen) {
+  if (!wideScreen) return "0 0 1600 900";
+  const viewportWidth = Math.max(1, Number(window.innerWidth) || BASE_SCENE_WIDTH);
+  const viewportHeight = Math.max(1, Number(window.innerHeight) || BASE_SCENE_HEIGHT);
+  const viewportAspect = viewportWidth / viewportHeight;
+  const sceneAspect = BASE_SCENE_WIDTH / BASE_SCENE_HEIGHT;
+
+  if (viewportAspect >= sceneAspect) {
+    const width = BASE_SCENE_HEIGHT * viewportAspect;
+    const x = (BASE_SCENE_WIDTH - width) / 2;
+    return `${formatViewBoxNumber(x)} 0 ${formatViewBoxNumber(width)} 900`;
+  }
+
+  const height = BASE_SCENE_WIDTH / viewportAspect;
+  const y = BASE_SCENE_HEIGHT - height;
+  return `0 ${formatViewBoxNumber(y)} 1600 ${formatViewBoxNumber(height)}`;
+}
+
+function synchronizeDisplayMode() {
+  const wideScreen = Boolean(state.wideScreen);
+  root.dataset.displayMode = wideScreen ? "wide" : "standard";
+  schoolScene?.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  schoolScene?.setAttribute("viewBox", deriveDisplayViewBox(wideScreen));
+}
 
 function announce(message) {
   announcer.textContent = message;
@@ -160,6 +193,7 @@ function applyState(nextState) {
   view.setNightMode(state.nightMode);
   view.setStudentsClapping(state.studentsClapping);
   view.setThankYouVisible(state.thankYouVisible);
+  synchronizeDisplayMode();
   keyboardHint.hidden = !state.keyboardLegendVisible;
   if (buildSummaryCard) {
     buildSummaryCard.classList.toggle(
@@ -188,6 +222,10 @@ function applyState(nextState) {
   scheduleFrame();
   return true;
 }
+
+window.addEventListener("resize", () => {
+  if (state.wideScreen) synchronizeDisplayMode();
+});
 
 async function requestJson(url, options) {
   const response = await fetch(url, {

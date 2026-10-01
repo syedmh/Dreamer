@@ -22,6 +22,7 @@ const celebrationToggle = document.querySelector("#celebration-toggle");
 const amountEditToggle = document.querySelector("#edit-amounts-toggle");
 const overrideEditToggle = document.querySelector("#edit-override-toggle");
 const applyOverrideButton = document.querySelector("#apply-override-button");
+const wideScreenToggle = document.querySelector("#wide-screen-toggle");
 const money = createCurrencyFormatter("en-US", "USD");
 
 const toggles = {
@@ -108,6 +109,7 @@ function synchronizeOverrideEditState() {
 
 function synchronizeToggles() {
   if (!state) return;
+  if (wideScreenToggle) wideScreenToggle.checked = Boolean(state.wideScreen);
   const labels = {
     demoActive: state.demoActive ? "Pause demo" : "Start demo",
     nightMode: state.nightMode ? "Switch to day" : "Switch to night",
@@ -453,6 +455,21 @@ for (const [field, button] of Object.entries(toggles)) {
     );
   });
 }
+
+wideScreenToggle?.addEventListener("change", () => {
+  if (!state) {
+    wideScreenToggle.checked = false;
+    setStatus("Wait for the initial live state before changing display mode.", true);
+    return;
+  }
+  mutate(
+    "/api/state",
+    { wideScreen: Boolean(wideScreenToggle.checked) },
+    wideScreenToggle.checked
+      ? "Wide screen mode enabled."
+      : "Fitted 16:9 mode enabled."
+  );
+});
 
 celebrationToggle?.addEventListener("click", async () => {
   if (!state) {

@@ -55,7 +55,8 @@ const BOOLEAN_STATE_FIELDS = new Set([
   "buildSummaryVisible",
   "totalBoxVisible",
   "keyboardLegendVisible",
-  "keypressEnabled"
+  "keypressEnabled",
+  "wideScreen"
 ]);
 const ALLOWED_STATE_FIELDS = new Set([
   "raised",
@@ -165,6 +166,7 @@ export function createSharedState(initialState = {}, scheduler = {}) {
     totalBoxVisible: false,
     keyboardLegendVisible: false,
     keypressEnabled: false,
+    wideScreen: false,
     ...normalizedInitialState,
     distantSchools: Object.freeze([])
   });

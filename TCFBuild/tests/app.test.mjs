@@ -116,7 +116,9 @@ async function withAppHarness({
   fetchImplementation,
   locationSearch,
   mediaMatches = false,
-  startedAt = 2000
+  startedAt = 2000,
+  viewportHeight = 900,
+  viewportWidth = 1600
 }, run) {
   const originalGlobals = new Map();
   const setGlobal = (name, value) => {
@@ -219,6 +221,7 @@ async function withAppHarness({
     buildSummaryVisible: true,
     keyboardLegendVisible: false,
     keypressEnabled: true,
+    wideScreen: false,
     distantSchools: []
   };
   const defaultFetch = async (url, options = {}) => {
@@ -265,6 +268,8 @@ async function withAppHarness({
   setGlobal("fetch", fetchImplementation ?? defaultFetch);
   setGlobal("window", {
     addEventListener() {},
+    innerHeight: viewportHeight,
+    innerWidth: viewportWidth,
     location: { search: locationSearch },
     matchMedia: () => mediaQueryList
   });
@@ -381,6 +386,168 @@ test("pointer-close focus layer is contained, above stage content, and pointer-t
     activeRule[1],
     /box-shadow:/,
     "pointer-close state must not replace or interpolate the base stage shadow"
+  );
+});
+
+test("display switches between fitted 16:9 and wide monitor layouts", async () => {
+  const [css, html] = await Promise.all([
+    readFile(new URL("../styles.css", import.meta.url), "utf8"),
+    readFile(new URL("../index.html", import.meta.url), "utf8")
+  ]);
+  const stageRule = css.match(/^\.stage\s*\{([^}]*)\}/m);
+  assert.ok(stageRule, "stage rule must exist");
+  assert.match(stageRule[1], /width:\s*min\(100vw, calc\(100vh \* 16 \/ 9\)\);/);
+  assert.match(stageRule[1], /height:\s*min\(100vh, calc\(100vw \* 9 \/ 16\)\);/);
+  assert.match(
+    css,
+    /#fundraiser\[data-display-mode="wide"\] \.stage\s*\{[^}]*width:\s*100vw;[^}]*height:\s*100vh;/s
+  );
+  assert.match(
+    html,
+    /<svg id="school-scene"[^>]*preserveAspectRatio="xMidYMid meet"/s,
+    "the display should default to the fitted 16:9 scene"
+  );
+});
+
+test("authoritative display state switches wide-screen rendering live", async () => {
+  let events;
+  class FakeEventSource {
+    constructor() {
+      this.listeners = new Map();
+      events = this;
+    }
+
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+
+    emit(type, value) {
+      this.listeners.get(type)?.({ data: JSON.stringify(value) });
+    }
+  }
+
+  await withAppHarness(
+    {
+      eventSourceClass: FakeEventSource,
+      locationSearch: "?motion=reduce",
+      viewportHeight: 1440,
+      viewportWidth: 3440
+    },
+    async ({ createdElements, root, rootElements }) => {
+      const sceneElement = rootElements.get("#school-scene");
+      events.emit("snapshot", {
+        state: {
+          revision: 1,
+          raised: 0,
+          goal: 100000,
+          wideScreen: true,
+          distantSchools: []
+        }
+      });
+      assert.equal(root.dataset.displayMode, "wide");
+      assert.equal(
+        sceneElement.attributes.get("preserveAspectRatio"),
+        "xMidYMid meet"
+      );
+      assert.equal(sceneElement.attributes.get("viewBox"), "-275 0 2150 900");
+      const skyRects = createdElements.filter(
+        (element) => element.tagName === "rect"
+          && element.attributes.get("fill") === "url(#sky-gradient)"
+      );
+      assert.equal(skyRects.length, 1, "wide mode should use one continuous sky");
+      assert.equal(skyRects[0].attributes.get("x"), "-4000");
+      assert.equal(skyRects[0].attributes.get("y"), "-4000");
+      assert.ok(
+        createdElements.some(
+          (element) => element.tagName === "path"
+            && element.attributes.get("d")
+              === "M-4000 435 H0 Q210 355 410 428 T810 418 T1210 402 T1600 415 H5600 V1800 H-4000Z"
+        ),
+        "the expanded far hill should continue the original hill curve"
+      );
+      const wideMountainRanges = createdElements.filter(
+        (element) => (element.attributes.get("class") ?? "")
+          .split(/\s+/)
+          .includes("wide-mountains")
+      );
+      assert.deepEqual(
+        wideMountainRanges.map((range) => range.attributes.get("data-side")),
+        ["left", "right"]
+      );
+      assert.equal(
+        createdElements.filter(
+          (element) => element.attributes.get("class") === "wide-mountain"
+        ).length,
+        4
+      );
+      assert.equal(
+        createdElements.filter(
+          (element) => element.attributes.get("class") === "wide-mountain__snow"
+        ).length,
+        4
+      );
+      const wideTrees = createdElements.filter(
+        (element) => element.attributes.get("class") === "tree tree--wide"
+      );
+      assert.deepEqual(
+        wideTrees.map((tree) => tree.attributes.get("transform")),
+        [
+          "translate(-190 395) scale(0.9)",
+          "translate(-70 460) scale(0.65)",
+          "translate(1670 415) scale(0.85)",
+          "translate(1810 465) scale(0.65)"
+        ]
+      );
+      const widePlaygroundItems = createdElements.filter(
+        (element) => element.attributes.get("class") === "wide-playground__item"
+      );
+      const widePlaygroundLayer = createdElements.find(
+        (element) => element.attributes.get("class") === "wide-playground"
+      );
+      assert.ok(
+        createdElements.indexOf(widePlaygroundLayer)
+          > Math.max(...wideTrees.map((tree) => createdElements.indexOf(tree))),
+        "wide playground equipment should render in front of the landscape trees"
+      );
+      assert.deepEqual(
+        widePlaygroundItems.map((item) => ({
+          kind: item.attributes.get("data-kind"),
+          transform: item.attributes.get("transform")
+        })),
+        [
+          {
+            kind: "slide",
+            transform: "translate(-290 480) scale(0.78)"
+          },
+          {
+            kind: "bench",
+            transform: "translate(1640 640) scale(0.72)"
+          },
+          {
+            kind: "bench",
+            transform: "translate(1765 670) scale(0.72)"
+          },
+          {
+            kind: "seesaw",
+            transform: "translate(1610 505) scale(0.85)"
+          },
+          {
+            kind: "climbing-frame",
+            transform: "translate(1745 520) scale(0.75)"
+          }
+        ]
+      );
+      events.emit("state", {
+        revision: 2,
+        wideScreen: false
+      });
+      assert.equal(root.dataset.displayMode, "standard");
+      assert.equal(
+        sceneElement.attributes.get("preserveAspectRatio"),
+        "xMidYMid meet"
+      );
+      assert.equal(sceneElement.attributes.get("viewBox"), "0 0 1600 900");
+    }
   );
 });
 
@@ -2781,6 +2948,23 @@ test("display and dashboard keep their current separate layout contracts", async
   assert.doesNotMatch(displayHtml, /operator-panel|progress-form/);
   assert.match(controlHtml, /id="progress-form"/);
   assert.match(controlHtml, /id="raised-slider"/);
+  for (const [stage, ratio, percent] of [
+    [0, "0", 0],
+    [1, ".2", 20],
+    [2, ".4", 40],
+    [3, ".6", 60],
+    [4, ".8", 80],
+    [5, "1", 100],
+    [6, "1.2", 120]
+  ]) {
+    assert.match(
+      controlHtml,
+      new RegExp(
+        `data-progress-set="${ratio.replace(".", "\\.")}"[^>]*`
+          + `title="Set ${percent}%"[^>]*>Stage ${stage}<`
+      )
+    );
+  }
 
   const hint = css.match(/^\.keyboard-hint\s*\{([^}]*)\}/m)?.[1];
   assert.ok(hint);

@@ -18,6 +18,12 @@ const VIEWBOX = Object.freeze({
   width: 1600,
   height: 900
 });
+const WIDE_LANDSCAPE_TREES = Object.freeze([
+  Object.freeze({ x: -190, y: 545, scale: .9, trunkHeight: 90 }),
+  Object.freeze({ x: -70, y: 610, scale: .65, trunkHeight: 95 }),
+  Object.freeze({ x: 1670, y: 565, scale: .85, trunkHeight: 90 }),
+  Object.freeze({ x: 1810, y: 615, scale: .65, trunkHeight: 95 })
+]);
 const KITE_PALETTES = Object.freeze([
   Object.freeze({
     body: "#FFD45F",
@@ -288,30 +294,33 @@ function addDefinitions(root) {
   const defs = svg("defs", {}, root);
   const sky = svg("linearGradient", {
     id: "sky-gradient",
+    gradientUnits: "userSpaceOnUse",
     x1: 0,
     y1: 0,
     x2: 0,
-    y2: 1
+    y2: 900
   }, defs);
   svg("stop", { offset: "0%", "stop-color": "#68C9F2" }, sky);
   svg("stop", { offset: "100%", "stop-color": "#D9F3FA" }, sky);
 
   const nightSky = svg("linearGradient", {
     id: "night-sky-gradient",
+    gradientUnits: "userSpaceOnUse",
     x1: 0,
     y1: 0,
     x2: 0,
-    y2: 1
+    y2: 900
   }, defs);
   svg("stop", { offset: "0%", "stop-color": "#07142F" }, nightSky);
   svg("stop", { offset: "100%", "stop-color": "#28476F" }, nightSky);
 
   const grass = svg("linearGradient", {
     id: "grass-gradient",
+    gradientUnits: "userSpaceOnUse",
     x1: 0,
-    y1: 0,
+    y1: 440,
     x2: 0,
-    y2: 1
+    y2: 900
   }, defs);
   svg("stop", { offset: "0%", "stop-color": "#2FAF68" }, grass);
   svg("stop", { offset: "100%", "stop-color": "#078447" }, grass);
@@ -622,14 +631,18 @@ function createDistantSchoolController(root, dataRoot, slots) {
 function addLandscape(root, trees, distantSchools, dataRoot) {
   const landscape = svg("g", { class: "landscape" }, root);
   svg("rect", {
-    width: 1600,
-    height: 900,
+    x: -4000,
+    y: -4000,
+    width: 9600,
+    height: 5800,
     fill: "url(#sky-gradient)"
   }, landscape);
   svg("rect", {
     class: "night-sky",
-    width: 1600,
-    height: 900,
+    x: -4000,
+    y: -4000,
+    width: 9600,
+    height: 5800,
     fill: "url(#night-sky-gradient)"
   }, landscape);
 
@@ -702,6 +715,8 @@ function addLandscape(root, trees, distantSchools, dataRoot) {
   }, sun);
   sunTcf.textContent = "TCF";
 
+  addWideMountains(landscape);
+
   const clouds = [
     [280, 190, 1.15, .84, false, -450, 1500, 34, -8],
     [1160, 270, .75, .60, true, -1350, 620, 48, -31],
@@ -739,11 +754,11 @@ function addLandscape(root, trees, distantSchools, dataRoot) {
   }
 
   svg("path", {
-    d: "M0 435 Q210 355 410 428 T810 418 T1210 402 T1600 415 V900 H0Z",
+    d: "M-4000 435 H0 Q210 355 410 428 T810 418 T1210 402 T1600 415 H5600 V1800 H-4000Z",
     fill: "#57BE74"
   }, landscape);
   svg("path", {
-    d: "M0 515 Q230 440 435 511 T845 498 T1240 482 T1600 500 V900 H0Z",
+    d: "M-4000 515 H0 Q230 440 435 511 T845 498 T1240 482 T1600 500 H5600 V1800 H-4000Z",
     fill: "url(#grass-gradient)"
   }, landscape);
 
@@ -762,9 +777,13 @@ function addLandscape(root, trees, distantSchools, dataRoot) {
     raisedDistantSchools
   );
 
-  for (const { x, y, scale, trunkHeight } of trees) {
+  const landscapeTrees = [
+    ...trees.map((tree) => ({ ...tree, wideOnly: false })),
+    ...WIDE_LANDSCAPE_TREES.map((tree) => ({ ...tree, wideOnly: true }))
+  ];
+  for (const { x, y, scale, trunkHeight, wideOnly } of landscapeTrees) {
     const tree = svg("g", {
-      class: "tree",
+      class: wideOnly ? "tree tree--wide" : "tree",
       transform: `translate(${x} ${y - CAMPUS_RAISE_Y}) scale(${scale})`
     }, landscape);
     svg("rect", {
@@ -780,16 +799,295 @@ function addLandscape(root, trees, distantSchools, dataRoot) {
     svg("circle", { cx: 34, cy: 20, r: 38, fill: "#0A713E" }, tree);
   }
 
+  addWidePlayground(landscape);
+
   svg("rect", {
     class: "night-ground-shade",
-    x: 0,
+    x: -4000,
     y: 280,
-    width: 1600,
-    height: 620,
+    width: 9600,
+    height: 1520,
     fill: "#07142F"
   }, landscape);
 
   return distantSchoolController;
+}
+
+function addWideMountains(root) {
+  const mountainRanges = [
+    {
+      side: "left",
+      peaks: [
+        {
+          mountain: "M-620 472 L-410 245 L-205 472 Z",
+          snow: "M-474 315 L-410 245 L-346 315 L-370 302 L-392 323 L-415 298 L-438 320 Z",
+          fill: "#7195A2",
+          ridge: "M-410 245 L-334 472"
+        },
+        {
+          mountain: "M-390 472 L-205 300 L-8 472 Z",
+          snow: "M-262 353 L-205 300 L-144 354 L-166 346 L-185 364 L-205 342 L-225 360 Z",
+          fill: "#557F78",
+          ridge: "M-205 300 L-126 472"
+        }
+      ]
+    },
+    {
+      side: "right",
+      peaks: [
+        {
+          mountain: "M1608 472 L1815 250 L2070 472 Z",
+          snow: "M1749 321 L1815 250 L1885 323 L1857 309 L1835 331 L1811 306 L1785 329 Z",
+          fill: "#7195A2",
+          ridge: "M1815 250 L1902 472"
+        },
+        {
+          mountain: "M1740 472 L1960 290 L2225 472 Z",
+          snow: "M1895 344 L1960 290 L2029 345 L2002 335 L1981 356 L1957 332 L1933 352 Z",
+          fill: "#557F78",
+          ridge: "M1960 290 L2054 472"
+        }
+      ]
+    }
+  ];
+
+  for (const range of mountainRanges) {
+    const group = svg("g", {
+      class: `wide-mountains wide-mountains--${range.side}`,
+      "data-side": range.side,
+      opacity: .94
+    }, root);
+    for (const peak of range.peaks) {
+      svg("path", {
+        class: "wide-mountain",
+        d: peak.mountain,
+        fill: peak.fill
+      }, group);
+      svg("path", {
+        class: "wide-mountain__snow",
+        d: peak.snow,
+        fill: "#FFF7DF"
+      }, group);
+      svg("path", {
+        d: peak.ridge,
+        fill: "none",
+        stroke: "#335F5D",
+        "stroke-width": 5,
+        opacity: .28
+      }, group);
+    }
+  }
+}
+
+function addWidePlayground(root) {
+  const layer = svg("g", {
+    class: "wide-playground",
+    "aria-hidden": "true"
+  }, root);
+
+  const slide = svg("g", {
+    class: "wide-playground__item",
+    "data-kind": "slide",
+    transform: "translate(-290 480) scale(0.78)"
+  }, layer);
+  svg("ellipse", {
+    cx: 88,
+    cy: 145,
+    rx: 78,
+    ry: 12,
+    fill: "#17352A",
+    opacity: .18
+  }, slide);
+  svg("line", {
+    x1: 60,
+    y1: 50,
+    x2: 28,
+    y2: 140,
+    stroke: "#087541",
+    "stroke-width": 8,
+    "stroke-linecap": "round"
+  }, slide);
+  svg("line", {
+    x1: 83,
+    y1: 50,
+    x2: 51,
+    y2: 140,
+    stroke: "#087541",
+    "stroke-width": 8,
+    "stroke-linecap": "round"
+  }, slide);
+  for (const y of [68, 88, 108, 128]) {
+    svg("line", {
+      x1: 48 - (y - 68) * .36,
+      y1: y,
+      x2: 75 - (y - 68) * .36,
+      y2: y,
+      stroke: "#FFD45F",
+      "stroke-width": 6,
+      "stroke-linecap": "round"
+    }, slide);
+  }
+  svg("rect", {
+    x: 54,
+    y: 43,
+    width: 62,
+    height: 13,
+    rx: 6,
+    fill: "#D54843",
+    stroke: "#8F432C",
+    "stroke-width": 3
+  }, slide);
+  svg("path", {
+    d: "M110 50 C136 68 127 111 158 137",
+    fill: "none",
+    stroke: "#F0A533",
+    "stroke-width": 18,
+    "stroke-linecap": "round"
+  }, slide);
+  svg("path", {
+    d: "M110 48 C133 68 124 108 157 134",
+    fill: "none",
+    stroke: "#FFD45F",
+    "stroke-width": 7,
+    "stroke-linecap": "round"
+  }, slide);
+
+  for (const transform of [
+    "translate(1640 640) scale(0.72)",
+    "translate(1765 670) scale(0.72)"
+  ]) {
+    const bench = svg("g", {
+      class: "wide-playground__item",
+      "data-kind": "bench",
+      transform
+    }, layer);
+    svg("ellipse", {
+      cx: 56,
+      cy: 82,
+      rx: 62,
+      ry: 9,
+      fill: "#17352A",
+      opacity: .16
+    }, bench);
+    for (const y of [18, 34, 51]) {
+      svg("rect", {
+        x: 0,
+        y,
+        width: 112,
+        height: 11,
+        rx: 5,
+        fill: y === 51 ? "#F0A533" : "#C96E43",
+        stroke: "#8F432C",
+        "stroke-width": 2
+      }, bench);
+    }
+    for (const x of [16, 92]) {
+      svg("line", {
+        x1: x,
+        y1: 13,
+        x2: x,
+        y2: 78,
+        stroke: "#075F38",
+        "stroke-width": 7,
+        "stroke-linecap": "round"
+      }, bench);
+    }
+  }
+
+  const seesaw = svg("g", {
+    class: "wide-playground__item",
+    "data-kind": "seesaw",
+    transform: "translate(1610 505) scale(0.85)"
+  }, layer);
+  svg("ellipse", {
+    cx: 82,
+    cy: 75,
+    rx: 82,
+    ry: 10,
+    fill: "#17352A",
+    opacity: .18
+  }, seesaw);
+  svg("path", {
+    d: "M67 72 L82 42 L97 72 Z",
+    fill: "#F0A533",
+    stroke: "#8F432C",
+    "stroke-width": 3,
+    "stroke-linejoin": "round"
+  }, seesaw);
+  svg("line", {
+    x1: 4,
+    y1: 28,
+    x2: 160,
+    y2: 58,
+    stroke: "#078447",
+    "stroke-width": 12,
+    "stroke-linecap": "round"
+  }, seesaw);
+  for (const x of [17, 145]) {
+    const y = x < 80 ? 31 : 55;
+    svg("rect", {
+      x: x - 17,
+      y: y - 9,
+      width: 34,
+      height: 10,
+      rx: 4,
+      fill: "#D54843",
+      stroke: "#8F432C",
+      "stroke-width": 2
+    }, seesaw);
+    svg("path", {
+      d: `M${x - 4} ${y - 11} V${y - 30} H${x + 7} V${y - 11}`,
+      fill: "none",
+      stroke: "#FFD45F",
+      "stroke-width": 5,
+      "stroke-linecap": "round",
+      "stroke-linejoin": "round"
+    }, seesaw);
+  }
+
+  const climbingFrame = svg("g", {
+    class: "wide-playground__item",
+    "data-kind": "climbing-frame",
+    transform: "translate(1745 520) scale(0.75)"
+  }, layer);
+  svg("ellipse", {
+    cx: 70,
+    cy: 153,
+    rx: 78,
+    ry: 12,
+    fill: "#17352A",
+    opacity: .18
+  }, climbingFrame);
+  for (const d of [
+    "M4 148 Q18 42 70 8 Q122 42 136 148",
+    "M4 148 Q70 84 136 148",
+    "M19 78 Q70 115 121 78"
+  ]) {
+    svg("path", {
+      d,
+      fill: "none",
+      stroke: "#087541",
+      "stroke-width": 8,
+      "stroke-linecap": "round"
+    }, climbingFrame);
+  }
+  for (const [x1, y1, x2, y2] of [
+    [4, 148, 121, 78],
+    [19, 78, 136, 148],
+    [70, 8, 70, 148]
+  ]) {
+    svg("line", {
+      x1,
+      y1,
+      x2,
+      y2,
+      stroke: "#FFD45F",
+      "stroke-width": 5,
+      "stroke-linecap": "round"
+    }, climbingFrame);
+  }
+
+  return layer;
 }
 
 function createKiteBounds({
@@ -1648,14 +1946,6 @@ function addSwings(root, swings) {
     stroke: "#FFF7DF",
     "stroke-width": 2
   }, decorations);
-  for (const pennant of swings.pennants) {
-    svg("path", {
-      d: `M${pennant.x - 6} ${pennant.y - 7} L${pennant.x + 6} ${pennant.y - 8} L${pennant.x + 1} ${pennant.y + 5} Z`,
-      fill: pennant.color,
-      stroke: "#17352A",
-      "stroke-width": 1
-    }, decorations);
-  }
 
   return {
     layer,

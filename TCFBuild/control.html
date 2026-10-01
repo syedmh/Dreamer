@@ -60,13 +60,13 @@
         <input id="raised-slider" type="range" min="0" max="200000" step="any">
       </label>
       <div class="action-grid shortcut-grid" aria-label="Keyboard-equivalent progress controls">
-        <button type="button" data-progress-set="0">Set 0%</button>
-        <button type="button" data-progress-set=".2">Set 20%</button>
-        <button type="button" data-progress-set=".4">Set 40%</button>
-        <button type="button" data-progress-set=".6">Set 60%</button>
-        <button type="button" data-progress-set=".8">Set 80%</button>
-        <button type="button" data-progress-set="1">Set 100%</button>
-        <button type="button" data-progress-set="1.2">Set 120%</button>
+        <button type="button" data-progress-set="0" aria-label="Stage 0, set progress to 0 percent" title="Set 0%">Stage 0</button>
+        <button type="button" data-progress-set=".2" aria-label="Stage 1, set progress to 20 percent" title="Set 20%">Stage 1</button>
+        <button type="button" data-progress-set=".4" aria-label="Stage 2, set progress to 40 percent" title="Set 40%">Stage 2</button>
+        <button type="button" data-progress-set=".6" aria-label="Stage 3, set progress to 60 percent" title="Set 60%">Stage 3</button>
+        <button type="button" data-progress-set=".8" aria-label="Stage 4, set progress to 80 percent" title="Set 80%">Stage 4</button>
+        <button type="button" data-progress-set="1" aria-label="Stage 5, set progress to 100 percent" title="Set 100%">Stage 5</button>
+        <button type="button" data-progress-set="1.2" aria-label="Stage 6, set progress to 120 percent" title="Set 120%">Stage 6</button>
       </div>
       <button type="submit" hidden>Apply Raised and Goal</button>
     </form>
@@ -88,6 +88,11 @@
 
     <section class="card">
       <h2>Display state</h2>
+      <label class="edit-amounts-toggle">
+        <input id="wide-screen-toggle" type="checkbox">
+        Wide screen / fill monitor
+      </label>
+      <span class="field-help">Enable to expand the scene across ultrawide or non-16:9 displays while preserving every element's proportions. Disable to restore the fitted 16:9 layout.</span>
       <div class="toggle-grid">
         <button id="demo-toggle" class="toggle" type="button" aria-pressed="false" hidden>Start demo</button>
         <button id="night-toggle" class="toggle" type="button" aria-pressed="false" hidden>Switch to night</button>

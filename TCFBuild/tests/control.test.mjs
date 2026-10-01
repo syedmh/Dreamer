@@ -87,6 +87,7 @@ async function withControlHarness(run, {
   const overrideRaisedInput = new FakeElement();
   const overrideEditToggle = new FakeElement();
   const applyOverrideButton = new FakeElement();
+  const wideScreenToggle = new FakeElement();
   overrideForm.append(
     overrideRaisedInput,
     overrideEditToggle,
@@ -130,6 +131,8 @@ async function withControlHarness(run, {
     ,
     ["#edit-override-toggle", overrideEditToggle],
     ["#apply-override-button", applyOverrideButton]
+    ,
+    ["#wide-screen-toggle", wideScreenToggle]
   ]);
   if (includeDisplayPreview) {
     elements.set("#display-preview", new FakeElement());
@@ -166,6 +169,7 @@ async function withControlHarness(run, {
       overrideRaisedInput,
       overrideEditToggle,
       applyOverrideButton,
+      wideScreenToggle,
       raisedInput,
       raisedSlider,
       actionButtons,
@@ -255,6 +259,53 @@ test("focus alone does not block authoritative progress updates", async () => {
 
     assert.equal(raisedInput.value, "75");
     assert.equal(goalInput.value, "150");
+  });
+
+  test("wide-screen checkbox patches explicit state and follows authoritative updates", async () => {
+    const requests = [];
+    await withControlHarness(
+      async ({ events, wideScreenToggle }) => {
+        sendState(events, {
+          revision: 1,
+          raised: 0,
+          goal: 100000,
+          wideScreen: false
+        });
+        assert.equal(wideScreenToggle.checked, false);
+
+        wideScreenToggle.checked = true;
+        await wideScreenToggle.dispatch("change");
+        await new Promise((resolve) => setImmediate(resolve));
+
+        assert.deepEqual(JSON.parse(requests[0].options.body), {
+          wideScreen: true
+        });
+        assert.equal(wideScreenToggle.checked, true);
+
+        sendState(events, {
+          revision: 3,
+          wideScreen: false
+        });
+        assert.equal(wideScreenToggle.checked, false);
+      },
+      {
+        fetchImplementation: async (url, options) => {
+          requests.push({ url, options });
+          assert.equal(url, "/api/state");
+          return {
+            ok: true,
+            async json() {
+              return {
+                revision: 2,
+                raised: 0,
+                goal: 100000,
+                wideScreen: true
+              };
+            }
+          };
+        }
+      }
+    );
   });
 });
 
