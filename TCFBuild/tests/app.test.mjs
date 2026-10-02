@@ -2989,6 +2989,18 @@ test("display and dashboard keep their current separate layout contracts", async
   }
 });
 
+test("wide-screen total box preserves scene-relative proportions", async () => {
+  const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
+  assert.match(
+    css,
+    /#fundraiser\[data-display-mode="wide"\] \.total-box\s*\{[^}]*width:\s*min\(91\.1111cqh,\s*calc\(100cqw - 48px\)\)/s
+  );
+  assert.match(
+    css,
+    /#fundraiser\[data-display-mode="wide"\] \.total-box-amount\s*\{[^}]*font-size:\s*clamp\(54px,\s*12\.4444cqh,\s*190px\)/s
+  );
+});
+
 test("default-motion keyboard progress smooths after authoritative commands and caps at 200%", async () => {
   await withAppHarness(
     { locationSearch: "?goal=100000&raised=51000" },

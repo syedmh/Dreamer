@@ -241,6 +241,30 @@ body { display: grid; place-items: center; }
   text-shadow: 0 5px 14px rgb(0 0 0 / .65);
 }
 
+#fundraiser[data-display-mode="wide"] .total-box {
+  --bulb-step: clamp(30px, 4.2667cqh, 52px);
+  --bulb-depth: clamp(18px, 2.4cqh, 30px);
+  width: min(91.1111cqh, calc(100cqw - 48px));
+  padding: clamp(7px, 1.1556cqh, 18px);
+  border-radius: clamp(24px, 3.9111cqh, 64px);
+}
+
+#fundraiser[data-display-mode="wide"] .total-box-inner {
+  padding: clamp(20px, 3.9111cqh, 54px);
+  border-width: clamp(2px, .3911cqh, 6px);
+  border-radius: clamp(18px, 3.0222cqh, 50px);
+}
+
+#fundraiser[data-display-mode="wide"] .total-box-label {
+  font-size: clamp(16px, 2.8444cqh, 48px);
+}
+
+#fundraiser[data-display-mode="wide"] .total-box-amount {
+  max-width: 100%;
+  font-size: clamp(54px, 12.4444cqh, 190px);
+  white-space: nowrap;
+}
+
 .total-box.is-hidden {
   pointer-events: none;
   opacity: 0;
