@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join, relative, sep } from "node:path";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import test from "node:test";
 
 import { runUpdater } from "../release/updater.mjs";
@@ -31,6 +31,23 @@ const RUNTIME_FILES = [
 const PNG = Buffer.from([
   0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x54, 0x43, 0x46,
 ]);
+
+test("immutable runtime manifest contains every local JavaScript import", async () => {
+  const projectRoot = resolve(import.meta.dirname, "..");
+  for (const runtimePath of RUNTIME_FILES.filter((pathValue) => pathValue.endsWith(".mjs"))) {
+    const source = await readFile(join(projectRoot, ...runtimePath.split("/")), "utf8");
+    for (const match of source.matchAll(/from\s+["'](\.[^"']+)["']/g)) {
+      const importedPath = relative(
+        projectRoot,
+        resolve(projectRoot, dirname(runtimePath), match[1])
+      ).split(sep).join("/");
+      assert.ok(
+        RUNTIME_FILES.includes(importedPath),
+        `${runtimePath} imports ${importedPath}, which is absent from the immutable runtime manifest`
+      );
+    }
+  }
+});
 
 function gitBlobSha(bytes) {
   return createHash("sha1")

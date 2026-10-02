@@ -2,18 +2,21 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { deriveSliderMaximum, MAX_GOAL } from "../src/config.mjs";
-import { deriveFittedFontSize } from "../src/layout.mjs";
-import { deriveProgress } from "../src/model.mjs";
-import { createFundraiserView, progressiveOpacity } from "../src/render.mjs";
+import {
+  advanceTotalBoxRoll,
+  beginTotalBoxRoll,
+  deriveProgress,
+  retargetTotalBoxRoll
+} from "../src/model.mjs";
+import {
+  createFundraiserView,
+  deriveFittedFontSize,
+  progressiveOpacity
+} from "../src/render.mjs";
 import {
   createScene,
   deriveStudentRoutePosition
 } from "../src/scene.mjs";
-import {
-  advanceTotalBoxRoll,
-  beginTotalBoxRoll,
-  retargetTotalBoxRoll
-} from "../src/total-box.mjs";
 
 class FakeStyle {
   constructor() {

@@ -90,11 +90,9 @@ const DISPLAY_PATHS = new Set([
   "/index.html",
   "/styles.css",
   "/src/app.mjs",
-  "/src/layout.mjs",
   "/src/model.mjs",
   "/src/render.mjs",
   "/src/scene.mjs",
-  "/src/total-box.mjs",
   "/tests/harness.html"
 ]);
 const CONTROL_PATHS = new Set([

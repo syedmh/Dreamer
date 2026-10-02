@@ -227,11 +227,7 @@ test("serves isolated display and control surfaces with security headers", async
     assert.equal((await fetch(`${displayBase}/src/control.mjs`)).status, 404);
     assert.equal((await fetch(`${controlBase}/index.html`)).status, 404);
     assert.equal((await fetch(`${controlBase}/src/app.mjs`)).status, 404);
-    assert.equal((await fetch(`${controlBase}/src/layout.mjs`)).status, 404);
-    assert.equal((await fetch(`${controlBase}/src/total-box.mjs`)).status, 404);
     assert.equal((await fetch(`${displayBase}/styles.css`)).status, 200);
-    assert.equal((await fetch(`${displayBase}/src/layout.mjs`)).status, 200);
-    assert.equal((await fetch(`${displayBase}/src/total-box.mjs`)).status, 200);
     assert.equal((await fetch(`${controlBase}/control.css`)).status, 200);
     assert.equal((await fetch(`${displayBase}/favicon.ico`)).headers.get("content-type"), "image/png");
     assert.equal((await fetch(`${controlBase}/favicon.ico`)).headers.get("content-type"), "image/png");

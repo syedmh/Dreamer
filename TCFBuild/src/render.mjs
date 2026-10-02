@@ -18,6 +18,32 @@ const VIEWBOX = Object.freeze({
   width: 1600,
   height: 900
 });
+
+export function deriveFittedFontSize({
+  availableWidth,
+  baseFontSize,
+  renderedWidth,
+  minimumFontSize = 32,
+  safetyRatio = .96
+}) {
+  if (
+    !Number.isFinite(availableWidth)
+    || !Number.isFinite(baseFontSize)
+    || !Number.isFinite(renderedWidth)
+    || availableWidth <= 0
+    || baseFontSize <= 0
+    || renderedWidth <= 0
+    || renderedWidth <= availableWidth * safetyRatio
+  ) {
+    return baseFontSize;
+  }
+
+  return Math.max(
+    minimumFontSize,
+    Math.min(baseFontSize, baseFontSize * availableWidth * safetyRatio / renderedWidth)
+  );
+}
+
 const WIDE_LANDSCAPE_TREES = Object.freeze([
   Object.freeze({ x: -190, y: 545, scale: .9, trunkHeight: 90 }),
   Object.freeze({ x: -70, y: 610, scale: .65, trunkHeight: 95 }),

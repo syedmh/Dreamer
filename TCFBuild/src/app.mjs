@@ -4,16 +4,16 @@ import {
   parseConfig
 } from "./config.mjs";
 import { createCurrencyFormatter } from "./currency.mjs";
-import { deriveFittedFontSize } from "./layout.mjs";
-import { deriveProgress, exponentialStep } from "./model.mjs";
-import { createScene } from "./scene.mjs";
-import { createFundraiserView } from "./render.mjs";
 import {
   advanceTotalBoxRoll,
   beginTotalBoxRoll,
+  deriveProgress,
+  exponentialStep,
   hideTotalBoxRoll,
   retargetTotalBoxRoll
-} from "./total-box.mjs";
+} from "./model.mjs";
+import { createScene } from "./scene.mjs";
+import { createFundraiserView, deriveFittedFontSize } from "./render.mjs";
 
 const config = parseConfig(window.location.search);
 const root = document.querySelector("#fundraiser");
