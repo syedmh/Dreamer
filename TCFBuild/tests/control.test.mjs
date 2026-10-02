@@ -88,6 +88,7 @@ async function withControlHarness(run, {
   const overrideEditToggle = new FakeElement();
   const applyOverrideButton = new FakeElement();
   const wideScreenToggle = new FakeElement();
+  const displayPreviewFrame = new FakeElement();
   overrideForm.append(
     overrideRaisedInput,
     overrideEditToggle,
@@ -133,6 +134,8 @@ async function withControlHarness(run, {
     ["#apply-override-button", applyOverrideButton]
     ,
     ["#wide-screen-toggle", wideScreenToggle]
+    ,
+    ["#display-preview-frame", displayPreviewFrame]
   ]);
   if (includeDisplayPreview) {
     elements.set("#display-preview", new FakeElement());
@@ -170,6 +173,7 @@ async function withControlHarness(run, {
       overrideEditToggle,
       applyOverrideButton,
       wideScreenToggle,
+      displayPreviewFrame,
       raisedInput,
       raisedSlider,
       actionButtons,
@@ -264,7 +268,7 @@ test("focus alone does not block authoritative progress updates", async () => {
   test("wide-screen checkbox patches explicit state and follows authoritative updates", async () => {
     const requests = [];
     await withControlHarness(
-      async ({ events, wideScreenToggle }) => {
+      async ({ displayPreviewFrame, events, wideScreenToggle }) => {
         sendState(events, {
           revision: 1,
           raised: 0,
@@ -272,9 +276,11 @@ test("focus alone does not block authoritative progress updates", async () => {
           wideScreen: false
         });
         assert.equal(wideScreenToggle.checked, false);
+        assert.equal(displayPreviewFrame.dataset.displayMode, "standard");
 
         wideScreenToggle.checked = true;
         await wideScreenToggle.dispatch("change");
+        assert.equal(displayPreviewFrame.dataset.displayMode, "wide");
         await new Promise((resolve) => setImmediate(resolve));
 
         assert.deepEqual(JSON.parse(requests[0].options.body), {
@@ -287,6 +293,7 @@ test("focus alone does not block authoritative progress updates", async () => {
           wideScreen: false
         });
         assert.equal(wideScreenToggle.checked, false);
+        assert.equal(displayPreviewFrame.dataset.displayMode, "standard");
       },
       {
         fetchImplementation: async (url, options) => {

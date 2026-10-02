@@ -14,6 +14,33 @@ function interpolateMilestone(value, start, end, startValue, endValue) {
   return startValue + (endValue - startValue) * progress;
 }
 
+const SCHOOL_BLOCK_COUNT = 308;
+const SCHOOL_BLOCK_MILESTONES = Object.freeze([
+  Object.freeze([0, 0]),
+  Object.freeze([.2, 100]),
+  Object.freeze([.4, 160]),
+  Object.freeze([.6, 226]),
+  Object.freeze([.8, 244]),
+  Object.freeze([1, SCHOOL_BLOCK_COUNT])
+]);
+
+function deriveBuildingRatio(donationRatio) {
+  const boundedRatio = clamp(donationRatio, 0, 1);
+  for (let index = 1; index < SCHOOL_BLOCK_MILESTONES.length; index += 1) {
+    const [endRatio, endBlocks] = SCHOOL_BLOCK_MILESTONES[index];
+    if (boundedRatio > endRatio) continue;
+    const [startRatio, startBlocks] = SCHOOL_BLOCK_MILESTONES[index - 1];
+    return interpolateMilestone(
+      boundedRatio,
+      startRatio,
+      endRatio,
+      startBlocks / SCHOOL_BLOCK_COUNT,
+      endBlocks / SCHOOL_BLOCK_COUNT
+    );
+  }
+  return 1;
+}
+
 export function deriveProgress(raised, goal, overGoalRamp = 0.15) {
   const safeRaised = Number.isFinite(raised) ? Math.max(0, raised) : 0;
   const safeGoal = Number.isFinite(goal) && goal > 0 ? goal : 1;
@@ -22,27 +49,7 @@ export function deriveProgress(raised, goal, overGoalRamp = 0.15) {
     Number.MAX_VALUE,
     Math.max(0, safeRaised / safeGoal)
   );
-  const firstLevelComplete = 160 / 308;
-  const secondLevelComplete = 226 / 308;
-  const buildingRatio = donationRatio < .2
-    ? interpolateMilestone(donationRatio, 0, .2, 0, firstLevelComplete)
-    : donationRatio < .4
-      ? interpolateMilestone(
-        donationRatio,
-        .2,
-        .4,
-        firstLevelComplete,
-        secondLevelComplete
-      )
-      : donationRatio < .8
-        ? interpolateMilestone(
-          donationRatio,
-          .4,
-          .8,
-          secondLevelComplete,
-          1
-        )
-        : 1;
+  const buildingRatio = deriveBuildingRatio(donationRatio);
   const studentRatio = donationRatio < .8
     ? 0
     : donationRatio < 1

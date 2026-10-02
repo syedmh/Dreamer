@@ -9,6 +9,7 @@ const PENDING_RENDER_RESULT = Object.freeze({ needsFrame: true });
 const WINDOW_X = Object.freeze([569, 677, 785, 1109, 1217, 1325]);
 const FINISH_RANGES = Object.freeze({
   shell: Object.freeze([.17, .30]),
+  entrance: Object.freeze([.20, 100 / 308]),
   lower: Object.freeze([.31, .52]),
   upper: Object.freeze([.58, .74]),
   tower: Object.freeze([.75, .84]),
@@ -831,7 +832,7 @@ function addLandscape(root, trees, distantSchools, dataRoot) {
     svg("circle", { cx: 34, cy: 20, r: 38, fill: "#0A713E" }, tree);
   }
 
-  addWidePlayground(landscape);
+  const widePlayground = addWidePlayground(landscape);
 
   svg("rect", {
     class: "night-ground-shade",
@@ -842,7 +843,10 @@ function addLandscape(root, trees, distantSchools, dataRoot) {
     fill: "#07142F"
   }, landscape);
 
-  return distantSchoolController;
+  return Object.freeze({
+    ...distantSchoolController,
+    widePlayground
+  });
 }
 
 function addWideMountains(root) {
@@ -920,7 +924,8 @@ function addWidePlayground(root) {
   const slide = svg("g", {
     class: "wide-playground__item",
     "data-kind": "slide",
-    transform: "translate(-290 480) scale(0.78)"
+    transform: "translate(-290 480) scale(0.78)",
+    opacity: 0
   }, layer);
   svg("ellipse", {
     cx: 88,
@@ -984,6 +989,7 @@ function addWidePlayground(root) {
     "stroke-linecap": "round"
   }, slide);
 
+  const completionNodes = [];
   for (const transform of [
     "translate(1640 640) scale(0.72)",
     "translate(1765 670) scale(0.72)"
@@ -991,8 +997,10 @@ function addWidePlayground(root) {
     const bench = svg("g", {
       class: "wide-playground__item",
       "data-kind": "bench",
-      transform
+      transform,
+      opacity: 0
     }, layer);
+    completionNodes.push(bench);
     svg("ellipse", {
       cx: 56,
       cy: 82,
@@ -1029,7 +1037,8 @@ function addWidePlayground(root) {
   const seesaw = svg("g", {
     class: "wide-playground__item",
     "data-kind": "seesaw",
-    transform: "translate(1610 505) scale(0.85)"
+    transform: "translate(1610 505) scale(0.85)",
+    opacity: 0
   }, layer);
   svg("ellipse", {
     cx: 82,
@@ -1080,8 +1089,10 @@ function addWidePlayground(root) {
   const climbingFrame = svg("g", {
     class: "wide-playground__item",
     "data-kind": "climbing-frame",
-    transform: "translate(1745 520) scale(0.75)"
+    transform: "translate(1745 520) scale(0.75)",
+    opacity: 0
   }, layer);
+  completionNodes.push(climbingFrame);
   svg("ellipse", {
     cx: 70,
     cy: 153,
@@ -1119,7 +1130,11 @@ function addWidePlayground(root) {
     }, climbingFrame);
   }
 
-  return layer;
+  return Object.freeze({
+    layer,
+    stage80Nodes: [slide, seesaw],
+    completionNodes
+  });
 }
 
 function createKiteBounds({
@@ -2306,10 +2321,11 @@ function addApertureBacking(parent, {
 function addApertureRecesses(root) {
   const finishNodes = [];
   const shell = progressiveGroup(root, "shell", "aperture-recesses");
+  const entrance = progressiveGroup(shell.element, "entrance", "aperture-entrance");
   const lower = progressiveGroup(shell.element, "lower", "aperture-lower");
   const upper = progressiveGroup(shell.element, "upper", "aperture-upper");
   const tower = progressiveGroup(shell.element, "tower", "aperture-tower");
-  finishNodes.push(shell, lower, upper, tower);
+  finishNodes.push(shell, entrance, lower, upper, tower);
 
   for (const x of WINDOW_X) {
     addApertureBacking(lower.element, {
@@ -2327,14 +2343,14 @@ function addApertureRecesses(root) {
       height: 74
     });
   }
-  addApertureBacking(lower.element, {
+  addApertureBacking(entrance.element, {
     className: "backing-entrance-lower",
     x: 918,
     y: 513,
     width: 98,
     height: 140
   });
-  addApertureBacking(upper.element, {
+  addApertureBacking(entrance.element, {
     className: "backing-entrance-upper",
     x: 936,
     y: 491,
@@ -2356,7 +2372,7 @@ function addApertureRecesses(root) {
   svg("path", {
     d: "M918 653 V538 A45 45 0 0 1 1008 538 V653 Z",
     fill: "#17352A"
-  }, lower.element);
+  }, entrance.element);
   svg("path", {
     d: "M929 407 V373 A34 34 0 0 1 997 373 V407 Z",
     fill: "#17352A"
@@ -2603,10 +2619,13 @@ function addMasonryBand(parent, x, y, width, height = 8) {
 function addArchitecturalFinishes(root) {
   const finishNodes = [];
 
+  const entrance = progressiveGroup(root, "entrance", "facade-entrance");
+  finishNodes.push(entrance);
+  addEntrance(entrance.element);
+
   const lower = progressiveGroup(root, "lower", "facade-lower");
   finishNodes.push(lower);
   for (const x of WINDOW_X) addWindowFrame(lower.element, x, 547);
-  addEntrance(lower.element);
   addMasonryBand(lower.element, 530, 648, 956, 8);
 
   const upper = progressiveGroup(root, "upper", "facade-upper");
@@ -3158,6 +3177,25 @@ export function createFundraiserView(root, scene, config) {
         )
       );
     }
+    const stage80PlaygroundRatio = donationRatio <= .6
+      ? 0
+      : donationRatio >= .8
+        ? 1
+        : (donationRatio - .6) / .2;
+    for (const node of distantSchoolController.widePlayground.stage80Nodes) {
+      setRenderedAttribute(
+        node,
+        "opacity",
+        fixedPreservingEndpoints(stage80PlaygroundRatio, 4, [0, 1])
+      );
+    }
+    for (const node of distantSchoolController.widePlayground.completionNodes) {
+      setRenderedAttribute(
+        node,
+        "opacity",
+        fixedPreservingEndpoints(playgroundRatio, 4, [0, 1])
+      );
+    }
 
     setRenderedAttribute(goalFlag, "opacity", goalAchieved ? "1" : "0");
 
@@ -3292,32 +3330,51 @@ export function createFundraiserView(root, scene, config) {
 
     const percentage = Math.min(Number.MAX_VALUE, donationRatio * 100);
     const wholePercentage = wholeDisplayPercentage(percentage);
+    const atMilestone = (ratio) => Math.abs(donationRatio - ratio) < 1e-12;
     setRenderedText(raisedDisplay, money.format(raised));
     setRenderedText(goalDisplay, `Goal ${money.format(goal)}`);
-    if (donationRatio < .2) {
+    if (atMilestone(.2)) {
+      setRenderedText(percentDisplay, "20% — 4 rows and door complete!");
+    } else if (atMilestone(.4)) {
+      setRenderedText(percentDisplay, "40% — 8 rows and swings complete!");
+    } else if (atMilestone(.6)) {
+      setRenderedText(percentDisplay, "60% — 12 rows and bus complete!");
+    } else if (atMilestone(.8)) {
       setRenderedText(
         percentDisplay,
-        `${wholePercentage}% — first level building!`
+        "80% — 16 rows, slide, and seesaw complete!"
+      );
+    } else if (atMilestone(1)) {
+      setRenderedText(
+        percentDisplay,
+        "100% — school, flag, and 12 students complete!"
+      );
+    } else if (atMilestone(1.2)) {
+      setRenderedText(percentDisplay, "120% — full campus complete!");
+    } else if (donationRatio < .2) {
+      setRenderedText(
+        percentDisplay,
+        `${wholePercentage}% — first 4 block rows building!`
       );
     } else if (donationRatio < .4) {
       setRenderedText(
         percentDisplay,
-        `${wholePercentage}% — second level and swings!`
+        `${wholePercentage}% — next 4 rows and swings!`
       );
     } else if (donationRatio < .6) {
       setRenderedText(
         percentDisplay,
-        `${wholePercentage}% — school bus arriving!`
+        `${wholePercentage}% — next 4 rows and bus!`
       );
     } else if (donationRatio < .8) {
       setRenderedText(
         percentDisplay,
-        `${wholePercentage}% — school completing!`
+        `${wholePercentage}% — next 4 rows, slide, and seesaw!`
       );
     } else if (donationRatio < 1) {
       setRenderedText(
         percentDisplay,
-        `${wholePercentage}% — first students arriving!`
+        `${wholePercentage}% — school finishing!`
       );
     } else if (donationRatio < 1.2) {
       setRenderedText(

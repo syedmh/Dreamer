@@ -18,6 +18,7 @@ const serverIndicator = document.querySelector("#server-indicator");
 const displayIndicator = document.querySelector("#display-indicator");
 const operationStatus = document.querySelector("#operation-status");
 const displayPreview = document.querySelector("#display-preview");
+const displayPreviewFrame = document.querySelector("#display-preview-frame");
 const celebrationToggle = document.querySelector("#celebration-toggle");
 const amountEditToggle = document.querySelector("#edit-amounts-toggle");
 const overrideEditToggle = document.querySelector("#edit-override-toggle");
@@ -107,9 +108,16 @@ function synchronizeOverrideEditState() {
   if (applyOverrideButton) applyOverrideButton.disabled = !editable;
 }
 
+function synchronizePreviewMode(wideScreen) {
+  if (!displayPreviewFrame) return;
+  displayPreviewFrame.dataset.displayMode = wideScreen ? "wide" : "standard";
+}
+
 function synchronizeToggles() {
   if (!state) return;
-  if (wideScreenToggle) wideScreenToggle.checked = Boolean(state.wideScreen);
+  const wideScreen = Boolean(state.wideScreen);
+  if (wideScreenToggle) wideScreenToggle.checked = wideScreen;
+  synchronizePreviewMode(wideScreen);
   const labels = {
     demoActive: state.demoActive ? "Pause demo" : "Start demo",
     nightMode: state.nightMode ? "Switch to day" : "Switch to night",
@@ -459,9 +467,11 @@ for (const [field, button] of Object.entries(toggles)) {
 wideScreenToggle?.addEventListener("change", () => {
   if (!state) {
     wideScreenToggle.checked = false;
+    synchronizePreviewMode(false);
     setStatus("Wait for the initial live state before changing display mode.", true);
     return;
   }
+  synchronizePreviewMode(Boolean(wideScreenToggle.checked));
   mutate(
     "/api/state",
     { wideScreen: Boolean(wideScreenToggle.checked) },

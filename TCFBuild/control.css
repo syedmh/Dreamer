@@ -98,6 +98,13 @@ input:focus-visible { outline: 3px solid #ffd34e; outline-offset: 2px; }
 h2 { margin: 0 0 16px; font-size: 1.2rem; }
 label { display: grid; gap: 7px; font-weight: 750; }
 
+.preview-card {
+  position: sticky;
+  z-index: 20;
+  top: 12px;
+  background: #102d24;
+}
+
 .preview-frame {
   overflow: hidden;
   aspect-ratio: 16 / 9;
@@ -105,6 +112,10 @@ label { display: grid; gap: 7px; font-weight: 750; }
   border-radius: 12px;
   background: #68c9f2;
   box-shadow: 0 12px 30px rgb(0 0 0 / .28);
+}
+
+.preview-frame[data-display-mode="wide"] {
+  aspect-ratio: 21 / 9;
 }
 
 .preview-frame iframe {

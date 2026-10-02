@@ -442,7 +442,7 @@ test("authoritative display state switches wide-screen rendering live", async ()
       viewportHeight: 1440,
       viewportWidth: 3440
     },
-    async ({ createdElements, root, rootElements }) => {
+    async ({ animationFrames, createdElements, root, rootElements, startedAt }) => {
       const sceneElement = rootElements.get("#school-scene");
       events.emit("snapshot", {
         state: {
@@ -513,6 +513,13 @@ test("authoritative display state switches wide-screen rendering live", async ()
       const widePlaygroundLayer = createdElements.find(
         (element) => element.attributes.get("class") === "wide-playground"
       );
+      assert.ok(widePlaygroundLayer);
+      assert.ok(
+        widePlaygroundItems.every(
+          (item) => Number(item.attributes.get("opacity")) === 0
+        ),
+        "playground equipment should be hidden before its milestone"
+      );
       assert.ok(
         createdElements.indexOf(widePlaygroundLayer)
           > Math.max(...wideTrees.map((tree) => createdElements.indexOf(tree))),
@@ -548,6 +555,46 @@ test("authoritative display state switches wide-screen rendering live", async ()
       );
       events.emit("state", {
         revision: 2,
+        raised: 80000,
+        goal: 100000,
+        wideScreen: true
+      });
+      const stage80Frame = animationFrames.shift();
+      assert.ok(
+        stage80Frame,
+        "the 80% authoritative state should schedule a render frame"
+      );
+      stage80Frame(startedAt + 16);
+      assert.deepEqual(
+        widePlaygroundItems.map((item) => ({
+          kind: item.attributes.get("data-kind"),
+          opacity: Number(item.attributes.get("opacity"))
+        })),
+        [
+          { kind: "slide", opacity: 1 },
+          { kind: "bench", opacity: 0 },
+          { kind: "bench", opacity: 0 },
+          { kind: "seesaw", opacity: 1 },
+          { kind: "climbing-frame", opacity: 0 }
+        ]
+      );
+      events.emit("state", {
+        revision: 3,
+        raised: 120000,
+        goal: 100000,
+        wideScreen: true
+      });
+      const frame = animationFrames.shift();
+      assert.ok(frame, "the authoritative state should schedule a render frame");
+      frame(startedAt + 16);
+      assert.ok(
+        widePlaygroundItems.every(
+          (item) => Number(item.attributes.get("opacity")) === 1
+        ),
+        "playground equipment should be fully visible at 120%"
+      );
+      events.emit("state", {
+        revision: 4,
         wideScreen: false
       });
       assert.equal(root.dataset.displayMode, "standard");
@@ -1008,6 +1055,23 @@ test("progress labels preserve exact integers, floor fractions, and distinguish 
   }
 });
 
+test("fundraising stages reveal four school rows at each construction milestone", () => {
+  const expectedBlocks = new Map([
+    [.2, 100],
+    [.4, 160],
+    [.6, 226],
+    [.8, 244],
+    [1, 308],
+    [1.2, 308]
+  ]);
+  for (const [donationRatio, blockCount] of expectedBlocks) {
+    const progress = deriveProgress(donationRatio * 100000, 100000);
+    assert.ok(Math.abs(progress.buildingRatio * 308 - blockCount) < 1e-9);
+  }
+  assert.equal(deriveProgress(100000, 100000).studentRatio * 24, 12);
+  assert.equal(deriveProgress(120000, 100000).studentRatio * 24, 24);
+});
+
 test("renderer preserves adjacent and extreme non-endpoint rendering states", () => {
   const originalDocument = Object.getOwnPropertyDescriptor(globalThis, "document");
   const root = new FakeElement("main");
@@ -1208,6 +1272,7 @@ test("finished facade uses frozen drawing order, geometry, and progressive finis
         "school-blueprint",
         "architectural-finish finish-shell aperture-recesses",
         "school",
+        "architectural-finish finish-entrance facade-entrance",
         "architectural-finish finish-lower facade-lower",
         "architectural-finish finish-upper facade-upper",
         "architectural-finish finish-tower facade-tower",
@@ -1327,11 +1392,13 @@ test("finished facade uses frozen drawing order, geometry, and progressive finis
       ]),
       [
         ["shell", .17, .30],
+        ["entrance", .20, 100 / 308],
         ["lower", .31, .52],
         ["upper", .58, .74],
         ["tower", .75, .84],
         ["final", .84, 1],
         ["final", .84, 1],
+        ["entrance", .20, 100 / 308],
         ["lower", .31, .52],
         ["upper", .58, .74],
         ["tower", .75, .84]
@@ -1347,6 +1414,14 @@ test("finished facade uses frozen drawing order, geometry, and progressive finis
       reducedMotion,
       celebrationActive: false
     });
+    update(100 / 308, true);
+    assert.deepEqual(
+      finishGroups
+        .filter((node) => node.attributes.get("data-finish") === "entrance")
+        .map((node) => Number(node.attributes.get("opacity"))),
+      [1, 1]
+    );
+
     update(.92);
     const forward = finishGroups.map((node) => node.attributes.get("opacity"));
     update(.46);
@@ -2952,6 +3027,10 @@ test("progressive opacity clamps exact stage ramps and reverses deterministicall
 
 test("display and dashboard keep their current separate layout contracts", async () => {
   const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
+  const controlCss = await readFile(
+    new URL("../control.css", import.meta.url),
+    "utf8"
+  );
   const displayHtml = await readFile(new URL("../index.html", import.meta.url), "utf8");
   const controlHtml = await readFile(new URL("../control.html", import.meta.url), "utf8");
   assert.doesNotMatch(displayHtml, /operator-panel|progress-form/);
@@ -2986,6 +3065,12 @@ test("display and dashboard keep their current separate layout contracts", async
   assert.match(progress, /right:\s*5\.5%;/);
   assert.match(progress, /top:\s*7\.1%;/);
   assert.doesNotMatch(css, /\.operator-panel/);
+
+  const previewCard = controlCss.match(/^\.preview-card\s*\{([^}]*)\}/m)?.[1];
+  assert.ok(previewCard);
+  assert.match(previewCard, /position:\s*sticky;/);
+  assert.match(previewCard, /top:\s*12px;/);
+  assert.match(previewCard, /z-index:\s*20;/);
 
   for (const [viewportWidth, viewportHeight] of [
     [1920, 1080],

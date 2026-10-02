@@ -1,6 +1,6 @@
 # TCF Fundraiser Progress Experience
 
-A dependency-free, event-ready 16:9 visualization with six fundraising milestones: 20% completes the first school level; 40% completes the second level and swings; 60% adds the school bus; 80% completes the school; 100% raises the Pakistan flag and completes the first student row; and 120% completes the full campus.
+A dependency-free, event-ready 16:9 visualization with six fundraising milestones: 20% completes the first four block rows and the door; 40% adds the next four rows and swings; 60% adds the next four rows and the school bus; 80% adds the next four rows, slide, and seesaw; 100% completes the school, raises the Pakistan flag, and completes the first student row; and 120% completes the full campus.
 
 ## Dashboard stage buttons
 
@@ -12,16 +12,17 @@ available in each button's tooltip and accessible label.
 | Dashboard button | Goal percentage | Result at that exact stage |
 |---|---:|---|
 | **Stage 0** | 0% | Resets fundraiser progress. No school blocks, swings, bus, students, flag, or playground enhancements are revealed. |
-| **Stage 1** | 20% | Reveals the first major school level: 160 of 308 blocks. This is the starting threshold for the swing-set phase. |
-| **Stage 2** | 40% | Reveals 226 of 308 school blocks and the complete swing set. This is the starting threshold for the bus entrance. |
-| **Stage 3** | 60% | Reveals 267 of 308 school blocks and completes the school-bus arrival. |
-| **Stage 4** | 80% | Completes all 308 school blocks and architectural finishes. This is the starting threshold for students to appear. |
-| **Stage 5** | 100% | Marks the goal achieved, raises the Pakistan flag, shows the goal message, triggers the goal celebration, and reveals 12 of 24 students. This starts the enhanced-playground phase. |
+| **Stage 1** | 20% | Reveals the first 4 block rows and the complete entrance door: 100 of 308 blocks. |
+| **Stage 2** | 40% | Reveals the next 4 block rows and the complete swing set: 160 of 308 blocks. |
+| **Stage 3** | 60% | Reveals the next 4 block rows and completes the school-bus arrival: 226 of 308 blocks. |
+| **Stage 4** | 80% | Reveals the next 4 block rows, slide, and seesaw: 244 of 308 blocks. |
+| **Stage 5** | 100% | Completes all 308 school blocks and architectural finishes, raises the Pakistan flag, shows the goal message, triggers the goal celebration, and reveals 12 of 24 students. This starts the enhanced-playground phase. |
 | **Stage 6** | 120% | Completes the over-goal campus with all 24 students and all swing/playground enhancements visible. |
 
 Progress is continuous between presets. The swing set reveals from 20% through
-40%, the bus enters from 40% through 60%, students appear from 80% through
-120%, and the playground enhancements reveal from 100% through 120%.
+40%, the bus enters from 40% through 60%, the slide and seesaw reveal from 60%
+through 80%, students appear from 80% through 120%, and the remaining
+playground enhancements reveal from 100% through 120%.
 
 A transparent blueprint of the completed school remains visible behind the construction until the fundraising goal is reached, illustrating what incoming donations will complete.
 

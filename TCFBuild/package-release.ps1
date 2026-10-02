@@ -478,6 +478,10 @@ try {
     -LauncherName 'setup-tcfbuild.command' `
     -Checksums $checksums `
     -PackagedBaseCommit $packagedBaseCommit
+  Copy-RequiredFile `
+    -Source (Join-Path $projectRoot 'release\README.txt') `
+    -Destination (Join-Path $artifactsRoot 'README.txt')
+  Write-Host "Created release instructions: $(Join-Path $artifactsRoot 'README.txt')"
 }
 finally {
   if (Test-Path -LiteralPath $stagingRoot) {
