@@ -4,9 +4,16 @@ import {
   parseConfig
 } from "./config.mjs";
 import { createCurrencyFormatter } from "./currency.mjs";
+import { deriveFittedFontSize } from "./layout.mjs";
 import { deriveProgress, exponentialStep } from "./model.mjs";
 import { createScene } from "./scene.mjs";
 import { createFundraiserView } from "./render.mjs";
+import {
+  advanceTotalBoxRoll,
+  beginTotalBoxRoll,
+  hideTotalBoxRoll,
+  retargetTotalBoxRoll
+} from "./total-box.mjs";
 
 const config = parseConfig(window.location.search);
 const root = document.querySelector("#fundraiser");
@@ -42,8 +49,7 @@ let state = {
 let goal = state.goal;
 let targetRaised = state.raised;
 let displayedRaised = targetRaised;
-let targetOverrideRaised = state.overrideRaised;
-let displayedOverrideRaised = targetOverrideRaised;
+let totalBoxRoll = hideTotalBoxRoll(state.raised, state.overrideRaised);
 let lastFrameAt = performance.now();
 let celebrationUntil = 0;
 let previousDisplayedRatio = displayedRaised / goal;
@@ -51,6 +57,8 @@ let framePending = false;
 let continuousFireworksEnabled = false;
 let continuousFireworksTimeoutId = 0;
 let fireworksCleanupComplete = false;
+let totalBoxFitPending = false;
+let totalBoxFitSignature = "";
 let nextActionSequence = 0;
 let highestAuthoritativeRevision = null;
 let initialUrlStateSent = false;
@@ -90,6 +98,7 @@ function synchronizeDisplayMode() {
   root.dataset.displayMode = wideScreen ? "wide" : "standard";
   schoolScene?.setAttribute("preserveAspectRatio", "xMidYMid meet");
   schoolScene?.setAttribute("viewBox", deriveDisplayViewBox(wideScreen));
+  scheduleTotalBoxAmountFit(true);
 }
 
 function announce(message) {
@@ -106,7 +115,47 @@ function scheduleFrame() {
 }
 
 function synchronizeMotionState() {
-  root.dataset.motion = reducedMotion() ? "reduce" : "full";
+  const motion = reducedMotion() ? "reduce" : "full";
+  if (root.dataset.motion !== motion) root.dataset.motion = motion;
+}
+
+function fitTotalBoxAmount() {
+  if (!totalBoxAmount?.parentElement) return;
+
+  const inner = totalBoxAmount.parentElement;
+  totalBoxAmount.style.removeProperty("font-size");
+  const amountStyle = getComputedStyle(totalBoxAmount);
+  const innerStyle = getComputedStyle(inner);
+  const availableWidth = inner.clientWidth
+    - Number.parseFloat(innerStyle.paddingLeft)
+    - Number.parseFloat(innerStyle.paddingRight);
+  const baseFontSize = Number.parseFloat(amountStyle.fontSize);
+  const renderedWidth = Math.max(
+    totalBoxAmount.scrollWidth,
+    totalBoxAmount.getBoundingClientRect().width
+  );
+  const fittedFontSize = deriveFittedFontSize({
+    availableWidth,
+    baseFontSize,
+    renderedWidth
+  });
+
+  if (fittedFontSize < baseFontSize) {
+    totalBoxAmount.style.setProperty("font-size", `${fittedFontSize}px`);
+  }
+}
+
+function scheduleTotalBoxAmountFit(force = false) {
+  if (!totalBoxAmount) return;
+  const signature = `${root.dataset.displayMode}:${totalBoxAmount.textContent.length}`;
+  if (!force && signature === totalBoxFitSignature) return;
+  totalBoxFitSignature = signature;
+  if (totalBoxFitPending) return;
+  totalBoxFitPending = true;
+  requestAnimationFrame(() => {
+    totalBoxFitPending = false;
+    fitTotalBoxAmount();
+  });
 }
 
 function randomContinuousDelay() {
@@ -186,10 +235,26 @@ function applyState(nextState) {
     return false;
   }
   if (revision !== null) highestAuthoritativeRevision = revision;
+  const previousState = state;
   state = { ...state, ...nextState };
   goal = state.goal;
   targetRaised = clampAmount(state.raised);
-  targetOverrideRaised = clampAmount(state.overrideRaised);
+  const wasTotalBoxVisible = Boolean(previousState.totalBoxVisible);
+  const isTotalBoxVisible = Boolean(state.totalBoxVisible);
+  const raisedChanged = state.raised !== previousState.raised;
+  const overrideChanged = state.overrideRaised !== previousState.overrideRaised;
+  if (!wasTotalBoxVisible && isTotalBoxVisible) {
+    totalBoxRoll = beginTotalBoxRoll(state.raised, state.overrideRaised);
+  } else if (isTotalBoxVisible) {
+    totalBoxRoll = retargetTotalBoxRoll(totalBoxRoll, {
+      overrideChanged,
+      overrideRaised: state.overrideRaised,
+      raised: state.raised,
+      raisedChanged
+    });
+  } else {
+    totalBoxRoll = hideTotalBoxRoll(state.raised, state.overrideRaised);
+  }
   view.setNightMode(state.nightMode);
   view.setStudentsClapping(state.studentsClapping);
   view.setThankYouVisible(state.thankYouVisible);
@@ -208,6 +273,7 @@ function applyState(nextState) {
   if (totalBox) {
     totalBox.classList.toggle("is-hidden", !state.totalBoxVisible);
     totalBox.setAttribute("aria-hidden", String(!state.totalBoxVisible));
+    if (state.totalBoxVisible) scheduleTotalBoxAmountFit(true);
   }
   if (seattleSchoolsDisplay) {
     seattleSchoolsDisplay.textContent = Number(state.seattleSchools).toLocaleString(
@@ -225,6 +291,7 @@ function applyState(nextState) {
 
 window.addEventListener("resize", () => {
   if (state.wideScreen) synchronizeDisplayMode();
+  else scheduleTotalBoxAmountFit(true);
 });
 
 async function requestJson(url, options) {
@@ -598,18 +665,20 @@ function frame(now) {
     ? targetRaised
     : exponentialStep(displayedRaised, targetRaised, delta, config.animationTimeConstantMs);
   if (Math.abs(displayedRaised - targetRaised) < .01) displayedRaised = targetRaised;
-  displayedOverrideRaised = reducedMotion()
-    ? targetOverrideRaised
-    : exponentialStep(
-      displayedOverrideRaised,
-      targetOverrideRaised,
-      delta,
-      config.animationTimeConstantMs
-    );
-  if (Math.abs(displayedOverrideRaised - targetOverrideRaised) < .01) {
-    displayedOverrideRaised = targetOverrideRaised;
+  if (state.totalBoxVisible) {
+    totalBoxRoll = advanceTotalBoxRoll(totalBoxRoll, {
+      deltaMs: delta,
+      reducedMotion: reducedMotion(),
+      timeConstantMs: config.animationTimeConstantMs
+    });
   }
-  if (totalBoxAmount) totalBoxAmount.textContent = money.format(displayedOverrideRaised);
+  if (totalBoxAmount) {
+    const formattedOverrideRaised = money.format(totalBoxRoll.displayed);
+    if (totalBoxAmount.textContent !== formattedOverrideRaised) {
+      totalBoxAmount.textContent = formattedOverrideRaised;
+      scheduleTotalBoxAmountFit();
+    }
+  }
 
   const progress = deriveProgress(displayedRaised, goal, config.overGoalRamp);
   if (previousDisplayedRatio < 1 && progress.donationRatio >= 1) {
@@ -627,7 +696,7 @@ function frame(now) {
   });
   if (
     displayedRaised !== targetRaised
-    || displayedOverrideRaised !== targetOverrideRaised
+    || (state.totalBoxVisible && totalBoxRoll.stage !== "settled")
     || now < celebrationUntil
     || renderResult.needsFrame
   ) {

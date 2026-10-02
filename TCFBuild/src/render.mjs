@@ -264,11 +264,17 @@ function setMeterWidth(meterFill, meterPercent) {
     [0, 100]
   )}%`;
   if (meterPercent > 0 && meterPercent < 100) {
-    meterFill.style.setProperty("--meter-width", width);
-    meterFill.style.width = "var(--meter-width)";
+    if (meterFill.style.getPropertyValue("--meter-width") !== width) {
+      meterFill.style.setProperty("--meter-width", width);
+    }
+    if (meterFill.style.width !== "var(--meter-width)") {
+      meterFill.style.width = "var(--meter-width)";
+    }
   } else {
-    meterFill.style.removeProperty("--meter-width");
-    meterFill.style.width = width;
+    if (meterFill.style.getPropertyValue("--meter-width")) {
+      meterFill.style.removeProperty("--meter-width");
+    }
+    if (meterFill.style.width !== width) meterFill.style.width = width;
   }
 }
 
@@ -3000,6 +3006,41 @@ export function createFundraiserView(root, scene, config) {
   const meterFill = root.querySelector("#meter-fill");
   const overGoalMessage = root.querySelector("#over-goal-message");
   const money = createCurrencyFormatter(config.locale, config.currency);
+  const renderedAttributes = new WeakMap();
+  const renderedClassStates = new WeakMap();
+
+  function setRenderedAttribute(element, name, value) {
+    const stringValue = String(value);
+    let attributes = renderedAttributes.get(element);
+    if (!attributes) {
+      attributes = new Map();
+      renderedAttributes.set(element, attributes);
+    }
+    if (attributes.get(name) === stringValue) return;
+    attributes.set(name, stringValue);
+    element.setAttribute(name, stringValue);
+  }
+
+  function setRenderedClass(element, className, enabled) {
+    let classStates = renderedClassStates.get(element);
+    if (!classStates) {
+      classStates = new Map();
+      renderedClassStates.set(element, classStates);
+    }
+    const nextState = Boolean(enabled);
+    if (classStates.get(className) === nextState) return;
+    classStates.set(className, nextState);
+    element.classList.toggle(className, nextState);
+  }
+
+  function setRenderedText(element, value) {
+    if (element.textContent !== value) element.textContent = value;
+  }
+
+  function setRenderedDataset(name, value) {
+    const stringValue = String(value);
+    if (root.dataset[name] !== stringValue) root.dataset[name] = stringValue;
+  }
 
   function update({
     raised,
@@ -3025,7 +3066,8 @@ export function createFundraiserView(root, scene, config) {
       const centerX = scene.blocks[index].x + scene.blocks[index].width / 2;
       const centerY = scene.blocks[index].y + scene.blocks[index].height / 2;
       const translatedY = centerY + drop;
-      blockNodes[index].setAttribute(
+      setRenderedAttribute(
+        blockNodes[index],
         "opacity",
         fixedPreservingEndpoints(reveal, 4, [0, 1])
       );
@@ -3038,14 +3080,16 @@ export function createFundraiserView(root, scene, config) {
         4,
         reducedMotion ? [1] : [.72, 1]
       )}) translate(${-centerX.toFixed(2)} ${-centerY.toFixed(2)})`;
-      blockNodes[index].setAttribute(
+      setRenderedAttribute(
+        blockNodes[index],
         "transform",
         transformPreservingEndpoints(transform, reveal)
       );
     }
 
     for (const finish of finishNodes) {
-      finish.element.setAttribute(
+      setRenderedAttribute(
+        finish.element,
         "opacity",
         fixedPreservingEndpoints(
           progressiveOpacity(buildingRatio, finish.start, finish.end),
@@ -3056,7 +3100,8 @@ export function createFundraiserView(root, scene, config) {
     }
 
     for (let index = 0; index < swingNodes.length; index += 1) {
-      swingNodes[index].setAttribute(
+      setRenderedAttribute(
+        swingNodes[index],
         "opacity",
         fixedPreservingEndpoints(
           revealAt(swingRatio, swingNodes.length, index),
@@ -3065,14 +3110,20 @@ export function createFundraiserView(root, scene, config) {
         )
       );
     }
-    swingsLayer.setAttribute(
+    setRenderedAttribute(
+      swingsLayer,
       "transform",
       `translate(${scene.campus.swings.offsetX} ${scene.campus.swings.offsetY})`
     );
-    swingsLayer.dataset.currentOffsetX = String(scene.campus.swings.offsetX);
-    swingsLayer.dataset.currentOffsetY = String(scene.campus.swings.offsetY);
+    if (swingsLayer.dataset.currentOffsetX !== String(scene.campus.swings.offsetX)) {
+      swingsLayer.dataset.currentOffsetX = String(scene.campus.swings.offsetX);
+    }
+    if (swingsLayer.dataset.currentOffsetY !== String(scene.campus.swings.offsetY)) {
+      swingsLayer.dataset.currentOffsetY = String(scene.campus.swings.offsetY);
+    }
     for (let index = 0; index < playgroundNodes.length; index += 1) {
-      playgroundNodes[index].setAttribute(
+      setRenderedAttribute(
+        playgroundNodes[index],
         "opacity",
         fixedPreservingEndpoints(
           revealAt(playgroundRatio, playgroundNodes.length, index),
@@ -3082,7 +3133,7 @@ export function createFundraiserView(root, scene, config) {
       );
     }
 
-    goalFlag.setAttribute("opacity", goalAchieved ? "1" : "0");
+    setRenderedAttribute(goalFlag, "opacity", goalAchieved ? "1" : "0");
 
     let visibleTeachers = 0;
     for (let index = 0; index < teacherNodes.length; index += 1) {
@@ -3093,7 +3144,8 @@ export function createFundraiserView(root, scene, config) {
         ? (reveal > 0 ? 1 : 0)
         : 1 - Math.pow(1 - reveal, 3);
       const y = teacher.y + (1 - eased) * 12;
-      teacherNodes[index].setAttribute(
+      setRenderedAttribute(
+        teacherNodes[index],
         "opacity",
         fixedPreservingEndpoints(reveal, 4, [0, 1])
       );
@@ -3102,7 +3154,8 @@ export function createFundraiserView(root, scene, config) {
         2,
         reducedMotion ? [teacher.y] : [teacher.y, teacher.y + 12]
       )}) scale(${teacher.scale})`;
-      teacherNodes[index].setAttribute(
+      setRenderedAttribute(
+        teacherNodes[index],
         "transform",
         reveal === 1 || (reducedMotion && reveal > 0)
           ? teacher.transform
@@ -3167,7 +3220,8 @@ export function createFundraiserView(root, scene, config) {
         displayedReveal,
         reducedMotion
       );
-      studentNodes[index].setAttribute(
+      setRenderedAttribute(
+        studentNodes[index],
         "opacity",
         fixedPreservingEndpoints(displayedReveal, 4, [0, 1])
       );
@@ -3180,7 +3234,8 @@ export function createFundraiserView(root, scene, config) {
         2,
         [student.startY, student.targetY]
       )}) scale(${student.scale.toFixed(3)})`;
-      studentNodes[index].setAttribute(
+      setRenderedAttribute(
+        studentNodes[index],
         "transform",
         transformPreservingEndpoints(transform, displayedReveal)
       );
@@ -3193,11 +3248,13 @@ export function createFundraiserView(root, scene, config) {
     const busOffsetY = reducedMotion
       ? 0
       : (1 - busEased) * scene.campus.bus.startOffset.y;
-    busNode.setAttribute(
+    setRenderedAttribute(
+      busNode,
       "opacity",
       fixedPreservingEndpoints(busRatio, 4, [0, 1])
     );
-    busNode.setAttribute(
+    setRenderedAttribute(
+      busNode,
       "transform",
       reducedMotion || busRatio === 1
         ? "translate(0 0)"
@@ -3205,78 +3262,98 @@ export function createFundraiserView(root, scene, config) {
           ? `translate(${scene.campus.bus.startOffset.x} ${scene.campus.bus.startOffset.y})`
           : `translate(${busOffsetX.toFixed(2)} ${busOffsetY.toFixed(2)})`
     );
-    busNode.classList.toggle("is-idling", busRatio >= .99 && !reducedMotion);
+    setRenderedClass(busNode, "is-idling", busRatio >= .99 && !reducedMotion);
 
     const percentage = Math.min(Number.MAX_VALUE, donationRatio * 100);
     const wholePercentage = wholeDisplayPercentage(percentage);
-    raisedDisplay.textContent = money.format(raised);
-    goalDisplay.textContent = `Goal ${money.format(goal)}`;
+    setRenderedText(raisedDisplay, money.format(raised));
+    setRenderedText(goalDisplay, `Goal ${money.format(goal)}`);
     if (donationRatio < .2) {
-      percentDisplay.textContent = `${wholePercentage}% — first level building!`;
+      setRenderedText(
+        percentDisplay,
+        `${wholePercentage}% — first level building!`
+      );
     } else if (donationRatio < .4) {
-      percentDisplay.textContent = `${wholePercentage}% — second level and swings!`;
+      setRenderedText(
+        percentDisplay,
+        `${wholePercentage}% — second level and swings!`
+      );
     } else if (donationRatio < .6) {
-      percentDisplay.textContent = `${wholePercentage}% — school bus arriving!`;
+      setRenderedText(
+        percentDisplay,
+        `${wholePercentage}% — school bus arriving!`
+      );
     } else if (donationRatio < .8) {
-      percentDisplay.textContent = `${wholePercentage}% — school completing!`;
+      setRenderedText(
+        percentDisplay,
+        `${wholePercentage}% — school completing!`
+      );
     } else if (donationRatio < 1) {
-      percentDisplay.textContent = `${wholePercentage}% — first students arriving!`;
+      setRenderedText(
+        percentDisplay,
+        `${wholePercentage}% — first students arriving!`
+      );
     } else if (donationRatio < 1.2) {
-      percentDisplay.textContent = `${wholePercentage}% — campus completing!`;
+      setRenderedText(
+        percentDisplay,
+        `${wholePercentage}% — campus completing!`
+      );
     } else {
-      percentDisplay.textContent = `${wholePercentage}% — campus ready!`;
+      setRenderedText(percentDisplay, `${wholePercentage}% — campus ready!`);
     }
     const meterPercent = Math.min(100, donationRatio * 100);
     setMeterWidth(meterFill, meterPercent);
-    overGoalMessage.hidden = !goalAchieved;
-    celebration.classList.toggle("is-active", celebrationActive);
+    if (overGoalMessage.hidden !== !goalAchieved) {
+      overGoalMessage.hidden = !goalAchieved;
+    }
+    setRenderedClass(celebration, "is-active", celebrationActive);
 
-    root.dataset.buildingPercent = fixedPreservingEndpoints(
+    setRenderedDataset("buildingPercent", fixedPreservingEndpoints(
       buildingRatio * 100,
       3,
       [0, 100]
-    );
-    root.dataset.visibleBlocks = fixedPreservingEndpoints(
+    ));
+    setRenderedDataset("visibleBlocks", fixedPreservingEndpoints(
       visibleBlocks,
       6,
       [0, blockNodes.length]
-    );
-    root.dataset.goalAchieved = String(goalAchieved);
-    root.dataset.studentPercent = fixedPreservingEndpoints(
+    ));
+    setRenderedDataset("goalAchieved", goalAchieved);
+    setRenderedDataset("studentPercent", fixedPreservingEndpoints(
       studentRatio * 100,
       3,
       [0, 100]
-    );
-    root.dataset.visibleStudents = fixedPreservingEndpoints(
+    ));
+    setRenderedDataset("visibleStudents", fixedPreservingEndpoints(
       visibleStudents,
       6,
       [0, studentNodes.length]
-    );
-    root.dataset.swingPercent = fixedPreservingEndpoints(
+    ));
+    setRenderedDataset("swingPercent", fixedPreservingEndpoints(
       swingRatio * 100,
       3,
       [0, 100]
-    );
-    root.dataset.teacherPercent = fixedPreservingEndpoints(
+    ));
+    setRenderedDataset("teacherPercent", fixedPreservingEndpoints(
       teacherRatio * 100,
       3,
       [0, 100]
-    );
-    root.dataset.visibleTeachers = fixedPreservingEndpoints(
+    ));
+    setRenderedDataset("visibleTeachers", fixedPreservingEndpoints(
       visibleTeachers,
       6,
       [0, teacherNodes.length]
-    );
-    root.dataset.playgroundPercent = fixedPreservingEndpoints(
+    ));
+    setRenderedDataset("playgroundPercent", fixedPreservingEndpoints(
       playgroundRatio * 100,
       3,
       [0, 100]
-    );
-    root.dataset.busPercent = fixedPreservingEndpoints(
+    ));
+    setRenderedDataset("busPercent", fixedPreservingEndpoints(
       busRatio * 100,
       3,
       [0, 100]
-    );
+    ));
     return studentRoutesPending
       ? PENDING_RENDER_RESULT
       : SETTLED_RENDER_RESULT;
@@ -3284,20 +3361,20 @@ export function createFundraiserView(root, scene, config) {
 
   function setNightMode(enabled) {
     const night = Boolean(enabled);
-    sceneSvg.classList.toggle("is-night", night);
-    root.dataset.timeOfDay = night ? "night" : "day";
+    setRenderedClass(sceneSvg, "is-night", night);
+    setRenderedDataset("timeOfDay", night ? "night" : "day");
   }
 
   function setStudentsClapping(enabled) {
     const clapping = Boolean(enabled);
-    studentLayer.classList.toggle("is-clapping", clapping);
-    root.dataset.studentsClapping = String(clapping);
+    setRenderedClass(studentLayer, "is-clapping", clapping);
+    setRenderedDataset("studentsClapping", clapping);
   }
 
   function setThankYouVisible(enabled) {
     const visible = Boolean(enabled);
-    studentLayer.classList.toggle("thank-you-enabled", visible);
-    root.dataset.thankYouEnabled = String(visible);
+    setRenderedClass(studentLayer, "thank-you-enabled", visible);
+    setRenderedDataset("thankYouEnabled", visible);
   }
 
   return Object.freeze({

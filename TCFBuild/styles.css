@@ -233,11 +233,16 @@ body { display: grid; place-items: center; }
 }
 
 .total-box-amount {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
   color: #fff;
   font-size: clamp(54px, 7cqw, 190px);
   font-weight: 950;
+  font-variant-numeric: tabular-nums;
   line-height: .95;
   letter-spacing: -.06em;
+  white-space: nowrap;
   text-shadow: 0 5px 14px rgb(0 0 0 / .65);
 }
 
@@ -260,9 +265,7 @@ body { display: grid; place-items: center; }
 }
 
 #fundraiser[data-display-mode="wide"] .total-box-amount {
-  max-width: 100%;
   font-size: clamp(54px, 12.4444cqh, 190px);
-  white-space: nowrap;
 }
 
 .total-box.is-hidden {

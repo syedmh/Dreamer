@@ -2,12 +2,18 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { deriveSliderMaximum, MAX_GOAL } from "../src/config.mjs";
+import { deriveFittedFontSize } from "../src/layout.mjs";
 import { deriveProgress } from "../src/model.mjs";
 import { createFundraiserView, progressiveOpacity } from "../src/render.mjs";
 import {
   createScene,
   deriveStudentRoutePosition
 } from "../src/scene.mjs";
+import {
+  advanceTotalBoxRoll,
+  beginTotalBoxRoll,
+  retargetTotalBoxRoll
+} from "../src/total-box.mjs";
 
 class FakeStyle {
   constructor() {
@@ -2999,6 +3005,123 @@ test("wide-screen total box preserves scene-relative proportions", async () => {
     css,
     /#fundraiser\[data-display-mode="wide"\] \.total-box-amount\s*\{[^}]*font-size:\s*clamp\(54px,\s*12\.4444cqh,\s*190px\)/s
   );
+});
+
+test("total box amount shrinks to fit wider Mac font metrics", () => {
+  const fittedSize = deriveFittedFontSize({
+    availableWidth: 796.8,
+    baseFontSize: 105.84,
+    renderedWidth: 850
+  });
+
+  assert.ok(fittedSize < 105.84);
+  assert.ok(850 * fittedSize / 105.84 <= 796.8 * .96);
+  assert.equal(deriveFittedFontSize({
+    availableWidth: 796.8,
+    baseFontSize: 105.84,
+    renderedWidth: 700
+  }), 105.84);
+});
+
+test("total box rolls from zero to raised and then raised to override", () => {
+  let roll = beginTotalBoxRoll(600, 900);
+  assert.deepEqual(roll, {
+    displayed: 0,
+    override: 900,
+    stage: "raised",
+    target: 600
+  });
+
+  roll = advanceTotalBoxRoll(roll, {
+    deltaMs: 16,
+    reducedMotion: false,
+    timeConstantMs: 420
+  });
+  assert.ok(roll.displayed > 0 && roll.displayed < 600);
+  assert.equal(roll.target, 600);
+
+  roll = advanceTotalBoxRoll(roll, {
+    deltaMs: 16,
+    reducedMotion: true,
+    timeConstantMs: 420
+  });
+  assert.equal(roll.displayed, 600);
+  assert.equal(roll.stage, "override");
+  assert.equal(roll.target, 900);
+
+  roll = advanceTotalBoxRoll(roll, {
+    deltaMs: 16,
+    reducedMotion: true,
+    timeConstantMs: 420
+  });
+  assert.equal(roll.displayed, 900);
+  assert.equal(roll.stage, "settled");
+
+  roll = retargetTotalBoxRoll(roll, {
+    overrideChanged: true,
+    overrideRaised: 1200,
+    raised: 600
+  });
+  assert.equal(roll.displayed, 600);
+  assert.equal(roll.stage, "override");
+  assert.equal(roll.target, 1200);
+});
+
+test("renderer skips redundant SVG attribute writes for unchanged frames", () => {
+  const originalDocument = Object.getOwnPropertyDescriptor(globalThis, "document");
+  const root = new FakeElement("main");
+  const elements = new Map([
+    ["#goal-display", new FakeElement("span")],
+    ["#meter-fill", new FakeElement("span")],
+    ["#over-goal-message", new FakeElement("p")],
+    ["#percent-display", new FakeElement("span")],
+    ["#raised-display", new FakeElement("p")],
+    ["#school-scene", new FakeElement("svg")]
+  ]);
+  root.querySelector = (selector) => elements.get(selector);
+  Object.defineProperty(globalThis, "document", {
+    configurable: true,
+    writable: true,
+    value: {
+      createElementNS(_namespace, name) {
+        return new FakeElement(name);
+      }
+    }
+  });
+
+  try {
+    const view = createFundraiserView(
+      root,
+      createScene({ maxStudents: 24 }),
+      { locale: "en-US", currency: "USD" }
+    );
+    const render = () => view.update({
+      raised: 120000,
+      goal: 100000,
+      ...deriveProgress(120000, 100000),
+      reducedMotion: true,
+      celebrationActive: false
+    });
+    const sceneWrites = () => elements.get("#school-scene")
+      .children
+      .flatMap(function descendants(element) {
+        return [element, ...element.children.flatMap(descendants)];
+      })
+      .reduce((total, element) => total + element.setAttributeCalls, 0);
+
+    render();
+    const firstFrameWrites = sceneWrites();
+    assert.ok(firstFrameWrites > 0);
+
+    render();
+    assert.equal(sceneWrites(), firstFrameWrites);
+  } finally {
+    if (originalDocument) {
+      Object.defineProperty(globalThis, "document", originalDocument);
+    } else {
+      delete globalThis.document;
+    }
+  }
 });
 
 test("default-motion keyboard progress smooths after authoritative commands and caps at 200%", async () => {
