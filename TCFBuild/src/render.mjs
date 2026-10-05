@@ -182,6 +182,7 @@ const FIREWORK_FULL_DURATION_MS = 1450;
 const FIREWORK_REDUCED_DURATION_MS = 680;
 const TCF_FIREWORK_DURATION_MS = 5000;
 const FIREWORK_MAX_ACTIVE = 14;
+const SCHOOL_CELEBRATION_MILESTONE = "seattle-schools-50";
 const DISTANT_SCHOOL_EVENT_CENTER_X = 800;
 const DISTANT_SCHOOL_EVENT_BOTTOM_Y = 820;
 const CAMPUS_RAISE_Y = 150;
@@ -459,6 +460,7 @@ function createDistantSchoolController(root, dataRoot, slots) {
       "stroke-linejoin": "round"
     }, motion);
     svg("rect", {
+      class: "distant-school-door",
       x: 33,
       y: -27,
       width: 14,
@@ -467,6 +469,14 @@ function createDistantSchoolController(root, dataRoot, slots) {
       fill: "#087541",
       stroke: "#17352A",
       "stroke-width": 2
+    }, motion);
+    svg("path", {
+      class: "distant-school-smile",
+      d: "M31 -18 Q40 -7 49 -18",
+      fill: "none",
+      stroke: "#087541",
+      "stroke-width": 5,
+      "stroke-linecap": "round"
     }, motion);
     for (const [index, x] of [10, 57].entries()) {
       const eye = svg("g", {
@@ -555,13 +565,33 @@ function createDistantSchoolController(root, dataRoot, slots) {
       "letter-spacing": .05
     }, motion);
     schoolLabel.textContent = "New Seattle School";
+    const fiftiethLabel = svg("text", {
+      class: "distant-school-50th-label",
+      x: 40,
+      y: -104,
+      "text-anchor": "middle",
+      "aria-hidden": "true"
+    }, motion);
+    fiftiethLabel.textContent = "50th";
 
-    schools.set(slot.slot, { position, motion, generation: 0 });
+    motion.addEventListener("animationend", (event) => {
+      if (event.animationName !== "distant-school-50th-arrival") return;
+      motion.setAttribute("class", "distant-school-drop-motion");
+      position.dataset.celebrating = "false";
+    });
+
+    schools.set(slot.slot, {
+      position,
+      motion,
+      generation: 0,
+      celebrationGeneration: 0
+    });
   }
 
   function showDistantSchool(slotNumber, {
     phase = "pending",
     generation = 1,
+    celebration = "",
     startedAt = 0,
     completesAt = startedAt + 6500,
     now = Date.now(),
@@ -570,10 +600,10 @@ function createDistantSchoolController(root, dataRoot, slots) {
     const school = schools.get(Number(slotNumber));
     if (!school) return droppedCount;
     const wasDropped = school.position.dataset.dropped === "true";
-    const wasDropping = school.motion.attributes?.get?.("class")
-      === "distant-school-drop-motion is-dropping"
-      || school.motion.getAttribute?.("class")
-        === "distant-school-drop-motion is-dropping";
+    const motionClass = school.motion.attributes?.get?.("class")
+      ?? school.motion.getAttribute?.("class")
+      ?? "";
+    const wasDropping = motionClass.includes("is-dropping");
     if (!wasDropped) droppedCount += 1;
 
     school.position.dataset.state = "dropped";
@@ -581,12 +611,25 @@ function createDistantSchoolController(root, dataRoot, slots) {
     school.position.dataset.phase = phase;
     school.position.dataset.generation = String(generation);
     school.position.dataset.reducedMotion = String(Boolean(reducedMotion));
+    school.position.dataset.celebration = celebration;
     const pending = phase === "pending" && now < completesAt;
     const generationChanged = school.generation !== generation;
+    const milestoneArrival = pending
+      && celebration === SCHOOL_CELEBRATION_MILESTONE;
     school.generation = generation;
     if (pending && !reducedMotion) {
       if (generationChanged || !wasDropping) {
         const elapsed = Math.max(0, now - startedAt);
+        if (
+          milestoneArrival
+          && school.celebrationGeneration !== generation
+        ) {
+          school.celebrationGeneration = generation;
+          school.position.dataset.celebrating = "true";
+          school.position.dataset.celebrationRun = String(
+            Number(school.position.dataset.celebrationRun || 0) + 1
+          );
+        }
         school.motion.setAttribute("class", "distant-school-drop-motion");
         school.motion.style.setProperty("animation-delay", `${-elapsed}ms`);
         school.position.dataset.dropRun = String(
@@ -595,10 +638,18 @@ function createDistantSchoolController(root, dataRoot, slots) {
         school.motion.getBoundingClientRect?.();
         school.motion.setAttribute(
           "class",
-          "distant-school-drop-motion is-dropping"
+          milestoneArrival
+            ? "distant-school-drop-motion is-dropping is-50th-arrival"
+            : "distant-school-drop-motion is-dropping"
         );
       }
-    } else {
+    } else if (school.position.dataset.celebrating !== "true") {
+      if (
+        celebration === SCHOOL_CELEBRATION_MILESTONE
+        && school.celebrationGeneration !== generation
+      ) {
+        school.celebrationGeneration = generation;
+      }
       school.motion.setAttribute("class", "distant-school-drop-motion");
       school.motion.style.removeProperty("animation-delay");
     }
@@ -614,6 +665,8 @@ function createDistantSchoolController(root, dataRoot, slots) {
     school.position.dataset.dropped = "false";
     school.position.dataset.phase = "inactive";
     school.position.dataset.reducedMotion = "false";
+    school.position.dataset.celebration = "";
+    school.position.dataset.celebrating = "false";
     school.motion.setAttribute("class", "distant-school-drop-motion");
     school.motion.style.removeProperty("animation-delay");
     droppedCount = Math.max(0, droppedCount - 1);
@@ -1802,6 +1855,7 @@ function createFireworkController(sceneSvg) {
       shape,
       removeFromActive
     );
+    group.fireworkSource = source;
     activeFireworks.push(group);
     updateActiveCount();
     return group;
@@ -1824,8 +1878,10 @@ function createFireworkController(sceneSvg) {
     return group;
   }
 
-  function clearFireworks() {
-    for (const group of [...activeFireworks]) group.removeFirework();
+  function clearFireworks(source = "") {
+    for (const group of [...activeFireworks]) {
+      if (!source || group.fireworkSource === source) group.removeFirework();
+    }
   }
 
   updateActiveCount();

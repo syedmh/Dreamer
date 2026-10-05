@@ -46,6 +46,7 @@ const DEMO_DURATION_MS = 86400;
 const MAX_DISTANT_SCHOOLS = 10;
 const DISTANT_SCHOOL_DROP_DURATION_MS = 6500;
 const SEATTLE_SCHOOL_BASELINE = 47;
+const SCHOOL_CELEBRATION_MILESTONE = "seattle-schools-50";
 const BOOLEAN_STATE_FIELDS = new Set([
   "demoActive",
   "nightMode",
@@ -366,17 +367,21 @@ export function createSharedState(initialState = {}, scheduler = {}) {
     schoolTimers.delete(slot);
     const school = state.distantSchools[slot - 1];
     if (!school || school.generation !== generation || school.phase !== "pending") return;
+    const previousSeattleSchools = Math.max(
+      SEATTLE_SCHOOL_BASELINE,
+      Number(state.seattleSchools) || 0
+    );
     const distantSchools = state.distantSchools.map((entry) => (
       entry.slot === slot
-        ? Object.freeze({ ...entry, phase: "completed" })
+        ? Object.freeze({
+            ...entry,
+            phase: "completed"
+          })
         : entry
     ));
     updateState({
       distantSchools: Object.freeze(distantSchools),
-      seattleSchools: Math.max(
-        SEATTLE_SCHOOL_BASELINE,
-        Number(state.seattleSchools) || 0
-      ) + 1
+      seattleSchools: previousSeattleSchools + 1
     });
   }
 
@@ -393,15 +398,31 @@ export function createSharedState(initialState = {}, scheduler = {}) {
       const generation = (schoolGenerations.get(slot) ?? 0) + 1;
       schoolGenerations.set(slot, generation);
       const startedAt = now();
+      const pendingSchools = state.distantSchools.filter(
+        (entry) => entry.phase === "pending"
+      ).length;
+      const projectedSeattleSchools = Math.max(
+        SEATTLE_SCHOOL_BASELINE,
+        Number(state.seattleSchools) || 0
+      ) + pendingSchools;
       const school = Object.freeze({
         slot,
         phase: "pending",
         generation,
         startedAt,
-        completesAt: startedAt + DISTANT_SCHOOL_DROP_DURATION_MS
+        completesAt: startedAt + DISTANT_SCHOOL_DROP_DURATION_MS,
+        ...(projectedSeattleSchools === 49
+          ? { celebration: SCHOOL_CELEBRATION_MILESTONE }
+          : {})
       });
       const distantSchools = Object.freeze([...state.distantSchools, school]);
-      const nextState = updateState({ distantSchools });
+      const nextState = updateState({
+        distantSchools,
+        seattleSchools: Math.max(
+          SEATTLE_SCHOOL_BASELINE,
+          Number(state.seattleSchools) || 0
+        )
+      });
       const timer = scheduleTimeout(
         () => completeSchool(slot, generation),
         DISTANT_SCHOOL_DROP_DURATION_MS

@@ -44,6 +44,10 @@ The center box displays Override Raised Amount. Normal fundraiser progress chang
 
 Up to ten distant schools can be dropped. The Seattle Schools counter starts at 47 and increases when each 6.5-second drop finishes, reaching 57 when all schools have landed. Removing a completed school decreases the count; removing one before its landing completes cancels its pending increment.
 
+The **Total Seattle Schools** row uses exact-count celebration states: at 49 the row keeps its normal appearance while the number cycles through glowing colors with a heartbeat pulse; at 50 the row switches to its milestone heartbeat treatment and starts a one-time 10-second fireworks window. Repeated live-state updates at 50 do not restart the window; leaving 50 cancels it, and reaching 50 again starts a fresh window. Reduced-motion mode keeps static milestone highlighting and suppresses the automatic fireworks.
+
+The school whose landing raises the total from 49 to 50 appears large in the foreground, smiles, rotates 360 degrees clockwise and then 360 degrees anti-clockwise before shrinking into its hill position. After settling, it remains smiling with a shining **50th** badge above it until that school is removed.
+
 ## Hidden dashboard buttons
 
 The following 13 buttons remain implemented and wired, but currently have the

@@ -63,6 +63,9 @@ let previousDisplayedRatio = displayedRaised / goal;
 let framePending = false;
 let continuousFireworksEnabled = false;
 let continuousFireworksTimeoutId = 0;
+let schoolMilestoneFireworksActive = false;
+let schoolMilestoneFireworksTimeoutId = 0;
+let schoolMilestoneFireworksStopTimeoutId = 0;
 let fireworksCleanupComplete = false;
 let totalBoxFitPending = false;
 let totalBoxFitSignature = "";
@@ -79,6 +82,7 @@ const reducedMotion = () => config.motion === "reduce"
 const BASE_SCENE_WIDTH = 1600;
 const BASE_SCENE_HEIGHT = 900;
 const SCHOOL_COMMITMENT_REVEAL_DELAY_MS = 5000;
+const SCHOOL_MILESTONE_FIREWORKS_DURATION_MS = 10000;
 
 function hideSchoolCommitmentBox() {
   clearTimeout(schoolCommitmentRevealTimeoutId);
@@ -257,6 +261,77 @@ function synchronizeContinuousFireworks(enabled) {
   }
 }
 
+function setSchoolMilestoneFireworksState(stateName) {
+  root.dataset.schoolMilestoneFireworks = stateName;
+}
+
+function cancelSchoolMilestoneFireworksLaunch() {
+  if (!schoolMilestoneFireworksTimeoutId) return;
+  clearTimeout(schoolMilestoneFireworksTimeoutId);
+  schoolMilestoneFireworksTimeoutId = 0;
+}
+
+function stopSchoolMilestoneFireworks(stateName = "inactive") {
+  schoolMilestoneFireworksActive = false;
+  cancelSchoolMilestoneFireworksLaunch();
+  if (schoolMilestoneFireworksStopTimeoutId) {
+    clearTimeout(schoolMilestoneFireworksStopTimeoutId);
+    schoolMilestoneFireworksStopTimeoutId = 0;
+  }
+  view.clearFireworks("school-milestone");
+  setSchoolMilestoneFireworksState(stateName);
+}
+
+function scheduleSchoolMilestoneFirework() {
+  if (!schoolMilestoneFireworksActive || Number(state.seattleSchools) !== 50) {
+    stopSchoolMilestoneFireworks();
+    return;
+  }
+  if (document.hidden) {
+    setSchoolMilestoneFireworksState("paused-hidden");
+    return;
+  }
+  if (schoolMilestoneFireworksTimeoutId) return;
+
+  const delay = Math.round(350 + Math.random() * 750);
+  schoolMilestoneFireworksTimeoutId = setTimeout(() => {
+    schoolMilestoneFireworksTimeoutId = 0;
+    if (!schoolMilestoneFireworksActive || Number(state.seattleSchools) !== 50) {
+      stopSchoolMilestoneFireworks();
+      return;
+    }
+    if (document.hidden) {
+      setSchoolMilestoneFireworksState("paused-hidden");
+      return;
+    }
+    view.addFirework({
+      reducedMotion: false,
+      source: "school-milestone"
+    });
+    scheduleSchoolMilestoneFirework();
+  }, delay);
+}
+
+function startSchoolMilestoneFireworks() {
+  stopSchoolMilestoneFireworks();
+  if (reducedMotion()) {
+    setSchoolMilestoneFireworksState("suppressed-reduced-motion");
+    return;
+  }
+
+  schoolMilestoneFireworksActive = true;
+  setSchoolMilestoneFireworksState("active");
+  schoolMilestoneFireworksStopTimeoutId = setTimeout(() => {
+    schoolMilestoneFireworksStopTimeoutId = 0;
+    stopSchoolMilestoneFireworks("completed");
+  }, SCHOOL_MILESTONE_FIREWORKS_DURATION_MS);
+  view.addFirework({
+    reducedMotion: false,
+    source: "school-milestone"
+  });
+  scheduleSchoolMilestoneFirework();
+}
+
 function applyState(nextState) {
   const revision = Number.isInteger(nextState?.revision)
     && nextState.revision >= 0
@@ -319,6 +394,20 @@ function applyState(nextState) {
     seattleSchoolsDisplay.textContent = Number(state.seattleSchools).toLocaleString(
       config.locale
     );
+  }
+  const previousSeattleSchools = Number(previousState.seattleSchools);
+  const seattleSchools = Number(state.seattleSchools);
+  if (buildSummaryCard) {
+    if (seattleSchools === 49 || seattleSchools === 50) {
+      buildSummaryCard.dataset.schoolMilestone = String(seattleSchools);
+    } else {
+      delete buildSummaryCard.dataset.schoolMilestone;
+    }
+  }
+  if (seattleSchools === 50 && previousSeattleSchools !== 50) {
+    startSchoolMilestoneFireworks();
+  } else if (seattleSchools !== 50 && previousSeattleSchools === 50) {
+    stopSchoolMilestoneFireworks();
   }
   if (newSchoolsCommittedDisplay) {
     newSchoolsCommittedDisplay.textContent = state.distantSchools.length.toLocaleString(
@@ -516,6 +605,9 @@ function connectEvents() {
 function handleMotionPreferenceChange() {
   synchronizeMotionState();
   if (reducedMotion()) celebrationUntil = 0;
+  if (reducedMotion() && schoolMilestoneFireworksActive) {
+    stopSchoolMilestoneFireworks("suppressed-reduced-motion");
+  }
   if (continuousFireworksEnabled) {
     cancelContinuousFireworksTimeout();
     scheduleContinuousFireworks();
@@ -532,12 +624,22 @@ if (config.motion === "auto") {
 }
 
 function handleVisibilityChange() {
-  if (!continuousFireworksEnabled) return;
-  if (document.hidden) {
-    cancelContinuousFireworksTimeout();
-    setContinuousFireworksState("paused-hidden");
-  } else {
-    scheduleContinuousFireworks();
+  if (continuousFireworksEnabled) {
+    if (document.hidden) {
+      cancelContinuousFireworksTimeout();
+      setContinuousFireworksState("paused-hidden");
+    } else {
+      scheduleContinuousFireworks();
+    }
+  }
+  if (schoolMilestoneFireworksActive) {
+    if (document.hidden) {
+      cancelSchoolMilestoneFireworksLaunch();
+      setSchoolMilestoneFireworksState("paused-hidden");
+    } else {
+      setSchoolMilestoneFireworksState("active");
+      scheduleSchoolMilestoneFirework();
+    }
   }
 }
 
@@ -546,6 +648,7 @@ function cleanupFireworks() {
   fireworksCleanupComplete = true;
   continuousFireworksEnabled = false;
   cancelContinuousFireworksTimeout();
+  stopSchoolMilestoneFireworks();
   view.clearFireworks();
 }
 
@@ -760,5 +863,6 @@ view.setNightMode(state.nightMode);
 view.setStudentsClapping(state.studentsClapping);
 view.setThankYouVisible(state.thankYouVisible);
 setContinuousFireworksState("stopped");
+setSchoolMilestoneFireworksState("inactive");
 connectEvents();
 scheduleFrame();

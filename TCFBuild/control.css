@@ -102,6 +102,9 @@ label { display: grid; gap: 7px; font-weight: 750; }
   position: sticky;
   z-index: 20;
   top: 12px;
+  width: 56.25%;
+  margin-right: auto;
+  margin-left: auto;
   background: #102d24;
 }
 
@@ -201,5 +204,6 @@ kbd { padding: 2px 6px; border: 1px solid rgb(255 255 255 / .35); border-radius:
   .dashboard { width: min(100% - 20px, 940px); padding-top: 16px; }
   .dashboard-header { align-items: flex-start; }
   .dashboard-header img { width: 64px; }
+  .preview-card { width: 75%; }
   .amount-grid { grid-template-columns: 1fr; }
 }

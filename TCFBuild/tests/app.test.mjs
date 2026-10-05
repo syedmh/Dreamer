@@ -102,6 +102,14 @@ class FakeElement {
     );
     return descendants(this).filter(matches);
   }
+
+  remove() {
+    if (!this.parentElement) return;
+    this.parentElement.children = this.parentElement.children.filter(
+      (candidate) => candidate !== this
+    );
+    this.parentElement = null;
+  }
 }
 
 class FakeInputElement extends FakeElement {}
@@ -303,10 +311,21 @@ async function withAppHarness({
       elements,
       mediaListenerCount: () => mediaListeners.size,
       pendingTimerCount: () => timers.size,
+      pendingTimerDelays: () => [...timers.values()].map(({ delay }) => delay),
       root,
       rootElements,
       runNextTimer() {
         const nextTimer = timers.entries().next().value;
+        if (!nextTimer) return false;
+        const [timerId, timer] = nextTimer;
+        timers.delete(timerId);
+        timer.callback();
+        return true;
+      },
+      runTimerWithDelay(delay) {
+        const nextTimer = [...timers.entries()].find(
+          ([, timer]) => timer.delay === delay
+        );
         if (!nextTimer) return false;
         const [timerId, timer] = nextTimer;
         timers.delete(timerId);
@@ -623,6 +642,179 @@ test("distant schools appear large at center before settling on the hill", async
   assert.match(
     css,
     /\.tcf-firework-burst\s*\{[^}]*animation:\s*tcf-firework-show var\(--tcf-firework-duration, 5s\)/s
+  );
+});
+
+test("the marked 50th school celebrates once per generation and normal schools do not", () => {
+  const originalDocument = Object.getOwnPropertyDescriptor(globalThis, "document");
+  const root = new FakeElement("main");
+  const elements = new Map([
+    ["#raised-display", new FakeElement("p")],
+    ["#school-scene", new FakeElement("svg")]
+  ]);
+  root.querySelector = (selector) => elements.get(selector);
+  Object.defineProperty(globalThis, "document", {
+    configurable: true,
+    writable: true,
+    value: {
+      createElementNS(_namespace, name) {
+        return new FakeElement(name);
+      }
+    }
+  });
+  const descendants = (node) => [
+    ...node.children,
+    ...node.children.flatMap(descendants)
+  ];
+
+  try {
+    const view = createFundraiserView(root, createScene(), {
+      locale: "en-US",
+      currency: "USD"
+    });
+    const schools = descendants(elements.get("#school-scene")).filter(
+      (node) => node.attributes.has("data-school-slot")
+    );
+    const fiftiethLabels = descendants(elements.get("#school-scene")).filter(
+      (node) => node.attributes.get("class") === "distant-school-50th-label"
+    );
+    assert.ok(fiftiethLabels.length > 0);
+    assert.ok(fiftiethLabels.every((label) => label.textContent === "50th"));
+    const normalSchool = {
+      slot: 1,
+      phase: "completed",
+      generation: 1,
+      startedAt: 0,
+      completesAt: 6500
+    };
+    const milestoneSchool = {
+      slot: 2,
+      phase: "pending",
+      generation: 1,
+      startedAt: 0,
+      completesAt: 6500,
+      celebration: "seattle-schools-50"
+    };
+
+    view.reconcileDistantSchools([normalSchool, milestoneSchool], {
+      now: 0,
+      reducedMotion: false
+    });
+    assert.equal(
+      schools[0].children[0].attributes.get("class"),
+      "distant-school-drop-motion"
+    );
+    assert.equal(schools[0].dataset.celebrationRun, undefined);
+    assert.equal(
+      schools[1].children[0].attributes.get("class"),
+      "distant-school-drop-motion is-dropping is-50th-arrival"
+    );
+    assert.equal(schools[1].dataset.celebrationRun, "1");
+
+    view.reconcileDistantSchools([normalSchool, milestoneSchool], {
+      now: 1000,
+      reducedMotion: false
+    });
+    assert.equal(schools[1].dataset.celebrationRun, "1");
+    assert.equal(
+      schools[1].children[0].attributes.get("class"),
+      "distant-school-drop-motion is-dropping is-50th-arrival"
+    );
+
+    schools[1].children[0].listeners.get("animationend")?.({
+      animationName: "distant-school-50th-arrival"
+    });
+    assert.equal(
+      schools[1].children[0].attributes.get("class"),
+      "distant-school-drop-motion"
+    );
+    assert.equal(schools[1].dataset.celebrating, "false");
+
+    view.reconcileDistantSchools([
+      normalSchool,
+      { ...milestoneSchool, phase: "completed" }
+    ], {
+      now: 6500,
+      reducedMotion: false
+    });
+    assert.equal(schools[1].dataset.celebrationRun, "1");
+    assert.equal(
+      schools[1].children[0].attributes.get("class"),
+      "distant-school-drop-motion"
+    );
+
+    view.reconcileDistantSchools([normalSchool], {
+      now: 9000,
+      reducedMotion: false
+    });
+    view.reconcileDistantSchools([
+      normalSchool,
+      {
+        ...milestoneSchool,
+        generation: 2,
+        startedAt: 9000,
+        completesAt: 15500
+      }
+    ], {
+      now: 9000,
+      reducedMotion: false
+    });
+    assert.equal(schools[1].dataset.celebrationRun, "2");
+    assert.equal(
+      schools[1].children[0].attributes.get("class"),
+      "distant-school-drop-motion is-dropping is-50th-arrival"
+    );
+  } finally {
+    if (originalDocument) {
+      Object.defineProperty(globalThis, "document", originalDocument);
+    } else {
+      delete globalThis.document;
+    }
+  }
+});
+
+test("school celebration CSS spins the full-size arrival both directions, smiles, and reduces motion", async () => {
+  const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
+  assert.match(
+    css,
+    /\.distant-school-drop-motion\.is-dropping\.is-50th-arrival\s*\{[^}]*animation-name:\s*distant-school-50th-arrival;/s
+  );
+  assert.doesNotMatch(
+    css,
+    /\.distant-school-drop-motion\.is-dropping \.distant-school-eye\s*\{[^}]*animation:/s
+  );
+  assert.match(
+    css,
+    /@keyframes distant-school-50th-arrival\s*\{[\s\S]*rotate\(1turn\)[\s\S]*rotate\(0turn\)[\s\S]*scale\(9\.5\)/
+  );
+  assert.match(
+    css,
+    /\.is-50th-arrival \.distant-school-eye\s*\{[^}]*distant-school-celebration-blink/s
+  );
+  assert.match(
+    css,
+    /\.is-50th-arrival \.distant-school-smile\s*\{[^}]*distant-school-smile-reveal/s
+  );
+  assert.match(
+    css,
+    /data-celebration="seattle-schools-50"[\s\S]*\.distant-school-smile\s*\{[^}]*opacity:\s*1;/s
+  );
+  assert.match(
+    css,
+    /data-celebration="seattle-schools-50"\]\[data-phase="completed"\][\s\S]*\.distant-school-50th-label\s*\{[^}]*animation:\s*distant-school-50th-shine 1400ms ease-in-out infinite;/s
+  );
+  assert.match(
+    css,
+    /\.distant-school-50th-label\s*\{[^}]*font-size:\s*32px;/s
+  );
+  assert.match(css, /@keyframes distant-school-50th-shine/);
+  assert.match(
+    css,
+    /data-motion="reduce"[\s\S]*\.is-50th-arrival \.distant-school-eye[\s\S]*animation:\s*none !important/s
+  );
+  assert.match(
+    css,
+    /data-motion="reduce"[\s\S]*\.is-50th-arrival \.distant-school-smile[\s\S]*opacity:\s*1;/s
   );
 });
 
@@ -3092,6 +3284,9 @@ test("display and dashboard keep their current separate layout contracts", async
   assert.match(previewCard, /position:\s*sticky;/);
   assert.match(previewCard, /top:\s*12px;/);
   assert.match(previewCard, /z-index:\s*20;/);
+  assert.match(previewCard, /width:\s*56\.25%;/);
+  assert.match(previewCard, /margin-right:\s*auto;/);
+  assert.match(previewCard, /margin-left:\s*auto;/);
 
   for (const [viewportWidth, viewportHeight] of [
     [1920, 1080],
@@ -3126,6 +3321,161 @@ test("top-right school summary remains separate from delayed commitment box", as
   assert.match(
     html,
     /id="school-commitment-box"[^>]*class="total-box school-commitment-box/
+  );
+});
+
+test("school count milestones style 49 and run one bounded fireworks window at 50", async () => {
+  let events;
+  class FakeEventSource {
+    constructor() {
+      this.listeners = new Map();
+      events = this;
+    }
+
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+
+    emit(type, value) {
+      this.listeners.get(type)?.({ data: JSON.stringify(value) });
+    }
+  }
+
+  await withAppHarness(
+    {
+      eventSourceClass: FakeEventSource,
+      locationSearch: "?motion=full"
+    },
+    async ({
+      createdElements,
+      elements,
+      pendingTimerDelays,
+      root,
+      runTimerWithDelay
+    }) => {
+      const milestoneFireworks = () => createdElements.filter(
+        (element) => element.attributes.get("data-firework-source") === "school-milestone"
+      );
+      const emitSchoolCount = (revision, seattleSchools) => events.emit("state", {
+        revision,
+        seattleSchools,
+        distantSchools: []
+      });
+
+      emitSchoolCount(1, 48);
+      assert.equal(elements.get("#build-summary-card").dataset.schoolMilestone, undefined);
+      assert.equal(milestoneFireworks().length, 0);
+
+      emitSchoolCount(2, 49);
+      assert.equal(elements.get("#build-summary-card").dataset.schoolMilestone, "49");
+      assert.equal(milestoneFireworks().length, 0);
+
+      emitSchoolCount(3, 50);
+      assert.equal(elements.get("#build-summary-card").dataset.schoolMilestone, "50");
+      assert.equal(root.dataset.schoolMilestoneFireworks, "active");
+      assert.equal(milestoneFireworks().length, 1);
+      assert.ok(pendingTimerDelays().includes(10000));
+
+      const timerCountAtFirst50 = pendingTimerDelays().length;
+      emitSchoolCount(4, 50);
+      assert.equal(milestoneFireworks().length, 1);
+      assert.equal(pendingTimerDelays().length, timerCountAtFirst50);
+
+      assert.equal(runTimerWithDelay(10000), true);
+      assert.equal(root.dataset.schoolMilestoneFireworks, "completed");
+      assert.ok(
+        milestoneFireworks().every((firework) => firework.dataset.state === "cancelled")
+      );
+      emitSchoolCount(5, 50);
+      assert.equal(milestoneFireworks().length, 1);
+      assert.equal(pendingTimerDelays().includes(10000), false);
+
+      emitSchoolCount(6, 51);
+      assert.equal(elements.get("#build-summary-card").dataset.schoolMilestone, undefined);
+      assert.equal(root.dataset.schoolMilestoneFireworks, "inactive");
+
+      emitSchoolCount(7, 50);
+      assert.equal(milestoneFireworks().length, 2);
+      assert.ok(pendingTimerDelays().includes(10000));
+
+      emitSchoolCount(8, 48);
+      assert.equal(root.dataset.schoolMilestoneFireworks, "inactive");
+      assert.equal(pendingTimerDelays().includes(10000), false);
+      assert.equal(milestoneFireworks().length, 2);
+      assert.ok(
+        milestoneFireworks().every((firework) => firework.dataset.state === "cancelled")
+      );
+    }
+  );
+});
+
+test("reduced motion keeps milestone styling but suppresses automatic fireworks", async () => {
+  let events;
+  class FakeEventSource {
+    constructor() {
+      this.listeners = new Map();
+      events = this;
+    }
+
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+
+    emit(type, value) {
+      this.listeners.get(type)?.({ data: JSON.stringify(value) });
+    }
+  }
+
+  await withAppHarness(
+    {
+      eventSourceClass: FakeEventSource,
+      locationSearch: "?motion=reduce"
+    },
+    async ({ createdElements, elements, pendingTimerDelays, root }) => {
+      events.emit("state", {
+        revision: 1,
+        seattleSchools: 49,
+        distantSchools: []
+      });
+      assert.equal(elements.get("#build-summary-card").dataset.schoolMilestone, "49");
+
+      events.emit("state", {
+        revision: 2,
+        seattleSchools: 50,
+        distantSchools: []
+      });
+      assert.equal(elements.get("#build-summary-card").dataset.schoolMilestone, "50");
+      assert.equal(root.dataset.schoolMilestoneFireworks, "suppressed-reduced-motion");
+      assert.equal(
+        createdElements.some(
+          (element) => element.attributes.get("data-firework-source") === "school-milestone"
+        ),
+        false
+      );
+      assert.equal(pendingTimerDelays().includes(10000), false);
+    }
+  );
+});
+
+test("school milestone CSS uses distinct full-motion and reduced-motion treatments", async () => {
+  const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
+  assert.match(
+    css,
+    /data-school-milestone="49"[^}]*#seattle-schools-display\s*\{[^}]*animation:\s*school-count-49-heartbeat-glow 2\.4s ease-in-out infinite/s
+  );
+  assert.match(
+    css,
+    /data-school-milestone="50"[^}]*animation:\s*school-count-heartbeat 1\.1s ease-in-out infinite/s
+  );
+  assert.match(css, /@keyframes school-count-49-heartbeat-glow/);
+  assert.match(css, /@keyframes school-count-heartbeat/);
+  assert.match(
+    css,
+    /data-motion="reduce"[\s\S]*data-school-milestone="49"[\s\S]*#seattle-schools-display[\s\S]*text-shadow:[^;}]+;/s
+  );
+  assert.match(
+    css,
+    /data-motion="reduce"[\s\S]*data-school-milestone="50"[\s\S]*transform:\s*none;/s
   );
 });
 

@@ -888,6 +888,48 @@ test("school lifecycle is authoritative, cancellable, contiguous, and generation
   shared.closeClients();
 });
 
+test("only the school projected to raise Seattle Schools from 49 to 50 is marked to celebrate", () => {
+  const clock = createFakeScheduler();
+  const shared = createSharedState({ seattleSchools: 48 }, clock);
+
+  shared.recordSchoolAction("school.add");
+  clock.advance(6500);
+  let current = shared.getState();
+  assert.equal(current.seattleSchools, 49);
+  assert.equal(current.distantSchools[0].celebration, undefined);
+
+  shared.recordSchoolAction("school.add");
+  assert.equal(
+    shared.getState().distantSchools[1].celebration,
+    "seattle-schools-50"
+  );
+  clock.advance(6500);
+  current = shared.getState();
+  assert.equal(current.seattleSchools, 50);
+  assert.equal(
+    current.distantSchools[1].celebration,
+    "seattle-schools-50"
+  );
+  assert.equal(current.distantSchools[0].celebration, undefined);
+
+  shared.recordSchoolAction("school.remove");
+  assert.equal(shared.getState().seattleSchools, 49);
+  shared.recordSchoolAction("school.add");
+  assert.equal(
+    shared.getState().distantSchools[1].celebration,
+    "seattle-schools-50"
+  );
+  clock.advance(6500);
+  current = shared.getState();
+  assert.equal(current.seattleSchools, 50);
+  assert.equal(current.distantSchools[1].generation, 2);
+  assert.equal(
+    current.distantSchools[1].celebration,
+    "seattle-schools-50"
+  );
+  shared.closeClients();
+});
+
 test("rejects unexpected hosts, methods, traversal, and oversized JSON", async () => {
   await withServers(async ({ displayPort, controlBase }) => {
     const host = await rawRequest(displayPort, "/", "GET", {
