@@ -129,8 +129,8 @@ function synchronizeToggles() {
       ? "Stop continuous fireworks"
       : "Start continuous fireworks",
     buildSummaryVisible: state.buildSummaryVisible
-      ? "Hide Seattle Schools"
-      : "Show Seattle Schools",
+      ? "Hide School Counts"
+      : "Show School Counts",
     totalBoxVisible: state.totalBoxVisible
       ? "Hide Total Box"
       : "Show Total Box",

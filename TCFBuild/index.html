@@ -70,16 +70,29 @@
         </p>
       </section>
 
-      <section id="build-summary-card" class="progress-card build-card is-hidden" aria-label="Seattle Schools count" aria-hidden="true">
-        <p class="progress-label">Seattle Schools</p>
+      <section id="build-summary-card" class="progress-card build-card is-hidden" aria-label="Seattle school counts" aria-hidden="true">
         <div class="build-metrics">
           <div class="build-metric">
-            <span id="seattle-schools-display" class="build-value">0</span>
+            <div class="school-count-row">
+              <span class="school-count-label">New Schools Committed Today</span>
+              <span id="new-schools-committed-display" class="build-value">0</span>
+            </div>
+            <div class="school-count-row">
+              <span class="school-count-label">Total Seattle Schools</span>
+              <span id="seattle-schools-display" class="build-value">0</span>
+            </div>
           </div>
         </div>
       </section>
 
-      <p id="keyboard-hint" class="keyboard-hint" hidden>Press <kbd>Space</kbd> to hide key legends · <kbd>Y</kbd> show/hide Seattle Schools · <kbd>S</kbd> drop next school · <kbd>X</kbd> remove last school · <kbd>D</kbd> demo · <kbd>N</kbd> day/night · <kbd>O</kbd> clap · <kbd>P</kbd> thank you · <kbd>K</kbd> kite · <kbd>L</kbd> clear kites · <kbd>Q</kbd> firework · <kbd>W</kbd> continuous · <kbd>F</kbd> fullscreen · arrows/Home/End progress</p>
+      <section id="school-commitment-box" class="total-box school-commitment-box is-hidden" aria-label="New schools committed" aria-hidden="true">
+        <div class="total-box-inner">
+          <span class="total-box-label">New School Committed</span>
+          <strong id="school-commitment-display" class="school-commitment-count">0</strong>
+        </div>
+      </section>
+
+      <p id="keyboard-hint" class="keyboard-hint" hidden>Press <kbd>Space</kbd> to hide key legends · <kbd>Y</kbd> show/hide school counts · <kbd>S</kbd> drop next school · <kbd>X</kbd> remove last school · <kbd>D</kbd> demo · <kbd>N</kbd> day/night · <kbd>O</kbd> clap · <kbd>P</kbd> thank you · <kbd>K</kbd> kite · <kbd>L</kbd> clear kites · <kbd>Q</kbd> firework · <kbd>W</kbd> continuous · <kbd>F</kbd> fullscreen · arrows/Home/End progress</p>
 
       <div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     </section>

@@ -141,16 +141,16 @@ body { display: grid; place-items: center; }
 }
 
 .total-box {
-  --bulb-step: clamp(30px, 2.4cqw, 52px);
-  --bulb-depth: clamp(18px, 1.35cqw, 30px);
+  --bulb-step: clamp(23px, 1.8cqw, 39px);
+  --bulb-depth: clamp(14px, 1.0125cqw, 23px);
   position: absolute;
   z-index: 12;
-  top: 50%;
+  top: 35%;
   left: 50%;
-  width: min(54cqw, 820px);
-  padding: clamp(7px, .65cqw, 18px);
+  width: min(40.5cqw, 615px);
+  padding: clamp(5px, .4875cqw, 14px);
   overflow: hidden;
-  border-radius: clamp(24px, 2.2cqw, 64px);
+  border-radius: clamp(18px, 1.65cqw, 48px);
   background: #003d20;
   box-shadow: 0 22px 75px rgb(0 0 0 / .42);
   opacity: 1;
@@ -212,10 +212,10 @@ body { display: grid; place-items: center; }
   z-index: 1;
   display: grid;
   place-items: center;
-  min-height: clamp(150px, 17cqh, 260px);
-  padding: clamp(20px, 2.2cqw, 54px);
-  border: clamp(2px, .22cqw, 6px) solid rgb(255 255 255 / .8);
-  border-radius: clamp(18px, 1.7cqw, 50px);
+  min-height: clamp(113px, 12.75cqh, 195px);
+  padding: clamp(15px, 1.65cqw, 41px);
+  border: clamp(2px, .165cqw, 5px) solid rgb(255 255 255 / .8);
+  border-radius: clamp(14px, 1.275cqw, 38px);
   background: linear-gradient(145deg, rgb(10 35 28 / .97), rgb(4 91 51 / .96));
   box-shadow:
     inset 0 0 30px rgb(255 255 255 / .12),
@@ -225,7 +225,7 @@ body { display: grid; place-items: center; }
 
 .total-box-label {
   color: #fff;
-  font-size: clamp(16px, 1.6cqw, 48px);
+  font-size: clamp(14px, 1.2cqw, 36px);
   font-weight: 900;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -237,7 +237,7 @@ body { display: grid; place-items: center; }
   min-width: 0;
   max-width: 100%;
   color: #fff;
-  font-size: clamp(54px, 7cqw, 190px);
+  font-size: clamp(41px, 5.25cqw, 143px);
   font-weight: 950;
   font-variant-numeric: tabular-nums;
   line-height: .95;
@@ -247,25 +247,70 @@ body { display: grid; place-items: center; }
 }
 
 #fundraiser[data-display-mode="wide"] .total-box {
-  --bulb-step: clamp(30px, 4.2667cqh, 52px);
-  --bulb-depth: clamp(18px, 2.4cqh, 30px);
-  width: min(91.1111cqh, calc(100cqw - 48px));
-  padding: clamp(7px, 1.1556cqh, 18px);
-  border-radius: clamp(24px, 3.9111cqh, 64px);
+  --bulb-step: clamp(23px, 3.2cqh, 39px);
+  --bulb-depth: clamp(14px, 1.8cqh, 23px);
+  width: min(68.3333cqh, calc(100cqw - 48px));
+  padding: clamp(5px, .8667cqh, 14px);
+  border-radius: clamp(18px, 2.9333cqh, 48px);
 }
 
 #fundraiser[data-display-mode="wide"] .total-box-inner {
-  padding: clamp(20px, 3.9111cqh, 54px);
-  border-width: clamp(2px, .3911cqh, 6px);
-  border-radius: clamp(18px, 3.0222cqh, 50px);
+  padding: clamp(15px, 2.9333cqh, 41px);
+  border-width: clamp(2px, .2933cqh, 5px);
+  border-radius: clamp(14px, 2.2667cqh, 38px);
 }
 
 #fundraiser[data-display-mode="wide"] .total-box-label {
-  font-size: clamp(16px, 2.8444cqh, 48px);
+  font-size: clamp(14px, 2.1333cqh, 36px);
 }
 
 #fundraiser[data-display-mode="wide"] .total-box-amount {
-  font-size: clamp(54px, 12.4444cqh, 190px);
+  font-size: clamp(41px, 9.3333cqh, 143px);
+}
+
+.school-commitment-box {
+  --bulb-step: clamp(22px, 1.7cqw, 38px);
+  --bulb-depth: clamp(13px, .95cqw, 21px);
+  z-index: 11;
+  top: 55%;
+  width: min(31cqw, 470px);
+}
+
+.school-commitment-box .total-box-inner {
+  min-height: clamp(90px, 9.5cqh, 145px);
+  padding: clamp(12px, 1.15cqw, 30px);
+}
+
+.school-commitment-box .total-box-label {
+  font-size: clamp(14px, 1.15cqw, 34px);
+}
+
+.school-commitment-count {
+  display: block;
+  color: #fff;
+  font-size: clamp(44px, 4.2cqw, 120px);
+  font-weight: 950;
+  font-variant-numeric: tabular-nums;
+  line-height: .9;
+  text-shadow: 0 5px 14px rgb(0 0 0 / .65);
+}
+
+#fundraiser[data-display-mode="wide"] .school-commitment-box {
+  --bulb-step: clamp(22px, 3.0222cqh, 38px);
+  --bulb-depth: clamp(13px, 1.6889cqh, 21px);
+  width: min(52.2667cqh, calc(100cqw - 48px));
+}
+
+#fundraiser[data-display-mode="wide"] .school-commitment-box .total-box-inner {
+  padding: clamp(12px, 2.0444cqh, 30px);
+}
+
+#fundraiser[data-display-mode="wide"] .school-commitment-box .total-box-label {
+  font-size: clamp(14px, 2.0444cqh, 34px);
+}
+
+#fundraiser[data-display-mode="wide"] .school-commitment-count {
+  font-size: clamp(44px, 7.4667cqh, 120px);
 }
 
 .total-box.is-hidden {
@@ -279,6 +324,12 @@ body { display: grid; place-items: center; }
   animation:
     total-box-drop 1400ms cubic-bezier(.16, .82, .28, 1.08),
     total-box-hover 2.8s ease-in-out 1400ms infinite;
+}
+
+.school-commitment-box.is-dropping {
+  animation:
+    school-commitment-box-drop 900ms cubic-bezier(.16, .82, .28, 1.08),
+    total-box-hover 2.8s ease-in-out 900ms infinite;
 }
 
 @keyframes total-box-hover {
@@ -323,6 +374,24 @@ body { display: grid; place-items: center; }
   }
 }
 
+@keyframes school-commitment-box-drop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% - 8px)) scale(.94);
+  }
+  68% {
+    opacity: 1;
+    transform: translate(-50%, calc(-50% + 5px)) scale(1.02);
+  }
+  84% {
+    transform: translate(-50%, calc(-50% - 2px)) scale(.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
 .progress-card {
   position: absolute;
   z-index: 5;
@@ -339,11 +408,11 @@ body { display: grid; place-items: center; }
 }
 
 .build-card {
-  top: 4.5%;
-  right: 10.5%;
-  width: 17cqw;
-  min-width: 210px;
-  padding: clamp(14px, 1.1cqw, 34px);
+  top: 1%;
+  right: 11%;
+  width: 18cqw;
+  min-width: 230px;
+  padding: clamp(10px, .75cqw, 24px);
   opacity: 1;
   transform: translateY(0);
   transition:
@@ -351,20 +420,36 @@ body { display: grid; place-items: center; }
     transform 1100ms ease;
 }
 
-.build-card .progress-label {
-  text-align: center;
-}
-
 .build-card .build-metrics {
-  margin-top: clamp(8px, .55cqw, 18px);
+  margin-top: 0;
 }
 
 .build-card .build-metric {
-  padding: clamp(14px, 1.2cqw, 36px);
+  padding: 0;
+  overflow: hidden;
+}
+
+.school-count-row {
+  display: grid;
+  justify-items: center;
+  gap: clamp(3px, .25cqw, 8px);
+  padding: clamp(8px, .55cqw, 18px);
+}
+
+.school-count-row + .school-count-row {
+  border-top: 2px solid rgb(0 122 61 / .18);
+}
+
+.school-count-label {
+  color: var(--green);
+  font-size: clamp(12px, .9cqw, 30px);
+  font-weight: 850;
+  line-height: 1.15;
+  text-align: center;
 }
 
 .build-card .build-value {
-  font-size: clamp(54px, 5cqw, 170px);
+  font-size: clamp(44px, 4cqw, 136px);
   line-height: .85;
 }
 
@@ -1003,10 +1088,6 @@ kbd {
   animation: none !important;
   opacity: 1;
   transform: none !important;
-}
-
-#fundraiser[data-motion="reduce"] .build-card {
-  transition: none;
 }
 
 #fundraiser[data-motion="reduce"] .total-box,

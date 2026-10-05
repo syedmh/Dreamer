@@ -22,7 +22,14 @@ const view = createFundraiserView(root, scene, config);
 const announcer = document.querySelector("#announcer");
 const keyboardHint = document.querySelector("#keyboard-hint");
 const buildSummaryCard = document.querySelector("#build-summary-card");
+const schoolCommitmentBox = document.querySelector("#school-commitment-box");
 const seattleSchoolsDisplay = document.querySelector("#seattle-schools-display");
+const newSchoolsCommittedDisplay = document.querySelector(
+  "#new-schools-committed-display"
+);
+const schoolCommitmentDisplay = document.querySelector(
+  "#school-commitment-display"
+);
 const totalBox = document.querySelector("#total-box");
 const totalBoxAmount = document.querySelector("#total-box-amount");
 const schoolScene = root.querySelector("#school-scene");
@@ -59,6 +66,7 @@ let continuousFireworksTimeoutId = 0;
 let fireworksCleanupComplete = false;
 let totalBoxFitPending = false;
 let totalBoxFitSignature = "";
+let schoolCommitmentRevealTimeoutId = 0;
 let nextActionSequence = 0;
 let highestAuthoritativeRevision = null;
 let initialUrlStateSent = false;
@@ -70,6 +78,33 @@ const reducedMotion = () => config.motion === "reduce"
   || (config.motion === "auto" && mediaReduced.matches);
 const BASE_SCENE_WIDTH = 1600;
 const BASE_SCENE_HEIGHT = 900;
+const SCHOOL_COMMITMENT_REVEAL_DELAY_MS = 5000;
+
+function hideSchoolCommitmentBox() {
+  clearTimeout(schoolCommitmentRevealTimeoutId);
+  schoolCommitmentRevealTimeoutId = 0;
+  if (!schoolCommitmentBox) return;
+  schoolCommitmentBox.classList.add("is-hidden");
+  schoolCommitmentBox.classList.remove("is-dropping");
+  schoolCommitmentBox.setAttribute("aria-hidden", "true");
+}
+
+function revealSchoolCommitmentBox() {
+  schoolCommitmentRevealTimeoutId = 0;
+  if (!schoolCommitmentBox) return;
+  schoolCommitmentBox.classList.remove("is-hidden", "is-dropping");
+  schoolCommitmentBox.setAttribute("aria-hidden", "false");
+  void schoolCommitmentBox.offsetWidth;
+  schoolCommitmentBox.classList.add("is-dropping");
+}
+
+function scheduleSchoolCommitmentBoxReveal() {
+  hideSchoolCommitmentBox();
+  schoolCommitmentRevealTimeoutId = setTimeout(
+    revealSchoolCommitmentBox,
+    SCHOOL_COMMITMENT_REVEAL_DELAY_MS
+  );
+}
 
 function formatViewBoxNumber(value) {
   return String(Number(value.toFixed(3)));
@@ -270,6 +305,11 @@ function applyState(nextState) {
       String(!state.buildSummaryVisible)
     );
   }
+  if (!isTotalBoxVisible) {
+    hideSchoolCommitmentBox();
+  } else if (!wasTotalBoxVisible && isTotalBoxVisible) {
+    scheduleSchoolCommitmentBoxReveal();
+  }
   if (totalBox) {
     totalBox.classList.toggle("is-hidden", !state.totalBoxVisible);
     totalBox.setAttribute("aria-hidden", String(!state.totalBoxVisible));
@@ -277,6 +317,16 @@ function applyState(nextState) {
   }
   if (seattleSchoolsDisplay) {
     seattleSchoolsDisplay.textContent = Number(state.seattleSchools).toLocaleString(
+      config.locale
+    );
+  }
+  if (newSchoolsCommittedDisplay) {
+    newSchoolsCommittedDisplay.textContent = state.distantSchools.length.toLocaleString(
+      config.locale
+    );
+  }
+  if (schoolCommitmentDisplay) {
+    schoolCommitmentDisplay.textContent = state.distantSchools.length.toLocaleString(
       config.locale
     );
   }
@@ -391,6 +441,7 @@ function executeAction(action, { announceResult = true } = {}) {
         void totalBox.offsetWidth;
         totalBox.classList.add("is-dropping");
       }
+      scheduleSchoolCommitmentBoxReveal();
       message = "Fundraising total dropped into view.";
       break;
     case "school.add": {
@@ -550,8 +601,8 @@ document.addEventListener("keydown", (event) => {
       sendCommand(
         { type: "state.toggle", field: "buildSummaryVisible" },
         state.buildSummaryVisible
-          ? "Seattle Schools count hidden."
-          : "Seattle Schools count shown."
+          ? "School counts hidden."
+          : "School counts shown."
       );
       break;
     }

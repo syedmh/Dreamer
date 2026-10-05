@@ -142,13 +142,16 @@ async function withAppHarness({
 
   const elements = new Map([
     ["#announcer", new FakeElement()],
+    ["#build-summary-card", new FakeElement()],
     ["#close-controls", new FakeElement()],
     ["#goal-input", new FakeInputElement()],
     ["#keyboard-hint", new FakeElement()],
+    ["#new-schools-committed-display", new FakeElement()],
     ["#operator-form", new FakeElement()],
     ["#operator-panel", new FakeElement()],
     ["#raised-input", new FakeInputElement()],
-    ["#raised-slider", new FakeInputElement()]
+    ["#raised-slider", new FakeInputElement()],
+    ["#seattle-schools-display", new FakeElement()]
   ]);
   elements.get("#operator-panel").hidden = true;
   elements.get("#keyboard-hint").hidden = true;
@@ -250,7 +253,7 @@ async function withAppHarness({
       }
       serverState.revision += 1;
     } else if (url === "/api/actions") {
-      if (body.type === "school.add" && serverState.distantSchools.length < 7) {
+      if (body.type === "school.add" && serverState.distantSchools.length < 10) {
         const slot = serverState.distantSchools.length + 1;
         serverState.distantSchools = [...serverState.distantSchools, {
           slot,
@@ -1625,7 +1628,17 @@ test("display school keys wait for authoritative state reconciliation", async ()
       const schools = createdElements.filter(
         (element) => element.attributes.has("data-school-slot")
       );
-      assert.equal(schools.length, 7);
+      assert.equal(schools.length, 10);
+      events.emit("state", {
+        raised: 51000,
+        goal: 100000,
+        keypressEnabled: true,
+        distantSchools: []
+      });
+      assert.equal(
+        elements.get("#new-schools-committed-display").textContent,
+        "0"
+      );
 
       keydown({ key: "s", target: root, preventDefault() {} });
       await new Promise((resolve) => setImmediate(resolve));
@@ -1646,6 +1659,10 @@ test("display school keys wait for authoritative state reconciliation", async ()
         distantSchools: [pending]
       });
       assert.equal(root.dataset.distantSchools, "1");
+      assert.equal(
+        elements.get("#new-schools-committed-display").textContent,
+        "1"
+      );
       assert.equal(schools[0].dataset.generation, "1");
       assert.equal(
         schools[0].children[0].attributes.get("class"),
@@ -1671,6 +1688,10 @@ test("display school keys wait for authoritative state reconciliation", async ()
         distantSchools: []
       });
       assert.equal(root.dataset.distantSchools, "0");
+      assert.equal(
+        elements.get("#new-schools-committed-display").textContent,
+        "0"
+      );
 
       const readded = { ...pending, generation: 2 };
       events.emit("state", {
@@ -3087,11 +3108,24 @@ test("wide-screen total box preserves scene-relative proportions", async () => {
   const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
   assert.match(
     css,
-    /#fundraiser\[data-display-mode="wide"\] \.total-box\s*\{[^}]*width:\s*min\(91\.1111cqh,\s*calc\(100cqw - 48px\)\)/s
+    /#fundraiser\[data-display-mode="wide"\] \.total-box\s*\{[^}]*width:\s*min\(68\.3333cqh,\s*calc\(100cqw - 48px\)\)/s
   );
   assert.match(
     css,
-    /#fundraiser\[data-display-mode="wide"\] \.total-box-amount\s*\{[^}]*font-size:\s*clamp\(54px,\s*12\.4444cqh,\s*190px\)/s
+    /#fundraiser\[data-display-mode="wide"\] \.total-box-amount\s*\{[^}]*font-size:\s*clamp\(41px,\s*9\.3333cqh,\s*143px\)/s
+  );
+});
+
+test("top-right school summary remains separate from delayed commitment box", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  assert.match(
+    html,
+    /id="build-summary-card"[^>]*class="progress-card build-card/
+  );
+  assert.match(html, /id="seattle-schools-display"/);
+  assert.match(
+    html,
+    /id="school-commitment-box"[^>]*class="total-box school-commitment-box/
   );
 });
 
