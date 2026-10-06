@@ -2061,7 +2061,7 @@ function addSchoolBus(root, bus) {
   const group = svg("g", {
     class: "school-bus",
     role: "img",
-    "aria-label": "Yellow TCF School Bus facing right",
+    "aria-label": `Yellow TCF School Bus facing ${bus.facing}`,
     opacity: 0,
     transform: `translate(${bus.startOffset.x} ${bus.startOffset.y})`
   }, root);
@@ -2069,6 +2069,16 @@ function addSchoolBus(root, bus) {
     class: "bus-idle-motion",
     transform: `translate(${bus.artworkOffset.x} ${bus.artworkOffset.y})`
   }, group);
+  artwork.style.setProperty("--bus-artwork-x", `${bus.artworkOffset.x}px`);
+  artwork.style.setProperty("--bus-artwork-y", `${bus.artworkOffset.y}px`);
+  artwork.style.setProperty(
+    "--bus-facing-x",
+    bus.facing === "left" ? `${bus.mirrorAxisX}px` : "0px"
+  );
+  artwork.style.setProperty(
+    "--bus-facing-scale",
+    bus.facing === "left" ? "-1" : "1"
+  );
   const yellow = "#F7C948";
   const yellowDark = "#C88A14";
   const outline = "#4A3718";
@@ -2236,6 +2246,7 @@ function addSchoolBus(root, bus) {
   }, artwork);
 
   const sideLabel = svg("text", {
+    class: "bus-readable-label",
     x: 337,
     y: 777,
     "text-anchor": "middle",
@@ -2243,7 +2254,10 @@ function addSchoolBus(root, bus) {
     "font-family": "Arial, sans-serif",
     "font-size": 11,
     "font-weight": 900,
-    "letter-spacing": .8
+    "letter-spacing": .8,
+    ...(bus.facing === "left"
+      ? { transform: "translate(674 0) scale(-1 1)" }
+      : {})
   }, artwork);
   sideLabel.textContent = "TCF School Bus";
 
@@ -2271,13 +2285,20 @@ function addSchoolBus(root, bus) {
     "stroke-width": 1.5
   }, stopSign);
   const stopLabel = svg("text", {
+    class: "bus-readable-label",
     x: bus.stopSign.cx,
     y: bus.stopSign.cy + 2.5,
     "text-anchor": "middle",
     fill: "#FFF7DF",
     "font-family": "Arial, sans-serif",
     "font-size": 5.5,
-    "font-weight": 900
+    "font-weight": 900,
+    ...(bus.facing === "left"
+      ? {
+          transform:
+            `translate(${bus.stopSign.cx * 2} 0) scale(-1 1)`
+        }
+      : {})
   }, stopSign);
   stopLabel.textContent = "STOP";
 

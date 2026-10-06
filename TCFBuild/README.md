@@ -134,7 +134,7 @@ Display-local keyboard controls:
 
 Fullscreen remains local to the display browser and is not remotely controlled.
 
-The distant-school controls use `/api/actions`, but the accepted action first mutates the authoritative `distantSchools` state. Each `S` press fills the next fixed hillside slot until all ten are present; `X` removes the most recently filled slot, and adding it again uses a new generation so every client replays the drop animation. Reconnecting clients resume a pending 6.5-second drop from its elapsed time or render an already completed school immediately.
+The distant-school controls use `/api/actions`, but the accepted action first mutates the authoritative `distantSchools` state. Each `S` press fills the next fixed hillside slot until all 25 are present: slots 1–5 retain their original positions, slots 6–12 form a raised rainbow-shaped second layer that opens around the left tree and drops beneath the first row on the right, slots 13–24 form one tightly spaced, deeper rainbow that follows directly beneath the second layer through the right edge, and school 25 sits directly beneath school 18. `X` removes the most recently filled slot, and adding it again uses a new generation so every client replays the drop animation. Reconnecting clients resume a pending 6.5-second drop from its elapsed time or render an already completed school immediately.
 
 URL parameter `motion=auto|reduce|full` controls the display animation preference. The server is authoritative for live fundraiser and effect state.
 

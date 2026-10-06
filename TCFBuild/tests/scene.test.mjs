@@ -323,112 +323,107 @@ test("teachers are omitted and campus geometry is deeply frozen", () => {
 
   const scene = createScene();
   assert.equal(scene.campus.swings.offsetX, -15);
-  assert.equal(scene.campus.swings.offsetY, 95);
+  assert.equal(scene.campus.swings.offsetY, 205);
   assert.deepEqual(scene.campus.swings.bounds, {
     left: 5,
     right: 130,
-    top: 585,
-    bottom: 755
+    top: 695,
+    bottom: 865
   });
-  assert.deepEqual(scene.campus.distantSchools, [
-    {
-      slot: 1,
-      x: 18,
-      baseY: 571,
-      scale: .54,
-      bounds: { left: 18, right: 61.2, top: 518.08, bottom: 571 }
-    },
-    {
-      slot: 2,
-      x: 82,
-      baseY: 555,
-      scale: .5,
-      bounds: { left: 82, right: 122, top: 506, bottom: 555 }
-    },
-    {
-      slot: 3,
-      x: 325,
-      baseY: 559,
-      scale: .56,
-      bounds: { left: 325, right: 369.8, top: 504.12, bottom: 559 }
-    },
-    {
-      slot: 4,
-      x: 390,
-      baseY: 578,
-      scale: .52,
-      bounds: { left: 390, right: 431.6, top: 527.04, bottom: 578 }
-    },
-    {
-      slot: 5,
-      x: 455,
-      baseY: 602,
-      scale: .48,
-      bounds: { left: 455, right: 493.4, top: 554.96, bottom: 602 }
-    },
-    {
-      slot: 6,
-      x: 357,
-      baseY: 625,
-      scale: .5,
-      bounds: { left: 357, right: 397, top: 576, bottom: 625 }
-    },
-    {
-      slot: 7,
-      x: 422,
-      baseY: 640,
-      scale: .5,
-      bounds: { left: 422, right: 462, top: 591, bottom: 640 }
-    }
-  ]);
-  assert.equal(new Set(
-    scene.campus.distantSchools.map(({ slot }) => slot)
-  ).size, 7);
+  assert.equal(scene.campus.distantSchools.length, 25);
+  assert.deepEqual(
+    scene.campus.distantSchools.map(({ slot }) => slot),
+    Array.from({ length: 25 }, (_, index) => index + 1)
+  );
+  assert.deepEqual(
+    scene.campus.distantSchools.slice(0, 5).map(
+      ({ slot, x, baseY, scale }) => ({ slot, x, baseY, scale })
+    ),
+    [
+      { slot: 1, x: 18, baseY: 571, scale: .54 },
+      { slot: 2, x: 82, baseY: 555, scale: .5 },
+      { slot: 3, x: 325, baseY: 559, scale: .56 },
+      { slot: 4, x: 390, baseY: 578, scale: .52 },
+      { slot: 5, x: 455, baseY: 602, scale: .48 }
+    ]
+  );
+  assert.deepEqual(
+    scene.campus.distantSchools.slice(5, 12).map(
+      ({ slot, x, baseY, scale }) => ({ slot, x, baseY, scale })
+    ),
+    [
+      { slot: 6, x: 18, baseY: 620, scale: .44 },
+      { slot: 7, x: 65, baseY: 610, scale: .44 },
+      { slot: 8, x: 112, baseY: 604, scale: .44 },
+      { slot: 9, x: 314, baseY: 604, scale: .44 },
+      { slot: 10, x: 361, baseY: 622, scale: .44 },
+      { slot: 11, x: 408, baseY: 634, scale: .44 },
+      { slot: 12, x: 455, baseY: 648, scale: .44 }
+    ]
+  );
+  assert.deepEqual(
+    scene.campus.distantSchools.slice(12).map(
+      ({ slot, x, baseY, scale }) => ({ slot, x, baseY, scale })
+    ),
+    [
+      { slot: 13, x: 15, baseY: 670, scale: .36 },
+      { slot: 14, x: 56, baseY: 662, scale: .36 },
+      { slot: 15, x: 97, baseY: 656, scale: .36 },
+      { slot: 16, x: 138, baseY: 652, scale: .36 },
+      { slot: 17, x: 179, baseY: 650, scale: .36 },
+      { slot: 18, x: 220, baseY: 654, scale: .36 },
+      { slot: 19, x: 261, baseY: 652, scale: .36 },
+      { slot: 20, x: 302, baseY: 650, scale: .36 },
+      { slot: 21, x: 343, baseY: 664, scale: .36 },
+      { slot: 22, x: 384, baseY: 676, scale: .36 },
+      { slot: 23, x: 425, baseY: 682, scale: .36 },
+      { slot: 24, x: 466, baseY: 692, scale: .36 },
+      { slot: 25, x: 220, baseY: 696, scale: .36 }
+    ]
+  );
   assert.ok(scene.campus.distantSchools.every(({ bounds }) =>
-    bounds.right < 540
+    bounds.right <= 540
     && bounds.bottom < scene.campus.bus.bounds.top
   ));
-  for (let index = 1; index < 5; index += 1) {
-    assert.ok(
-      scene.campus.distantSchools[index - 1].bounds.right
-        < scene.campus.distantSchools[index].bounds.left
-    );
+  assert.ok(scene.campus.distantSchools.every((school) =>
+    Math.abs(school.bounds.left - school.x) < 1e-9
+    && Math.abs(school.bounds.right - (school.x + 80 * school.scale)) < 1e-9
+    && Math.abs(school.bounds.top - (school.baseY - 98 * school.scale)) < 1e-9
+    && Math.abs(school.bounds.bottom - school.baseY) < 1e-9
+  ));
+  for (const [start, end] of [[0, 5], [5, 12], [12, 24]]) {
+    const row = scene.campus.distantSchools.slice(start, end);
+    for (let index = 1; index < row.length; index += 1) {
+      assert.ok(row[index - 1].bounds.right < row[index].bounds.left);
+    }
   }
   assert.ok(
-    scene.campus.distantSchools[5].bounds.left
-      < scene.campus.distantSchools[2].bounds.right
+    scene.campus.distantSchools[5].bounds.top
+      > scene.campus.distantSchools[0].bounds.bottom
   );
   assert.ok(
-    scene.campus.distantSchools[5].bounds.right
-      > scene.campus.distantSchools[3].bounds.left
+    scene.campus.distantSchools[12].bounds.top
+      > scene.campus.distantSchools[5].bounds.bottom
+  );
+  assert.equal(
+    scene.campus.distantSchools[24].x,
+    scene.campus.distantSchools[17].x
   );
   assert.ok(
-    scene.campus.distantSchools[5].bounds.bottom
-      > scene.campus.distantSchools[3].bounds.bottom
-  );
-  assert.ok(
-    scene.campus.distantSchools[6].bounds.left
-      < scene.campus.distantSchools[3].bounds.right
-  );
-  assert.ok(
-    scene.campus.distantSchools[6].bounds.right
-      > scene.campus.distantSchools[4].bounds.left
-  );
-  assert.ok(
-    scene.campus.distantSchools[6].bounds.bottom
-      > scene.campus.distantSchools[4].bounds.bottom
+    scene.campus.distantSchools[24].bounds.top
+      > scene.campus.distantSchools[17].bounds.bottom
   );
   assert.ok(scene.campus.distantSchools[1].bounds.right < 154.1);
   assert.ok(scene.campus.distantSchools[2].bounds.left > 309.2);
   assert.deepEqual(scene.campus.bus.bounds, {
-    left: 150,
-    right: 515,
-    top: 675,
-    bottom: 820
+    left: 1215,
+    right: 1580,
+    top: 815,
+    bottom: 960
   });
   assert.deepEqual(scene.campus.bus.startBounds, {
-    left: -450,
-    right: -85,
+    left: 1765,
+    right: 2130,
     top: 700,
     bottom: 845
   });
@@ -463,7 +458,9 @@ test("teachers are omitted and campus geometry is deeply frozen", () => {
     { cx: 235, cy: 805, r: 30 },
     { cx: 475, cy: 805, r: 30 }
   ]);
-  assert.deepEqual(scene.campus.bus.startOffset, { x: -600, y: 25 });
+  assert.equal(scene.campus.bus.facing, "left");
+  assert.equal(scene.campus.bus.mirrorAxisX, 698);
+  assert.deepEqual(scene.campus.bus.startOffset, { x: 550, y: -115 });
   assert.deepEqual(scene.campus.bus.body, {
     x: 169,
     y: 732,
@@ -494,23 +491,23 @@ test("teachers are omitted and campus geometry is deeply frozen", () => {
   });
   assert.equal(
     scene.campus.bus.routeDistance,
-    Math.hypot(600, 25)
+    Math.hypot(550, 115)
   );
   assert.equal(scene.campus.bus.bounds.right - scene.campus.bus.bounds.left, 365);
   assert.equal(scene.campus.bus.bounds.bottom - scene.campus.bus.bounds.top, 145);
-  assert.ok(scene.campus.bus.startBounds.right < 0);
-  assert.equal(scene.campus.bus.bounds.left - scene.campus.swings.bounds.right, 20);
-  assert.equal(scene.campus.bus.startBounds.top - scene.campus.swings.bounds.bottom, -55);
+  assert.ok(scene.campus.bus.startBounds.left > 1600);
+  assert.equal(scene.campus.bus.bounds.left - scene.campus.swings.bounds.right, 1085);
+  assert.equal(scene.campus.bus.startBounds.top - scene.campus.swings.bounds.bottom, -165);
   assert.equal(scene.campus.bus.wheels[1].cx - scene.campus.bus.wheels[0].cx, 240);
   assert.equal(
     scene.campus.bus.wheels[0].cy
       + scene.campus.bus.wheels[0].r
       + scene.campus.bus.artworkOffset.y,
-    820
+    960
   );
-  assert.equal(scene.campus.bus.bounds.left, 150);
-  assert.equal(900 - scene.campus.bus.bounds.bottom, 80);
-  assert.deepEqual(scene.campus.bus.artworkOffset, { x: -15, y: -15 });
+  assert.equal(scene.campus.bus.bounds.left, 1215);
+  assert.equal(scene.campus.bus.bounds.bottom, 960);
+  assert.deepEqual(scene.campus.bus.artworkOffset, { x: 1050, y: 125 });
   assert.deepEqual(scene.campus.trees, [
     { x: 230, y: 520, scale: 1.1, trunkHeight: 76 },
     { x: 1420, y: 590, scale: 1, trunkHeight: 98 },

@@ -26,6 +26,21 @@ function deepFreeze(value) {
   return Object.freeze(value);
 }
 
+function distantSchoolSlot(slot, x, baseY, scale) {
+  return {
+    slot,
+    x,
+    baseY,
+    scale,
+    bounds: {
+      left: x,
+      right: x + 80 * scale,
+      top: baseY - 98 * scale,
+      bottom: baseY
+    }
+  };
+}
+
 const CAMPUS_GEOMETRY = deepFreeze({
   flag: {
     pole: { x: 960, top: 111, bottom: 252, width: 6 },
@@ -44,8 +59,8 @@ const CAMPUS_GEOMETRY = deepFreeze({
   },
   swings: {
     offsetX: -15,
-    offsetY: 95,
-    bounds: { left: 5, right: 130, top: 585, bottom: 755 },
+    offsetY: 205,
+    bounds: { left: 5, right: 130, top: 695, bottom: 865 },
     ground: {
       cx: 82,
       cy: 646,
@@ -81,76 +96,31 @@ const CAMPUS_GEOMETRY = deepFreeze({
     }
   },
   distantSchools: [
-    {
-      slot: 1,
-      x: 18,
-      baseY: 571,
-      scale: .54,
-      bounds: { left: 18, right: 61.2, top: 518.08, bottom: 571 }
-    },
-    {
-      slot: 2,
-      x: 82,
-      baseY: 555,
-      scale: .5,
-      bounds: { left: 82, right: 122, top: 506, bottom: 555 }
-    },
-    {
-      slot: 3,
-      x: 325,
-      baseY: 559,
-      scale: .56,
-      bounds: { left: 325, right: 369.8, top: 504.12, bottom: 559 }
-    },
-    {
-      slot: 4,
-      x: 390,
-      baseY: 578,
-      scale: .52,
-      bounds: { left: 390, right: 431.6, top: 527.04, bottom: 578 }
-    },
-    {
-      slot: 5,
-      x: 455,
-      baseY: 602,
-      scale: .48,
-      bounds: { left: 455, right: 493.4, top: 554.96, bottom: 602 }
-    },
-    {
-      slot: 6,
-      x: 357,
-      baseY: 625,
-      scale: .5,
-      bounds: { left: 357, right: 397, top: 576, bottom: 625 }
-    },
-    {
-      slot: 7,
-      x: 422,
-      baseY: 640,
-      scale: .5,
-      bounds: { left: 422, right: 462, top: 591, bottom: 640 }
-    },
-    {
-      slot: 8,
-      x: 302,
-      baseY: 610,
-      scale: .5,
-      bounds: { left: 302, right: 342, top: 561, bottom: 610 }
-    },
-    {
-      slot: 9,
-      x: 260,
-      baseY: 660,
-      scale: .48,
-      bounds: { left: 260, right: 298.4, top: 612.96, bottom: 660 }
-    },
-    {
-      slot: 10,
-      x: 315,
-      baseY: 660,
-      scale: .48,
-      bounds: { left: 315, right: 353.4, top: 612.96, bottom: 660 }
-    }
+    distantSchoolSlot(1, 18, 571, .54),
+    distantSchoolSlot(2, 82, 555, .5),
+    distantSchoolSlot(3, 325, 559, .56),
+    distantSchoolSlot(4, 390, 578, .52),
+    distantSchoolSlot(5, 455, 602, .48),
+    distantSchoolSlot(6, 18, 620, .44),
+    distantSchoolSlot(7, 65, 610, .44),
+    distantSchoolSlot(8, 112, 604, .44),
+    distantSchoolSlot(9, 314, 604, .44),
+    distantSchoolSlot(10, 361, 622, .44),
+    distantSchoolSlot(11, 408, 634, .44),
+    distantSchoolSlot(12, 455, 648, .44),
+    distantSchoolSlot(13, 15, 670, .36),
+    distantSchoolSlot(14, 56, 662, .36),
+    distantSchoolSlot(15, 97, 656, .36),
+    distantSchoolSlot(16, 138, 652, .36),
+    distantSchoolSlot(17, 179, 650, .36),
+    distantSchoolSlot(18, 220, 654, .36),
+    distantSchoolSlot(19, 261, 652, .36),
+    distantSchoolSlot(20, 302, 650, .36),
+    distantSchoolSlot(21, 343, 664, .36),
+    distantSchoolSlot(22, 384, 676, .36),
+    distantSchoolSlot(23, 425, 682, .36),
+    distantSchoolSlot(24, 466, 692, .36),
+    distantSchoolSlot(25, 220, 696, .36)
   ],
   trees: [
     { x: 230, y: 520, scale: 1.1, trunkHeight: 76 },
@@ -158,11 +128,13 @@ const CAMPUS_GEOMETRY = deepFreeze({
     { x: 1330, y: 640, scale: .65, trunkHeight: 98 }
   ],
   bus: {
-    bounds: { left: 150, right: 515, top: 675, bottom: 820 },
-    artworkOffset: { x: -15, y: -15 },
-    startOffset: { x: -600, y: 25 },
-    startBounds: { left: -450, right: -85, top: 700, bottom: 845 },
-    routeDistance: Math.hypot(600, 25),
+    facing: "left",
+    mirrorAxisX: 698,
+    bounds: { left: 1215, right: 1580, top: 815, bottom: 960 },
+    artworkOffset: { x: 1050, y: 125 },
+    startOffset: { x: 550, y: -115 },
+    startBounds: { left: 1765, right: 2130, top: 700, bottom: 845 },
+    routeDistance: Math.hypot(550, 115),
     wheels: [
       { cx: 235, cy: 805, r: 30 },
       { cx: 475, cy: 805, r: 30 }

@@ -439,7 +439,7 @@ test("school boundary actions reject without state mutation or SSE broadcasts", 
     const displayEvents = await openEventStream(displayPort, "presentation");
     await displayEvents.waitFor("snapshot");
 
-    for (let index = 0; index < 7; index += 1) {
+    for (let index = 0; index < 25; index += 1) {
       const response = await fetch(`${controlBase}/api/actions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -450,7 +450,7 @@ test("school boundary actions reject without state mutation or SSE broadcasts", 
 
     const fullState = await fetch(`${controlBase}/api/state`)
       .then((response) => response.json());
-    assert.equal(fullState.distantSchools.length, 7);
+    assert.equal(fullState.distantSchools.length, 25);
     const fullStateEvents = displayEvents.eventCount("state");
     const fullActionEvents = displayEvents.eventCount("action");
 
@@ -461,7 +461,7 @@ test("school boundary actions reject without state mutation or SSE broadcasts", 
     });
     assert.equal(fullAdd.status, 409);
     assert.deepEqual(await fullAdd.json(), {
-      error: "Cannot add another distant school: the seven-school maximum is already active."
+      error: "Cannot add another distant school: the 25-school maximum is already active."
     });
     await new Promise((resolve) => setTimeout(resolve, 20));
     assert.deepEqual(
@@ -471,7 +471,7 @@ test("school boundary actions reject without state mutation or SSE broadcasts", 
     assert.equal(displayEvents.eventCount("state"), fullStateEvents);
     assert.equal(displayEvents.eventCount("action"), fullActionEvents);
 
-    for (let index = 0; index < 7; index += 1) {
+    for (let index = 0; index < 25; index += 1) {
       const response = await fetch(`${controlBase}/api/actions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

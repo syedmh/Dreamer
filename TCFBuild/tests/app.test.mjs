@@ -261,7 +261,7 @@ async function withAppHarness({
       }
       serverState.revision += 1;
     } else if (url === "/api/actions") {
-      if (body.type === "school.add" && serverState.distantSchools.length < 10) {
+      if (body.type === "school.add" && serverState.distantSchools.length < 25) {
         const slot = serverState.distantSchools.length + 1;
         serverState.distantSchools = [...serverState.distantSchools, {
           slot,
@@ -1642,7 +1642,7 @@ test("finished facade uses frozen drawing order, geometry, and progressive finis
   }
 });
 
-test("renderer adds seven distant schools in order and removes them last-in-first-out", () => {
+test("renderer adds 25 distant schools in order and removes them last-in-first-out", () => {
   const originalDocument = Object.getOwnPropertyDescriptor(globalThis, "document");
   const root = new FakeElement("main");
   const elements = new Map([
@@ -1682,10 +1682,10 @@ test("renderer adds seven distant schools in order and removes them last-in-firs
       (node) => node.attributes.get("class") === "campus-back swings"
     );
 
-    assert.equal(schools.length, 7);
+    assert.equal(schools.length, 25);
     assert.deepEqual(
       schools.map((school) => Number(school.attributes.get("data-school-slot"))),
-      [1, 2, 3, 4, 5, 6, 7]
+      Array.from({ length: 25 }, (_, index) => index + 1)
     );
     assert.ok(schools.every((school) =>
       school.attributes.get("data-state") === "inactive"
@@ -1693,9 +1693,9 @@ test("renderer adds seven distant schools in order and removes them last-in-firs
       && school.attributes.get("focusable") === "false"
     ));
     assert.equal(root.dataset.distantSchools, "0");
-    assert.equal(swings.attributes.get("transform"), "translate(-15 95)");
+    assert.equal(swings.attributes.get("transform"), "translate(-15 205)");
     assert.equal(swings.attributes.get("data-offset-x"), "-15");
-    assert.equal(swings.attributes.get("data-offset-y"), "95");
+    assert.equal(swings.attributes.get("data-offset-y"), "205");
 
     view.update({
       raised: 125001,
@@ -1705,7 +1705,7 @@ test("renderer adds seven distant schools in order and removes them last-in-firs
       celebrationActive: false
     });
     assert.equal(swings.dataset.currentOffsetX, "-15");
-    assert.equal(swings.dataset.currentOffsetY, "95");
+    assert.equal(swings.dataset.currentOffsetY, "205");
     view.update({
       raised: 130000,
       goal: 100000,
@@ -1713,8 +1713,8 @@ test("renderer adds seven distant schools in order and removes them last-in-firs
       reducedMotion: false,
       celebrationActive: false
     });
-    assert.equal(swings.attributes.get("transform"), "translate(-15 95)");
-    assert.equal(swings.dataset.currentOffsetY, "95");
+    assert.equal(swings.attributes.get("transform"), "translate(-15 205)");
+    assert.equal(swings.dataset.currentOffsetY, "205");
     view.update({
       raised: 130000,
       goal: 100000,
@@ -1722,8 +1722,8 @@ test("renderer adds seven distant schools in order and removes them last-in-firs
       reducedMotion: true,
       celebrationActive: false
     });
-    assert.equal(swings.attributes.get("transform"), "translate(-15 95)");
-    assert.equal(swings.dataset.currentOffsetY, "95");
+    assert.equal(swings.attributes.get("transform"), "translate(-15 205)");
+    assert.equal(swings.dataset.currentOffsetY, "205");
     view.update({
       raised: 135000,
       goal: 100000,
@@ -1731,8 +1731,8 @@ test("renderer adds seven distant schools in order and removes them last-in-firs
       reducedMotion: true,
       celebrationActive: false
     });
-    assert.equal(swings.attributes.get("transform"), "translate(-15 95)");
-    assert.equal(swings.dataset.currentOffsetY, "95");
+    assert.equal(swings.attributes.get("transform"), "translate(-15 205)");
+    assert.equal(swings.dataset.currentOffsetY, "205");
 
     assert.equal(view.addDistantSchool({ reducedMotion: false }), 1);
     const school1 = schools[0];
@@ -1750,31 +1750,25 @@ test("renderer adds seven distant schools in order and removes them last-in-firs
     assert.equal(school1Motion.style.getPropertyValue("--school-drop-y"), "736.89px");
 
     assert.equal(view.addDistantSchool({ reducedMotion: true }), 2);
-    assert.equal(view.addDistantSchool({ reducedMotion: false }), 3);
-    assert.equal(view.addDistantSchool({ reducedMotion: false }), 4);
-    assert.equal(view.addDistantSchool({ reducedMotion: false }), 5);
-    assert.equal(view.addDistantSchool({ reducedMotion: false }), 6);
-    assert.equal(view.addDistantSchool({ reducedMotion: false }), 7);
-    assert.equal(view.addDistantSchool({ reducedMotion: false }), 7);
-    assert.equal(root.dataset.distantSchools, "7");
+    for (let count = 3; count <= 25; count += 1) {
+      assert.equal(view.addDistantSchool({ reducedMotion: false }), count);
+    }
+    assert.equal(view.addDistantSchool({ reducedMotion: false }), 25);
+    assert.equal(root.dataset.distantSchools, "25");
     assert.ok(schools.every((school) => school.dataset.dropped === "true"));
 
-    const school7 = schools.find(
-      (school) => school.attributes.get("data-school-slot") === "7"
+    const school25 = schools.find(
+      (school) => school.attributes.get("data-school-slot") === "25"
     );
-    assert.equal(view.removeLastDistantSchool(), 6);
-    assert.equal(root.dataset.distantSchools, "6");
-    assert.equal(school7.dataset.state, "inactive");
-    assert.equal(school7.dataset.dropped, "false");
-    assert.equal(view.addDistantSchool({ reducedMotion: false }), 7);
-    assert.equal(school7.dataset.dropRun, "2");
-    assert.equal(view.removeLastDistantSchool(), 6);
-    assert.equal(view.removeLastDistantSchool(), 5);
-    assert.equal(view.removeLastDistantSchool(), 4);
-    assert.equal(view.removeLastDistantSchool(), 3);
-    assert.equal(view.removeLastDistantSchool(), 2);
-    assert.equal(view.removeLastDistantSchool(), 1);
-    assert.equal(view.removeLastDistantSchool(), 0);
+    assert.equal(view.removeLastDistantSchool(), 24);
+    assert.equal(root.dataset.distantSchools, "24");
+    assert.equal(school25.dataset.state, "inactive");
+    assert.equal(school25.dataset.dropped, "false");
+    assert.equal(view.addDistantSchool({ reducedMotion: false }), 25);
+    assert.equal(school25.dataset.dropRun, "2");
+    for (let count = 24; count >= 0; count -= 1) {
+      assert.equal(view.removeLastDistantSchool(), count);
+    }
     assert.equal(view.removeLastDistantSchool(), 0);
   } finally {
     if (originalDocument) {
@@ -2014,7 +2008,7 @@ test("rejected school boundary actions refetch authority without success or fire
             status: 409,
             async json() {
               return {
-                error: "Cannot add another distant school: the seven-school maximum is already active."
+                error: "Cannot add another distant school: the 25-school maximum is already active."
               };
             }
           };
@@ -2026,7 +2020,7 @@ test("rejected school boundary actions refetch authority without success or fire
               revision: 8,
               raised: 51000,
               goal: 100000,
-              distantSchools: Array.from({ length: 7 }, (_, index) => ({
+              distantSchools: Array.from({ length: 25 }, (_, index) => ({
                 slot: index + 1,
                 phase: "completed",
                 generation: 1,
@@ -2051,7 +2045,7 @@ test("rejected school boundary actions refetch authority without success or fire
         "/api/actions",
         "/api/state"
       ]);
-      assert.equal(root.dataset.distantSchools, "7");
+      assert.equal(root.dataset.distantSchools, "25");
       assert.equal(createdElements.filter(
         (element) => (element.attributes.get("class") ?? "")
           .split(/\s+/)
@@ -2059,7 +2053,7 @@ test("rejected school boundary actions refetch authority without success or fire
       ).length, 0);
       assert.equal(
         elements.get("#announcer").textContent,
-        "Cannot add another distant school: the seven-school maximum is already active."
+        "Cannot add another distant school: the 25-school maximum is already active."
       );
     }
   );
@@ -2226,12 +2220,12 @@ test("campus additions reveal at frozen thresholds with bounded one-shot motion"
 
     update(1.25);
     assert.equal(Number(bus.attributes.get("opacity")), 0);
-    assert.equal(bus.attributes.get("transform"), "translate(-600 25)");
+    assert.equal(bus.attributes.get("transform"), "translate(550 -115)");
     assert.equal(root.dataset.busPercent, "0.000");
 
     update(1.30);
     assert.equal(Number(bus.attributes.get("opacity")), .5);
-    assert.equal(bus.attributes.get("transform"), "translate(-75.00 3.13)");
+    assert.equal(bus.attributes.get("transform"), "translate(68.75 -14.38)");
     assert.equal(root.dataset.busPercent, "50.000");
 
     update(1.30, true);
@@ -2245,7 +2239,7 @@ test("campus additions reveal at frozen thresholds with bounded one-shot motion"
 
     assert.equal(
       bus.attributes.get("aria-label"),
-      "Yellow TCF School Bus facing right"
+      "Yellow TCF School Bus facing left"
     );
     assert.equal(bus.attributes.get("role"), "img");
     assert.equal(nodes.filter((node) => classes(node) === "school-bus").length, 1);
@@ -2261,6 +2255,25 @@ test("campus additions reveal at frozen thresholds with bounded one-shot motion"
     assert.equal(bus.querySelectorAll(".bus-rub-rail").length, 2);
     assert.equal(bus.querySelectorAll(".bus-roof-stud").length, 0);
     assert.equal(bus.querySelectorAll(".bus-idle-motion").length, 1);
+    assert.equal(
+      bus.querySelector(".bus-idle-motion").style.getPropertyValue(
+        "--bus-artwork-x"
+      ),
+      "1050px"
+    );
+    assert.equal(
+      bus.querySelector(".bus-idle-motion").style.getPropertyValue(
+        "--bus-artwork-y"
+      ),
+      "125px"
+    );
+    assert.equal(
+      bus.querySelector(".bus-idle-motion").style.getPropertyValue(
+        "--bus-facing-scale"
+      ),
+      "-1"
+    );
+    assert.equal(bus.querySelectorAll(".bus-readable-label").length, 2);
     assert.equal(bus.querySelectorAll(".bus-wheel").length, 2);
     for (const wheelNode of bus.querySelectorAll(".bus-wheel")) {
       const centerY = Number(wheelNode.attributes.get("cy"));

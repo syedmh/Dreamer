@@ -43,7 +43,7 @@ export const MAX_SSE_CLIENTS_PER_ROLE = 8;
 const MAX_SSE_PENDING_BYTES = 65536;
 const DEMO_UPDATE_INTERVAL_MS = 200;
 const DEMO_DURATION_MS = 86400;
-const MAX_DISTANT_SCHOOLS = 10;
+const MAX_DISTANT_SCHOOLS = 25;
 const DISTANT_SCHOOL_DROP_DURATION_MS = 6500;
 const SEATTLE_SCHOOL_BASELINE = 47;
 const SCHOOL_CELEBRATION_MILESTONE = "seattle-schools-50";
@@ -391,7 +391,7 @@ export function createSharedState(initialState = {}, scheduler = {}) {
         return Object.freeze({
           changed: false,
           state,
-          error: "Cannot add another distant school: the ten-school maximum is already active."
+          error: "Cannot add another distant school: the 25-school maximum is already active."
         });
       }
       const slot = state.distantSchools.length + 1;
