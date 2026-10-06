@@ -346,7 +346,7 @@ function addDefinitions(root) {
     y2: 900
   }, defs);
   svg("stop", { offset: "0%", "stop-color": "#07142F" }, nightSky);
-  svg("stop", { offset: "100%", "stop-color": "#28476F" }, nightSky);
+  svg("stop", { offset: "100%", "stop-color": "#07142F" }, nightSky);
 
   const grass = svg("linearGradient", {
     id: "grass-gradient",
@@ -765,7 +765,7 @@ function addLandscape(root, trees, distantSchools, dataRoot) {
     cx: 762,
     cy: 78,
     r: 48,
-    fill: "#122746"
+    fill: "#07142F"
   }, moon);
 
   const sun = svg("g", {
@@ -839,14 +839,15 @@ function addLandscape(root, trees, distantSchools, dataRoot) {
     svg("circle", { cx: 51, cy: 5, r: 31, fill: "#FFF7DF" }, group);
   }
 
+  const groundLayer = svg("g", { class: "landscape-ground" }, landscape);
   svg("path", {
     d: "M-4000 435 H0 Q210 355 410 428 T810 418 T1210 402 T1600 415 H5600 V1800 H-4000Z",
     fill: "#57BE74"
-  }, landscape);
+  }, groundLayer);
   svg("path", {
     d: "M-4000 515 H0 Q230 440 435 511 T845 498 T1240 482 T1600 500 H5600 V1800 H-4000Z",
     fill: "url(#grass-gradient)"
-  }, landscape);
+  }, groundLayer);
 
   const raisedDistantSchools = distantSchools.map((school) => ({
     ...school,
@@ -858,7 +859,7 @@ function addLandscape(root, trees, distantSchools, dataRoot) {
     }
   }));
   const distantSchoolController = createDistantSchoolController(
-    landscape,
+    groundLayer,
     dataRoot,
     raisedDistantSchools
   );
@@ -871,7 +872,7 @@ function addLandscape(root, trees, distantSchools, dataRoot) {
     const tree = svg("g", {
       class: wideOnly ? "tree tree--wide" : "tree",
       transform: `translate(${x} ${y - CAMPUS_RAISE_Y}) scale(${scale})`
-    }, landscape);
+    }, groundLayer);
     svg("rect", {
       x: -10,
       y: 12,
@@ -885,16 +886,7 @@ function addLandscape(root, trees, distantSchools, dataRoot) {
     svg("circle", { cx: 34, cy: 20, r: 38, fill: "#0A713E" }, tree);
   }
 
-  const widePlayground = addWidePlayground(landscape);
-
-  svg("rect", {
-    class: "night-ground-shade",
-    x: -4000,
-    y: 280,
-    width: 9600,
-    height: 1520,
-    fill: "#07142F"
-  }, landscape);
+  const widePlayground = addWidePlayground(groundLayer);
 
   return Object.freeze({
     ...distantSchoolController,
@@ -1941,9 +1933,17 @@ function addSwings(root, swings) {
   }, frame);
   for (const foot of swings.feet) {
     svg("line", {
+      class: "swing-pole-outline",
       ...foot,
-      stroke: "#087541",
-      "stroke-width": 10,
+      stroke: "#45515C",
+      "stroke-width": 15,
+      "stroke-linecap": "round"
+    }, frame);
+    svg("line", {
+      class: "swing-pole",
+      ...foot,
+      stroke: "#B9C4CC",
+      "stroke-width": 9,
       "stroke-linecap": "round"
     }, frame);
   }
@@ -2008,35 +2008,6 @@ function addSwings(root, swings) {
     }, safetyPads);
   }
 
-  const climbingSide = svg("g", {
-    class: "playground-climbing-side",
-    opacity: 0
-  }, layer);
-  for (const brace of swings.braces) {
-    svg("line", {
-      ...brace,
-      stroke: "#F0A533",
-      "stroke-width": 6,
-      "stroke-linecap": "round"
-    }, climbingSide);
-  }
-  for (const rail of swings.ladder.rails) {
-    svg("line", {
-      ...rail,
-      stroke: "#0A713E",
-      "stroke-width": 6,
-      "stroke-linecap": "round"
-    }, climbingSide);
-  }
-  for (const rung of swings.ladder.rungs) {
-    svg("line", {
-      ...rung,
-      stroke: "#FFD45F",
-      "stroke-width": 5,
-      "stroke-linecap": "round"
-    }, climbingSide);
-  }
-
   const decorations = svg("g", {
     class: "playground-decorations",
     opacity: 0
@@ -2053,7 +2024,7 @@ function addSwings(root, swings) {
   return {
     layer,
     baseNodes: [ground, frame, ropes, seats],
-    enhancementNodes: [safetyPads, climbingSide, decorations]
+    enhancementNodes: [safetyPads, decorations]
   };
 }
 

@@ -78,22 +78,7 @@ const CAMPUS_GEOMETRY = deepFreeze({
     seats: [
       { centerX: 75, topY: 508.1, y: 590, rotation: -11 },
       { centerX: 101, topY: 501.4, y: 581, rotation: -11 }
-    ],
-    braces: [
-      { x1: 29, y1: 616, x2: 72, y2: 605 },
-      { x1: 98, y1: 598, x2: 137, y2: 588 }
-    ],
-    ladder: {
-      rails: [
-        { x1: 108, y1: 526, x2: 119, y2: 637 },
-        { x1: 123, y1: 522, x2: 145, y2: 632 }
-      ],
-      rungs: [
-        { x1: 111, y1: 559, x2: 130, y2: 554 },
-        { x1: 113, y1: 581, x2: 134, y2: 576 },
-        { x1: 115, y1: 603, x2: 138, y2: 598 }
-      ]
-    }
+    ]
   },
   distantSchools: [
     distantSchoolSlot(1, 18, 571, .54),

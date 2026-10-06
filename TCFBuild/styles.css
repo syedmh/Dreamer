@@ -409,12 +409,13 @@ body { display: grid; place-items: center; }
 
 .build-card {
   top: 1%;
-  right: 11%;
+  right: 13%;
   width: 18cqw;
   min-width: 230px;
   padding: clamp(10px, .75cqw, 24px);
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(.9);
+  transform-origin: top right;
   transition:
     opacity 1100ms ease,
     transform 1100ms ease;
@@ -522,7 +523,7 @@ body { display: grid; place-items: center; }
 .build-card.is-hidden {
   pointer-events: none;
   opacity: 0;
-  transform: translateY(24px);
+  transform: translateY(24px) scale(.9);
 }
 
 .progress-label {
@@ -660,20 +661,19 @@ kbd {
 .night-sky,
 .night-stars,
 .night-moon,
-.night-ground-shade,
 .day-sun {
   transition: opacity 700ms ease;
 }
 
 .night-sky,
 .night-stars,
-.night-moon,
-.night-ground-shade {
+.night-moon {
   opacity: 0;
 }
 
-.night-ground-shade {
-  pointer-events: none;
+.wide-mountains,
+.landscape-ground {
+  transition: filter 700ms ease;
 }
 
 #school-scene.is-night .night-sky,
@@ -682,8 +682,9 @@ kbd {
   opacity: 1;
 }
 
-#school-scene.is-night .night-ground-shade {
-  opacity: .32;
+#school-scene.is-night .wide-mountains,
+#school-scene.is-night .landscape-ground {
+  filter: brightness(.68) saturate(.78);
 }
 
 #school-scene.is-night .day-sun {
