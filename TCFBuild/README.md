@@ -138,7 +138,7 @@ The distant-school controls use `/api/actions`, but the accepted action first mu
 
 URL parameter `motion=auto|reduce|full` controls the display animation preference. The server is authoritative for live fundraiser and effect state.
 
-Valid, explicitly supplied `goal` and `raised` URL parameters are applied as a one-time authoritative initialization after the display receives its first server snapshot. The browser sends one absolute state patch containing only the fundraiser parameters that were explicitly supplied, renders the server response, and then follows normal revision ordering. Automatic SSE reconnects do not resend the initialization; reloading the page may initialize once again. A dashboard preview URL with no `goal` or `raised` parameter never initializes fundraiser state.
+Valid `goal` and `raised` URL parameters remain display-local configuration only. They never mutate shared server state; the first server snapshot and all subsequent live updates are authoritative.
 
 Raised amounts are capped at 120% of the current goal across URL configuration, keyboard adjustments, dashboard controls, demo playback, and the server API. The campus is fully complete at the 120% ceiling. The dashboard and display retain whole-number progress copy while preserving precise amount and ratio calculations internally.
 

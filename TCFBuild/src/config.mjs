@@ -147,17 +147,7 @@ export function parseConfig(search = "", overrides = {}) {
   const base = { ...DEFAULT_CONFIG, ...overrides };
   const requestedGoal = params.get("goal");
   const requestedRaised = params.get("raised");
-  const hasExplicitGoal = requestedGoal !== null
-    && requestedGoal.trim() !== ""
-    && Number.isFinite(Number(requestedGoal))
-    && Number(requestedGoal) >= MIN_GOAL
-    && Number(requestedGoal) <= MAX_GOAL;
   const goal = finiteNumber(requestedGoal, base.goal, MIN_GOAL, MAX_GOAL);
-  const hasExplicitRaised = requestedRaised !== null
-    && requestedRaised.trim() !== ""
-    && Number.isFinite(Number(requestedRaised))
-    && Number(requestedRaised) >= 0
-    && Number(requestedRaised) <= MAX_RAISED;
   const raised = Math.min(
     deriveSliderMaximum(goal),
     finiteNumber(requestedRaised, base.raised, 0, MAX_RAISED)
@@ -166,16 +156,11 @@ export function parseConfig(search = "", overrides = {}) {
   const motion = ["auto", "reduce", "full"].includes(requestedMotion)
     ? requestedMotion
     : "auto";
-  const authoritativeInitialState = Object.freeze({
-    ...(hasExplicitGoal ? { goal } : {}),
-    ...(hasExplicitRaised ? { raised } : {})
-  });
 
   return Object.freeze({
     ...base,
     goal,
     raised,
-    authoritativeInitialState,
     controls: flag(params.get("controls")),
     demo: flag(params.get("demo")),
     motion

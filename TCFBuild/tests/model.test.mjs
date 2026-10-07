@@ -56,28 +56,9 @@ test("URL configuration accepts valid event parameters and rejects invalid value
   assert.equal(config.controls, true);
   assert.equal(config.demo, true);
   assert.equal(config.motion, "reduce");
-  assert.deepEqual(config.authoritativeInitialState, {
-    goal: 200000,
-    raised: 125000
-  });
+  assert.equal("authoritativeInitialState" in config, false);
   assert.equal(parseConfig("?goal=0&raised=-1").goal, DEFAULT_CONFIG.goal);
   assert.equal(parseConfig("?goal=0&raised=-1").raised, DEFAULT_CONFIG.raised);
-  assert.deepEqual(
-    parseConfig("?goal=0&raised=-1").authoritativeInitialState,
-    {}
-  );
-  assert.deepEqual(
-    parseConfig("?client=preview&motion=reduce").authoritativeInitialState,
-    {}
-  );
-  assert.deepEqual(
-    parseConfig("?goal=&raised=").authoritativeInitialState,
-    {}
-  );
-  assert.deepEqual(
-    parseConfig("?raised=210000").authoritativeInitialState,
-    { raised: 120000 }
-  );
 
   const arbitrary = parseConfig("?goal=12345&raised=123.75");
   assert.equal(arbitrary.goal, 12345);

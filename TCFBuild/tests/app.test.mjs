@@ -1116,9 +1116,8 @@ test("authoritative keypress disable blocks display shortcuts until re-enabled",
   );
 });
 
-test("explicit fundraiser URL state initializes once after the first snapshot without optimism", async () => {
+test("explicit fundraiser URL state is display-local until authoritative snapshots", async () => {
   let events;
-  let resolvePatch;
   const requests = [];
   class FakeEventSource {
     constructor(url) {
@@ -1140,17 +1139,15 @@ test("explicit fundraiser URL state initializes once after the first snapshot wi
     {
       eventSourceClass: FakeEventSource,
       fetchImplementation(url, options) {
-        requests.push({ url, body: JSON.parse(options.body) });
-        return new Promise((resolve) => {
-          resolvePatch = resolve;
-        });
+        requests.push({ url, options });
+        throw new Error("unexpected fetch");
       },
-      locationSearch: "?raised=60000&motion=reduce"
+      locationSearch: "?goal=500000&raised=600000&motion=reduce"
     },
     async ({ animationFrames, rootElements, startedAt }) => {
       while (animationFrames.length > 0) animationFrames.shift()(startedAt);
-      assert.equal(rootElements.get("#raised-display").textContent, "$0");
-      assert.equal(rootElements.get("#goal-display").textContent, "Goal $100,000");
+      assert.equal(rootElements.get("#raised-display").textContent, "$600,000");
+      assert.equal(rootElements.get("#goal-display").textContent, "Goal $500,000");
       assert.deepEqual(requests, []);
 
       events.emit("snapshot", {
@@ -1161,45 +1158,29 @@ test("explicit fundraiser URL state initializes once after the first snapshot wi
           distantSchools: []
         }
       });
-      assert.deepEqual(requests, [{
-        url: "/api/state",
-        body: { raised: 60000 }
-      }]);
-
-      events.emit("state", {
-        revision: 7,
-        raised: 70000,
-        goal: 140000,
-        distantSchools: []
-      });
-      resolvePatch({
-        ok: true,
-        async json() {
-          return {
-            revision: 6,
-            raised: 60000,
-            goal: 120000,
-            distantSchools: []
-          };
-        }
-      });
       await new Promise((resolve) => setImmediate(resolve));
       while (animationFrames.length > 0) {
         animationFrames.shift()(startedAt + 1);
       }
-      assert.equal(rootElements.get("#raised-display").textContent, "$70,000");
-      assert.equal(rootElements.get("#goal-display").textContent, "Goal $140,000");
+      assert.deepEqual(requests, []);
+      assert.equal(rootElements.get("#raised-display").textContent, "$10,000");
+      assert.equal(rootElements.get("#goal-display").textContent, "Goal $120,000");
 
       events.emit("snapshot", {
         state: {
-          revision: 8,
-          raised: 71000,
-          goal: 140000,
+          revision: 6,
+          raised: 11000,
+          goal: 130000,
           distantSchools: []
         }
       });
       await new Promise((resolve) => setImmediate(resolve));
-      assert.equal(requests.length, 1);
+      while (animationFrames.length > 0) {
+        animationFrames.shift()(startedAt + 2);
+      }
+      assert.deepEqual(requests, []);
+      assert.equal(rootElements.get("#raised-display").textContent, "$11,000");
+      assert.equal(rootElements.get("#goal-display").textContent, "Goal $130,000");
       assert.equal(events.url, "/events?role=presentation");
     }
   );
@@ -3810,7 +3791,7 @@ test("default-motion keyboard progress smooths after authoritative commands and 
         initialNow += 16;
         initialFrames += 1;
       }
-      assert.ok(initialFrames > 1);
+      assert.equal(initialFrames, 1);
       assert.equal(animationFrames.length, 0);
       assert.equal(root.dataset.motion, "full");
       const settledWrites = createdElements.reduce(

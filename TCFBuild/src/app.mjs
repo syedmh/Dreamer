@@ -41,8 +41,8 @@ const schoolScene = root.querySelector("#school-scene");
 const money = createCurrencyFormatter(config.locale, config.currency);
 
 let state = {
-  raised: DEFAULT_CONFIG.raised,
-  goal: DEFAULT_CONFIG.goal,
+  raised: config.raised,
+  goal: config.goal,
   overrideRaised: DEFAULT_CONFIG.raised,
   seattleSchools: 0,
   operationCost: 0,
@@ -77,7 +77,6 @@ let totalBoxFitSignature = "";
 let schoolCommitmentRevealTimeoutId = 0;
 let nextActionSequence = 0;
 let highestAuthoritativeRevision = null;
-let initialUrlStateSent = false;
 const executedActionIds = new Set();
 const MAX_EXECUTED_ACTION_IDS = 256;
 
@@ -479,10 +478,6 @@ async function mutate(url, body, successMessage) {
   }
 }
 
-function patchState(patch, successMessage) {
-  return mutate("/api/state", patch, successMessage);
-}
-
 function sendCommand(command, successMessage) {
   return mutate("/api/commands", command, successMessage);
 }
@@ -585,12 +580,6 @@ function connectEvents() {
   events.addEventListener("snapshot", (event) => {
     const snapshot = JSON.parse(event.data);
     applyState(snapshot.state);
-    if (!initialUrlStateSent) {
-      initialUrlStateSent = true;
-      if (Object.keys(config.authoritativeInitialState).length > 0) {
-        patchState(config.authoritativeInitialState);
-      }
-    }
   });
   events.addEventListener("state", (event) => {
     applyState(JSON.parse(event.data));
