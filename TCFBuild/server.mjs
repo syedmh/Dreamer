@@ -28,7 +28,7 @@ const MIME_TYPES = new Map([
 
 const BASE_SECURITY_HEADERS = Object.freeze({
   "Cache-Control": "no-store",
-  "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-5T7sWeLQQ4jOrxFZHC2c5KDWDLW/9fl6mf5bWn5D1IM='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
+  "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-n8wTSyiSX1RjQfQG72kB2+PsVWhj3/tou/25uDugF3o='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
   "Cross-Origin-Resource-Policy": "same-origin",
   "Referrer-Policy": "no-referrer",
   "X-Content-Type-Options": "nosniff",

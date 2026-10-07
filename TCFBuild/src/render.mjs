@@ -3,7 +3,7 @@ import { createCurrencyFormatter } from "./currency.mjs";
 import { deriveStudentRoutePosition } from "./scene.mjs";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
-const STUDENT_ROUTE_SPEED_PER_MS = 1.2;
+const STUDENT_ROUTE_SPEED_PER_MS = 1.185;
 const SETTLED_RENDER_RESULT = Object.freeze({ needsFrame: false });
 const PENDING_RENDER_RESULT = Object.freeze({ needsFrame: true });
 const WINDOW_X = Object.freeze([569, 677, 785, 1109, 1217, 1325]);

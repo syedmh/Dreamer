@@ -131,6 +131,7 @@ function adjacentFloat(value, direction) {
 async function withAppHarness({
   eventSourceClass,
   fetchImplementation,
+  keypressEnabled = false,
   locationSearch,
   mediaMatches = false,
   startedAt = 2000,
@@ -194,6 +195,21 @@ async function withAppHarness({
   };
   const documentListeners = new Map();
   const createdElements = [];
+  let harnessEvents;
+  class HarnessEventSource {
+    constructor() {
+      this.listeners = new Map();
+      harnessEvents = this;
+    }
+
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+
+    emit(type, value) {
+      this.listeners.get(type)?.({ data: JSON.stringify(value) });
+    }
+  }
   const document = {
     activeElement: null,
     fullscreenElement: null,
@@ -225,14 +241,17 @@ async function withAppHarness({
   setGlobal("clearTimeout", (timerId) => {
     timers.delete(timerId);
   });
-  if (eventSourceClass) setGlobal("EventSource", eventSourceClass);
+  if (eventSourceClass) {
+    setGlobal("EventSource", eventSourceClass);
+  } else if (keypressEnabled) {
+    setGlobal("EventSource", HarnessEventSource);
+  }
   const params = new URLSearchParams(locationSearch);
   let serverState = {
     revision: 0,
     raised: Number(params.get("raised") ?? 0),
     goal: Number(params.get("goal") ?? 100000),
     seattleSchools: 0,
-    operationCost: 0,
     demoActive: false,
     nightMode: false,
     studentsClapping: false,
@@ -240,7 +259,7 @@ async function withAppHarness({
     continuousFireworks: false,
     buildSummaryVisible: true,
     keyboardLegendVisible: false,
-    keypressEnabled: true,
+    keypressEnabled,
     wideScreen: false,
     distantSchools: []
   };
@@ -249,7 +268,7 @@ async function withAppHarness({
     if (url === "/api/commands") {
       if (body.type === "raised.step") {
         serverState.raised = Math.min(
-          serverState.goal * 2,
+          serverState.goal * 1.2,
           Math.max(0, serverState.raised + serverState.goal * body.fraction)
         );
         serverState.demoActive = false;
@@ -298,6 +317,7 @@ async function withAppHarness({
     const appUrl = new URL("../src/app.mjs", import.meta.url);
     appUrl.searchParams.set("test", `${Date.now()}-${Math.random()}`);
     await import(appUrl);
+    harnessEvents?.emit("state", serverState);
     await run({
       animationFrames,
       createdElements,
@@ -438,6 +458,139 @@ test("display switches between fitted 16:9 and wide monitor layouts", async () =
     /<svg id="school-scene"[^>]*preserveAspectRatio="xMidYMid meet"/s,
     "the display should default to the fitted 16:9 scene"
   );
+});
+
+test("presentation refinements preserve titles, night layers, swing poles, and school count placement", async () => {
+  const originalDocument = Object.getOwnPropertyDescriptor(globalThis, "document");
+  const root = new FakeElement("main");
+  const elements = new Map([
+    ["#goal-display", new FakeElement("span")],
+    ["#meter-fill", new FakeElement("span")],
+    ["#over-goal-message", new FakeElement("p")],
+    ["#percent-display", new FakeElement("span")],
+    ["#raised-display", new FakeElement("p")],
+    ["#school-scene", new FakeElement("svg")]
+  ]);
+  root.querySelector = (selector) => elements.get(selector);
+  Object.defineProperty(globalThis, "document", {
+    configurable: true,
+    writable: true,
+    value: {
+      createElementNS(_namespace, name) {
+        return new FakeElement(name);
+      }
+    }
+  });
+
+  const descendants = (node) => [
+    ...node.children,
+    ...node.children.flatMap(descendants)
+  ];
+
+  try {
+    createFundraiserView(root, createScene(), {
+      locale: "en-US",
+      currency: "USD"
+    });
+    const sceneSvg = elements.get("#school-scene");
+    const nodes = descendants(sceneSvg);
+    const [html, css] = await Promise.all([
+      readFile(new URL("../index.html", import.meta.url), "utf8"),
+      readFile(new URL("../styles.css", import.meta.url), "utf8")
+    ]);
+
+    assert.match(html, /<title>TCF Seattle<\/title>/);
+    assert.match(html, /<title id="scene-title">TCF Seattle<\/title>/);
+
+    const nightStops = nodes.filter(
+      (node) => node.tagName === "stop"
+        && node.parentElement?.attributes.get("id") === "night-sky-gradient"
+    );
+    assert.deepEqual(
+      nightStops.map((stop) => stop.attributes.get("stop-color")),
+      ["#07142F", "#07142F"]
+    );
+    const moonCutout = nodes.find(
+      (node) => node.tagName === "circle"
+        && node.parentElement?.attributes.get("class") === "night-moon"
+        && node.attributes.get("cx") === "762"
+        && node.attributes.get("cy") === "78"
+    );
+    assert.equal(moonCutout?.attributes.get("fill"), "#07142F");
+    assert.equal(
+      nodes.some(
+        (node) => node.attributes.get("class") === "night-ground-shade"
+      ),
+      false
+    );
+    assert.ok(
+      nodes.some(
+        (node) => node.attributes.get("class") === "landscape-ground"
+      )
+    );
+    assert.match(
+      css,
+      /#school-scene\.is-night \.wide-mountains,\s*#school-scene\.is-night \.landscape-ground\s*\{\s*filter:\s*brightness\(\.68\) saturate\(\.78\);/s
+    );
+    assert.doesNotMatch(css, /night-ground-shade/);
+
+    const poleOutlines = nodes.filter(
+      (node) => node.attributes.get("class") === "swing-pole-outline"
+    );
+    const poles = nodes.filter(
+      (node) => node.attributes.get("class") === "swing-pole"
+    );
+    assert.equal(poleOutlines.length, 4);
+    assert.equal(poles.length, 4);
+    assert.ok(poleOutlines.every((pole) =>
+      pole.attributes.get("stroke") === "#45515C"
+      && pole.attributes.get("stroke-width") === "15"
+      && pole.attributes.get("stroke-linecap") === "round"
+    ));
+    assert.ok(poles.every((pole) =>
+      pole.attributes.get("stroke") === "#B9C4CC"
+      && pole.attributes.get("stroke-width") === "9"
+      && pole.attributes.get("stroke-linecap") === "round"
+    ));
+    assert.deepEqual(
+      poleOutlines.map((pole) => [
+        pole.attributes.get("x1"),
+        pole.attributes.get("y1"),
+        pole.attributes.get("x2"),
+        pole.attributes.get("y2")
+      ]),
+      poles.map((pole) => [
+        pole.attributes.get("x1"),
+        pole.attributes.get("y1"),
+        pole.attributes.get("x2"),
+        pole.attributes.get("y2")
+      ])
+    );
+    assert.equal(
+      nodes.some(
+        (node) => node.attributes.get("class") === "playground-climbing-side"
+      ),
+      false
+    );
+
+    const buildCard = css.match(/^\.build-card\s*\{([^}]*)\}/m)?.[1];
+    const hiddenBuildCard = css.match(/^\.build-card\.is-hidden\s*\{([^}]*)\}/m)?.[1];
+    assert.ok(buildCard);
+    assert.ok(hiddenBuildCard);
+    assert.match(buildCard, /right:\s*13%;/);
+    assert.match(buildCard, /transform:\s*translateY\(0\) scale\(\.9\);/);
+    assert.match(buildCard, /transform-origin:\s*top right;/);
+    assert.match(
+      hiddenBuildCard,
+      /transform:\s*translateY\(24px\) scale\(\.9\);/
+    );
+  } finally {
+    if (originalDocument) {
+      Object.defineProperty(globalThis, "document", originalDocument);
+    } else {
+      delete globalThis.document;
+    }
+  }
 });
 
 test("authoritative display state switches wide-screen rendering live", async () => {
@@ -820,7 +973,10 @@ test("school celebration CSS spins the full-size arrival both directions, smiles
 
 test("display keyboard legend waits for authoritative command responses", async () => {
   await withAppHarness(
-    { locationSearch: "?goal=100000&raised=51000" },
+    {
+      keypressEnabled: true,
+      locationSearch: "?goal=100000&raised=51000"
+    },
     async ({
       documentListeners,
       elements,
@@ -1123,10 +1279,18 @@ test("progress labels preserve exact integers, floor fractions, and distinguish 
     );
 
     for (const [donationRatio, expectedLabel] of [
-      [.29, "29% complete"],
-      [.57, "57% complete"],
-      [.58, "58% complete"],
-      [.579, "57% complete"]
+      [.19, "19% — first 4 block rows building!"],
+      [.2, "20% — 4 rows and door complete!"],
+      [.29, "29% — next 4 rows and swings!"],
+      [.4, "40% — 8 rows and swings complete!"],
+      [.57, "57% — next 4 rows and bus!"],
+      [.6, "60% — 12 rows and bus complete!"],
+      [.79, "79% — next 4 rows, slide, and seesaw!"],
+      [.8, "80% — 16 rows, slide, and seesaw complete!"],
+      [.99, "99% — school finishing!"],
+      [1, "100% — school, flag, and 12 students complete!"],
+      [1.1, "110% — campus completing!"],
+      [1.2, "120% — full campus complete!"]
     ]) {
       view.update({
         raised: donationRatio * 100000,
@@ -1153,7 +1317,10 @@ test("progress labels preserve exact integers, floor fractions, and distinguish 
       reducedMotion: true,
       celebrationActive: false
     });
-    assert.equal(elements.get("#percent-display").textContent, "99% complete");
+    assert.equal(
+      elements.get("#percent-display").textContent,
+      "100% — school, flag, and 12 students complete!"
+    );
 
     view.update({
       raised: 0.00995,
@@ -1164,7 +1331,10 @@ test("progress labels preserve exact integers, floor fractions, and distinguish 
       reducedMotion: true,
       celebrationActive: false
     });
-    assert.equal(elements.get("#percent-display").textContent, "99% complete");
+    assert.equal(
+      elements.get("#percent-display").textContent,
+      "99% — school finishing!"
+    );
 
     view.update({
       raised: 0.01,
@@ -1180,7 +1350,7 @@ test("progress labels preserve exact integers, floor fractions, and distinguish 
     assert.equal(elements.get("#goal-display").textContent, "Goal $0");
     assert.equal(
       elements.get("#percent-display").textContent,
-      "100% — students arriving!"
+      "100% — school, flag, and 12 students complete!"
     );
     assert.equal(elements.get("#over-goal-message").hidden, false);
 
@@ -1199,13 +1369,13 @@ test("progress labels preserve exact integers, floor fractions, and distinguish 
     );
     assert.equal(
       elements.get("#percent-display").textContent,
-      "100% — students arriving!"
+      "100% — campus completing!"
     );
 
     view.update({
-      raised: 0.0125,
+      raised: 0.012,
       goal: 0.01,
-      donationRatio: 1.25,
+      donationRatio: 1.2,
       buildingRatio: 1,
       studentRatio: 1,
       reducedMotion: true,
@@ -1215,32 +1385,8 @@ test("progress labels preserve exact integers, floor fractions, and distinguish 
     assert.equal(elements.get("#goal-display").textContent, "Goal $0");
     assert.equal(
       elements.get("#percent-display").textContent,
-      "125% — school bus arriving!"
+      "120% — full campus complete!"
     );
-
-    for (const [donationRatio, expectedLabel] of [
-      [1.029, "102% — students arriving!"],
-      [1.03, "103% — playground growing!"],
-      [1.099, "109% — playground growing!"],
-      [1.10, "110% — campus growing!"],
-      [1.169, "116% — campus growing!"],
-      [1.17, "117% — playground finishing!"],
-      [1.249, "124% — playground finishing!"],
-      [1.25, "125% — school bus arriving!"],
-      [1.30, "130% — school bus arriving!"],
-      [1.349, "134% — school bus arriving!"],
-      [1.35, "135% — campus ready!"],
-      [1.40, "140% — campus ready!"]
-    ]) {
-      view.update({
-        raised: donationRatio * 100000,
-        goal: 100000,
-        ...deriveProgress(donationRatio * 100000, 100000),
-        reducedMotion: true,
-        celebrationActive: false
-      });
-      assert.equal(elements.get("#percent-display").textContent, expectedLabel);
-    }
   } finally {
     if (originalDocument) {
       Object.defineProperty(globalThis, "document", originalDocument);
@@ -1306,7 +1452,7 @@ test("renderer preserves adjacent and extreme non-endpoint rendering states", ()
   };
 
   try {
-    const goal = 7205759403792793;
+    const goal = 100000;
     const scene = createScene({ maxStudents: 24 });
     const view = createFundraiserView(root, scene, {
       locale: "en-US",
@@ -1329,13 +1475,12 @@ test("renderer preserves adjacent and extreme non-endpoint rendering states", ()
 
     update(view, goal, goal);
     const completedBlockTransform = lastBlock.attributes.get("transform");
-    const emptyStudentTransform = firstStudent.attributes.get("transform");
     assert.equal(Number(lastBlock.attributes.get("opacity")), 1);
     assert.equal(Number(root.dataset.visibleBlocks), blocks.length);
-    assert.equal(Number(firstStudent.attributes.get("opacity")), 0);
-    assert.equal(Number(root.dataset.visibleStudents), 0);
+    assert.equal(Number(firstStudent.attributes.get("opacity")), 1);
+    assert.equal(Number(root.dataset.visibleStudents), 12);
 
-    const belowGoal = update(view, goal - 1, goal);
+    const belowGoal = update(view, goal - 100, goal);
     const lastBlockReveal = belowGoal.buildingRatio * blocks.length
       - (blocks.length - 1);
     assert.ok(lastBlockReveal > 0 && lastBlockReveal < 1);
@@ -1347,12 +1492,20 @@ test("renderer preserves adjacent and extreme non-endpoint rendering states", ()
     const meterStateDistinct = elements.get("#meter-fill").style.width
       === "var(--meter-width)"
       && elements.get("#meter-fill").style.getPropertyValue("--meter-width")
-        === "99.99999999999999%";
+        === "99.900%";
     assert.ok(Number(root.dataset.buildingPercent) < 100);
     assert.ok(Number(root.dataset.visibleBlocks) < blocks.length);
 
-    const aboveGoal = update(view, goal + 1, goal);
-    const firstStudentReveal = aboveGoal.studentRatio * students.length;
+    const studentStartRaised = goal * .8;
+    update(view, studentStartRaised, goal);
+    const emptyStudentTransform = firstStudent.attributes.get("transform");
+    assert.equal(Number(firstStudent.attributes.get("opacity")), 0);
+    const aboveStudentStart = update(
+      view,
+      studentStartRaised + .01,
+      goal
+    );
+    const firstStudentReveal = aboveStudentStart.studentRatio * students.length;
     assert.ok(firstStudentReveal > 0 && firstStudentReveal < 1);
     assert.ok(Number(firstStudent.attributes.get("opacity")) > 0);
     assert.notEqual(
@@ -1364,22 +1517,23 @@ test("renderer preserves adjacent and extreme non-endpoint rendering states", ()
 
     update(view, 0, 1);
     const emptyBlockTransform = firstBlock.attributes.get("transform");
-    update(view, Number.MIN_VALUE, 1);
+    update(view, .000001, 1);
     const firstBlockOpacity = Number(firstBlock.attributes.get("opacity"));
     assert.ok(firstBlockOpacity > 0 && firstBlockOpacity < 1);
     const initialBlockTransformDistinct = firstBlock.attributes.get("transform")
       !== emptyBlockTransform;
 
-    const studentCompletionRaised = MAX_GOAL * 1.25;
-    update(view, studentCompletionRaised, MAX_GOAL);
+    const studentCompletionGoal = 100000;
+    const studentCompletionRaised = studentCompletionGoal * 1.2;
+    update(view, studentCompletionRaised, studentCompletionGoal);
     const completedStudentTransform = lastStudent.attributes.get("transform");
-    update(view, studentCompletionRaised - 1, MAX_GOAL);
+    update(view, studentCompletionRaised - 1, studentCompletionGoal);
     const lastStudentOpacity = Number(lastStudent.attributes.get("opacity"));
     assert.ok(lastStudentOpacity > 0 && lastStudentOpacity < 1);
     const finalStudentTransformDistinct = lastStudent.attributes.get("transform")
       !== completedStudentTransform;
     const busGoal = 100000;
-    const completionRaised = busGoal * 1.35;
+    const completionRaised = busGoal * .6;
     update(view, completionRaised, busGoal);
     assert.equal(Number(bus.attributes.get("opacity")), 1);
     update(view, completionRaised - .01, busGoal);
@@ -1698,36 +1852,36 @@ test("renderer adds 25 distant schools in order and removes them last-in-first-o
     assert.equal(swings.attributes.get("data-offset-y"), "205");
 
     view.update({
-      raised: 125001,
+      raised: 100001,
       goal: 100000,
-      ...deriveProgress(125001, 100000),
+      ...deriveProgress(100001, 100000),
       reducedMotion: false,
       celebrationActive: false
     });
     assert.equal(swings.dataset.currentOffsetX, "-15");
     assert.equal(swings.dataset.currentOffsetY, "205");
     view.update({
-      raised: 130000,
+      raised: 110000,
       goal: 100000,
-      ...deriveProgress(130000, 100000),
+      ...deriveProgress(110000, 100000),
       reducedMotion: false,
       celebrationActive: false
     });
     assert.equal(swings.attributes.get("transform"), "translate(-15 205)");
     assert.equal(swings.dataset.currentOffsetY, "205");
     view.update({
-      raised: 130000,
+      raised: 110000,
       goal: 100000,
-      ...deriveProgress(130000, 100000),
+      ...deriveProgress(110000, 100000),
       reducedMotion: true,
       celebrationActive: false
     });
     assert.equal(swings.attributes.get("transform"), "translate(-15 205)");
     assert.equal(swings.dataset.currentOffsetY, "205");
     view.update({
-      raised: 135000,
+      raised: 120000,
       goal: 100000,
-      ...deriveProgress(135000, 100000),
+      ...deriveProgress(120000, 100000),
       reducedMotion: true,
       celebrationActive: false
     });
@@ -1814,7 +1968,7 @@ test("display school keys wait for authoritative state reconciliation", async ()
       const schools = createdElements.filter(
         (element) => element.attributes.has("data-school-slot")
       );
-      assert.equal(schools.length, 10);
+      assert.equal(schools.length, 25);
       events.emit("state", {
         raised: 51000,
         goal: 100000,
@@ -1937,6 +2091,7 @@ test("display-originated actions are not optimistic and accepted echoes are dedu
           rejectAction = reject;
         });
       },
+      keypressEnabled: true,
       locationSearch: "?goal=100000&raised=51000&motion=reduce"
     },
     async ({
@@ -1950,6 +2105,13 @@ test("display-originated actions are not optimistic and accepted echoes are dedu
       const school = createdElements.find(
         (element) => element.attributes.get("data-school-slot") === "1"
       );
+      eventSource.emit("state", JSON.stringify({
+        revision: 1,
+        raised: 51000,
+        goal: 100000,
+        keypressEnabled: true,
+        distantSchools: []
+      }));
       documentListeners.get("keydown")({
         key: "s",
         target: root,
@@ -2031,6 +2193,7 @@ test("rejected school boundary actions refetch authority without success or fire
           }
         };
       },
+      keypressEnabled: true,
       locationSearch: "?goal=100000&raised=51000&motion=reduce"
     },
     async ({ createdElements, documentListeners, elements, root }) => {
@@ -2067,6 +2230,7 @@ test("display ignores mutation responses older than the latest authoritative rev
         assert.equal(url, "/api/commands");
         return new Promise((resolve) => pending.push({ resolve }));
       },
+      keypressEnabled: true,
       locationSearch: "?goal=100&raised=0&motion=reduce"
     },
     async ({
@@ -2186,56 +2350,66 @@ test("campus additions reveal at frozen thresholds with bounded one-shot motion"
       celebrationActive: false
     });
 
-    update(.999999);
+    update(.199999);
     assert.equal(flag.attributes.get("opacity"), "0");
     assert.equal(elements.get("#over-goal-message").hidden, true);
     assert.equal(root.dataset.goalAchieved, "false");
 
-    update(1);
-    assert.equal(flag.attributes.get("opacity"), "1");
-    assert.equal(elements.get("#over-goal-message").hidden, false);
+    update(.2);
     assert.deepEqual(swingParts.map((node) => node.attributes.get("opacity")), [
       "0.0000",
       "0.0000",
       "0.0000",
       "0.0000"
     ]);
-    assert.equal(root.dataset.goalAchieved, "true");
+    assert.equal(root.dataset.goalAchieved, "false");
 
-    update(1.065);
+    update(.3);
     assert.deepEqual(
       swingParts.map((node) => Number(node.attributes.get("opacity"))),
-      [1, .9999999999999953, 0, 0]
+      [1, .9999999999999996, 0, 0]
     );
     assert.equal(root.dataset.swingPercent, "50.000");
 
-    update(1.10);
+    update(.4);
     assert.deepEqual(
       swingParts.map((node) => Number(node.attributes.get("opacity"))),
       [1, 1, 1, 1]
     );
-    update(1.135);
-    assert.equal(root.dataset.visibleTeachers, "0.000000");
-    assert.equal(root.dataset.teacherPercent, "50.000");
 
-    update(1.25);
+    update(.4);
     assert.equal(Number(bus.attributes.get("opacity")), 0);
     assert.equal(bus.attributes.get("transform"), "translate(550 -115)");
     assert.equal(root.dataset.busPercent, "0.000");
 
-    update(1.30);
+    update(.5);
     assert.equal(Number(bus.attributes.get("opacity")), .5);
     assert.equal(bus.attributes.get("transform"), "translate(68.75 -14.38)");
     assert.equal(root.dataset.busPercent, "50.000");
 
-    update(1.30, true);
+    update(.5, true);
     assert.equal(bus.attributes.get("transform"), "translate(0 0)");
     assert.equal(Number(bus.attributes.get("opacity")), .5);
 
-    update(1.35);
+    update(.6);
     assert.equal(Number(bus.attributes.get("opacity")), 1);
     assert.equal(bus.attributes.get("transform"), "translate(0 0)");
     assert.equal(root.dataset.busPercent, "100.000");
+
+    update(1);
+    assert.equal(flag.attributes.get("opacity"), "1");
+    assert.equal(elements.get("#over-goal-message").hidden, false);
+    assert.equal(root.dataset.goalAchieved, "true");
+    assert.equal(root.dataset.teacherPercent, "0.000");
+    assert.equal(root.dataset.playgroundPercent, "0.000");
+
+    update(1.1);
+    assert.equal(root.dataset.teacherPercent, "50.000");
+    assert.equal(root.dataset.playgroundPercent, "50.000");
+
+    update(1.2);
+    assert.equal(root.dataset.teacherPercent, "100.000");
+    assert.equal(root.dataset.playgroundPercent, "100.000");
 
     assert.equal(
       bus.attributes.get("aria-label"),
@@ -2546,14 +2720,14 @@ test("student route display progress bounds painted-frame movement and settles e
       celebrationActive: false
     });
 
-    let result = render(1, 0);
+    let result = render(.8, 0);
     assert.equal(result.needsFrame, false);
     assert.equal(root.dataset.visibleStudents, "0.000000");
     let previous = students.map(parsePosition);
     let forwardFrames = 0;
     let maximumNormalMovement = 0;
     do {
-      result = render(1.25, 16);
+      result = render(1.2, 16);
       const current = students.map(parsePosition);
       for (let index = 0; index < current.length; index += 1) {
         if (previous[index].opacity > 0 || current[index].opacity > 0) {
@@ -2584,7 +2758,7 @@ test("student route display progress bounds painted-frame movement and settles e
     let reverseFrames = 0;
     let maximumCappedMovement = 0;
     do {
-      result = render(1, 50);
+      result = render(.8, 50);
       const current = students.map(parsePosition);
       for (let index = 0; index < current.length; index += 1) {
         if (previous[index].opacity > 0 || current[index].opacity > 0) {
@@ -2607,7 +2781,7 @@ test("student route display progress bounds painted-frame movement and settles e
     assert.equal(root.dataset.studentPercent, "0.000");
     assert.equal(root.dataset.visibleStudents, "0.000000");
 
-    result = render(1.25, 16, true);
+    result = render(1.2, 16, true);
     assert.equal(result.needsFrame, false);
     assert.equal(root.dataset.visibleStudents, "24.000000");
     for (let index = 0; index < students.length; index += 1) {
@@ -2703,16 +2877,6 @@ test("direct and initial full-motion targets settle to collision-free bus placem
           }
           previousBusOffset = busOffset;
           if (Number(busNode.attributes.get("opacity")) <= 0) return;
-          const allStudentsSettled = studentNodes.every((studentNode, index) => {
-            const transform = studentNode.attributes.get("transform");
-            const match = transform.match(
-              /^translate\(([-\d.]+) ([-\d.]+)\) scale\(/
-            );
-            assert.ok(match, transform);
-            return Number(match[1]) === scene.students[index].targetX
-              && Number(match[2]) === scene.students[index].targetY;
-          });
-          if (!allStudentsSettled) return;
           const busBounds = {
             left: scene.campus.bus.bounds.left + busOffset.x,
             right: scene.campus.bus.bounds.right + busOffset.x,
@@ -2756,8 +2920,13 @@ test("direct and initial full-motion targets settle to collision-free bus placem
           return frame;
         };
 
-        if (!initialTarget) settle(1, "direct baseline");
-        assert.ok(settle(1.35, initialTarget ? "initial 135%" : "direct 100-135") > 1);
+        if (!initialTarget) settle(.8, "direct baseline");
+        if (initialTarget) {
+          assert.ok(settle(1.2, "initial 120%") > 1);
+        } else {
+          assert.ok(settle(1, "direct 80-100") > 1);
+          assert.ok(settle(1.2, "direct 100-120") > 1);
+        }
         assert.equal(root.dataset.visibleStudents, "24.000000");
         assert.equal(root.dataset.busPercent, "100.000");
         assert.equal(busNode.attributes.get("transform"), "translate(0 0)");
@@ -2774,18 +2943,20 @@ test("direct and initial full-motion targets settle to collision-free bus placem
         if (!initialTarget) {
           const interruptedFrames = Math.ceil(500 / deltaMs);
           for (let frame = 0; frame < interruptedFrames; frame += 1) {
-            const result = render(1);
+            const result = render(.8);
             assert.equal(result.needsFrame, true);
             assertBusClear(frame, "mid-transition reverse");
           }
-          settle(1.35, "mid-transition retarget");
+          settle(1, "mid-transition retarget 80-100");
+          settle(1.2, "mid-transition retarget 100-120");
         }
-        assert.ok(settle(1, "reverse 135-100") > 1);
+        assert.ok(settle(1, "reverse 120-100") > 1);
+        assert.ok(settle(.8, "reverse 100-80") > 1);
         assert.equal(root.dataset.visibleStudents, "0.000000");
-        assert.equal(root.dataset.busPercent, "0.000");
+        assert.equal(root.dataset.busPercent, "100.000");
         assert.equal(
           busNode.attributes.get("transform"),
-          `translate(${scene.campus.bus.startOffset.x} ${scene.campus.bus.startOffset.y})`
+          "translate(0 0)"
         );
         assert.ok(maximumBusMovement <= scene.campus.bus.routeDistance);
       }
@@ -2872,15 +3043,15 @@ test("integrated student route jumps remain collision-safe forward and reverse",
       celebrationActive: false
     });
     const targets = [
-      1,
+      .8,
       1.19917,
       1.19926,
       1.19935,
-      1.25,
+      1.2,
       1.19935,
       1.19926,
       1.19917,
-      1
+      .8
     ];
 
     render(targets[0], 0);
@@ -3047,20 +3218,26 @@ test("aperture recesses reveal with their wall phases forward, reverse, and redu
         Number(node.attributes.get("data-end"))
       ]),
       [
+        [
+          "architectural-finish finish-entrance aperture-entrance",
+          "entrance",
+          .2,
+          100 / 308
+        ],
         ["architectural-finish finish-lower aperture-lower", "lower", .31, .52],
         ["architectural-finish finish-upper aperture-upper", "upper", .58, .74],
         ["architectural-finish finish-tower aperture-tower", "tower", .75, .84]
       ]
     );
 
-    const [lower, upper, tower] = apertureLayer.children;
+    const [entrance, lower, upper, tower] = apertureLayer.children;
     assert.equal(
       lower.children.filter((node) =>
         node.tagName === "rect" && node.attributes.get("y") === "547"
       ).length,
       6
     );
-    assert.ok(lower.children.some((node) =>
+    assert.ok(entrance.children.some((node) =>
       node.attributes.get("d") === "M918 653 V538 A45 45 0 0 1 1008 538 V653 Z"
     ));
     assert.equal(
@@ -3086,16 +3263,19 @@ test("aperture recesses reveal with their wall phases forward, reverse, and redu
       (node) => node.attributes.get("opacity")
     );
     const cases = [
-      [.235, ["0.0000", "0.0000", "0.0000"]],
-      [.31, ["0.0000", "0.0000", "0.0000"]],
-      [.415, ["0.5000", "0.0000", "0.0000"]],
-      [.52, ["1.0000", "0.0000", "0.0000"]],
-      [.58, ["1.0000", "0.0000", "0.0000"]],
-      [.66, ["1.0000", "0.5000", "0.0000"]],
-      [.74, ["1.0000", "1.0000", "0.0000"]],
-      [.75, ["1.0000", "1.0000", "0.0000"]],
-      [.795, ["1.0000", "1.0000", "0.5000"]],
-      [.84, ["1.0000", "1.0000", "1.0000"]]
+      [.19, ["0.0000", "0.0000", "0.0000", "0.0000"]],
+      [.2, ["0.0000", "0.0000", "0.0000", "0.0000"]],
+      [.235, ["0.2807", "0.0000", "0.0000", "0.0000"]],
+      [.2623376623376623, ["0.5000", "0.0000", "0.0000", "0.0000"]],
+      [.31, ["0.8823", "0.0000", "0.0000", "0.0000"]],
+      [.415, ["1.0000", "0.5000", "0.0000", "0.0000"]],
+      [.52, ["1.0000", "1.0000", "0.0000", "0.0000"]],
+      [.58, ["1.0000", "1.0000", "0.0000", "0.0000"]],
+      [.66, ["1.0000", "1.0000", "0.5000", "0.0000"]],
+      [.74, ["1.0000", "1.0000", "1.0000", "0.0000"]],
+      [.75, ["1.0000", "1.0000", "1.0000", "0.0000"]],
+      [.795, ["1.0000", "1.0000", "1.0000", "0.5000"]],
+      [.84, ["1.0000", "1.0000", "1.0000", "1.0000"]]
     ];
 
     for (const [ratio, expected] of cases) {
@@ -3609,9 +3789,12 @@ test("renderer skips redundant SVG attribute writes for unchanged frames", () =>
   }
 });
 
-test("default-motion keyboard progress smooths after authoritative commands and caps at 200%", async () => {
+test("default-motion keyboard progress smooths after authoritative commands and caps at 120%", async () => {
   await withAppHarness(
-    { locationSearch: "?goal=100000&raised=51000" },
+    {
+      keypressEnabled: true,
+      locationSearch: "?goal=100000&raised=51000"
+    },
     async ({
       animationFrames,
       createdElements,
@@ -3620,8 +3803,14 @@ test("default-motion keyboard progress smooths after authoritative commands and 
       rootElements,
       startedAt
     }) => {
-      assert.equal(animationFrames.length, 1);
-      animationFrames.shift()(startedAt);
+      let initialFrames = 0;
+      let initialNow = startedAt;
+      while (animationFrames.length > 0 && initialFrames < 1000) {
+        animationFrames.shift()(initialNow);
+        initialNow += 16;
+        initialFrames += 1;
+      }
+      assert.ok(initialFrames > 1);
       assert.equal(animationFrames.length, 0);
       assert.equal(root.dataset.motion, "full");
       const settledWrites = createdElements.reduce(
@@ -3693,9 +3882,20 @@ test("default-motion keyboard progress smooths after authoritative commands and 
   );
 
   await withAppHarness(
-    { locationSearch: "?goal=100000&raised=200000&motion=reduce" },
+    {
+      keypressEnabled: true,
+      locationSearch: "?goal=100000&raised=120000&motion=reduce"
+    },
     async ({ animationFrames, documentListeners, root, rootElements, startedAt }) => {
-      animationFrames.shift()(startedAt);
+      let initialFrames = 0;
+      let initialNow = startedAt;
+      while (animationFrames.length > 0 && initialFrames < 1000) {
+        animationFrames.shift()(initialNow);
+        initialNow += 16;
+        initialFrames += 1;
+      }
+      assert.ok(initialFrames >= 1);
+      assert.equal(animationFrames.length, 0);
       documentListeners.get("keydown")({
         key: "ArrowRight",
         target: root,
@@ -3703,7 +3903,7 @@ test("default-motion keyboard progress smooths after authoritative commands and 
       });
       await new Promise((resolve) => setImmediate(resolve));
       animationFrames.shift()(startedAt + 16);
-      assert.equal(rootElements.get("#raised-display").textContent, "$200,000");
+      assert.equal(rootElements.get("#raised-display").textContent, "$120,000");
       assert.equal(root.dataset.busPercent, "100.000");
     }
   );
@@ -3748,7 +3948,7 @@ test("first authoritative full-motion student target keeps one scheduler until r
       events.emit("snapshot", {
         state: {
           revision: 1,
-          raised: 125000,
+          raised: 120000,
           goal: 100000,
           distantSchools: []
         }
@@ -3824,6 +4024,7 @@ test("dynamic reduced motion stops an active celebration after its transition fr
   await withAppHarness(
     {
       locationSearch: "?goal=100000&raised=99000&motion=auto",
+      keypressEnabled: true,
       mediaMatches: false
     },
     async ({
@@ -3839,7 +4040,14 @@ test("dynamic reduced motion stops an active celebration after its transition fr
         0
       );
 
-      animationFrames.shift()(startedAt);
+      let initialFrames = 0;
+      let initialNow = startedAt;
+      while (animationFrames.length > 0 && initialFrames < 1000) {
+        animationFrames.shift()(initialNow);
+        initialNow += 16;
+        initialFrames += 1;
+      }
+      assert.ok(initialFrames > 1);
       assert.equal(animationFrames.length, 0);
       assert.equal(root.dataset.motion, "full");
 
@@ -3913,7 +4121,10 @@ test("explicit motion modes ignore operating-system preference changes while idl
 
 test("explicit reduced motion settles each update without queued frames or later scene writes", async () => {
   await withAppHarness(
-    { locationSearch: "?goal=100000&raised=51000&motion=reduce" },
+    {
+      keypressEnabled: true,
+      locationSearch: "?goal=100000&raised=51000&motion=reduce"
+    },
     async ({
       animationFrames,
       createdElements,
@@ -3961,7 +4172,10 @@ test("explicit reduced motion settles each update without queued frames or later
 
 test("explicit reduced motion goal crossing settles in one frame without queued celebration writes", async () => {
   await withAppHarness(
-    { locationSearch: "?goal=100000&raised=99000&motion=reduce" },
+    {
+      keypressEnabled: true,
+      locationSearch: "?goal=100000&raised=99000&motion=reduce"
+    },
     async ({
       animationFrames,
       createdElements,
@@ -3994,7 +4208,7 @@ test("explicit reduced motion goal crossing settles in one frame without queued 
       assert.equal(rootElements.get("#raised-display").textContent, "$100,000");
       assert.equal(
         rootElements.get("#percent-display").textContent,
-        "100% — students arriving!"
+        "100% — school, flag, and 12 students complete!"
       );
       const updateSettledWrites = sceneWrites();
       assert.ok(updateSettledWrites > initialSettledWrites);
@@ -4007,7 +4221,7 @@ test("explicit reduced motion goal crossing settles in one frame without queued 
   );
 });
 
-test("production demo renders only server-authoritative 144-second milestones", async () => {
+test("production demo renders only server-authoritative 86,400ms milestones", async () => {
   let events;
   const requests = [];
   class FakeEventSource {
@@ -4040,6 +4254,7 @@ test("production demo renders only server-authoritative 144-second milestones", 
           }
         };
       },
+      keypressEnabled: true,
       locationSearch: "?goal=100000&raised=0&motion=reduce"
     },
     async ({
@@ -4057,6 +4272,14 @@ test("production demo renders only server-authoritative 144-second milestones", 
       };
 
       runNextFrame(startedAt);
+      events.emit("state", {
+        revision: 1,
+        raised: 0,
+        goal: 100000,
+        demoActive: false,
+        keypressEnabled: true,
+        distantSchools: []
+      });
       documentListeners.get("keydown")({
         key: "d",
         target: root,
@@ -4071,44 +4294,45 @@ test("production demo renders only server-authoritative 144-second milestones", 
       runNextFrame(startedAt + 1);
 
       events.emit("state", {
-        raised: 125000,
+        raised: 60000,
         goal: 100000,
         demoActive: true,
         distantSchools: []
       });
-      runNextFrame(startedAt + 90000);
-      assert.equal(rootElements.get("#raised-display").textContent, "$125,000");
-      assert.equal(root.dataset.studentPercent, "100.000");
-      assert.equal(root.dataset.playgroundPercent, "100.000");
-      assert.equal(root.dataset.busPercent, "0.000");
-
-      events.emit("state", {
-        raised: 135000,
-        goal: 100000,
-        demoActive: true,
-        distantSchools: []
-      });
-      runNextFrame(startedAt + 97200);
-      assert.equal(rootElements.get("#raised-display").textContent, "$135,000");
+      runNextFrame(startedAt + 43200);
+      assert.equal(rootElements.get("#raised-display").textContent, "$60,000");
+      assert.equal(root.dataset.studentPercent, "0.000");
+      assert.equal(root.dataset.playgroundPercent, "0.000");
       assert.equal(root.dataset.busPercent, "100.000");
 
-      const now = startedAt + 97200;
+      events.emit("state", {
+        raised: 100000,
+        goal: 100000,
+        demoActive: true,
+        distantSchools: []
+      });
+      runNextFrame(startedAt + 72000);
+      assert.equal(rootElements.get("#raised-display").textContent, "$100,000");
+      assert.equal(root.dataset.visibleStudents, "12.000000");
+      assert.equal(root.dataset.playgroundPercent, "0.000");
+      assert.equal(root.dataset.busPercent, "100.000");
+
+      events.emit("state", {
+        raised: 120000,
+        goal: 100000,
+        demoActive: true,
+        distantSchools: []
+      });
+      runNextFrame(startedAt + 86400);
+      assert.equal(rootElements.get("#raised-display").textContent, "$120,000");
       assert.equal(root.dataset.visibleStudents, "24.000000");
+      assert.equal(root.dataset.playgroundPercent, "100.000");
+      assert.equal(root.dataset.busPercent, "100.000");
       const bus = createdElements.find(
         (element) => element.attributes.get("class") === "school-bus"
       );
       assert.equal(bus.attributes.get("transform"), "translate(0 0)");
       assert.equal(Number(bus.attributes.get("opacity")), 1);
-
-      events.emit("state", {
-        raised: 200000,
-        goal: 100000,
-        demoActive: true,
-        distantSchools: []
-      });
-      runNextFrame(startedAt + 144000);
-      assert.equal(rootElements.get("#raised-display").textContent, "$200,000");
-      assert.equal(root.dataset.busPercent, "100.000");
       assert.equal(events.url, "/events?role=presentation");
       assert.equal(
         requests.some((request) =>

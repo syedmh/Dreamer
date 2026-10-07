@@ -96,11 +96,9 @@ async function withControlHarness(run, {
   );
   const buildSummaryForm = new FakeElement();
   const seattleSchoolsInput = new FakeElement();
-  const operationCostInput = new FakeElement();
   const buildSummarySubmitButton = new FakeElement();
   buildSummaryForm.append(
     seattleSchoolsInput,
-    operationCostInput,
     buildSummarySubmitButton
   );
   const addSchoolButton = new FakeElement();
@@ -116,7 +114,6 @@ async function withControlHarness(run, {
     ["#override-form", overrideForm],
     ["#build-summary-form", buildSummaryForm],
     ["#seattle-schools-input", seattleSchoolsInput],
-    ["#operation-cost-input", operationCostInput],
     ["#raised-input", raisedInput],
     ["#goal-input", goalInput],
     ["#override-raised-input", overrideRaisedInput],
@@ -178,7 +175,6 @@ async function withControlHarness(run, {
       raisedSlider,
       actionButtons,
       buildSummaryForm,
-      operationCostInput,
       seattleSchoolsInput
     });
   } finally {
@@ -493,7 +489,7 @@ test("dirty progress drafts survive SSE and reconcile on leaving the form", asyn
     await form.dispatch("focusout", { relatedTarget: null });
     assert.equal(raisedInput.value, "60");
     assert.equal(goalInput.value, "120");
-    assert.equal(raisedSlider.max, "240");
+    assert.equal(raisedSlider.max, "144");
     assert.equal(raisedSlider.value, "60");
   });
 });
@@ -578,21 +574,18 @@ test("failed progress submit and refetch reconcile held newer SSE authority", as
       form,
       raisedInput,
       goalInput,
-      operationCostInput,
       seattleSchoolsInput
     }) => {
       sendState(events, {
         revision: 1,
         raised: 50,
         goal: 100,
-        seattleSchools: 47,
-        operationCost: 1000
+        seattleSchools: 47
       });
       raisedInput.value = "80";
       goalInput.value = "160";
       await raisedInput.dispatch("input");
       seattleSchoolsInput.value = "48";
-      operationCostInput.value = "1200";
       await seattleSchoolsInput.dispatch("input");
 
       const submit = form.dispatch("submit");
@@ -600,8 +593,7 @@ test("failed progress submit and refetch reconcile held newer SSE authority", as
         revision: 3,
         raised: 90,
         goal: 180,
-        seattleSchools: 50,
-        operationCost: 1500
+        seattleSchools: 50
       });
       resolveSubmit({
         ok: false,
@@ -616,7 +608,6 @@ test("failed progress submit and refetch reconcile held newer SSE authority", as
       assert.equal(raisedInput.value, "90");
       assert.equal(goalInput.value, "180");
       assert.equal(seattleSchoolsInput.value, "48");
-      assert.equal(operationCostInput.value, "1200");
       assert.equal(
         elements.get("#operation-status").textContent,
         "progress rejected"
@@ -643,18 +634,15 @@ test("stale build summary submit responses reconcile controls to newer SSE autho
     async ({
       events,
       buildSummaryForm,
-      operationCostInput,
       seattleSchoolsInput
     }) => {
       sendState(events, {
         revision: 1,
         raised: 50,
         goal: 100,
-        seattleSchools: 47,
-        operationCost: 1000
+        seattleSchools: 47
       });
       seattleSchoolsInput.value = "48";
-      operationCostInput.value = "1200";
       await seattleSchoolsInput.dispatch("input");
 
       const submit = buildSummaryForm.dispatch("submit");
@@ -662,23 +650,20 @@ test("stale build summary submit responses reconcile controls to newer SSE autho
         revision: 3,
         raised: 50,
         goal: 100,
-        seattleSchools: 50,
-        operationCost: 1500
+        seattleSchools: 50
       });
       resolveSubmit({
         ok: true,
         async json() {
           return {
             revision: 2,
-            seattleSchools: 48,
-            operationCost: 1200
+            seattleSchools: 48
           };
         }
       });
       await submit;
-
       assert.equal(seattleSchoolsInput.value, "50");
-      assert.equal(operationCostInput.value, "1500");
+      assert.equal(seattleSchoolsInput.value, "50");
     },
     {
       fetchImplementation(url) {
@@ -697,24 +682,20 @@ test("failed build summary submits refetch and reconcile controls to authority",
     async ({
       events,
       buildSummaryForm,
-      operationCostInput,
       seattleSchoolsInput
     }) => {
       sendState(events, {
         revision: 1,
         raised: 50,
         goal: 100,
-        seattleSchools: 47,
-        operationCost: 1000
+        seattleSchools: 47
       });
       seattleSchoolsInput.value = "48";
-      operationCostInput.value = "1200";
-      await operationCostInput.dispatch("input");
+      await seattleSchoolsInput.dispatch("input");
       await buildSummaryForm.dispatch("submit");
 
       assert.deepEqual(requests, ["/api/state", "/api/state"]);
       assert.equal(seattleSchoolsInput.value, "51");
-      assert.equal(operationCostInput.value, "1750");
     },
     {
       fetchImplementation: async (url) => {
@@ -733,8 +714,7 @@ test("failed build summary submits refetch and reconcile controls to authority",
           async json() {
             return {
               revision: 2,
-              seattleSchools: 51,
-              operationCost: 1750
+              seattleSchools: 51
             };
           }
         };
@@ -753,30 +733,26 @@ test("failed build summary submit and refetch reconcile held newer SSE authority
       buildSummaryForm,
       raisedInput,
       goalInput,
-      operationCostInput,
       seattleSchoolsInput
     }) => {
       sendState(events, {
         revision: 1,
         raised: 50,
         goal: 100,
-        seattleSchools: 47,
-        operationCost: 1000
+        seattleSchools: 47
       });
       raisedInput.value = "80";
       goalInput.value = "160";
       await raisedInput.dispatch("input");
       seattleSchoolsInput.value = "48";
-      operationCostInput.value = "1200";
-      await operationCostInput.dispatch("input");
+      await seattleSchoolsInput.dispatch("input");
 
       const submit = buildSummaryForm.dispatch("submit");
       sendState(events, {
         revision: 3,
         raised: 90,
         goal: 180,
-        seattleSchools: 50,
-        operationCost: 1500
+        seattleSchools: 50
       });
       resolveSubmit({
         ok: false,
@@ -789,7 +765,6 @@ test("failed build summary submit and refetch reconcile held newer SSE authority
 
       assert.deepEqual(requests, ["/api/state", "/api/state"]);
       assert.equal(seattleSchoolsInput.value, "50");
-      assert.equal(operationCostInput.value, "1500");
       assert.equal(raisedInput.value, "80");
       assert.equal(goalInput.value, "160");
       assert.equal(
@@ -812,7 +787,7 @@ test("failed build summary submit and refetch reconcile held newer SSE authority
   );
 });
 
-test("valid goal drafts update the 200% slider range without invalid NaN state", async () => {
+test("valid goal drafts update the 120% slider range without invalid NaN state", async () => {
   await withControlHarness(async ({
     events,
     goalInput,
@@ -822,7 +797,7 @@ test("valid goal drafts update the 200% slider range without invalid NaN state",
 
     goalInput.value = "200.5";
     await goalInput.dispatch("input");
-    assert.equal(raisedSlider.max, "401");
+    assert.equal(raisedSlider.max, "240.6");
     assert.equal(raisedSlider.value, "120");
     assert.match(raisedSlider.getAttribute("aria-valuetext"), /59\.9% of goal/);
 

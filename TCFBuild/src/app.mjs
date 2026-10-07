@@ -17,6 +17,11 @@ import { createFundraiserView, deriveFittedFontSize } from "./render.mjs";
 
 const config = parseConfig(window.location.search);
 const root = document.querySelector("#fundraiser");
+const displayClient =
+  new URLSearchParams(window.location.search).get("client") === "preview"
+    ? "preview"
+    : "presentation";
+root.dataset.client = displayClient;
 const scene = createScene(config);
 const view = createFundraiserView(root, scene, config);
 const announcer = document.querySelector("#announcer");
@@ -573,10 +578,7 @@ function connectEvents() {
     announce("Live control connection is unavailable; keyboard controls remain active.");
     return;
   }
-  const role = new URLSearchParams(window.location.search).get("client") === "preview"
-    ? "preview"
-    : "presentation";
-  const events = new EventSource(`/events?role=${role}`);
+  const events = new EventSource(`/events?role=${displayClient}`);
   events.addEventListener("open", () => {
     root.dataset.connection = "connected";
   });

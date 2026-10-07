@@ -216,8 +216,15 @@ test("serves isolated display and control surfaces with security headers", async
     assert.match(controlHtml, /data-action="firework\.launch"/);
     assert.match(controlHtml, /data-action="school\.add"/);
     assert.match(controlHtml, /data-action="school\.remove"/);
-    assert.match(controlHtml, /max="200000"/);
-    assert.match(controlHtml, /max="4503599627370495\.5"/);
+    assert.match(controlHtml, /data-progress-set="1\.2"/);
+    assert.match(
+      controlHtml,
+      /id="goal-input"[^>]*max="7505999378950826"/
+    );
+    assert.match(
+      controlHtml,
+      /id="raised-slider"[^>]*max="120000"/
+    );
 
     const runtime = await fetch(`${controlBase}/api/runtime`);
     assert.equal(runtime.status, 200);
@@ -307,18 +314,18 @@ test("shares strict state mutations across listeners", async () => {
     const exactEndpoint = await fetch(`${controlBase}/api/state`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ raised: 200000, goal: 100000 })
+      body: JSON.stringify({ raised: 120000, goal: 100000 })
     });
     assert.equal(exactEndpoint.status, 200);
 
     const aboveEndpoint = await fetch(`${controlBase}/api/state`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ raised: adjacentFloat(200000, 1) })
+      body: JSON.stringify({ raised: adjacentFloat(120000, 1) })
     });
     assert.equal(aboveEndpoint.status, 400);
     assert.deepEqual(await aboveEndpoint.json(), {
-      error: "raised must be no more than 200% of goal."
+      error: "raised must be no more than 120% of goal."
     });
 
     const invalidGoalReduction = await fetch(`${controlBase}/api/state`, {
@@ -328,11 +335,11 @@ test("shares strict state mutations across listeners", async () => {
     });
     assert.equal(invalidGoalReduction.status, 400);
     assert.deepEqual(await invalidGoalReduction.json(), {
-      error: "raised must be no more than 200% of goal."
+      error: "raised must be no more than 120% of goal."
     });
     const endpointState = await fetch(`${displayBase}/api/state`)
       .then((response) => response.json());
-    assert.equal(endpointState.raised, 200000);
+    assert.equal(endpointState.raised, 120000);
     assert.equal(endpointState.goal, 100000);
   });
 });
@@ -381,7 +388,7 @@ test("SSE roles separate preview presence from presentation readiness", async ()
     const invalid = await fetch(`${controlBase}/api/state`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ raised: 200001, goal: 100000 })
+      body: JSON.stringify({ raised: 120001, goal: 100000 })
     });
     assert.equal(invalid.status, 400);
     await new Promise((resolve) => setTimeout(resolve, 20));
@@ -546,7 +553,7 @@ test("strict commands are atomic, concurrent-safe, protected, and revisioned onc
     });
     assert.equal(saturated.status, 200);
     const saturatedState = await saturated.json();
-    assert.equal(saturatedState.raised, 200000);
+    assert.equal(saturatedState.raised, 120000);
     assert.equal(Number.isFinite(saturatedState.raised), true);
     assert.equal(saturatedState.revision, 21);
     assert.deepEqual(
@@ -716,16 +723,18 @@ test("authoritative demo preserves milestones and exact maximum before looping",
   shared.command({ type: "state.toggle", field: "demoActive" });
   assert.deepEqual(clock.intervalDelays, [200]);
   assert.equal(shared.getState().revision, 1);
-  clock.advance(90000);
-  assert.equal(shared.getState().raised, 125000);
-  clock.advance(7200);
-  assert.equal(shared.getState().raised, 135000);
-  clock.advance(46800);
-  assert.equal(shared.getState().raised, 200000);
+  clock.advance(28800);
+  assert.equal(shared.getState().raised, 40000);
+  clock.advance(14400);
+  assert.equal(shared.getState().raised, 60000);
+  clock.advance(28800);
+  assert.equal(shared.getState().raised, 100000);
+  clock.advance(14400);
+  assert.equal(shared.getState().raised, 120000);
   const maxRevision = shared.getState().revision;
   clock.advance(200);
   assert.ok(shared.getState().raised > 0);
-  assert.ok(shared.getState().raised < 200000);
+  assert.ok(shared.getState().raised < 120000);
   assert.equal(shared.getState().revision, maxRevision + 1);
   shared.closeClients();
 });

@@ -41,12 +41,12 @@ test("default configuration is the frozen event configuration", () => {
     currency: "USD",
     locale: "en-US",
     maxStudents: 24,
-    overGoalRamp: 0.25,
+    overGoalRamp: 0.15,
     animationTimeConstantMs: 420,
-    demoDurationMs: 144000
+    demoDurationMs: 86400
   });
-  assert.equal(MAX_PROGRESS_RATIO, 2);
-  assert.equal(MAX_GOAL, 4503599627370495.5);
+  assert.equal(MAX_PROGRESS_RATIO, 1.2);
+  assert.equal(MAX_GOAL, 7505999378950826);
 });
 
 test("URL configuration accepts valid event parameters and rejects invalid values", () => {
@@ -76,7 +76,7 @@ test("URL configuration accepts valid event parameters and rejects invalid value
   );
   assert.deepEqual(
     parseConfig("?raised=210000").authoritativeInitialState,
-    { raised: 200000 }
+    { raised: 120000 }
   );
 
   const arbitrary = parseConfig("?goal=12345&raised=123.75");
@@ -91,13 +91,13 @@ test("URL configuration accepts valid event parameters and rejects invalid value
   assert.equal(parseConfig(`?goal=${MAX_GOAL}`).goal, MAX_GOAL);
   assert.equal(parseConfig(`?goal=${MIN_GOAL / 2}`).goal, DEFAULT_CONFIG.goal);
   assert.equal(parseConfig(`?goal=${MAX_GOAL + 1}`).goal, DEFAULT_CONFIG.goal);
-  assert.equal(parseConfig(`?raised=${MAX_RAISED}`).raised, 200000);
+  assert.equal(parseConfig(`?raised=${MAX_RAISED}`).raised, 120000);
   assert.equal(
     parseConfig(`?goal=${MAX_GOAL}&raised=${MAX_RAISED}`).raised,
     MAX_RAISED
   );
   assert.equal(parseConfig(`?raised=${MAX_RAISED * 2}`).raised, DEFAULT_CONFIG.raised);
-  assert.equal(parseConfig("?goal=100000&raised=210000").raised, 200000);
+  assert.equal(parseConfig("?goal=100000&raised=210000").raised, 120000);
   assert.equal(clampAmount(Number.POSITIVE_INFINITY), MAX_RAISED);
   assert.equal(clampAmount(Number.MAX_VALUE), MAX_RAISED);
 });
@@ -106,14 +106,14 @@ test("operator controls preserve accepted values and normalize slider values", (
   const fractional = deriveOperatorControlValues(123.75, 12345);
   assert.equal(fractional.raised, "123.75");
   assert.equal(fractional.goal, "12345");
-  assert.equal(fractional.sliderMax, "24690");
+  assert.equal(fractional.sliderMax, "14814");
   assert.equal(fractional.sliderValue, "123.75");
 
   assert.deepEqual(deriveOperatorControlValues(20000.5, 12345), {
     raised: "20000.5",
     goal: "12345",
-    sliderMax: "24690",
-    sliderValue: "20000.5"
+    sliderMax: "14814",
+    sliderValue: "14814"
   });
 
   const upperBound = deriveOperatorControlValues(MAX_RAISED, MAX_GOAL);
@@ -124,7 +124,7 @@ test("operator controls preserve accepted values and normalize slider values", (
 
   const lowerBound = deriveOperatorControlValues(MIN_GOAL, MIN_GOAL);
   assert.equal(lowerBound.goal, String(MIN_GOAL));
-  assert.equal(lowerBound.sliderMax, "0.02");
+  assert.equal(lowerBound.sliderMax, "0.012");
   assert.equal(lowerBound.sliderValue, "0.01");
 
   const keyboardNoise = deriveOperatorControlValues(56000.00000000001, 100000);
@@ -183,7 +183,7 @@ test("operator submissions require valid raised and goal values atomically", () 
   assert.deepEqual(validateOperatorAmounts("200001", "100000"), {
     valid: false,
     field: "raised",
-    message: "Enter a raised amount no greater than 200% of the goal."
+    message: "Enter a raised amount no greater than 120% of the goal."
   });
 
   for (const [raised, goal, field] of [
@@ -239,7 +239,7 @@ test("accepted goal bounds complete the slider, demo, and keyboard journey", () 
     assert.equal(deriveProgress(demoEndpoint, goal).busRatio, 1);
 
     let keyboardRaised = 0;
-    for (let step = 0; step < 200; step += 1) {
+    for (let step = 0; step < 120; step += 1) {
       const nextRaised = addRaisedAmount(keyboardRaised, goal, 0.01);
       assert.ok(nextRaised > keyboardRaised);
       keyboardRaised = nextRaised;
@@ -249,7 +249,7 @@ test("accepted goal bounds complete the slider, demo, and keyboard journey", () 
     assert.equal(deriveProgress(keyboardRaised, goal).busRatio, 1);
 
     let shiftedKeyboardRaised = 0;
-    for (let step = 0; step < 40; step += 1) {
+    for (let step = 0; step < 24; step += 1) {
       shiftedKeyboardRaised = addRaisedAmount(shiftedKeyboardRaised, goal, 0.05);
     }
     assert.equal(shiftedKeyboardRaised, endpoint);
@@ -310,16 +310,16 @@ test("keyboard percentages preserve exact grid steps without generic endpoint sn
     precisionHostileEndpoint
   );
   assert.equal(
-    addRaisedAmount(precisionHostileGoal * 1.22, precisionHostileGoal, 0.05),
-    precisionHostileGoal * 1.27
+    addRaisedAmount(precisionHostileGoal * 1.12, precisionHostileGoal, 0.05),
+    precisionHostileGoal * 1.17
   );
 
-  assert.equal(addRaisedAmount(125000, 100000, 0.01), 126000);
-  assert.equal(addRaisedAmount(122000, 100000, 0.05), 127000);
-  assert.equal(addRaisedAmount(200000, 100000, 0.01), 200000);
+  assert.equal(addRaisedAmount(119000, 100000, 0.01), 120000);
+  assert.equal(addRaisedAmount(115000, 100000, 0.05), 120000);
+  assert.equal(addRaisedAmount(120000, 100000, 0.01), 120000);
 });
 
-test("deriveProgress preserves campus timing and adds the 125..135% bus phase", () => {
+test("deriveProgress preserves the six authoritative fundraising stages", () => {
   assert.deepEqual(deriveProgress(0, 100000), {
     donationRatio: 0,
     buildingRatio: 0,
@@ -332,46 +332,36 @@ test("deriveProgress preserves campus timing and adds the 125..135% bus phase", 
   });
   assert.deepEqual(deriveProgress(50000, 100000), {
     donationRatio: .5,
-    buildingRatio: .5,
+    buildingRatio: .6266233766233766,
     studentRatio: 0,
     goalAchieved: false,
-    swingRatio: 0,
+    swingRatio: 1,
     teacherRatio: 0,
     playgroundRatio: 0,
-    busRatio: 0
+    busRatio: .4999999999999999
   });
   assert.deepEqual(deriveProgress(100000, 100000), {
     donationRatio: 1,
     buildingRatio: 1,
-    studentRatio: 0,
+    studentRatio: .5,
     goalAchieved: true,
-    swingRatio: 0,
+    swingRatio: 1,
     teacherRatio: 0,
     playgroundRatio: 0,
-    busRatio: 0
+    busRatio: 1
   });
-  assert.deepEqual(deriveProgress(125000, 100000), {
-    donationRatio: 1.25,
+  assert.deepEqual(deriveProgress(110000, 100000), {
+    donationRatio: 1.1,
     buildingRatio: 1,
-    studentRatio: 1,
+    studentRatio: .7500000000000002,
     goalAchieved: true,
     swingRatio: 1,
-    teacherRatio: 1,
-    playgroundRatio: 1,
-    busRatio: 0
+    teacherRatio: .5000000000000004,
+    playgroundRatio: .5000000000000004,
+    busRatio: 1
   });
-  assert.deepEqual(deriveProgress(130000, 100000), {
-    donationRatio: 1.3,
-    buildingRatio: 1,
-    studentRatio: 1,
-    goalAchieved: true,
-    swingRatio: 1,
-    teacherRatio: 1,
-    playgroundRatio: 1,
-    busRatio: .5
-  });
-  assert.deepEqual(deriveProgress(135000, 100000), {
-    donationRatio: 1.35,
+  assert.deepEqual(deriveProgress(120000, 100000), {
+    donationRatio: 1.2,
     buildingRatio: 1,
     studentRatio: 1,
     goalAchieved: true,
@@ -392,25 +382,25 @@ test("deriveProgress preserves campus timing and adds the 125..135% bus phase", 
   });
 });
 
-test("over-goal campus ratios honor every frozen threshold", () => {
+test("campus ratios honor every frozen threshold", () => {
   const cases = [
-    [1, true, 0, 0, 0, 0],
-    [1.03, true, 0, 0, 0, 0],
-    [1.065, true, .5, 0, 0, 0],
-    [1.10, true, 1, 0, 0, 0],
-    [1.135, true, 1, .5, 0, 0],
-    [1.17, true, 1, 1, 0, 0],
-    [1.21, true, 1, 1, .5, 0],
-    [1.25, true, 1, 1, 1, 0],
-    [1.30, true, 1, 1, 1, .5],
-    [1.35, true, 1, 1, 1, 1],
-    [1.75, true, 1, 1, 1, 1]
+    [0, false, 0, 0, 0, 0, 0],
+    [.2, false, 0, 0, 0, 0, 0],
+    [.3, false, .5, 0, 0, 0, 0],
+    [.4, false, 1, 0, 0, 0, 0],
+    [.5, false, 1, 0, 0, 0, .5],
+    [.6, false, 1, 0, 0, 0, 1],
+    [.8, false, 1, 0, 0, 0, 1],
+    [1, true, 1, .5, 0, 0, 1],
+    [1.1, true, 1, .75, .5, .5, 1],
+    [1.2, true, 1, 1, 1, 1, 1]
   ];
 
   for (const [
     donationRatio,
     goalAchieved,
     swingRatio,
+    studentRatio,
     teacherRatio,
     playgroundRatio,
     busRatio
@@ -418,12 +408,13 @@ test("over-goal campus ratios honor every frozen threshold", () => {
     const progress = deriveProgress(donationRatio * 100000, 100000);
     assert.equal(progress.goalAchieved, goalAchieved);
     assert.ok(Math.abs(progress.swingRatio - swingRatio) < 1e-12);
+    assert.ok(Math.abs(progress.studentRatio - studentRatio) < 1e-12);
     assert.ok(Math.abs(progress.teacherRatio - teacherRatio) < 1e-12);
     assert.ok(Math.abs(progress.playgroundRatio - playgroundRatio) < 1e-12);
     assert.ok(Math.abs(progress.busRatio - busRatio) < 1e-12);
   }
 
-  for (const endpoint of [1.25, 1.35]) {
+  for (const endpoint of [.2, .4, .6, .8, 1, 1.2]) {
     const below = deriveProgress(adjacentFloat(endpoint, -1) * 100000, 100000);
     const exact = deriveProgress(endpoint * 100000, 100000);
     const above = deriveProgress(adjacentFloat(endpoint, 1) * 100000, 100000);
@@ -432,24 +423,24 @@ test("over-goal campus ratios honor every frozen threshold", () => {
   }
 
   const hostileGoal = 240429705269.63782;
-  const hostileMidpoint = deriveProgress(hostileGoal * 1.30, hostileGoal);
-  assert.equal(hostileMidpoint.donationRatio, 1.30);
-  assert.equal(hostileMidpoint.busRatio, .5);
+  const hostileMidpoint = deriveProgress(hostileGoal * .50, hostileGoal);
+  assert.equal(hostileMidpoint.donationRatio, .50);
+  assert.ok(Math.abs(hostileMidpoint.busRatio - .5) < 1e-12);
 });
 
-test("bus reveal preserves adjacent raised precision inside both endpoints", () => {
+test("bus reveal preserves raised precision inside both endpoints", () => {
   const goal = 100000;
-  const startRaised = goal * 1.25;
-  const endRaised = goal * 1.35;
-  const justInsideStart = adjacentFloat(startRaised, 1);
-  const justInsideEnd = adjacentFloat(endRaised, -1);
+  const startRaised = goal * .4;
+  const endRaised = goal * .6;
+  const justInsideStart = startRaised + .000001;
+  const justInsideEnd = endRaised - .000001;
   const startProgress = deriveProgress(justInsideStart, goal);
   const endProgress = deriveProgress(justInsideEnd, goal);
 
   assert.ok(justInsideStart > startRaised);
   assert.ok(justInsideEnd < endRaised);
-  assert.ok(startProgress.donationRatio > 1.25);
-  assert.ok(endProgress.donationRatio < 1.35);
+  assert.ok(startProgress.donationRatio > .4);
+  assert.ok(endProgress.donationRatio < .6);
   assert.ok(startProgress.busRatio > 0);
   assert.ok(startProgress.busRatio < 1);
   assert.ok(endProgress.busRatio > 0);

@@ -107,9 +107,9 @@
             { locale: "en-US", currency: "USD" }
           );
           view.update({
-            raised: 135000,
+            raised: 120000,
             goal: 100000,
-            ...deriveProgress(135000, 100000),
+            ...deriveProgress(120000, 100000),
             reducedMotion: true,
             celebrationActive: false
           });
@@ -299,28 +299,28 @@
     }
 
     const paintedStudentMilestones = Object.freeze([
-      103,
+      40,
+      50,
+      60,
+      80,
+      90,
+      100,
+      105,
       110,
-      111.482,
-      113.5,
-      121,
-      124.0372,
-      124.5,
-      125,
-      130,
-      135
+      115,
+      120
     ]);
 
     const paintedMaskSupersample = 2;
     const animatedStudentTargetPercents = Object.freeze([
-      ...[24, 28, 32, 35].flatMap((studentIndex) =>
+      ...[12, 16, 20, 23].flatMap((studentIndex) =>
         [.68048, .69344, .7064].map((reveal) =>
-          100 + (studentIndex + reveal) / 36 * 25
+          80 + (studentIndex + reveal) / 24 * 40
         )
       ),
-      125,
-      130,
-      135
+      100,
+      110,
+      120
     ]);
 
     async function measurePaintedStudentAndBusIntersections() {
@@ -341,11 +341,20 @@
         const svgViewport = probe.root.querySelector("#school-scene");
         const students = [...probe.root.querySelectorAll(".student")];
         const bus = probe.root.querySelector(".school-bus");
-        const trees = [...probe.root.querySelectorAll(".tree")];
+        const stageBounds = stage.getBoundingClientRect();
+        const svgBounds = svgViewport.getBoundingClientRect();
+        const trees = [...probe.root.querySelectorAll(".tree")].filter(
+          (tree) => {
+            const bounds = tree.getBoundingClientRect();
+            return bounds.left < svgBounds.right
+              && bounds.right > svgBounds.left
+              && bounds.top < svgBounds.bottom
+              && bounds.bottom > svgBounds.top;
+          }
+        );
         const obstacles = [
           ...trees.map((tree, index) => [`tree-${index}`, tree]),
           ["playground", probe.root.querySelector(".swings")],
-          ["teacher", probe.root.querySelector(".teacher")],
           ["school", probe.root.querySelector(".school")]
         ];
         if (
@@ -355,8 +364,6 @@
         ) {
           throw new Error("painted bus obstacle probe did not render");
         }
-        const stageBounds = stage.getBoundingClientRect();
-        const svgBounds = svgViewport.getBoundingClientRect();
         const svgRasterWidth = Math.round(svgBounds.width);
         const svgRasterHeight = Math.round(svgBounds.height);
         const supersampledSvgWidth =
@@ -418,12 +425,22 @@
             return { left, top, width: 0, height: 0, alpha: new Uint8Array() };
           }
 
+          const paintedElement = element.cloneNode(true);
+          paintedElement.querySelectorAll(".student-thank-you, [opacity]")
+            .forEach((candidate) => {
+              if (
+                candidate.classList.contains("student-thank-you")
+                || Number(candidate.getAttribute("opacity")) === 0
+              ) {
+                candidate.remove();
+              }
+            });
           const source = [
             `<svg xmlns="http://www.w3.org/2000/svg"`,
             ` width="${rasterWidth}" height="${rasterHeight}"`,
             ` viewBox="${left / svgScaleX} ${top / svgScaleY}`,
             ` ${rasterWidth / svgScaleX} ${rasterHeight / svgScaleY}">`,
-            new XMLSerializer().serializeToString(element),
+            new XMLSerializer().serializeToString(paintedElement),
             "</svg>"
           ].join("");
           const image = await loadImage(source);
@@ -525,11 +542,10 @@
         const obstacleIntersections = Object.fromEntries(
           obstacles.map(([name]) => [name, 0])
         );
-        let treeIntersectionsAt130 = 0;
-        let treeStatesAt130 = 0;
-        let teacherPlacementValid = true;
-        let teacherPlacementStates = 0;
+        let treeIntersectionsAt50 = 0;
+        let treeStatesAt50 = 0;
         let stageEdgeViolations = 0;
+        let rightEdgeEntryStates = 0;
         const maximumScannedPercent = { full: 0, reduced: 0 };
         const scannedBusStates = { full: 0, reduced: 0 };
         let firstStudentIntersection = null;
@@ -593,14 +609,6 @@
             maximumScannedPercent[motion],
             percent
           );
-          if (phase === "static" && percent === 125) {
-            teacherPlacementStates += 1;
-            teacherPlacementValid &&=
-              obstacles.find(([name]) => name === "teacher")[1]
-                .getAttribute("transform")
-                === "translate(550 698) scale(1.08)";
-          }
-
           const visibleStudents = students
             .map((student, index) => ({ student, index }))
             .filter(({ student }) =>
@@ -670,9 +678,9 @@
                 await rasterize(element)
               );
               obstacleIntersections[name] += intersections;
-              if (name.startsWith("tree-") && percent === 130) {
-                treeStatesAt130 += 1;
-                treeIntersectionsAt130 += intersections;
+              if (name.startsWith("tree-") && percent === 50) {
+                treeStatesAt50 += 1;
+                treeIntersectionsAt50 += intersections;
               }
               if (intersections > 0) {
                 recordPaintedIntersection("bus", {
@@ -688,10 +696,16 @@
               }
             }
             const busBounds = bus.getBoundingClientRect();
+            const busFullyArrived =
+              bus.getAttribute("transform") === "translate(0 0)";
+            if (busBounds.right > stageBounds.right && !busFullyArrived) {
+              rightEdgeEntryStates += 1;
+            }
             if (
               busBounds.top < stageBounds.top
-              || busBounds.right > stageBounds.right
+              || busBounds.left < stageBounds.left
               || busBounds.bottom > stageBounds.bottom
+              || (busFullyArrived && busBounds.right > stageBounds.right)
             ) {
               stageEdgeViolations += 1;
             }
@@ -729,7 +743,7 @@
           }
         }
 
-        const animatedBaselinePercent = 100 + 24 / 36 * 25;
+        const animatedBaselinePercent = 100;
         const updateAnimatedTarget = (percent, reducedMotion, deltaMs) => {
           const ratio = percent / 100;
           return probe.view.update({
@@ -802,12 +816,6 @@
           trunkHeights.join(",");
         document.body.dataset.treeGeometryValid =
           String(treeGeometryValid);
-        document.body.dataset.teacherTransform =
-          "translate(550 698) scale(1.08)";
-        document.body.dataset.teacherPlacementValid =
-          String(teacherPlacementValid && teacherPlacementStates === 4);
-        document.body.dataset.teacherPlacementStates =
-          String(teacherPlacementStates);
         document.body.dataset.paintedMaskStaticStates = String(
           scannedStaticStates
         );
@@ -829,12 +837,15 @@
         );
         document.body.dataset.paintedBusObstacleIntersections =
           JSON.stringify(obstacleIntersections);
-        document.body.dataset.paintedBusTreeIntersectionsAt130 =
-          String(treeIntersectionsAt130);
-        document.body.dataset.paintedBusTreeStatesAt130 =
-          String(treeStatesAt130);
+        document.body.dataset.paintedBusTreeIntersectionsAt50 =
+          String(treeIntersectionsAt50);
+        document.body.dataset.paintedBusTreeStatesAt50 =
+          String(treeStatesAt50);
         document.body.dataset.paintedBusStageEdgeViolations = String(
           stageEdgeViolations
+        );
+        document.body.dataset.paintedBusRightEdgeEntryStates = String(
+          rightEdgeEntryStates
         );
         document.body.dataset.paintedBusFullMaxPercent =
           maximumScannedPercent.full.toFixed(3);
@@ -851,20 +862,19 @@
             && scannedStaticStates === 40
             && scannedAnimatedFrames
               > animatedStudentTargetPercents.length * 2,
-          busPhaseComplete: maximumScannedPercent.full === 135
-            && maximumScannedPercent.reduced === 135
+          busPhaseComplete: maximumScannedPercent.full === 120
+            && maximumScannedPercent.reduced === 120
             && scannedBusStates.full > 0
             && scannedBusStates.reduced > 0,
           studentIntersections,
           busIntersections,
           obstacleIntersections,
-          treeIntersectionsAt130,
-          treeStatesAt130,
+          treeIntersectionsAt50,
+          treeStatesAt50,
           stageEdgeViolations,
+          rightEdgeEntryStates,
           rasterOriginUsesSvgBounds,
           treeGeometryValid,
-          teacherPlacementValid:
-            teacherPlacementValid && teacherPlacementStates === 4,
           firstStudentIntersection,
           firstBusIntersection
         };
@@ -896,12 +906,12 @@
     async function paintedBusClearsCampusObstaclesAndStageEdges() {
       const measurement = await getPaintedIntersectionMeasurement();
       return measurement.scanComplete
-        && measurement.teacherPlacementValid
         && Object.values(measurement.obstacleIntersections)
           .every((count) => count === 0)
-        && measurement.treeStatesAt130 > 0
-        && measurement.treeIntersectionsAt130 === 0
-        && measurement.stageEdgeViolations === 0;
+        && measurement.treeStatesAt50 > 0
+        && measurement.treeIntersectionsAt50 === 0
+        && measurement.stageEdgeViolations === 0
+        && measurement.rightEdgeEntryStates > 0;
     }
 
     async function prominentTreeTrunkGeometryIsScoped() {
@@ -930,6 +940,21 @@
           0,
           Math.min(first.bottom, second.bottom) - Math.max(first.top, second.top)
         );
+      const paintedStudentBounds = (student) => {
+        const paintedElements = [
+          student.querySelector(".student-ground-shadow"),
+          student.querySelector(".student-figure-motion")
+        ].filter(Boolean);
+        const bounds = paintedElements.map((element) =>
+          element.getBoundingClientRect()
+        );
+        return {
+          left: Math.min(...bounds.map((value) => value.left)),
+          right: Math.max(...bounds.map((value) => value.right)),
+          top: Math.min(...bounds.map((value) => value.top)),
+          bottom: Math.max(...bounds.map((value) => value.bottom))
+        };
+      };
       try {
         const bus = probe.root.querySelector(".school-bus");
         const students = [...probe.root.querySelectorAll(".student")];
@@ -942,9 +967,9 @@
           let busIntersections = 0;
           probe.root.dataset.motion = reducedMotion ? "reduce" : "full";
           for (const direction of ["ascending", "descending"]) {
-            for (let sample = 0; sample <= 1400; sample += 1) {
-              const step = direction === "ascending" ? sample : 1400 - sample;
-              const ratio = 1 + .00025 * step;
+            for (let sample = 0; sample <= 1600; sample += 1) {
+              const step = direction === "ascending" ? sample : 1600 - sample;
+              const ratio = .8 + .00025 * step;
               probe.view.update({
                 raised: ratio * 100000,
                 goal: 100000,
@@ -960,7 +985,7 @@
                 .filter((student) => Number(student.getAttribute("opacity")) > 0)
                 .map((student) => ({
                   student,
-                  bounds: student.getBoundingClientRect()
+                  bounds: paintedStudentBounds(student)
                 }));
               for (let first = 0; first < visibleStudents.length; first += 1) {
                 for (
@@ -1008,9 +1033,9 @@
         }
 
         probe.view.update({
-          raised: 135000,
+          raised: 120000,
           goal: 100000,
-          ...deriveProgress(135000, 100000),
+          ...deriveProgress(120000, 100000),
           reducedMotion: true,
           celebrationActive: false
         });
@@ -1056,7 +1081,7 @@
         && measurements.reduced.maximumOverlapArea < 850
         && measurements.full.overlapViolations === 0
         && measurements.reduced.overlapViolations === 0
-        && distinctStudentPlacements === 36;
+        && distinctStudentPlacements === 24;
     }
 
     async function busBoundsClearStudentsAcrossFullRamp() {
@@ -1126,6 +1151,9 @@
           screenPoint(cloth, 132, 10),
           screenPoint(cloth, 132, 78)
         ];
+        const renderedUnitScale =
+          distance(screenPoint(cloth, 0, 44), screenPoint(cloth, 132, 44))
+          / 132;
         animation.currentTime = 2799;
         await new Promise(requestAnimationFrame);
         const secondPole = [
@@ -1142,12 +1170,21 @@
         const flyMovement = Math.max(
           ...firstFly.map((point, index) => distance(point, secondFly[index]))
         );
+        const normalizedPoleMovement = poleMovement / renderedUnitScale;
+        const normalizedFlyMovement = flyMovement / renderedUnitScale;
         document.body.dataset.flagDimensions = "132x88";
         document.body.dataset.flagHoistWidth = "33";
         document.body.dataset.flagTransformOrigin = computedOrigin;
         document.body.dataset.flagPoleMovement = poleMovement.toFixed(3);
         document.body.dataset.flagFlyMovement = flyMovement.toFixed(3);
-        return poleMovement <= .1 && flyMovement >= 4;
+        document.body.dataset.flagRenderedUnitScale =
+          renderedUnitScale.toFixed(6);
+        document.body.dataset.flagNormalizedPoleMovement =
+          normalizedPoleMovement.toFixed(3);
+        document.body.dataset.flagNormalizedFlyMovement =
+          normalizedFlyMovement.toFixed(3);
+        return normalizedPoleMovement <= .1
+          && normalizedFlyMovement >= 4;
       } finally {
         probe.remove();
       }
@@ -1190,31 +1227,35 @@
         || root.querySelector("#over-goal-message").hidden
       ) return false;
 
-      update(1.065);
+      update(.3);
       if (root.dataset.swingPercent !== "50.000") return false;
-      update(1.135);
+      update(1.1);
       if (
         root.dataset.teacherPercent !== "50.000"
-        || root.dataset.visibleTeachers !== "1.000000"
+        || root.dataset.visibleTeachers !== "0.000000"
       ) return false;
-      update(1.30);
+      update(.5);
       if (
         root.dataset.busPercent !== "50.000"
         || root.querySelector(".school-bus").getAttribute("transform")
           !== "translate(68.75 -14.38)"
       ) return false;
-      update(1.30, true);
+      update(.5, true);
       if (
         root.querySelector(".school-bus").getAttribute("transform")
           !== "translate(0 0)"
       ) return false;
-      update(1.35);
+      update(1.2);
       return root.dataset.studentPercent === "100.000"
+        && root.dataset.visibleStudents === "24.000000"
         && root.dataset.swingPercent === "100.000"
         && root.dataset.teacherPercent === "100.000"
+        && root.dataset.visibleTeachers === "0.000000"
         && root.dataset.busPercent === "100.000"
+        && root.querySelector(".campus-layer").getAttribute("transform")
+          === "translate(0 -150)"
         && root.querySelector("#percent-display").textContent
-          === "135% — campus ready!";
+          === "120% — full campus complete!";
     }
 
     async function suppliedLogoLoads() {
@@ -1270,15 +1311,15 @@
       context.drawImage(image, 0, 0);
       const windowXs = [569, 677, 785, 1109, 1217, 1325];
       const samples = windowXs.flatMap((x) => [
-        [x - 9, 575, "lower odd-row left fringe"],
-        [x + 71, 595, "lower even-row right fringe"],
-        [x - 9, 485, "upper odd-row left fringe"],
-        [x + 71, 465, "upper even-row right fringe"]
+        [x - 9, 425, "lower odd-row left fringe"],
+        [x + 71, 445, "lower even-row right fringe"],
+        [x - 9, 335, "upper odd-row left fringe"],
+        [x + 71, 315, "upper even-row right fringe"]
       ]);
       samples.push(
-        [1012, 510, "entrance arch shoulder"],
-        [1012, 530, "entrance lower stagger fringe"],
-        [913, 355, "tower arch shoulder"]
+        [1012, 360, "entrance arch shoulder"],
+        [1012, 380, "entrance lower stagger fringe"],
+        [913, 205, "tower arch shoulder"]
       );
 
       for (const [x, y, name] of samples) {
@@ -1291,28 +1332,39 @@
     }
 
     const checks = [
-      ["100% completes school with no students", () => {
+      ["100% completes school with 12 students", () => {
         const value = deriveProgress(100000, 100000);
-        return value.buildingRatio === 1 && value.studentRatio === 0;
+        return value.buildingRatio === 1 && value.studentRatio === .5;
       }],
-      ["125% fills students", () => deriveProgress(125000, 100000).studentRatio === 1],
-      ["Campus ramps honor 103/110/117/125/130/135 thresholds", () => {
-        const at103 = deriveProgress(103000, 100000);
+      ["120% fills students", () => deriveProgress(120000, 100000).studentRatio === 1],
+      ["Campus ramps honor 20/30/40/50/60/100/110/120 thresholds", () => {
+        const close = (actual, expected) =>
+          Math.abs(actual - expected) <= 16 * Number.EPSILON;
+        const at20 = deriveProgress(20000, 100000);
+        const at30 = deriveProgress(30000, 100000);
+        const at40 = deriveProgress(40000, 100000);
+        const at50 = deriveProgress(50000, 100000);
+        const at60 = deriveProgress(60000, 100000);
+        const at100 = deriveProgress(100000, 100000);
         const at110 = deriveProgress(110000, 100000);
-        const at117 = deriveProgress(117000, 100000);
-        const at125 = deriveProgress(125000, 100000);
-        const at130 = deriveProgress(130000, 100000);
-        const at135 = deriveProgress(135000, 100000);
-        return at103.goalAchieved
-          && at103.swingRatio === 0
-          && at110.swingRatio === 1
-          && at110.teacherRatio === 0
-          && at117.teacherRatio === 1
-          && at117.busRatio === 0
-          && at125.playgroundRatio === 1
-          && at125.busRatio === 0
-          && at130.busRatio === .5
-          && at135.busRatio === 1;
+        const at120 = deriveProgress(120000, 100000);
+        return !at20.goalAchieved
+          && at20.swingRatio === 0
+          && close(at30.swingRatio, .5)
+          && at40.swingRatio === 1
+          && at40.busRatio === 0
+          && close(at50.busRatio, .5)
+          && at60.busRatio === 1
+          && at100.goalAchieved
+          && at100.studentRatio === .5
+          && at100.teacherRatio === 0
+          && at100.playgroundRatio === 0
+          && close(at110.studentRatio, .75)
+          && close(at110.teacherRatio, .5)
+          && close(at110.playgroundRatio, .5)
+          && at120.studentRatio === 1
+          && at120.teacherRatio === 1
+          && at120.playgroundRatio === 1;
       }],
       ["Campus renderer reaches exact visual endpoints", campusThresholdsRender],
       ["Supplied TCF logo loads at its intrinsic dimensions", suppliedLogoLoads],
@@ -1443,17 +1495,17 @@
       ["Scene remains within limits", () => {
         const scene = createScene({ maxStudents: 24 });
         return scene.blocks.length === 308
-          && scene.students.length === 36
-          && scene.teachers.length === 2
+          && scene.students.length === 24
+          && scene.teachers.length === 0
           && Object.isFrozen(scene.campus);
       }],
       ["Student routes clear each other across the full ramp", studentRoutesClearAcrossFullRamp],
       ["Bus bounds clear students across the full ramp", busBoundsClearStudentsAcrossFullRamp],
       ["Painted student masks remain pixel-disjoint", paintedStudentMasksNeverIntersect],
-      ["Painted bus remains pixel-disjoint from students through 135%", paintedBusNeverIntersectsStudentsThroughBusPhase],
+      ["Painted bus remains pixel-disjoint from students through 120%", paintedBusNeverIntersectsStudentsThroughBusPhase],
       ["Only the prominent tree uses the shortened 76-unit trunk", prominentTreeTrunkGeometryIsScoped],
       ["Painted masks use the deliberately offset SVG viewport origin", paintedMasksUseSvgViewportOrigin],
-      ["Painted bus clears the tree, teacher, playground, school, and stage edges", paintedBusClearsCampusObstaclesAndStageEdges],
+      ["Painted bus clears campus obstacles and stays contained except during right-edge entry", paintedBusClearsCampusObstaclesAndStageEdges],
       ["Pakistan flag is exact and its wave stays pole-anchored", flagGeometryAndWaveArePoleAnchored],
       ["Completed facade has masonry pixels at former stagger leaks", completedFacadeHasNoSkyLeaks],
       ["Actual bus DOM clears overlays and painted keyboard descendants by 12px at responsive sizes", busClearsOverlaysAcrossViewports]

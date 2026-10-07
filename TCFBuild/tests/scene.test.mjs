@@ -211,11 +211,16 @@ test("student routes are frozen staged lanes with exact snap endpoints", () => {
   const students = createStudentLayout(24);
   for (const student of students) {
     const targetRow = Math.floor(student.index / 12);
-    const expectedLaneY = targetRow === 0
-      ? 812
-      : targetRow === 1
-        ? 880
-        : 960;
+    const usesUpperApproach = student.index === 22
+      || student.index === 10
+      || student.side > 0;
+    const expectedLaneY = usesUpperApproach
+      ? 620
+      : targetRow === 0
+        ? 812
+        : targetRow === 1
+          ? 880
+          : 960;
     const { route } = student;
     assert.ok(Object.isFrozen(route));
     assert.ok(Object.isFrozen(route.waypoints));
@@ -236,7 +241,10 @@ test("student routes are frozen staged lanes with exact snap endpoints", () => {
     });
     assert.ok(route.waypoints.some((point) => point.y === expectedLaneY));
     if (student.side > 0) {
-      assert.deepEqual(route.waypoints[0], { x: 1360, y: expectedLaneY });
+      assert.deepEqual(route.waypoints[0], {
+        x: 1360,
+        y: usesUpperApproach ? 620 : expectedLaneY
+      });
     }
     for (let index = 1; index < route.waypoints.length; index += 1) {
       const previous = route.waypoints[index - 1];
@@ -271,6 +279,95 @@ test("student routes are frozen staged lanes with exact snap endpoints", () => {
     () => deriveStudentRoutePosition(students[0], Number.NaN),
     /student reveal must be finite/
   );
+});
+
+test("bus-clearing student routes use the upper approach without moving targets", () => {
+  const scene = createScene({ maxStudents: 24 });
+  const [student22, student23] = scene.students.slice(22);
+  assert.deepEqual(
+    [student22, student23].map((student) => ({
+      index: student.index,
+      targetX: student.targetX,
+      targetY: student.targetY,
+      waypoints: student.route.waypoints
+    })),
+    [
+      {
+        index: 22,
+        targetX: 1240,
+        targetY: 760,
+        waypoints: [
+          { x: 247, y: 815 },
+          { x: 247, y: 620 },
+          { x: 1240, y: 620 },
+          { x: 1240, y: 760 }
+        ]
+      },
+      {
+        index: 23,
+        targetX: 1300,
+        targetY: 760,
+        waypoints: [
+          { x: 1360, y: 620 },
+          { x: 1300, y: 620 },
+          { x: 1300, y: 760 }
+        ]
+      }
+    ]
+  );
+
+  assert.deepEqual(
+    scene.students
+      .filter((student) => student.side > 0 || student.index === 10)
+      .map((student) => ({
+        index: student.index,
+        targetX: student.targetX,
+        targetY: student.targetY,
+        waypoints: student.route.waypoints
+      })),
+    scene.students
+      .filter((student) => student.side > 0 || student.index === 10)
+      .map((student) => ({
+        index: student.index,
+        targetX: student.targetX,
+        targetY: student.targetY,
+        waypoints: student.side > 0
+          ? [
+              { x: 1360, y: 620 },
+              { x: student.targetX, y: 620 },
+              { x: student.targetX, y: student.targetY }
+            ]
+          : [
+              { x: student.startX, y: student.startY },
+              { x: student.startX, y: 620 },
+              { x: student.targetX, y: 620 },
+              { x: student.targetX, y: student.targetY }
+            ]
+      }))
+  );
+
+  for (const student of [student22, student23]) {
+    const targetBounds = {
+      left: student.targetX + student.bounds.left * student.scale,
+      right: student.targetX + student.bounds.right * student.scale,
+      top: student.targetY + student.bounds.top * student.scale,
+      bottom: student.targetY + student.bounds.bottom * student.scale
+    };
+    assert.ok(targetBounds.bottom < scene.campus.bus.bounds.top);
+  }
+
+  for (const student of scene.students.slice(0, 22)) {
+    const targetColumn = student.index % 12;
+    const targetRow = Math.floor(student.index / 12);
+    assert.equal(
+      student.targetX,
+      610 + targetColumn * 60 + (targetRow % 2) * 30
+    );
+    assert.equal(
+      student.targetY,
+      722 + targetRow * 58 + (targetColumn % 3) * 2
+    );
+  }
 });
 
 test("full-motion student routes are continuous, bounded, and reverse deterministic", () => {
@@ -330,6 +427,8 @@ test("teachers are omitted and campus geometry is deeply frozen", () => {
     top: 695,
     bottom: 865
   });
+  assert.equal("braces" in scene.campus.swings, false);
+  assert.equal("ladder" in scene.campus.swings, false);
   assert.equal(scene.campus.distantSchools.length, 25);
   assert.deepEqual(
     scene.campus.distantSchools.map(({ slot }) => slot),

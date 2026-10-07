@@ -303,7 +303,8 @@ function createStudentRoute({
   startY,
   targetX,
   targetY,
-  targetRow
+  targetRow,
+  waypointOverride
 }) {
   const laneY = targetRow === 0
     ? 812
@@ -312,12 +313,12 @@ function createStudentRoute({
       : 960;
   const spawnX = side > 0 ? 1360 : startX;
   const spawnY = side > 0 ? laneY : startY;
-  const waypoints = [
-    [spawnX, spawnY],
-    [spawnX, laneY],
-    [targetX, laneY],
-    [targetX, targetY]
-  ]
+  const waypoints = (waypointOverride ?? [
+      [spawnX, spawnY],
+      [spawnX, laneY],
+      [targetX, laneY],
+      [targetX, targetY]
+    ])
     .filter((point, index, points) =>
       index === 0
       || point[0] !== points[index - 1][0]
@@ -387,14 +388,36 @@ export function createStudentLayout(maxStudents = 24) {
     const targetColumn = index % 12;
     const targetRow = Math.floor(index / 12);
     const targetX = 610 + targetColumn * 60 + (targetRow % 2) * 30;
-    const targetY = 722 + targetRow * 58 + (targetColumn % 3) * 2;
+    const clearsParkedBus = index === 22 || index === 23;
+    const targetY = clearsParkedBus
+      ? 760
+      : 722 + targetRow * 58 + (targetColumn % 3) * 2;
+    const startX = side < 0 ? 390 - lane * 13 : 1360;
+    const startY = 755 + (lane % 4) * 20;
+    const usesUpperApproach = index === 22
+      || index === 10
+      || side > 0;
     const route = createStudentRoute({
       side,
-      startX: side < 0 ? 390 - lane * 13 : 1360,
-      startY: 755 + (lane % 4) * 20,
+      startX,
+      startY,
       targetX,
       targetY,
-      targetRow
+      targetRow,
+      waypointOverride: usesUpperApproach && side < 0
+        ? [
+            [startX, startY],
+            [startX, 620],
+            [targetX, 620],
+            [targetX, targetY]
+          ]
+        : usesUpperApproach
+          ? [
+              [startX, 620],
+              [targetX, 620],
+              [targetX, targetY]
+            ]
+          : undefined
     });
     const figure = STUDENT_FIGURES[index % STUDENT_FIGURES.length];
     return Object.freeze({

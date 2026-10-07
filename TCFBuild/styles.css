@@ -526,6 +526,176 @@ body { display: grid; place-items: center; }
   transform: translateY(24px) scale(.9);
 }
 
+#fundraiser[data-display-mode="wide"] .build-card {
+  right: 23.1111cqh;
+  width: 32cqh;
+  padding: clamp(10px, 1.3333cqh, 24px);
+  border-radius: clamp(18px, 2.8444cqh, 60px);
+}
+
+#fundraiser[data-display-mode="wide"] .school-count-row {
+  gap: clamp(3px, .4444cqh, 8px);
+  padding: clamp(8px, .9778cqh, 18px);
+}
+
+#fundraiser[data-display-mode="wide"]
+  #build-summary-card[data-school-milestone="50"]
+  .school-count-row:last-child {
+  border-radius: clamp(12px, 1.7778cqh, 30px);
+}
+
+#fundraiser[data-display-mode="wide"] .school-count-label {
+  font-size: clamp(12px, 1.6cqh, 30px);
+}
+
+#fundraiser[data-display-mode="wide"] .build-card .build-value {
+  font-size: clamp(44px, 7.1111cqh, 136px);
+}
+
+#fundraiser[data-client="preview"] .total-box {
+  --bulb-step: 1.8cqw;
+  --bulb-depth: 1.0125cqw;
+  width: 40.5cqw;
+  padding: .4875cqw;
+  border-radius: 1.65cqw;
+}
+
+#fundraiser[data-client="preview"] .total-box-inner {
+  min-height: 12.75cqh;
+  padding: 1.65cqw;
+  border-width: .165cqw;
+  border-radius: 1.275cqw;
+}
+
+#fundraiser[data-client="preview"] .total-box-label {
+  font-size: 1.2cqw;
+}
+
+#fundraiser[data-client="preview"] .total-box-amount {
+  font-size: 5.25cqw;
+}
+
+#fundraiser[data-client="preview"] .school-commitment-box {
+  --bulb-step: 1.7cqw;
+  --bulb-depth: .95cqw;
+  width: 31cqw;
+}
+
+#fundraiser[data-client="preview"] .school-commitment-box .total-box-inner {
+  min-height: 9.5cqh;
+  padding: 1.15cqw;
+}
+
+#fundraiser[data-client="preview"] .school-commitment-box .total-box-label {
+  font-size: 1.15cqw;
+}
+
+#fundraiser[data-client="preview"] .school-commitment-count {
+  font-size: 4.2cqw;
+}
+
+#fundraiser[data-client="preview"] .build-card {
+  right: 13%;
+  width: 18cqw;
+  min-width: 0;
+  padding: .75cqw;
+  border-radius: 1.6cqw;
+}
+
+#fundraiser[data-client="preview"] .school-count-row {
+  gap: .25cqw;
+  padding: .55cqw;
+}
+
+#fundraiser[data-client="preview"]
+  #build-summary-card[data-school-milestone="50"]
+  .school-count-row:last-child {
+  border-radius: 1cqw;
+}
+
+#fundraiser[data-client="preview"] .school-count-label {
+  font-size: .9cqw;
+}
+
+#fundraiser[data-client="preview"] .build-card .build-value {
+  font-size: 4cqw;
+}
+
+#fundraiser[data-client="preview"][data-display-mode="wide"] .total-box {
+  --bulb-step: 3.2cqh;
+  --bulb-depth: 1.8cqh;
+  width: 68.3333cqh;
+  padding: .8667cqh;
+  border-radius: 2.9333cqh;
+}
+
+#fundraiser[data-client="preview"][data-display-mode="wide"] .total-box-inner {
+  padding: 2.9333cqh;
+  border-width: .2933cqh;
+  border-radius: 2.2667cqh;
+}
+
+#fundraiser[data-client="preview"][data-display-mode="wide"] .total-box-label {
+  font-size: 2.1333cqh;
+}
+
+#fundraiser[data-client="preview"][data-display-mode="wide"] .total-box-amount {
+  font-size: 9.3333cqh;
+}
+
+#fundraiser[data-client="preview"][data-display-mode="wide"]
+  .school-commitment-box {
+  --bulb-step: 3.0222cqh;
+  --bulb-depth: 1.6889cqh;
+  width: 52.2667cqh;
+}
+
+#fundraiser[data-client="preview"][data-display-mode="wide"]
+  .school-commitment-box
+  .total-box-inner {
+  min-height: 9.5cqh;
+  padding: 2.0444cqh;
+}
+
+#fundraiser[data-client="preview"][data-display-mode="wide"]
+  .school-commitment-box
+  .total-box-label {
+  font-size: 2.0444cqh;
+}
+
+#fundraiser[data-client="preview"][data-display-mode="wide"]
+  .school-commitment-count {
+  font-size: 7.4667cqh;
+}
+
+#fundraiser[data-client="preview"][data-display-mode="wide"] .build-card {
+  right: 23.1111cqh;
+  width: 32cqh;
+  padding: 1.3333cqh;
+  border-radius: 2.8444cqh;
+}
+
+#fundraiser[data-client="preview"][data-display-mode="wide"] .school-count-row {
+  gap: .4444cqh;
+  padding: .9778cqh;
+}
+
+#fundraiser[data-client="preview"][data-display-mode="wide"]
+  #build-summary-card[data-school-milestone="50"]
+  .school-count-row:last-child {
+  border-radius: 1.7778cqh;
+}
+
+#fundraiser[data-client="preview"][data-display-mode="wide"] .school-count-label {
+  font-size: 1.6cqh;
+}
+
+#fundraiser[data-client="preview"][data-display-mode="wide"]
+  .build-card
+  .build-value {
+  font-size: 7.1111cqh;
+}
+
 .progress-label {
   margin: 0;
   color: var(--green);
@@ -1247,6 +1417,10 @@ kbd {
 }
 
 @media (max-aspect-ratio: 4/3) {
+  .keyboard-hint {
+    bottom: min(1.5%, 4px);
+  }
+
   .progress-card {
     top: 2.2%;
     min-width: 260px;
@@ -1271,6 +1445,14 @@ kbd {
     margin-top: .35em;
     font-size: clamp(9px, .7cqw, 30px);
     line-height: 1.15;
+  }
+}
+
+@media (max-aspect-ratio: 2/3) {
+  .keyboard-hint {
+    bottom: 0;
+    font-size: 8px;
+    line-height: 1;
   }
 }
 
